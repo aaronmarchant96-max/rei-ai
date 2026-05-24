@@ -4,6 +4,8 @@ Debate Furnace is a React argument pressure-testing app. It runs both sides of a
 
 > We do not give you the answer. We show you what survived the heat.
 
+![Debate Furnace preview](assets/debate-furnace-preview.png)
+
 ## Features
 
 - Question type detection
