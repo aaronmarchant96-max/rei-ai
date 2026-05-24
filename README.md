@@ -4,6 +4,8 @@ Debate Furnace pressure-tests both sides of a question so you can see the real t
 
 > We pressure-test both sides. You decide what matters.
 
+![Debate Furnace preview](assets/debate-furnace-preview.png)
+
 ## Live Demo
 
 Live Vercel deployment: https://debate-furnace-prompthound.vercel.app/
