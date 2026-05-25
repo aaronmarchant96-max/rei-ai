@@ -69,8 +69,14 @@ function cleanQuestion(q) {
   return q.trim().replace(/\s+/g, " ");
 }
 
+function isStarterQuestion(q) {
+  const cleaned = cleanQuestion(q).toLowerCase();
+  return STARTERS.some((starter) => starter.toLowerCase() === cleaned);
+}
+
 function classify(question) {
   const l = question.toLowerCase();
+  if (l.includes("bush") && l.includes("obama")) return "policy";
   if (["uap", "ufo", "alien", "non-human", "non human", "unidentified anomalous", "bob lazar", "lazar", "area 51", "s4", "element 115", "sport model", "reverse engineering", "flying saucer"].some((x) => l.includes(x))) return "extraordinary";
   if (["seed oil", "seed oils"].some((x) => l.includes(x))) return "factual";
   if (["free will", "money the root", "pineapple on pizza"].some((x) => l.includes(x))) return "moral";
@@ -84,6 +90,7 @@ function classify(question) {
 
 function inferSides(question, type) {
   const l = question.toLowerCase();
+  if (l.includes("bush") && l.includes("obama")) return ["George W. Bush", "Barack Obama"];
   if (l.includes("bob lazar") || l.includes("lazar")) return ["Bob Lazar is telling the truth", "Bob Lazar has not proven his core claims"];
   if (l.includes("remote work") || l.includes("office work")) return ["Remote work is better", "Office work is better"];
   if (l.includes("seed oil")) return ["Seed oils are actually bad for you", "Seed oils are not uniquely bad for you"];
@@ -195,6 +202,59 @@ function genericProfile(question, a, b) {
 
 function profile(question, type, a, b) {
   const l = question.toLowerCase();
+  if (l.includes("bush") && l.includes("obama")) return {
+    label: "Presidential Comparison",
+    icon: "🏛",
+    criteria: ["crisis leadership", "foreign policy", "economic record", "civil liberties", "healthcare", "long-term consequences"],
+    desc: "This is a presidential comparison, not a simple personality contest. The real question depends on which standard matters most: crisis leadership, foreign policy judgment, economic stewardship, institutional trust, civil liberties, healthcare, or long-term damage control.",
+    rounds: [
+      [
+        "Bush's strongest case is leadership under immediate crisis. After 9/11, he projected steadiness at a moment when the country was shocked, frightened, and looking for direction. Supporters point to his ability to rally institutions, create a security posture against further attacks, and pass major bipartisan domestic policy like No Child Left Behind and Medicare Part D. The best Bush argument is not that every decision aged well; it is that he faced a uniquely severe national-security rupture and made hard choices under pressure.",
+        "Obama's strongest case is repair and restraint. He inherited a financial crisis, two wars, and collapsing public confidence, then stabilized the economy, expanded health coverage through the Affordable Care Act, and restored a calmer style of governance. Supporters argue that his presidency lowered the temperature, improved America's global image, and moved policy forward without creating disasters on the scale of Iraq. The best Obama argument is competence under constraint."
+      ],
+      [
+        "The Obama side cannot treat inherited difficulty as a blank check. Bush also inherited a changed world after 9/11, and presidents do not get to choose their crisis. Obama's foreign policy had its own failures: Libya's aftermath, drone-war expansion, Syria's red-line problem, and a recovery that many working-class voters experienced as slow and uneven. Bush's rebuttal is that Obama looked smoother, but smoothness is not the same as decisive leadership.",
+        "The Bush side cannot outrun Iraq. The invasion damaged U.S. credibility, cost enormous lives and money, destabilized the region, and was justified by intelligence claims that did not hold. Add the financial crisis beginning at the end of his presidency, Hurricane Katrina's response, and expanded surveillance powers, and the burden gets heavy. Obama's rebuttal is that Bush's biggest choices created consequences far larger than Obama's biggest failures."
+      ],
+      [
+        "The final Bush case is that history should judge the full presidency, not only Iraq. He responded to the worst attack on U.S. soil in modern history, prevented another attack of that scale during his term, pushed AIDS relief in Africa, expanded prescription drug coverage, and governed with a moral seriousness his supporters still value. If you prioritize resolve during national trauma, Bush remains defensible.",
+        "The final Obama case is that the presidency is partly about avoiding catastrophic errors. Obama was not flawless, but his largest achievements were constructive: economic stabilization, healthcare expansion, climate diplomacy, and a less reckless foreign-policy posture. If you weigh long-term damage, institutional competence, and policy durability, Obama has the cleaner record."
+      ]
+    ],
+    take: [
+      ["The standard decides the winner", "Crisis resolve favors Bush more than policy durability does."],
+      ["Iraq is the central weight", "Any Bush case has to absorb the cost and credibility damage of the Iraq War."],
+      ["Obama's case is steadier than flashier", "His strongest argument is stabilization, healthcare, and fewer catastrophic choices."]
+    ],
+    strongA: "Bush's strongest case is crisis leadership after 9/11, plus major domestic and global-health initiatives that supporters see as under-credited.",
+    strongB: "Obama's strongest case is stabilizing the economy, expanding healthcare, restoring steadier governance, and avoiding a foreign-policy error as costly as Iraq.",
+    crackA: "Bush cracks hardest on Iraq, Katrina, surveillance, and the financial crisis shadow at the end of his presidency.",
+    crackB: "Obama cracks on Libya, drone warfare, Syria, deportations, and an economic recovery many people experienced as uneven.",
+    verify: [
+      "Economic indicators at the start and end of each presidency.",
+      "The human and financial cost of the Iraq War.",
+      "Affordable Care Act coverage and durability.",
+      "Katrina, Libya, Syria, surveillance, and drone-policy records.",
+      "How much credit or blame each president deserves for inherited conditions."
+    ],
+    changeA: [
+      "A stronger argument that post-9/11 security outcomes outweigh Iraq's cost.",
+      "Evidence Bush's domestic achievements had more durable benefit than critics admit.",
+      "A fair accounting of inherited crisis versus chosen policy mistakes."
+    ],
+    changeB: [
+      "A clearer defense of Obama's foreign-policy failures.",
+      "Evidence the recovery and ACA changed ordinary lives more than critics admit.",
+      "A direct argument that avoiding catastrophic mistakes should weigh more than crisis resolve."
+    ],
+    core: "The hinge is whether you judge presidents more by resolve in crisis, or by long-term policy consequences and avoided damage.",
+    comp: [
+      "resolve after 9/11 and willingness to make hard security choices",
+      "economic stabilization, healthcare expansion, and avoiding catastrophic foreign-policy mistakes",
+      "whether crisis leadership or long-term consequences matters more"
+    ]
+  };
+
   if (l.includes("bob lazar") || l.includes("lazar")) return {
     label: "Extraordinary Claim",
     icon: "🛸",
@@ -409,7 +469,7 @@ function profile(question, type, a, b) {
     verify: ["Which definition of free will is being debated.", "Neuroscience claims about unconscious decision-making.", "Whether moral responsibility requires ultimate desert.", "Examples involving coercion, addiction, and deliberation."],
     changeA: ["A stronger account of why compatibilist freedom is insufficient.", "Evidence conscious deliberation is mostly post-hoc.", "A practical accountability model without free will."],
     changeB: ["A definition of freedom that preserves real responsibility.", "A response to the luck objection.", "Examples where deliberation changes outcomes meaningfully."],
-    core: "The heat point is whether free will requires ultimate authorship, or whether reason-responsive agency is enough.",
+    core: "The hinge is whether free will requires ultimate authorship, or whether reason-responsive agency is enough.",
     comp: ["the causal history behind every choice", "practical agency, deliberation, and responsibility", "which definition of freedom you are willing to defend"]
   };
 
@@ -526,6 +586,54 @@ function profile(question, type, a, b) {
   return genericProfile(question, a, b);
 }
 
+function normalizeAiProfile(ai, fallback) {
+  const validTypes = new Set(["product", "policy", "moral", "practical", "factual", "extraordinary", "open"]);
+  const asText = (value, fallbackValue = "") => (typeof value === "string" && value.trim() ? value.trim() : fallbackValue);
+  const asList = (value, fallbackValue, min = 3) => {
+    const list = Array.isArray(value) ? value.filter((item) => typeof item === "string" && item.trim()).map((item) => item.trim()) : [];
+    return list.length >= min ? list : fallbackValue;
+  };
+  const asTakeaways = (value) => {
+    if (!Array.isArray(value)) return fallback.take;
+    const takeaways = value
+      .map((item) => Array.isArray(item) ? [asText(item[0]), asText(item[1])] : null)
+      .filter((item) => item && item[0] && item[1]);
+    return takeaways.length >= 3 ? takeaways.slice(0, 3) : fallback.take;
+  };
+  const fallbackRounds = fallback.rounds;
+  const rounds = [0, 1, 2].map((i) => {
+    const round = Array.isArray(ai?.rounds) ? ai.rounds[i] : null;
+    if (Array.isArray(round)) return [asText(round[0], fallbackRounds[i][0]), asText(round[1], fallbackRounds[i][1])];
+    return [
+      asText(round?.aArg, fallbackRounds[i][0]),
+      asText(round?.bArg, fallbackRounds[i][1])
+    ];
+  });
+  const qType = asText(ai?.qType, "").toLowerCase();
+
+  return {
+    ...fallback,
+    qType: validTypes.has(qType) ? qType : null,
+    sideA: asText(ai?.sideA),
+    sideB: asText(ai?.sideB),
+    label: asText(ai?.label, fallback.label),
+    icon: asText(ai?.icon, fallback.icon),
+    criteria: asList(ai?.criteria, fallback.criteria, 4),
+    desc: asText(ai?.desc, fallback.desc),
+    rounds,
+    take: asTakeaways(ai?.take),
+    strongA: asText(ai?.strongA, fallback.strongA),
+    strongB: asText(ai?.strongB, fallback.strongB),
+    crackA: asText(ai?.crackA, fallback.crackA),
+    crackB: asText(ai?.crackB, fallback.crackB),
+    verify: asList(ai?.verify, fallback.verify, 3),
+    changeA: asList(ai?.changeA, fallback.changeA, 3),
+    changeB: asList(ai?.changeB, fallback.changeB, 3),
+    core: asText(ai?.core, fallback.core),
+    comp: asList(ai?.comp, fallback.comp, 3).slice(0, 3)
+  };
+}
+
 function scoreRound(type, question, i, intensity) {
   let a = 8.0;
   let b = 8.0;
@@ -570,6 +678,11 @@ function scoreRound(type, question, i, intensity) {
     if (i === 1) return [8.1, 8.4];
     return [8.3, 8.2];
   }
+  if (l.includes("bush") && l.includes("obama")) {
+    if (i === 0) return [8.2, 8.4];
+    if (i === 1) return [8.0, 8.6];
+    return [8.1, 8.5];
+  }
   if (type === "product") { if (i < 2) a += 0.35; else b += 0.35; }
   if (type === "moral" && l.includes("love")) { if (i === 0) a += 0.25; if (i === 1) a += 0.15; if (i === 2) b += 0.15; }
   if (type === "extraordinary") { if (i === 0) a += 0.15; if (i === 1 || i === 2) b += 0.3; }
@@ -600,6 +713,22 @@ function judge(winner, round, data) {
       `${w} takes final pressure because it gave the sharper closing distinction between origin and amplifier. ${l} kept serious examples alive, but the final standard favored the side that explained what 'root' should mean.`
     ];
     return moneyNotes[round] || moneyNotes[0];
+  }
+  if (topic.includes("free will")) {
+    const freeWillNotes = [
+      `${w} takes the opening because it controlled the original meaning of free will more directly. ${l} made the stronger practical case, but did less to answer the authorship problem head-on.`,
+      `${w} takes the rebuttal because it exposed the pressure point in the opponent's definition. ${l} defended the position, but did not fully close the gap between causation and responsibility.`,
+      `${w} takes final pressure because it gave the clearer account of what kind of freedom moral life actually needs. ${l} kept the authorship challenge alive, but left the practical definition less settled.`
+    ];
+    return freeWillNotes[round] || freeWillNotes[0];
+  }
+  if (topic.includes("bush") && topic.includes("obama")) {
+    const presidentialNotes = [
+      `${w} takes the opening because it gave the broader governing standard. ${l} made a serious crisis-leadership case, but the comparison needs more than resolve under pressure.`,
+      `${w} takes the rebuttal because it forced the debate onto long-term consequences, especially Iraq. ${l} kept valid achievements alive, but did not fully absorb the cost of the central failure.`,
+      `${w} takes final pressure because it offered the cleaner decision rule: judge the presidency by durable outcomes and avoided catastrophe. ${l} remains defensible if crisis resolve is weighted highest.`
+    ];
+    return presidentialNotes[round] || presidentialNotes[0];
   }
   const typeNotes = {
     product: [
@@ -637,15 +766,21 @@ function judge(winner, round, data) {
   return notes[round] || notes[0];
 }
 
-function generate(questionRaw, sideARaw, sideBRaw, intensity) {
+function generate(questionRaw, sideARaw, sideBRaw, intensity, aiProfile = null) {
   const question = cleanQuestion(questionRaw);
-  const qType = classify(question);
-  const inferred = inferSides(question, qType);
+  const fallbackType = classify(question);
+  const fallbackSides = inferSides(question, fallbackType);
+  const fallbackSideA = sideARaw.trim() || aiProfile?.sideA?.trim() || fallbackSides[0];
+  const fallbackSideB = sideBRaw.trim() || aiProfile?.sideB?.trim() || fallbackSides[1];
+  const fallbackProfile = genericProfile(question, fallbackSideA, fallbackSideB);
+  const ai = aiProfile ? normalizeAiProfile(aiProfile, fallbackProfile) : null;
+  const qType = ai?.qType || fallbackType;
+  const inferred = ai?.sideA && ai?.sideB ? [ai.sideA, ai.sideB] : inferSides(question, qType);
   const sideA = sideARaw.trim() || inferred[0];
   const sideB = sideBRaw.trim() || inferred[1];
   const shortA = shortLabel(sideA);
   const shortB = shortLabel(sideB);
-  const p = profile(question, qType, sideA, sideB);
+  const p = ai || profile(question, qType, sideA, sideB);
   const shell = { qType, question, sideA, sideB, shortA, shortB };
   const rounds = p.rounds.map((pair, i) => {
     const [sa, sb] = scoreRound(qType, question, i, intensity);
@@ -666,7 +801,8 @@ function generate(questionRaw, sideARaw, sideBRaw, intensity) {
   const bWins = rounds.filter((r) => r.winner === "B").length;
   const ties = rounds.filter((r) => r.winner === "TIE").length;
   const contested = (aWins > bWins && rounds[2].winner === "B") || (bWins > aWins && rounds[2].winner === "A");
-  const heatLevel = contested ? "critical" : ties > 0 ? "medium" : qType === "extraordinary" || (qType === "moral" && intensity === "ruthless") ? "high" : "medium";
+  const cleanDefinitionSplit = qType === "moral" && question.toLowerCase().includes("free will");
+  const heatLevel = cleanDefinitionSplit ? "medium" : contested ? "critical" : ties > 0 ? "medium" : qType === "extraordinary" || (qType === "moral" && intensity === "ruthless") ? "high" : "medium";
   return { ...p, qType, sideA, sideB, shortA, shortB, rounds, aWins, bWins, ties, matchWinner: contested ? "CONTESTED" : aWins > bWins ? "A" : bWins > aWins ? "B" : "TIE", heatLevel, intensity };
 }
 
@@ -698,18 +834,45 @@ export default function DebateFurnace() {
   const [final, setFinal] = useState(false);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [fallbackNotice, setFallbackNotice] = useState("");
   const grid = { display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 };
   const colors = { balanced: T.sideA, aggressive: T.gold, ruthless: T.molten };
 
-  const start = () => {
+  const start = async () => {
     if (!question.trim()) return;
-    setDebate(generate(question, sideA, sideB, intensity));
-    setRound(0);
-    setFinal(false);
-    setOpen(false);
-    setAnalysis(true);
+    setLoading(true);
+    setFallbackNotice("");
+    try {
+      let result;
+      if (isStarterQuestion(question)) {
+        result = generate(question, sideA, sideB, intensity);
+      } else {
+        const response = await fetch("/api/debate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, sideA, sideB, intensity })
+        });
+        if (!response.ok) throw new Error("AI generation unavailable");
+        result = generate(question, sideA, sideB, intensity, await response.json());
+      }
+      setDebate(result);
+      setRound(0);
+      setFinal(false);
+      setOpen(false);
+      setAnalysis(true);
+    } catch {
+      setDebate(generate(question, sideA, sideB, intensity));
+      setFallbackNotice("AI generation was unavailable, so Debate Furnace used its local fallback.");
+      setRound(0);
+      setFinal(false);
+      setOpen(false);
+      setAnalysis(true);
+    } finally {
+      setLoading(false);
+    }
   };
-  const reset = () => { setDebate(null); setSideA(""); setSideB(""); setFinal(false); setAnalysis(false); setRound(0); };
+  const reset = () => { setDebate(null); setSideA(""); setSideB(""); setFinal(false); setAnalysis(false); setRound(0); setFallbackNotice(""); };
   const stoke = () => { setAnalysis(false); round < 2 ? setRound(round + 1) : setFinal(true); };
   const copy = () => {
     if (!debate) return;
@@ -719,12 +882,12 @@ export default function DebateFurnace() {
     navigator.clipboard.writeText(md).finally(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); });
   };
 
-  if (!debate) return <div style={{ background: T.bg, minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: T.text, padding: mobile ? "24px 12px" : "36px 20px 60px" }}><div style={{ maxWidth: 680, margin: "0 auto" }}><div style={{ textAlign: "center", marginBottom: 32 }}><div style={{ fontSize: 10, letterSpacing: 7, color: T.brass, fontWeight: 800, marginBottom: 14 }}>DEBATE FURNACE</div><h1 style={{ fontSize: mobile ? 34 : 46, fontWeight: 900, margin: "0 0 14px", letterSpacing: -1.5, lineHeight: 1.05, background: `linear-gradient(135deg,${T.molten},${T.brass},${T.gold})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Debate Furnace</h1><p style={{ color: T.textDim, fontSize: 14, lineHeight: 1.5 }}>We pressure-test both sides.<br />You decide what matters.</p><p style={{ color: T.muted, fontSize: 13, lineHeight: 1.7 }}>Most arguments aren't really about facts — they're about which values matter more. Debate Furnace breaks them down so you can see the real tradeoffs.</p></div><div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>{[["⚔", "Pressure Test Both Sides", "Both advocates are pushed hard."], ["⚑", "Flag the Smoke", "Unsupported claims and retreats are called out."], ["🧭", "You Decide", "The final report shows where each side is strong, where it cracks, and what the choice actually depends on."]].map(([i, t, b]) => <div key={t} style={{ background: T.card, border: `1px solid ${T.border}`, borderTop: `2px solid ${T.ember}`, borderRadius: 12, padding: 16 }}><div style={{ fontSize: 20, marginBottom: 8 }}>{i}</div><b style={{ fontSize: 12 }}>{t}</b><p style={{ fontSize: 12, color: T.muted, lineHeight: 1.6 }}>{b}</p></div>)}</div><div style={{ fontSize: 10, letterSpacing: 3, color: T.muted, fontWeight: 700, marginBottom: 10 }}>STARTER QUESTIONS</div><div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>{STARTERS.map((s) => <button key={s} onClick={() => setQuestion(s)} style={{ background: question === s ? `${T.ember}18` : T.charcoal, border: `1px solid ${question === s ? T.ember : T.border}`, borderRadius: 20, padding: "7px 14px", fontSize: 12, color: question === s ? T.ember : T.textDim, cursor: "pointer" }}>{s}</button>)}</div><div style={{ background: T.surface, border: `1px solid ${T.ember}44`, borderRadius: 16, padding: mobile ? 16 : 22, marginBottom: 18 }}><label style={{ fontSize: 10, letterSpacing: 3, color: T.brass, fontWeight: 800 }}>QUESTION UNDER PRESSURE</label><textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} placeholder="State the question you want pressure tested..." style={{ width: "100%", boxSizing: "border-box", marginTop: 8, background: "transparent", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 14px", color: T.text, fontSize: 14, resize: "vertical", fontFamily: "inherit", lineHeight: 1.65 }} /><p style={{ margin: "8px 0 0", color: T.muted, fontSize: 12, lineHeight: 1.55 }}>Custom questions are experimental. Starter questions give the best results right now.</p><div style={{ ...grid, marginTop: 14 }}>{[[sideA, setSideA, T.sideA, "SIDE A POSITION"], [sideB, setSideB, T.sideB, "SIDE B POSITION"]].map(([v, set, c, l]) => <div key={l}><label style={{ fontSize: 10, letterSpacing: 2, color: c, fontWeight: 800 }}>{l}</label><input value={v} onChange={(e) => set(e.target.value)} placeholder="Optional — auto-labeled if blank" style={{ width: "100%", boxSizing: "border-box", marginTop: 6, background: T.charcoal, border: `1px solid ${c}33`, borderRadius: 9, padding: "10px 12px", color: T.text, fontSize: 13 }} /></div>)}</div></div><div style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: 10, marginBottom: 18 }}>{["balanced", "aggressive", "ruthless"].map((x) => <button key={x} onClick={() => setIntensity(x)} style={{ flex: 1, padding: "12px 8px", background: intensity === x ? T.surface : T.charcoal, border: `2px solid ${intensity === x ? colors[x] : T.border}`, borderRadius: 12, cursor: "pointer" }}><b style={{ color: colors[x], textTransform: "capitalize" }}>{x}</b></button>)}</div><button onClick={start} disabled={!question.trim()} style={{ width: "100%", background: question.trim() ? `linear-gradient(135deg,${T.molten},${T.brass})` : T.charcoal, border: "none", borderRadius: 12, padding: 16, fontSize: 15, fontWeight: 900, color: question.trim() ? "white" : T.muted, cursor: question.trim() ? "pointer" : "not-allowed", letterSpacing: 2 }}>IGNITE DEBATE</button></div></div>;
+  if (!debate) return <div style={{ background: T.bg, minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: T.text, padding: mobile ? "24px 12px" : "36px 20px 60px" }}><div style={{ maxWidth: 680, margin: "0 auto" }}><div style={{ textAlign: "center", marginBottom: 32 }}><div style={{ fontSize: 10, letterSpacing: 7, color: T.brass, fontWeight: 800, marginBottom: 14 }}>DEBATE FURNACE</div><h1 style={{ fontSize: mobile ? 34 : 46, fontWeight: 900, margin: "0 0 14px", letterSpacing: -1.5, lineHeight: 1.05, background: `linear-gradient(135deg,${T.molten},${T.brass},${T.gold})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Debate Furnace</h1><p style={{ color: T.textDim, fontSize: 14, lineHeight: 1.5 }}>We pressure-test both sides.<br />You decide what matters.</p><p style={{ color: T.muted, fontSize: 13, lineHeight: 1.7 }}>Most arguments aren't really about facts — they're about which values matter more. Debate Furnace breaks them down so you can see the real tradeoffs.</p></div><div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "repeat(3,1fr)", gap: 12, marginBottom: 28 }}>{[["⚔", "Pressure Test Both Sides", "Both advocates are pushed hard."], ["⚑", "Flag the Smoke", "Unsupported claims and retreats are called out."], ["🧭", "You Decide", "The final report shows where each side is strong, where it cracks, and what the choice actually depends on."]].map(([i, t, b]) => <div key={t} style={{ background: T.card, border: `1px solid ${T.border}`, borderTop: `2px solid ${T.ember}`, borderRadius: 12, padding: 16 }}><div style={{ fontSize: 20, marginBottom: 8 }}>{i}</div><b style={{ fontSize: 12 }}>{t}</b><p style={{ fontSize: 12, color: T.muted, lineHeight: 1.6 }}>{b}</p></div>)}</div><div style={{ fontSize: 10, letterSpacing: 3, color: T.muted, fontWeight: 700, marginBottom: 10 }}>STARTER QUESTIONS</div><div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>{STARTERS.map((s) => <button key={s} onClick={() => setQuestion(s)} style={{ background: question === s ? `${T.ember}18` : T.charcoal, border: `1px solid ${question === s ? T.ember : T.border}`, borderRadius: 20, padding: "7px 14px", fontSize: 12, color: question === s ? T.ember : T.textDim, cursor: "pointer" }}>{s}</button>)}</div><div style={{ background: T.surface, border: `1px solid ${T.ember}44`, borderRadius: 16, padding: mobile ? 16 : 22, marginBottom: 18 }}><label style={{ fontSize: 10, letterSpacing: 3, color: T.brass, fontWeight: 800 }}>QUESTION UNDER PRESSURE</label><textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={3} placeholder="State the question you want pressure tested..." style={{ width: "100%", boxSizing: "border-box", marginTop: 8, background: "transparent", border: `1px solid ${T.border}`, borderRadius: 10, padding: "12px 14px", color: T.text, fontSize: 14, resize: "vertical", fontFamily: "inherit", lineHeight: 1.65 }} /><p style={{ margin: "8px 0 0", color: T.muted, fontSize: 12, lineHeight: 1.55 }}>Custom questions are experimental. Starter questions give the best results right now.</p>{fallbackNotice && <p style={{ margin: "8px 0 0", color: T.ember, fontSize: 12, lineHeight: 1.55 }}>{fallbackNotice}</p>}<div style={{ ...grid, marginTop: 14 }}>{[[sideA, setSideA, T.sideA, "SIDE A POSITION"], [sideB, setSideB, T.sideB, "SIDE B POSITION"]].map(([v, set, c, l]) => <div key={l}><label style={{ fontSize: 10, letterSpacing: 2, color: c, fontWeight: 800 }}>{l}</label><input value={v} onChange={(e) => set(e.target.value)} placeholder="Optional — auto-labeled if blank" style={{ width: "100%", boxSizing: "border-box", marginTop: 6, background: T.charcoal, border: `1px solid ${c}33`, borderRadius: 9, padding: "10px 12px", color: T.text, fontSize: 13 }} /></div>)}</div></div><div style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: 10, marginBottom: 18 }}>{["balanced", "aggressive", "ruthless"].map((x) => <button key={x} onClick={() => setIntensity(x)} style={{ flex: 1, padding: "12px 8px", background: intensity === x ? T.surface : T.charcoal, border: `2px solid ${intensity === x ? colors[x] : T.border}`, borderRadius: 12, cursor: "pointer" }}><b style={{ color: colors[x], textTransform: "capitalize" }}>{x}</b></button>)}</div><button onClick={start} disabled={!question.trim() || loading} style={{ width: "100%", background: question.trim() && !loading ? `linear-gradient(135deg,${T.molten},${T.brass})` : T.charcoal, border: "none", borderRadius: 12, padding: 16, fontSize: 15, fontWeight: 900, color: question.trim() && !loading ? "white" : T.muted, cursor: question.trim() && !loading ? "pointer" : "not-allowed", letterSpacing: 2 }}>{loading ? "IGNITING..." : "IGNITE DEBATE"}</button></div></div>;
 
   const h = HEAT[debate.heatLevel] || HEAT.medium;
   const r = debate.rounds[round];
   const result = debate.matchWinner === "CONTESTED" ? "Contested Result" : debate.matchWinner === "TIE" ? "Split Decision" : `${debate.matchWinner === "A" ? debate.shortA : debate.shortB} Survived Stronger`;
   const unburned = debate.label === "Moral / Philosophical" ? "UNBURNED CLAIMS TO VERIFY OR CLARIFY" : "UNBURNED CLAIMS TO VERIFY";
 
-  return <div style={{ background: T.bg, minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: T.text }}><div style={{ position: "sticky", top: 0, zIndex: 10, background: `${T.bg}f2`, backdropFilter: "blur(16px)", borderBottom: `1px solid ${T.border}`, padding: "10px 20px" }}><div style={{ maxWidth: 940, margin: "0 auto", display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}><div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}><span style={{ fontSize: 11, letterSpacing: 4, color: T.ember, fontWeight: 900 }}>DEBATE FURNACE</span><Pill color={h[2]}>{h[0]}</Pill><Pill color={T.brass}>{debate.icon} {debate.label}</Pill></div><div style={{ display: "flex", gap: 8 }}>{final && <button onClick={copy} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: "6px 12px", color: copied ? T.judge : T.muted, cursor: "pointer" }}>{copied ? "Copied" : "Copy Report"}</button>}<button onClick={reset} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: "6px 12px", color: T.muted, cursor: "pointer" }}>Reset</button></div></div></div><div style={{ maxWidth: 940, margin: "0 auto", padding: mobile ? "14px 12px" : "20px" }}><div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}><div style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 8 }}>{question}</div><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}><Pill color={T.sideA}>{debate.shortA}: {debate.sideA}</Pill><Pill color={T.sideB}>{debate.shortB}: {debate.sideB}</Pill><Pill color={colors[intensity]}>{intensity}</Pill></div></div>{analysis ? <Section title={`${debate.icon} QUESTION ANALYSIS`} color={T.brass}><div style={grid}><p style={{ fontSize: 13, color: T.textDim, lineHeight: 1.75 }}>{debate.desc}</p><div>{debate.criteria.map((c) => <span key={c} style={{ display: "inline-block", background: `${T.gold}10`, border: `1px solid ${T.gold}30`, borderRadius: 8, padding: "2px 8px", fontSize: 11, color: T.gold, margin: 2 }}>{c}</span>)}</div></div><button onClick={stoke} style={{ marginTop: 16, background: `linear-gradient(135deg,${T.molten},${T.brass})`, border: "none", borderRadius: 10, padding: "12px 22px", color: "white", fontWeight: 900, cursor: "pointer" }}>BEGIN ROUND 1 — OPENING ARGUMENTS</button></Section> : !final ? <><div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}><Pill color={T.ember}>ROUND {r.round} — {r.label.toUpperCase()}</Pill></div><div style={grid}>{[[debate.shortA, r.aArg, T.sideA, "A"], [debate.shortB, r.bArg, T.sideB, "B"]].map(([n, a, c, s]) => <div key={s} style={{ background: T.card, border: `1px solid ${c}28`, borderTop: `3px solid ${c}`, borderRadius: 12, padding: mobile ? 16 : 20 }}><b style={{ color: c }}>{s} {n.toUpperCase()}</b><p style={{ fontSize: 13.5, lineHeight: 1.8 }}>{a}</p></div>)}</div><div style={{ background: T.card, border: `1px solid ${T.judge}33`, borderLeft: `3px solid ${T.judge}`, borderRadius: 12, padding: mobile ? 16 : 20, marginTop: 14, marginBottom: 20 }}><div style={{ fontSize: 10, letterSpacing: 3, color: T.judge, fontWeight: 800, marginBottom: 14 }}>FURNACE JUDGE — ROUND {r.round}</div><div style={grid}><Score label={debate.shortA} score={r.sa} color={T.sideA} /><Score label={debate.shortB} score={r.sb} color={T.sideB} /></div><p style={{ fontSize: 13, color: T.muted, lineHeight: 1.65 }}>{r.judgeNote}</p></div><button onClick={stoke} style={{ width: "100%", background: "linear-gradient(135deg,#111825,#1a1228)", border: `1px solid ${T.sideA}44`, borderRadius: 12, padding: 14, color: T.sideA, fontWeight: 800, cursor: "pointer" }}>{round < 2 ? `STOKE THE FURNACE → ROUND ${round + 2}` : "STOKE THE FURNACE → WHAT SURVIVED"}</button></> : <><div style={{ background: "linear-gradient(135deg,#130f08,#0f0810)", border: `1px solid ${T.gold}44`, borderRadius: 16, padding: mobile ? 20 : 28, textAlign: "center", marginBottom: 18 }}><div style={{ fontSize: 10, letterSpacing: 6, color: T.brass, marginBottom: 10 }}>WHAT SURVIVED THE HEAT</div><div style={{ fontSize: mobile ? 24 : 30, fontWeight: 900, color: T.gold }}>{result}</div><div style={{ fontSize: 13, color: T.muted, marginTop: 8 }}>{debate.shortA}: {debate.aWins} rounds · {debate.shortB}: {debate.bWins} rounds{debate.ties ? ` · ${debate.ties} tie` : ""}</div><Pill color={h[2]}>{h[0]} — {h[1]}</Pill><p style={{ fontSize: 11, color: T.muted, fontStyle: "italic" }}>Survived stronger means performed better under pressure — not objectively correct.</p></div><Section title={`${debate.icon} WHAT THE QUESTION WAS REALLY ASKING`} color={T.brass}><p style={{ fontSize: 13, lineHeight: 1.75, color: T.textDim }}>{debate.desc}</p></Section><Section title="KEY TAKEAWAYS" color={T.gold}>{debate.take.map(([t, b]) => <p key={t} style={{ fontSize: 13, color: T.textDim, lineHeight: 1.7 }}><b style={{ color: T.text }}>{t}:</b> {b}</p>)}</Section><div style={grid}><Card title={`STRONGEST — ${debate.shortA.toUpperCase()}`} color={T.sideA}>{debate.strongA}</Card><Card title={`STRONGEST — ${debate.shortB.toUpperCase()}`} color={T.sideB}>{debate.strongB}</Card><Card title={`WHERE ${debate.shortA.toUpperCase()} CRACKED`} color={T.ember}>{debate.crackA}</Card><Card title={`WHERE ${debate.shortB.toUpperCase()} CRACKED`} color={T.ember}>{debate.crackB}</Card></div><Section title={unburned} color={T.smoke}>{debate.verify.map((v) => <div key={v} style={{ fontSize: 13, color: T.textDim, lineHeight: 1.65, marginBottom: 8 }}>• {v}</div>)}</Section><Section title="WHAT WOULD CHANGE THE VERDICT?" color={T.brass}><div style={grid}>{[[`Make ${debate.shortA} stronger`, debate.changeA, T.sideA], [`Make ${debate.shortB} stronger`, debate.changeB, T.sideB]].map(([t, items, c]) => <div key={t}><b style={{ fontSize: 11, color: c }}>{t.toUpperCase()}</b>{items.map((i) => <div key={i} style={{ fontSize: 12, color: T.textDim, lineHeight: 1.65, marginTop: 6 }}>• {i}</div>)}</div>)}</div></Section><Section title="WHAT THIS REALLY DEPENDS ON" color={T.gold}><p style={{ fontSize: 15, lineHeight: 1.75, fontStyle: "italic" }}>{debate.core}</p><p>If you value <b style={{ color: T.sideA }}>{debate.comp[0]}</b>, {debate.shortA} feels stronger.</p><p>If you value <b style={{ color: T.sideB }}>{debate.comp[1]}</b>, {debate.shortB} feels stronger.</p><p><span style={{ color: T.muted }}>The real question is: </span><em style={{ color: T.gold }}>{debate.comp[2]}</em>.</p><div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 12, fontSize: 13, color: T.muted, fontStyle: "italic" }}>The decision is yours. The furnace shows what the choice depends on.</div></Section><div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, marginBottom: 18, overflow: "hidden" }}><button onClick={() => setOpen(!open)} style={{ width: "100%", background: "none", border: "none", padding: "14px 18px", display: "flex", justifyContent: "space-between", color: T.muted, fontWeight: 800, cursor: "pointer" }}>FULL DEBATE TRANSCRIPT <span>{open ? "▲" : "▼"}</span></button>{open && <div style={{ padding: "4px 18px 22px", borderTop: `1px solid ${T.border}` }}>{debate.rounds.map((rr) => <div key={rr.round} style={{ marginTop: 20 }}><b style={{ fontSize: 10, letterSpacing: 3, color: T.ember }}>ROUND {rr.round} — {rr.label.toUpperCase()}</b><p><b style={{ color: T.sideA }}>{debate.shortA}:</b> {rr.aArg}</p><p><b style={{ color: T.sideB }}>{debate.shortB}:</b> {rr.bArg}</p><div style={{ background: T.charcoal, borderRadius: 8, padding: 12, fontSize: 13, color: T.muted }}><b style={{ color: T.judge }}>JUDGE:</b> {rr.judgeNote}</div></div>)}</div>}</div><p style={{ textAlign: "center", color: T.muted, fontSize: 12, fontStyle: "italic" }}>"Pressure-test both sides. Find the hinge. Decide what matters."</p><div style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: 12 }}><button onClick={copy} style={{ flex: 1, background: T.charcoal, border: `1px solid ${T.border}`, borderRadius: 12, padding: 13, color: copied ? T.judge : T.muted, fontWeight: 800, cursor: "pointer" }}>{copied ? "Copied" : "Copy Full Report"}</button><button onClick={reset} style={{ flex: 1, background: `linear-gradient(135deg,${T.molten},${T.brass})`, border: "none", borderRadius: 12, padding: 13, color: "white", fontWeight: 900, cursor: "pointer" }}>NEW DEBATE</button></div></>}</div></div>;
+  return <div style={{ background: T.bg, minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: T.text }}><div style={{ position: "sticky", top: 0, zIndex: 10, background: `${T.bg}f2`, backdropFilter: "blur(16px)", borderBottom: `1px solid ${T.border}`, padding: "10px 20px" }}><div style={{ maxWidth: 940, margin: "0 auto", display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}><div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}><span style={{ fontSize: 11, letterSpacing: 4, color: T.ember, fontWeight: 900 }}>DEBATE FURNACE</span><Pill color={h[2]}>{h[0]}</Pill><Pill color={T.brass}>{debate.icon} {debate.label}</Pill></div><div style={{ display: "flex", gap: 8 }}>{final && <button onClick={copy} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: "6px 12px", color: copied ? T.judge : T.muted, cursor: "pointer" }}>{copied ? "Copied" : "Copy Report"}</button>}<button onClick={reset} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 8, padding: "6px 12px", color: T.muted, cursor: "pointer" }}>Reset</button></div></div></div><div style={{ maxWidth: 940, margin: "0 auto", padding: mobile ? "14px 12px" : "20px" }}><div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 12, padding: "14px 16px", marginBottom: 14 }}><div style={{ fontSize: 14, lineHeight: 1.5, marginBottom: 8 }}>{question}</div><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}><Pill color={T.sideA}>{debate.shortA}: {debate.sideA}</Pill><Pill color={T.sideB}>{debate.shortB}: {debate.sideB}</Pill><Pill color={colors[intensity]}>{intensity}</Pill></div></div>{fallbackNotice && <div style={{ background: `${T.ember}10`, border: `1px solid ${T.ember}33`, borderRadius: 10, padding: "10px 14px", color: T.ember, fontSize: 12, lineHeight: 1.55, marginBottom: 14 }}>{fallbackNotice}</div>}{analysis ? <Section title={`${debate.icon} QUESTION ANALYSIS`} color={T.brass}><div style={grid}><p style={{ fontSize: 13, color: T.textDim, lineHeight: 1.75 }}>{debate.desc}</p><div>{debate.criteria.map((c) => <span key={c} style={{ display: "inline-block", background: `${T.gold}10`, border: `1px solid ${T.gold}30`, borderRadius: 8, padding: "2px 8px", fontSize: 11, color: T.gold, margin: 2 }}>{c}</span>)}</div></div><button onClick={stoke} style={{ marginTop: 16, background: `linear-gradient(135deg,${T.molten},${T.brass})`, border: "none", borderRadius: 10, padding: "12px 22px", color: "white", fontWeight: 900, cursor: "pointer" }}>BEGIN ROUND 1 — OPENING ARGUMENTS</button></Section> : !final ? <><div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}><Pill color={T.ember}>ROUND {r.round} — {r.label.toUpperCase()}</Pill></div><div style={grid}>{[[debate.shortA, r.aArg, T.sideA, "A"], [debate.shortB, r.bArg, T.sideB, "B"]].map(([n, a, c, s]) => <div key={s} style={{ background: T.card, border: `1px solid ${c}28`, borderTop: `3px solid ${c}`, borderRadius: 12, padding: mobile ? 16 : 20 }}><b style={{ color: c }}>{s} {n.toUpperCase()}</b><p style={{ fontSize: 13.5, lineHeight: 1.8 }}>{a}</p></div>)}</div><div style={{ background: T.card, border: `1px solid ${T.judge}33`, borderLeft: `3px solid ${T.judge}`, borderRadius: 12, padding: mobile ? 16 : 20, marginTop: 14, marginBottom: 20 }}><div style={{ fontSize: 10, letterSpacing: 3, color: T.judge, fontWeight: 800, marginBottom: 14 }}>FURNACE JUDGE — ROUND {r.round}</div><div style={grid}><Score label={debate.shortA} score={r.sa} color={T.sideA} /><Score label={debate.shortB} score={r.sb} color={T.sideB} /></div><p style={{ fontSize: 13, color: T.muted, lineHeight: 1.65 }}>{r.judgeNote}</p></div><button onClick={stoke} style={{ width: "100%", background: "linear-gradient(135deg,#111825,#1a1228)", border: `1px solid ${T.sideA}44`, borderRadius: 12, padding: 14, color: T.sideA, fontWeight: 800, cursor: "pointer" }}>{round < 2 ? `STOKE THE FURNACE → ROUND ${round + 2}` : "STOKE THE FURNACE → WHAT SURVIVED"}</button></> : <><div style={{ background: "linear-gradient(135deg,#130f08,#0f0810)", border: `1px solid ${T.gold}44`, borderRadius: 16, padding: mobile ? 20 : 28, textAlign: "center", marginBottom: 18 }}><div style={{ fontSize: 10, letterSpacing: 6, color: T.brass, marginBottom: 10 }}>WHAT SURVIVED THE HEAT</div><div style={{ fontSize: mobile ? 24 : 30, fontWeight: 900, color: T.gold }}>{result}</div><div style={{ fontSize: 13, color: T.muted, marginTop: 8 }}>{debate.shortA}: {debate.aWins} round{debate.aWins !== 1 ? "s" : ""} · {debate.shortB}: {debate.bWins} round{debate.bWins !== 1 ? "s" : ""}{debate.ties ? ` · ${debate.ties} tie` : ""}</div><Pill color={h[2]}>{h[0]} — {h[1]}</Pill><p style={{ fontSize: 11, color: T.muted, fontStyle: "italic" }}>Survived stronger means performed better under pressure — not objectively correct.</p></div><Section title={`${debate.icon} WHAT THE QUESTION WAS REALLY ASKING`} color={T.brass}><p style={{ fontSize: 13, lineHeight: 1.75, color: T.textDim }}>{debate.desc}</p></Section><Section title="KEY TAKEAWAYS" color={T.gold}>{debate.take.map(([t, b]) => <p key={t} style={{ fontSize: 13, color: T.textDim, lineHeight: 1.7 }}><b style={{ color: T.text }}>{t}:</b> {b}</p>)}</Section><div style={grid}><Card title={`STRONGEST — ${debate.shortA.toUpperCase()}`} color={T.sideA}>{debate.strongA}</Card><Card title={`STRONGEST — ${debate.shortB.toUpperCase()}`} color={T.sideB}>{debate.strongB}</Card><Card title={`WHERE ${debate.shortA.toUpperCase()} CRACKED`} color={T.ember}>{debate.crackA}</Card><Card title={`WHERE ${debate.shortB.toUpperCase()} CRACKED`} color={T.ember}>{debate.crackB}</Card></div><Section title={unburned} color={T.smoke}>{debate.verify.map((v) => <div key={v} style={{ fontSize: 13, color: T.textDim, lineHeight: 1.65, marginBottom: 8 }}>• {v}</div>)}</Section><Section title="WHAT WOULD CHANGE THE VERDICT?" color={T.brass}><div style={grid}>{[[`Make ${debate.shortA} stronger`, debate.changeA, T.sideA], [`Make ${debate.shortB} stronger`, debate.changeB, T.sideB]].map(([t, items, c]) => <div key={t}><b style={{ fontSize: 11, color: c }}>{t.toUpperCase()}</b>{items.map((i) => <div key={i} style={{ fontSize: 12, color: T.textDim, lineHeight: 1.65, marginTop: 6 }}>• {i}</div>)}</div>)}</div></Section><Section title="WHAT THIS REALLY DEPENDS ON" color={T.gold}><p style={{ fontSize: 15, lineHeight: 1.75, fontStyle: "italic" }}>{debate.core}</p><p>If you value <b style={{ color: T.sideA }}>{debate.comp[0]}</b>, {debate.shortA} feels stronger.</p><p>If you value <b style={{ color: T.sideB }}>{debate.comp[1]}</b>, {debate.shortB} feels stronger.</p><p><span style={{ color: T.muted }}>The real question is: </span><em style={{ color: T.gold }}>{debate.comp[2]}</em>.</p><div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 12, fontSize: 13, color: T.muted, fontStyle: "italic" }}>The decision is yours. The furnace shows what the choice depends on.</div></Section><div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, marginBottom: 18, overflow: "hidden" }}><button onClick={() => setOpen(!open)} style={{ width: "100%", background: "none", border: "none", padding: "14px 18px", display: "flex", justifyContent: "space-between", color: T.muted, fontWeight: 800, cursor: "pointer" }}>FULL DEBATE TRANSCRIPT <span>{open ? "▲" : "▼"}</span></button>{open && <div style={{ padding: "4px 18px 22px", borderTop: `1px solid ${T.border}` }}>{debate.rounds.map((rr) => <div key={rr.round} style={{ marginTop: 20 }}><b style={{ fontSize: 10, letterSpacing: 3, color: T.ember }}>ROUND {rr.round} — {rr.label.toUpperCase()}</b><p><b style={{ color: T.sideA }}>{debate.shortA}:</b> {rr.aArg}</p><p><b style={{ color: T.sideB }}>{debate.shortB}:</b> {rr.bArg}</p><div style={{ background: T.charcoal, borderRadius: 8, padding: 12, fontSize: 13, color: T.muted }}><b style={{ color: T.judge }}>JUDGE:</b> {rr.judgeNote}</div></div>)}</div>}</div><p style={{ textAlign: "center", color: T.muted, fontSize: 12, fontStyle: "italic" }}>"Pressure-test both sides. Find the hinge. Decide what matters."</p><div style={{ display: "flex", flexDirection: mobile ? "column" : "row", gap: 12 }}><button onClick={copy} style={{ flex: 1, background: T.charcoal, border: `1px solid ${T.border}`, borderRadius: 12, padding: 13, color: copied ? T.judge : T.muted, fontWeight: 800, cursor: "pointer" }}>{copied ? "Copied" : "Copy Full Report"}</button><button onClick={reset} style={{ flex: 1, background: `linear-gradient(135deg,${T.molten},${T.brass})`, border: "none", borderRadius: 12, padding: 13, color: "white", fontWeight: 900, cursor: "pointer" }}>NEW DEBATE</button></div></>}</div></div>;
 }
