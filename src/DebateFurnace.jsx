@@ -31,10 +31,17 @@ const STARTERS = [
   "Are seed oils actually bad for you?",
   "Is free will an illusion?",
   "Should college be free for everyone?",
+  "Should parents be allowed to genetically modify their babies for intelligence or health?",
+  "Should the 4-day workweek become standard for office jobs?",
+  "Should prisons prioritize rehabilitation over punishment?",
+  "Should social media be age-gated for teens under 16?",
+  "Should housing be treated as a human right?",
   "Is pineapple on pizza acceptable?",
   "Does social media do more harm than good?",
   "Is money the root of all evil?",
-  "Are cats better than dogs?"
+  "Are cats better than dogs?",
+  "Should capital punishment be abolished?",
+  "Should encryption be a human right?"
 ];
 
 const HEAT = {

@@ -46,7 +46,11 @@ Side A: ${sideA?.trim() || "Infer a clear Side A position from the question"}
 Side B: ${sideB?.trim() || "Infer a clear opposing Side B position from the question"}
 Intensity: ${intensity}
 
-Write vivid, specific arguments. Avoid generic debate filler. Be fair to both sides. Make the final hinge about what the user values or refuses to trade away.
+Write tight, vivid, specific arguments. Keep each field short and punchy.
+Use concrete examples, tradeoffs, and consequences. Avoid generic debate filler, hedging, and repeated phrasing.
+Do not restate the question in every section. Do not use full-sentence compass values.
+For the compass, use short noun phrases only.
+Keep round arguments to 2-4 sentences each. Keep takeaways to brief clauses.
 
 Return exactly this JSON shape:
 {
