@@ -178,14 +178,14 @@ const SEEDS = [
   }
 ];
 
-const TABS = [
-  { id: "seed-hunter", label: "Seed Hunter" },
-  { id: "blueprint", label: "Blueprint" },
-  { id: "remix", label: "Remix" },
-  { id: "source", label: "Source Trail" }
-];
-
 const GENRE_MUTATION = ["Realistic", "Grounded Fiction", "Speculative", "Fantasy", "Cosmic"];
+const MUTATION_DESCRIPTIONS = [
+  "Grounded in the real source.",
+  "Plausible changes, same pressure.",
+  "One what-if changes the outcome.",
+  "Mythic symbols carry the conflict.",
+  "Human conflict meets an unknowable system."
+];
 const BLUEPRINTS = [
   "Novel",
   "Short story",
@@ -199,15 +199,30 @@ const BLUEPRINTS = [
   "Documentary outline",
   "Fanfic setup"
 ];
+const FORGE_FLOW = [
+  { id: "seed-hunter", label: "Seed Hunter", helper: "Choose the source pattern." },
+  { id: "blueprint", label: "Blueprint", helper: "Shape it into structure." },
+  { id: "remix", label: "Remix", helper: "Shift genre and mutation." },
+  { id: "source", label: "Source Trail", helper: "Check the grounding." }
+];
 
 function listToChips(list) {
   return (list || []).map((item) => <span key={item} className="chip">{item}</span>);
 }
 
+function trimTerminalPunctuation(text) {
+  return String(text || "").replace(/[.!?]+$/u, "");
+}
+
+function lowerClean(text) {
+  return trimTerminalPunctuation(text).toLowerCase();
+}
+
 function buildFuel(seed, genre) {
   const focus = seed.storyDNA.slice(0, 3).join(", ");
+  const hinge = lowerClean(seed.hinge);
   return [
-    `Logline: A ${genre.toLowerCase()} story built around ${seed.hinge.toLowerCase()}.`,
+    `Logline: A ${genre.toLowerCase()} story built around ${hinge}.`,
     `Story DNA: Pull on ${focus} until the event becomes a usable narrative engine.`,
     `Character pressure: Force the lead to choose between survival, truth, and belonging.`,
     `Source rule: keep the real event visible so the fiction feels grounded instead of generic.`
@@ -255,6 +270,8 @@ function makeSeedPacket(seed) {
 }
 
 function makeBlueprintLines(seed, format) {
+  const hinge = lowerClean(seed.hinge);
+  const stakes = lowerClean(seed.stakes);
   const baseLines = {
     "Novel": [
       `Premise: ${seed.hinge}`,
@@ -265,11 +282,11 @@ function makeBlueprintLines(seed, format) {
     "Short story": [
       `Opening image: ${seed.summary}`,
       `Pressure turn: the hidden truth surfaces.`,
-      `Choice: someone has to pick between ${seed.stakes.toLowerCase()}.`,
+      `Choice: someone has to pick between ${stakes}.`,
       `Closing image: the hinge is still visible.`
     ],
     "Movie": [
-      `Logline: A ${seed.sourceType} seed about ${seed.hinge.toLowerCase()}.`,
+      `Logline: A ${seed.sourceType} pattern built around ${hinge}.`,
       `Act 1 setup: establish ${seed.charactersForces.slice(0, 2).join(" and ")}.`,
       `Act 2 escalation: push ${seed.storyDNA.slice(0, 3).join(", ")} into conflict.`,
       `Act 3 payoff: the central choice changes what survives.`,
@@ -289,7 +306,7 @@ function makeBlueprintLines(seed, format) {
     ],
     "Game quest": [
       `Quest title: build from ${seed.title}.`,
-      `Objective: force the player to navigate ${seed.hinge.toLowerCase()}.`,
+      `Objective: force the player to navigate ${hinge}.`,
       `Hidden twist: the real enemy is not obvious at first.`,
       `Reward: a choice, not just loot.`,
       `Failure consequence: the world changes around the player.`
@@ -301,7 +318,7 @@ function makeBlueprintLines(seed, format) {
       `Boss reveal: the final conflict is the hinge made physical.`
     ],
     "Comic issue": [
-      `Cover hook: a visual version of ${seed.hinge.toLowerCase()}.`,
+      `Cover hook: a visual version of ${hinge}.`,
       `Scene beats: compress the pressure into clean page turns.`,
       `Page turn: the hidden force is revealed.`,
       `Final panel: leave a question, not a lecture.`
@@ -441,6 +458,53 @@ function makeRemixPacket(seed, genre, mutation) {
   };
 }
 
+function makeStoryIdeaPacket(seed, format, genre, mutation) {
+  const blueprint = makeBlueprintLines(seed, format);
+  const remix = makeRemixPacket(seed, genre, mutation);
+  const remixAngle = (seed.genreRemixes || [])[mutation % (seed.genreRemixes?.length || 1)] || seed.genreRemixes?.[0];
+  const hinge = lowerClean(seed.hinge);
+  const stakes = lowerClean(seed.stakes);
+
+  return {
+    title: `${seed.title} / ${format} / ${genre}`,
+    summary: `A full story idea that combines ${seed.title}, a ${format.toLowerCase()} format, and a ${GENRE_MUTATION[mutation].toLowerCase()} ${genre.toLowerCase()} remix.`,
+    meta: [seed.sourceType, format, genre, GENRE_MUTATION[mutation]],
+    anchor: seed.hinge,
+    sections: [
+      {
+        label: "Core idea",
+        body: `${trimTerminalPunctuation(seed.summary)}. The central tension is ${hinge}, carried through ${seed.storyDNA.slice(0, 3).join(", ")}.`
+      },
+      {
+        label: "Blueprint shape",
+        body: blueprint.join(" ")
+      },
+      {
+        label: "Remix layer",
+        body: `${remix.summary} ${remixAngle ? remixAngle.prompt : ""}`.trim()
+      },
+      {
+        label: "Main pressure",
+        body: `The lead has to choose between ${stakes}, while the setting pushes back through ${seed.charactersForces.slice(0, 3).join(", ")}.`
+      },
+      {
+        label: "Story fuel",
+        body: [
+          `Format: ${format}`,
+          `Genre: ${genre}`,
+          `Mutation: ${GENRE_MUTATION[mutation]}`,
+          `Hinge: ${seed.hinge}`,
+          `Story DNA: ${seed.storyDNA.slice(0, 4).join(", ")}`
+        ].join(" · ")
+      },
+      {
+        label: "Source boundary",
+        body: "Inspired by the source pattern, not a retelling. Keep the real source visible, but mark the final story as fiction."
+      }
+    ]
+  };
+}
+
 function renderMetaChips(items) {
   return (
     <div className="chip-row">
@@ -537,14 +601,13 @@ function InspirationPanel({ seed, onSeedChange, filteredSeeds, selectedTag, onTa
   );
 }
 
-function BlueprintPanel({ seed }) {
-  const [format, setFormat] = useState("Movie");
+function BlueprintPanel({ seed, format, onFormatChange }) {
   const outline = useMemo(() => makeBlueprintLines(seed, format), [seed, format]);
-  const [packet, setPacket] = useState(null);
+  const [packet, setPacket] = useState(() => makeBlueprintPacket(seed, format));
   const [copyState, setCopyState] = useState("");
 
   useEffect(() => {
-    setPacket(null);
+    setPacket(makeBlueprintPacket(seed, format));
   }, [seed.id, format]);
 
   function generateOutline() {
@@ -584,19 +647,8 @@ function BlueprintPanel({ seed }) {
         <div className="meta">Turn the seed into a structured format</div>
       </div>
 
-      <div className="control-group">
-        <div className="control-label">Format</div>
-        <div className="button-row">
-          {BLUEPRINTS.map((item) => (
-            <button key={item} type="button" className={format === item ? "pill is-active" : "pill"} onClick={() => setFormat(item)}>
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="button-row">
-        <button type="button" className="pill" onClick={generateOutline}>Generate outline</button>
+      <div className="primary-actions">
+        <button type="button" className="pill pill--primary pill--large" onClick={generateOutline}>Generate outline</button>
         <button type="button" className="pill" onClick={copyOutline}>{copyState || (packet ? "Copy generated outline" : "Copy outline")}</button>
       </div>
 
@@ -635,27 +687,29 @@ function BlueprintPanel({ seed }) {
           ))}
         </div>
       )}
+
+      <div className="control-group">
+        <div className="control-label">Format</div>
+        <div className="button-row">
+          {BLUEPRINTS.map((item) => (
+            <button key={item} type="button" className={format === item ? "pill is-active" : "pill"} onClick={() => onFormatChange(item)}>
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
 
-function RemixPanel({ seed }) {
-  const [mutation, setMutation] = useState(2);
-  const [genre, setGenre] = useState("Fantasy");
+function RemixPanel({ seed, genre, onGenreChange, mutation, onMutationChange }) {
   const [packet, setPacket] = useState(null);
   const [copyState, setCopyState] = useState("");
-  const mutationLines = [
-    `Realistic: stay close to the source and keep the fiction layer thin.`,
-    `Grounded Fiction: change names and tone, but keep the event logic intact.`,
-    `Speculative: add one divergent variable that changes the outcome.`,
-    `Fantasy: convert the source pressure into symbolic conflict.`,
-    `Cosmic: reveal a larger, unknowable system behind the human problem.`
-  ];
   const fuel = [
     `Genre: ${genre}`,
     `Mutation level: ${GENRE_MUTATION[mutation]}`,
     `Core pressure: ${seed.hinge}`,
-    `Motion: ${mutationLines[mutation]}`,
+    `Mutation logic: ${MUTATION_DESCRIPTIONS[mutation]}`,
     ...buildFuel(seed, genre)
   ];
 
@@ -704,7 +758,7 @@ function RemixPanel({ seed }) {
         <div className="control-label">Genre</div>
         <div className="button-row">
           {["Sci-fi", "Horror", "Fantasy", "Western", "Political thriller", "War drama", "Dark comedy", "Game quest", "Anime arc", "Fanfic setup"].map((item) => (
-            <button key={item} type="button" className={genre === item ? "pill is-active" : "pill"} onClick={() => setGenre(item)}>
+            <button key={item} type="button" className={genre === item ? "pill is-active" : "pill"} onClick={() => onGenreChange(item)}>
               {item}
             </button>
           ))}
@@ -713,8 +767,16 @@ function RemixPanel({ seed }) {
 
       <div className="control-group">
         <div className="control-label">Mutation slider</div>
-        <input className="slider" type="range" min="0" max="4" step="1" value={mutation} onChange={(e) => setMutation(Number(e.target.value))} />
-        <div className="muted">{mutationLines[mutation]}</div>
+        <input className="slider" type="range" min="0" max="4" step="1" value={mutation} onChange={(e) => onMutationChange(Number(e.target.value))} />
+        <div className="mutation-note">
+          <strong>{GENRE_MUTATION[mutation]}</strong>
+          <span>{MUTATION_DESCRIPTIONS[mutation]}</span>
+        </div>
+        <div className="mutation-scale" aria-label="Mutation level scale">
+          {GENRE_MUTATION.map((item, index) => (
+            <span key={item} className={mutation === index ? "is-active" : ""}>{item}</span>
+          ))}
+        </div>
       </div>
 
       <div className="button-row">
@@ -760,6 +822,76 @@ function RemixPanel({ seed }) {
   );
 }
 
+function StoryIdeaPanel({ seed, format, genre, mutation, onGenerate, packet, copyState, onCopy }) {
+  const snapshot = useMemo(() => makeStoryIdeaPacket(seed, format, genre, mutation), [seed, format, genre, mutation]);
+  const activePacket = packet || snapshot;
+
+  return (
+    <section className="panel story-idea">
+      <div className="story-idea__header">
+        <div className="story-idea__header-copy">
+          <div className="eyebrow">Final packet</div>
+          <h2>Full story idea</h2>
+          <div className="story-idea__summary">Combine the current seed, format, and remix settings into one usable story packet.</div>
+        </div>
+        <div className="story-idea__header-meta">
+          <div className="story-idea__chips">
+            {renderMetaChips([seed.sourceType, format, genre, GENRE_MUTATION[mutation]])}
+          </div>
+          <div className="button-row">
+            <button type="button" className="pill pill--primary pill--large" onClick={onGenerate}>Generate full story idea</button>
+            <button type="button" className="pill" onClick={() => onCopy(activePacket)}>{copyState || (packet ? "Copy story packet" : "Copy preview")}</button>
+          </div>
+        </div>
+      </div>
+
+      {packet ? (
+        <div className="output-panel output-panel--story">
+          <div className="output-panel__head output-panel__head--story">
+            <div>
+              <div className="card-label">Story packet</div>
+              <h3 className="output-title">{activePacket.title}</h3>
+            </div>
+            <div className="meta">{format} · {genre}</div>
+          </div>
+          <p className="output-summary">{activePacket.summary}</p>
+          <div className="output-anchor output-anchor--story">
+            <div className="card-label">Anchor</div>
+            <div>{activePacket.anchor}</div>
+          </div>
+          <div className="story-idea__grid">
+            <div className="story-idea__col">
+              {activePacket.sections.slice(0, 3).map((section) => (
+                <div key={section.label} className="story-idea__block">
+                  <div className="card-label">{section.label}</div>
+                  <div>{section.body}</div>
+                </div>
+              ))}
+            </div>
+            <div className="story-idea__col">
+              {activePacket.sections.slice(3).map((section) => (
+                <div key={section.label} className="story-idea__block">
+                  <div className="card-label">{section.label}</div>
+                  <div>{section.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="story-idea__grid story-idea__grid--preview">
+          {snapshot.sections.map((section) => (
+            <div key={section.label} className="story-idea__block">
+              <div className="card-label">{section.label}</div>
+              <div>{section.body}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function SourceTrailPanel({ seed }) {
   return (
     <section className="panel">
@@ -773,7 +905,7 @@ function SourceTrailPanel({ seed }) {
 
       <div className="mini-grid">
         <div className="mini-card">
-          <div className="card-label">What the source says</div>
+          <div className="card-label">Source grounded</div>
           <div>{seed.summary}</div>
         </div>
         <div className="mini-card">
@@ -785,8 +917,8 @@ function SourceTrailPanel({ seed }) {
           <div>{seed.whyWild}</div>
         </div>
         <div className="mini-card">
-          <div className="card-label">Creative inspiration</div>
-          <div>Mark the transformed idea as fiction and keep the source separate.</div>
+          <div className="card-label">Fictional transformation</div>
+          <div>Inspired by the source pattern, not a retelling. Keep the real source visible, but mark the final story as fiction.</div>
         </div>
         <div className="mini-card mini-card--wide">
           <div className="card-label">Source links</div>
@@ -804,9 +936,14 @@ function SourceTrailPanel({ seed }) {
 }
 
 export default function CreativeEngine() {
-  const [tab, setTab] = useState("seed-hunter");
+  const [tab, setTab] = useState("blueprint");
   const [tag, setTag] = useState("All");
   const [seedId, setSeedId] = useState(SEEDS[0].id);
+  const [blueprintFormat, setBlueprintFormat] = useState("Movie");
+  const [remixGenre, setRemixGenre] = useState("Fantasy");
+  const [remixMutation, setRemixMutation] = useState(2);
+  const [storyPacket, setStoryPacket] = useState(null);
+  const [storyCopyState, setStoryCopyState] = useState("");
   const [copyState, setCopyState] = useState("");
 
   const filteredSeeds = useMemo(() => {
@@ -825,6 +962,10 @@ export default function CreativeEngine() {
     }
   }, [filteredSeeds, seedId]);
 
+  useEffect(() => {
+    setStoryPacket(null);
+  }, [seedId, blueprintFormat, remixGenre, remixMutation]);
+
   async function copySeedPacket() {
     try {
       const text = makeSeedPacket(activeSeed);
@@ -842,46 +983,152 @@ export default function CreativeEngine() {
     if (next) setSeedId(next.id);
   }
 
+  function generateStoryIdea() {
+    setStoryPacket(makeStoryIdeaPacket(activeSeed, blueprintFormat, remixGenre, remixMutation));
+  }
+
+  async function copyStoryIdea(packet) {
+    try {
+      const content = packet || makeStoryIdeaPacket(activeSeed, blueprintFormat, remixGenre, remixMutation);
+      const text = [
+        `# ${content.title}`,
+        "",
+        content.summary,
+        "",
+        ...content.sections.flatMap((section) => [
+          `## ${section.label}`,
+          section.body,
+          ""
+        ])
+      ].join("\n");
+      await navigator.clipboard.writeText(text);
+      setStoryCopyState("Copied story packet");
+      window.setTimeout(() => setStoryCopyState(""), 1400);
+    } catch {
+      setStoryCopyState("Copy failed");
+      window.setTimeout(() => setStoryCopyState(""), 1400);
+    }
+  }
+
   return (
     <div className="creative-engine">
-      <header className="section-header">
-        <div>
-          <div className="eyebrow">Story Forge</div>
+      <header className="forge-hero">
+        <div className="forge-hero__copy">
+          <div className="eyebrow">Creative engine</div>
           <h1>Find the real pattern. Forge a new story.</h1>
-          <p className="lead">Source-grounded creative generation for writers, worldbuilders, and anyone who needs a better starting point than a blank page.</p>
+          <p className="lead">Turn real events, old texts, and strange source material into usable story blueprints without losing the source trail.</p>
+          <div className="button-row forge-hero__actions">
+            <button type="button" className="pill pill--primary pill--large" onClick={pickRandomSeed}>Random seed</button>
+            <button type="button" className="pill" onClick={copySeedPacket}>{copyState || "Copy seed packet"}</button>
+          </div>
         </div>
-        <div className="button-row">
-          <button type="button" className="pill" onClick={pickRandomSeed}>Random seed</button>
-          <button type="button" className="pill" onClick={copySeedPacket}>{copyState || "Copy seed packet"}</button>
+        <div className="forge-hero__seed">
+          <section className="panel panel--hero-seed">
+            <div className="card-label">Current seed</div>
+            <h2>{activeSeed.title}</h2>
+            <p className="seed-summary">{activeSeed.summary}</p>
+            <div className="chip-row">
+              <span className="chip">{activeSeed.sourceType}</span>
+              <span className="chip">{activeSeed.era}</span>
+              <span className="chip">{activeSeed.region}</span>
+            </div>
+            <div className="output-anchor output-anchor--hero">
+              <div className="card-label">Core tension</div>
+              <div>{activeSeed.hinge}</div>
+            </div>
+          </section>
         </div>
       </header>
 
-      <nav className="inner-tabs" aria-label="Story Forge tabs">
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={tab === item.id ? "inner-tab is-active" : "inner-tab"}
-            onClick={() => setTab(item.id)}
-            aria-pressed={tab === item.id}
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
+      <section className="forge-workspace">
+        <aside className="forge-rail">
+          <div className="forge-rail__section">
+            <div className="card-label">Forge path</div>
+            <div className="forge-flow">
+              {FORGE_FLOW.map((step, index) => (
+                <button
+                  key={step.id}
+                  type="button"
+                  className={tab === step.id ? "forge-flow__step is-active" : "forge-flow__step"}
+                  onClick={() => setTab(step.id)}
+                  aria-pressed={tab === step.id}
+                >
+                  <div className="forge-flow__index">{index + 1}</div>
+                  <div>
+                    <div className="forge-flow__label">{step.label}</div>
+                    <div className="forge-flow__helper">{step.helper}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="forge-overview__note">Start with the seed, turn it into structure, mutate it, then check the source boundary.</div>
+          </div>
 
-      {tab === "seed-hunter" && (
-        <InspirationPanel
-          seed={activeSeed}
-          onSeedChange={setSeedId}
-          filteredSeeds={filteredSeeds}
-          selectedTag={tag}
-          onTagChange={setTag}
-        />
-      )}
-      {tab === "blueprint" && <BlueprintPanel seed={activeSeed} />}
-      {tab === "remix" && <RemixPanel seed={activeSeed} />}
-      {tab === "source" && <SourceTrailPanel seed={activeSeed} />}
+          <div className="forge-rail__section">
+            <div className="card-label">State</div>
+            <div className="forge-state">
+              <div className="forge-state__row">
+                <div className="card-label">Format</div>
+                <div className="forge-state__value">{blueprintFormat}</div>
+              </div>
+              <div className="forge-state__row">
+                <div className="card-label">Genre</div>
+                <div className="forge-state__value">{remixGenre}</div>
+              </div>
+              <div className="forge-state__row">
+                <div className="card-label">Mutation</div>
+                <div className="forge-state__setting">
+                  <div className="forge-state__value">{GENRE_MUTATION[remixMutation]}</div>
+                  <div className="forge-state__hint">{MUTATION_DESCRIPTIONS[remixMutation]}</div>
+                </div>
+              </div>
+              <div className="forge-state__row">
+                <div className="card-label">Current seed</div>
+                <div className="forge-state__value">{activeSeed.title}</div>
+              </div>
+              <div className="forge-state__chips">
+                {renderMetaChips([activeSeed.sourceType, activeSeed.era, activeSeed.region])}
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <div className="forge-workspace__main">
+          <StoryIdeaPanel
+            seed={activeSeed}
+            format={blueprintFormat}
+            genre={remixGenre}
+            mutation={remixMutation}
+            onGenerate={generateStoryIdea}
+            packet={storyPacket}
+            copyState={storyCopyState}
+            onCopy={copyStoryIdea}
+          />
+
+          <section className="supporting-module">
+            {tab === "seed-hunter" && (
+              <InspirationPanel
+                seed={activeSeed}
+                onSeedChange={setSeedId}
+                filteredSeeds={filteredSeeds}
+                selectedTag={tag}
+                onTagChange={setTag}
+              />
+            )}
+            {tab === "blueprint" && <BlueprintPanel seed={activeSeed} format={blueprintFormat} onFormatChange={setBlueprintFormat} />}
+            {tab === "remix" && (
+              <RemixPanel
+                seed={activeSeed}
+                genre={remixGenre}
+                onGenreChange={setRemixGenre}
+                mutation={remixMutation}
+                onMutationChange={setRemixMutation}
+              />
+            )}
+            {tab === "source" && <SourceTrailPanel seed={activeSeed} />}
+          </section>
+        </div>
+      </section>
     </div>
   );
 }

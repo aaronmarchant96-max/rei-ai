@@ -37,9 +37,9 @@ export default function AppShell() {
     <div className="app-shell">
       <header className="shell-header">
         <div className="shell-brand">
-          <div className="shell-brand__eyebrow">PromptHound Labs</div>
-          <div className="shell-brand__title">Structured outputs for messy input</div>
-          <div className="shell-brand__sub">Two tools. One point of view.</div>
+          <div className="shell-brand__eyebrow">AI tools lab</div>
+          <div className="shell-brand__title">PromptHound Labs</div>
+          <div className="shell-brand__sub">Structured outputs for messy input.</div>
         </div>
 
         <nav className="top-tabs" aria-label="Top-level tools">
