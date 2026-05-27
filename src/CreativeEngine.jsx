@@ -1204,7 +1204,7 @@ function StoryIdeaPanel({
     <section className="panel story-idea">
       <div className="story-idea__header">
         <div className="story-idea__header-copy">
-          <div className="eyebrow">Final packet</div>
+          <div className="eyebrow">Build final story packet</div>
           <h2>Full story idea</h2>
           <div className="story-idea__summary">Combine the current seed, format, and remix settings into one usable story packet.</div>
         </div>
@@ -1221,6 +1221,7 @@ function StoryIdeaPanel({
 
       <div className="custom-additions">
         <label className="control-label" htmlFor="custom-additions">Custom additions</label>
+        <div className="custom-additions__hint">Optional. Add your own character, setting shift, twist, tone, or ending direction.</div>
         <textarea
           id="custom-additions"
           className="custom-additions__input"
@@ -1286,7 +1287,7 @@ function SourceTrailPanel({ seed }) {
           <div className="eyebrow">Source Trail</div>
           <h2>{seed.title}</h2>
         </div>
-        <div className="meta">What the source says, and what it does not prove</div>
+        <div className="meta">See what inspired the seed and where the fiction boundary is.</div>
       </div>
 
       <div className="mini-grid">
@@ -1442,6 +1443,53 @@ export default function CreativeEngine() {
         </div>
       </header>
 
+      <section className="forge-guide panel">
+        <div className="panel__head forge-guide__head">
+          <div>
+            <div className="eyebrow">How Story Forge works</div>
+            <h2>Start with the source pressure, then forge a new story around it.</h2>
+          </div>
+        </div>
+        <div className="forge-guide__grid">
+          <div className="forge-guide__step">
+            <div className="forge-guide__index">1</div>
+            <div>
+              <div className="card-label">Pick a seed</div>
+              <div>Start with a real event, myth, archive mystery, or strange source.</div>
+            </div>
+          </div>
+          <div className="forge-guide__step">
+            <div className="forge-guide__index">2</div>
+            <div>
+              <div className="card-label">Shape the blueprint</div>
+              <div>Turn the source pressure into a movie, novel, game quest, documentary outline, or other format.</div>
+            </div>
+          </div>
+          <div className="forge-guide__step">
+            <div className="forge-guide__index">3</div>
+            <div>
+              <div className="card-label">Remix the angle</div>
+              <div>Shift genre and mutation so it becomes a new story, not a flat retelling.</div>
+            </div>
+          </div>
+          <div className="forge-guide__step">
+            <div className="forge-guide__index">4</div>
+            <div>
+              <div className="card-label">Add your twist</div>
+              <div>Use custom additions to inject your own setting, character, tone, or ending direction.</div>
+            </div>
+          </div>
+          <div className="forge-guide__step forge-guide__step--wide">
+            <div className="forge-guide__index">5</div>
+            <div>
+              <div className="card-label">Check the source trail</div>
+              <div>Keep the real source visible and make the final story clearly fictional.</div>
+            </div>
+          </div>
+        </div>
+        <div className="forge-guide__note">Recommended first flow: Pick a seed, choose Movie, choose Historical Mystery or Fantasy, generate Blueprint, then generate Full story idea.</div>
+      </section>
+
       <section className="forge-workspace">
         <aside className="forge-rail">
           <div className="forge-rail__section">
@@ -1467,7 +1515,7 @@ export default function CreativeEngine() {
           </div>
 
           <div className="forge-rail__section">
-            <div className="card-label">State</div>
+            <div className="card-label">Current setup</div>
             <div className="forge-state">
               <div className="forge-state__row">
                 <div className="card-label">Format</div>
