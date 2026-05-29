@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "app": "vite",
     "seeds:build": "node scripts/build-inspiration-seeds.mjs",
     "seeds:validate": "node scripts/validate-inspiration-seeds.mjs",
     "app:validate": "node scripts/validate-app-shell.mjs",

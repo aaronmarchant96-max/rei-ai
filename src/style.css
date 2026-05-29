@@ -776,9 +776,26 @@ button { font-family: inherit; }
   gap: 8px;
 }
 
+.cardo-guard__tool-name {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+
 .cardo-guard__intro {
   max-width: 72ch;
   line-height: 1.55;
+}
+
+.cardo-guard__intro p {
+  margin: 0;
+}
+
+.cardo-guard__intro p + p {
+  margin-top: 10px;
 }
 
 .cardo-guard__layout {
@@ -808,6 +825,25 @@ button { font-family: inherit; }
 
 .cardo-guard__hint {
   margin-top: 6px;
+}
+
+.cardo-guard__panel-note {
+  margin: 6px 0 14px;
+}
+
+.cardo-guard__steps {
+  margin-bottom: 14px;
+}
+
+.cardo-guard__steps-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.cardo-guard__steps-list strong {
+  color: var(--text);
 }
 
 .cardo-guard__slider-row {
@@ -880,6 +916,28 @@ button { font-family: inherit; }
 
 .cardo-guard__hinge {
   margin-top: 12px;
+}
+
+.cardo-guard__why-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.cardo-guard__plain-check {
+  margin-top: 8px;
+}
+
+.cardo-guard__math {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 .mini-grid {

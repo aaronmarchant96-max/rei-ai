@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   buildCardoGuardComparison,
+  buildCardoGuardWhyThisVerdict,
   calculateCardoGuardReview,
   formatMoney,
   getScenarioById,
@@ -57,6 +58,7 @@ export default function CardoGuard() {
 
   const review = useMemo(() => calculateCardoGuardReview(submitted), [submitted]);
   const comparison = useMemo(() => buildCardoGuardComparison(review), [review]);
+  const whyThisVerdict = useMemo(() => buildCardoGuardWhyThisVerdict(review), [review]);
 
   const confidenceBandLabel = `${review.confidenceBand} calibration band`;
 
@@ -88,33 +90,52 @@ export default function CardoGuard() {
   return (
     <section className="cardo-guard panel-stack">
       <section className="panel cardo-guard__hero">
-        <div className="panel__head">
-          <div>
-            <div className="card-label">PromptHound Labs</div>
-            <h2>CARDO GUARD</h2>
-            <p className="lede">
-              A synthetic decision validator that checks whether an AI risk score justifies a costly operational action.
-            </p>
+          <div className="panel__head">
+            <div>
+              <div className="card-label">PromptHound Labs</div>
+              <h2>Should we act on this AI risk score?</h2>
+              <div className="cardo-guard__tool-name">CARDO GUARD</div>
+              <p className="lede">
+                A synthetic decision checker that compares the cost of acting with the cost of ignoring a risk score.
+              </p>
+            </div>
+            <div className="cardo-guard__status">
+              <span className="status-badge status-badge--cyan">Synthetic demo only</span>
+              <span className="status-badge status-badge--muted">Not operational advice</span>
+            </div>
           </div>
-          <div className="cardo-guard__status">
-            <span className="status-badge status-badge--cyan">Synthetic only</span>
-            <span className="status-badge status-badge--muted">Launch gate</span>
-          </div>
-        </div>
 
-        <div className="cardo-guard__intro mini-card">
-          CARDO GUARD does not predict the world. It compares the cost of acting against the cost of missing and
-          makes the hinge visible before anyone treats a score like a decision.
-        </div>
-      </section>
+          <div className="cardo-guard__intro mini-card">
+            <p>AI confidence is not a decision. CARDO GUARD shows whether the business cost clears the gate.</p>
+            <p>The model gives a score. CARDO GUARD shows whether acting on it is worth the cost.</p>
+          </div>
+        </section>
 
       <div className="cardo-guard__layout">
         <section className="panel">
           <div className="panel__head">
             <div>
-              <div className="card-label">Synthetic input</div>
-              <h2>Set the scenario</h2>
+              <div className="card-label">Test the decision</div>
+              <h2>Start with a synthetic scenario</h2>
             </div>
+          </div>
+          <div className="muted cardo-guard__panel-note">
+            Use fake numbers to test the decision logic before trusting a model score.
+          </div>
+
+          <div className="mini-card cardo-guard__steps">
+            <div className="card-label">Three steps</div>
+            <ol className="cardo-guard__steps-list">
+              <li>
+                <strong>The model gives a score.</strong> Example: 89 percent risk.
+              </li>
+              <li>
+                <strong>The action has a cost.</strong> Example: acting costs $17,000.
+              </li>
+              <li>
+                <strong>Missing it has a cost.</strong> Example: missing it could cost $1,465,000.
+              </li>
+            </ol>
           </div>
 
           <div className="control-group">
@@ -198,8 +219,9 @@ export default function CardoGuard() {
           <div className="cardo-guard__rules mini-card">
             <div className="card-label">Guardrails</div>
             <ul className="cardo-guard__list">
-              <li>Decision validator, not a prediction engine.</li>
-              <li>Synthetic scenario only.</li>
+              <li>Synthetic demo only.</li>
+              <li>Not a prediction model.</li>
+              <li>Not operational advice.</li>
               <li>Costs stay visible in real units.</li>
               <li>The hinge should be obvious before the recommendation.</li>
             </ul>
@@ -210,14 +232,13 @@ export default function CardoGuard() {
           <div className="output-panel__head">
             <div>
               <div className="card-label">Decision report</div>
-              <h2 className="output-title">Synthetic launch gate</h2>
+              <h2 className="output-title">Act or do not act</h2>
             </div>
-            <div className="status-badge status-badge--violet">{confidenceBandLabel}</div>
+            <div className="status-badge status-badge--violet">Synthetic demo</div>
           </div>
 
           <p className="output-summary">
-            The current snapshot shows what the decision looks like if the synthetic calibration and cost inputs are
-            trusted exactly as written.
+            The current snapshot shows whether the business cost clears the gate if the synthetic inputs are trusted as written.
           </p>
 
           <div className="output-anchor cardo-guard__decision">
@@ -228,22 +249,64 @@ export default function CardoGuard() {
 
           <div className="mini-grid">
             <Metric label="Confidence" value={`${review.confidence}%`} note={confidenceBandLabel} />
-            <Metric label="False alarm rate" value={`${Math.round(review.falseAlarmRate * 100)}%`} note="Synthetic band" />
             <Metric
-              label="Chance the event is real after calibration"
+              label="How often this confidence band is wrong"
+              value={`${Math.round(review.falseAlarmRate * 100)}%`}
+              note="Synthetic band"
+            />
+            <Metric
+              label="Adjusted chance the risk is real"
               value={`${Math.round(review.calibratedEventLikelihood * 100)}%`}
               note="Based on the synthetic false-alarm band."
             />
-            <Metric label="Expected action waste" value={formatMoney(review.expectedActionWaste)} />
-            <Metric label="Expected miss loss" value={formatMoney(review.expectedMissLoss)} />
+            <Metric
+              label="Expected cost if we act and the model is wrong"
+              value={formatMoney(review.expectedActionWaste)}
+            />
+            <Metric
+              label="Expected cost if we ignore it and the risk is real"
+              value={formatMoney(review.expectedMissLoss)}
+            />
           </div>
 
           <div className="cardo-guard__hinge mini-card">
-            <div className="card-label">The hinge</div>
+            <div className="card-label">The decision hinge</div>
             <div>
               {review.shouldAct
                 ? `Expected miss loss ${formatMoney(review.expectedMissLoss)} is higher than expected action waste ${formatMoney(review.expectedActionWaste)}.`
                 : `Expected action waste ${formatMoney(review.expectedActionWaste)} is higher than expected miss loss ${formatMoney(review.expectedMissLoss)}.`}
+            </div>
+          </div>
+
+          <div className="mini-card">
+            <div className="card-label">Why it matters</div>
+            <div className="stacked-list">
+              <span>Act or do not act.</span>
+              <span>See why.</span>
+              <span>See the hinge.</span>
+              <span>See what would change the verdict.</span>
+            </div>
+          </div>
+
+          <div className="mini-card">
+            <div className="card-label">How the gate is checked</div>
+            <div className="stacked-list cardo-guard__plain-check">
+              <span>If the model is wrong: acting may waste money.</span>
+              <span>If the risk is real: ignoring it may cost more.</span>
+              <span>CARDO GUARD compares those two numbers before turning a score into a decision.</span>
+            </div>
+            <div className="cardo-guard__math">
+              <div>Action waste = cost to act × false alarm rate</div>
+              <div>Miss loss = cost of missing × adjusted chance the risk is real</div>
+            </div>
+          </div>
+
+          <div className="mini-card">
+            <div className="card-label">Why this verdict?</div>
+            <div className="cardo-guard__why-list">
+              {whyThisVerdict.map((item) => (
+                <div key={item}>{item}</div>
+              ))}
             </div>
           </div>
 
@@ -260,6 +323,15 @@ export default function CardoGuard() {
                 <span>Decision tradeoff visible</span>
                 <span>No claim of model accuracy gain</span>
               </div>
+            </div>
+            <div className="mini-card">
+              <div className="card-label">What this is useful for</div>
+              <ul className="cardo-guard__list">
+                <li>Checking whether a model score justifies action.</li>
+                <li>Explaining why a decision did or did not clear the gate.</li>
+                <li>Separating confidence from business impact.</li>
+                <li>Keeping synthetic assumptions visible.</li>
+              </ul>
             </div>
           </div>
 

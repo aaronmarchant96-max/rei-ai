@@ -5,8 +5,14 @@ describe("CardoGuard", () => {
   it("runs a synthetic guard check from the default scenario", () => {
     render(<CardoGuard />);
 
-    expect(screen.getByText(/synthetic decision validator/i)).toBeInTheDocument();
-    expect(screen.getByText(/synthetic only/i)).toBeInTheDocument();
+    expect(screen.getByText(/should we act on this ai risk score/i)).toBeInTheDocument();
+    expect(screen.getByText(/cardo guard/i, { selector: ".cardo-guard__tool-name" })).toBeInTheDocument();
+    expect(screen.getByText(/synthetic demo only/i, { selector: ".status-badge--cyan" })).toBeInTheDocument();
+    expect(screen.getByText(/not operational advice/i, { selector: ".status-badge--muted" })).toBeInTheDocument();
+    expect(screen.getByText(/test the decision/i, { selector: ".card-label" })).toBeInTheDocument();
+    expect(screen.getByText(/start with a synthetic scenario/i)).toBeInTheDocument();
+    expect(screen.getByText(/use fake numbers to test the decision logic before trusting a model score/i)).toBeInTheDocument();
+    expect(screen.getByText(/the model gives a score\./i, { selector: "strong" })).toBeInTheDocument();
     expect(
       screen.getByText(/route disruption threatens a fuel delivery/i, { selector: ".cardo-guard__hint" })
     ).toBeInTheDocument();
@@ -23,12 +29,22 @@ describe("CardoGuard", () => {
     fireEvent.click(screen.getByRole("button", { name: /run guard check/i }));
 
     expect(screen.getByText(/^ACT$/i)).toBeInTheDocument();
-    expect(screen.getByText(/expected miss loss \$9,100 is higher than expected action waste \$450\./i)).toBeInTheDocument();
     expect(
-      screen.getByText(/chance the event is real after calibration/i, { selector: ".card-label" })
+      screen.getByText(/acting clears the gate because the risk-adjusted cost of missing it is higher than the expected waste of acting\./i)
     ).toBeInTheDocument();
-    expect(screen.getByText(/what would change the verdict/i)).toBeInTheDocument();
-    expect(screen.getByText(/not a prediction model/i)).toBeInTheDocument();
+    expect(screen.getByText(/adjusted chance the risk is real/i, { selector: ".card-label" })).toBeInTheDocument();
+    expect(screen.getByText(/how often this confidence band is wrong/i, { selector: ".card-label" })).toBeInTheDocument();
+    expect(screen.getByText(/the decision hinge/i)).toBeInTheDocument();
+    expect(screen.getByText(/how the gate is checked/i)).toBeInTheDocument();
+    expect(screen.getByText(/why this verdict\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/action waste = \$5,000 × 9% = \$450/i)).toBeInTheDocument();
+    expect(screen.getByText(/miss loss = \$10,000 × 91% = \$9,100/i)).toBeInTheDocument();
+    expect(screen.getByText(/what would change the verdict/i, { selector: ".card-label" })).toBeInTheDocument();
+    expect(screen.getByText(/raise the cost of acting\./i)).toBeInTheDocument();
+    expect(screen.getByText(/show a higher calibrated false-alarm band\./i)).toBeInTheDocument();
+    expect(screen.getByText(/synthetic demo only/i, { selector: ".status-badge--cyan" })).toBeInTheDocument();
+    expect(screen.getByText(/not a prediction model/i, { selector: ".cardo-guard__rules li" })).toBeInTheDocument();
+    expect(screen.getByText(/what this is useful for/i)).toBeInTheDocument();
   });
 
   it("resets to the selected synthetic example", () => {
@@ -52,7 +68,9 @@ describe("CardoGuard", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /reset synthetic example/i }));
 
-    expect(screen.getByText(/expected miss loss \$50,400 is higher than expected action waste \$35,200\./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/acting clears the gate because the risk-adjusted cost of missing it is higher than the expected waste of acting\./i)
+    ).toBeInTheDocument();
   });
 
   it("coerces invalid numeric input to zero", () => {
@@ -63,7 +81,9 @@ describe("CardoGuard", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /run guard check/i }));
 
-    expect(screen.getByText(/expected action waste/i, { selector: ".card-label" })).toBeInTheDocument();
+    expect(
+      screen.getByText(/expected cost if we act and the model is wrong/i, { selector: ".card-label" })
+    ).toBeInTheDocument();
     expect(screen.getByText(/\$0/, { selector: ".cardo-guard__metric-value" })).toBeInTheDocument();
   });
 });

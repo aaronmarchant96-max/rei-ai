@@ -19,7 +19,7 @@ describe("cardoGuard", () => {
     expect(review.shouldAct).toBe(true);
     expect(review.expectedActionWaste).toBeCloseTo(35200);
     expect(review.expectedMissLoss).toBeCloseTo(50400);
-    expect(review.explanation).toContain("calibrated event likelihood");
+    expect(review.explanation).toContain("Acting clears the gate");
   });
 
   it("describes what would change the verdict", () => {

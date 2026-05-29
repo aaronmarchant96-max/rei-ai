@@ -98,8 +98,8 @@ export function calculateCardoGuardReview({
     margin,
     shouldAct,
     explanation: shouldAct
-      ? `The calibrated event likelihood makes the cost of missing higher than the expected waste of acting.`
-      : `The calibrated event likelihood does not justify the expected cost of acting.`
+      ? `Acting clears the gate because the risk-adjusted cost of missing it is higher than the expected waste of acting.`
+      : `Do not act because the expected waste of acting is higher than the risk-adjusted cost of missing it.`
   };
 }
 
@@ -116,7 +116,14 @@ export function buildCardoGuardComparison(review) {
   return [
     "Lower the cost of acting.",
     "Show a lower calibrated false-alarm band.",
-    "Prove the miss cost is smaller than assumed.",
-    "Show that the disruption impact is smaller or less likely than assumed."
+    "Prove the miss cost is larger than assumed.",
+    "Narrow the action so the response is cheaper."
+  ];
+}
+
+export function buildCardoGuardWhyThisVerdict(review) {
+  return [
+    `Action waste = ${formatMoney(review.costToAct)} × ${Math.round(review.falseAlarmRate * 100)}% = ${formatMoney(review.expectedActionWaste)}`,
+    `Miss loss = ${formatMoney(review.costToMiss)} × ${Math.round(review.calibratedEventLikelihood * 100)}% = ${formatMoney(review.expectedMissLoss)}`
   ];
 }
