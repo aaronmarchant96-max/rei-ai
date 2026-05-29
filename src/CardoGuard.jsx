@@ -94,10 +94,11 @@ export default function CardoGuard() {
           <div className="panel__head">
             <div>
               <div className="card-label">PromptHound Labs</div>
-              <h2>Should we act on this AI risk score?</h2>
+              <div className="muted" style={{ fontSize: "0.85em", marginBottom: 4 }}>Structured outputs for messy input.</div>
               <div className="cardo-guard__tool-name">CARDO GUARD</div>
+              <h2>Should we act on this AI risk score?</h2>
               <p className="lede">
-                A synthetic decision checker that compares the cost of acting with the cost of ignoring a risk score.
+                A synthetic decision checker that weighs the cost of acting against the cost of ignoring a risk score.
               </p>
             </div>
             <div className="cardo-guard__status">
@@ -107,7 +108,7 @@ export default function CardoGuard() {
           </div>
 
           <div className="cardo-guard__intro mini-card">
-            <p>AI confidence is not a decision. CARDO GUARD compares the cost of acting with the cost of ignoring the risk.</p>
+            <p><strong>AI confidence is not the decision.</strong> Cost-weighted consequence is the decision gate.</p>
           </div>
         </section>
 
@@ -221,13 +222,7 @@ export default function CardoGuard() {
 
           <div className="cardo-guard__rules mini-card">
             <div className="card-label">Guardrails</div>
-            <ul className="cardo-guard__list">
-              <li>Synthetic demo only.</li>
-              <li>Not a prediction model.</li>
-              <li>Not operational advice.</li>
-              <li>Costs stay visible in real units.</li>
-              <li>Show the hinge before the recommendation.</li>
-            </ul>
+            <div className="muted">Synthetic demo. Costs and hinge stay visible. Not operational advice.</div>
           </div>
         </section>
 
@@ -237,11 +232,10 @@ export default function CardoGuard() {
               <div className="card-label">Decision report</div>
               <h2 className="output-title">Act or do not act</h2>
             </div>
-            <div className="status-badge status-badge--violet">Synthetic demo</div>
           </div>
 
           <p className="output-summary">
-            The current snapshot shows whether the business cost clears the gate if the synthetic inputs are trusted as written.
+            The numbers show whether cost-weighted consequence clears the gate under these inputs.
           </p>
 
           <div className="output-anchor cardo-guard__decision">
@@ -279,15 +273,8 @@ export default function CardoGuard() {
                 ? `Risk-adjusted miss loss ${formatMoney(review.expectedMissLoss)} is higher than expected action waste ${formatMoney(review.expectedActionWaste)}.`
                 : `Expected action waste ${formatMoney(review.expectedActionWaste)} is higher than risk-adjusted miss loss ${formatMoney(review.expectedMissLoss)}.`}
             </div>
-          </div>
-
-          <div className="mini-card">
-            <div className="card-label">Why it matters</div>
-            <div className="stacked-list">
-              <span>Act or do not act.</span>
-              <span>See why.</span>
-              <span>See the hinge.</span>
-              <span>See what would change the verdict.</span>
+            <div className="muted" style={{ marginTop: 6 }}>
+              {review.decisionStrength} decision ({review.decisionMarginRatio.toFixed(1)}× margin)
             </div>
           </div>
 
@@ -341,6 +328,17 @@ export default function CardoGuard() {
           <div className="mini-card">
             <div className="card-label">What would change the verdict</div>
             <ul className="cardo-guard__list">
+              {review.breakevenMissCost > 0 && (
+                <li>
+                  {review.shouldAct
+                    ? `The cost of missing would need to drop below ${formatMoney(review.breakevenMissCost)} for the recommendation to flip.`
+                    : `The cost of missing would need to rise above ${formatMoney(review.breakevenMissCost)} for the recommendation to flip.`}
+                </li>
+              )}
+              <li>
+                If the false alarm rate for this confidence band was {review.shouldAct ? "higher" : "lower"} than assumed, the decision could reverse.
+              </li>
+
               {comparison.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -349,11 +347,7 @@ export default function CardoGuard() {
 
           <div className="mini-card">
             <div className="card-label">What this is not</div>
-            <div className="stacked-list">
-              <span>Not a prediction model.</span>
-              <span>Not an expert replacement.</span>
-              <span>Not a generic AI governance dashboard.</span>
-            </div>
+            <div className="muted">Not a prediction model or expert replacement. Synthetic demo only.</div>
           </div>
         </section>
       </div>
