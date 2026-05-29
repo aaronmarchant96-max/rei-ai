@@ -126,13 +126,13 @@ export default function CardoGuard() {
             <div className="card-label">Three steps</div>
             <ol className="cardo-guard__steps-list">
               <li>
-                <strong>The model gives a score.</strong> Example: 89 percent risk.
+                <strong>Start with the score.</strong> Example: 89 percent risk.
               </li>
               <li>
-                <strong>The action has a cost.</strong> Example: acting costs $17,000.
+                <strong>Add the cost to act.</strong> Example: acting costs $17,000.
               </li>
               <li>
-                <strong>Missing it has a cost.</strong> Example: missing it could cost $1,465,000.
+                <strong>Add the cost of missing it.</strong> Example: missing it could cost $1,465,000.
               </li>
             </ol>
           </div>

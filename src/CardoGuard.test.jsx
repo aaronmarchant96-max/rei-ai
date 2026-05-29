@@ -12,7 +12,7 @@ describe("CardoGuard", () => {
     expect(screen.getByText(/test the decision/i, { selector: ".card-label" })).toBeInTheDocument();
     expect(screen.getByText(/start with a synthetic scenario/i)).toBeInTheDocument();
     expect(screen.getByText(/use fake numbers to test the decision logic before trusting a model score/i)).toBeInTheDocument();
-    expect(screen.getByText(/the model gives a score\./i, { selector: "strong" })).toBeInTheDocument();
+    expect(screen.getByText(/start with the score\./i, { selector: "strong" })).toBeInTheDocument();
     expect(
       screen.getByText(/route disruption threatens a fuel delivery/i, { selector: ".cardo-guard__hint" })
     ).toBeInTheDocument();
