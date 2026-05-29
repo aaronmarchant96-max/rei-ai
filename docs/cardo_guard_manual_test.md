@@ -6,9 +6,8 @@ Use this as a pass/fail check while clicking through the live tool.
 
 - Open `CARDO GUARD`.
 - Expected:
-  - Header shows `PromptHound Labs`.
-  - Hero says `Synthetic only`.
-  - Tool says `Launch gate`.
+  - Header shows `PromptHound Labs` (with "Structured outputs for messy input." tagline visible in global shell).
+  - Inside CARDO GUARD: clear subhead "CARDO GUARD", question "Should we act on this AI risk score?", one-line synthetic description, and the two top badges ("Synthetic demo only", "Not operational advice").
   - Default scenario is `Road closure reroute`.
   - Default example should read like `89%`, `15%`, `85%`, `$17,000`, and `$1,465,000`.
   - The confidence band note should say the calibration is synthetic for this demo and would come from model evaluation logs in a real deployment.
@@ -81,7 +80,13 @@ Use this as a pass/fail check while clicking through the live tool.
   - It never claims prediction.
   - It never claims expert replacement.
   - It never sounds like generic AI governance.
-  - It keeps saying synthetic / launch gate / decision validator.
+  - It keeps boundary language tight: synthetic demo, visible costs/hinge, no prediction or expert claims.
+
+- Check the hero area and intro card (after the two status badges).
+- Expected:
+  - It centers the approved spine once: "AI confidence is not the decision. Cost-weighted consequence is the decision gate."
+  - The top badges provide the synthetic / not operational guardrails without repetition deeper in the page.
+  - The working demo ("Test the decision", inputs, Recommendation, "The decision hinge" with margin) follows immediately and stays the focus.
 
 ## 10. Mobile Check
 
@@ -94,4 +99,4 @@ Use this as a pass/fail check while clicking through the live tool.
 
 ## Pass Rule
 
-- A run passes if the inputs, report, hinge, and recommendation stay aligned, and the copy preserves the synthetic decision-validation boundary.
+- A run passes if the inputs, report, hinge, and recommendation stay aligned, the top-level hierarchy is clear (PromptHound Labs → CARDO GUARD), the spine sentence appears once prominently, and guardrail phrases ("synthetic demo", "not operational advice") appear only as compact top-level reminders without duplication.

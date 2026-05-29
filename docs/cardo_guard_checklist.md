@@ -47,6 +47,7 @@ Use this before shipping anything that uses CARDO GUARD language, logic, or repo
 - The scenario still renders correctly on mobile and desktop.
 - The decision math still matches the displayed inputs.
 - The boundary language still makes the synthetic status obvious.
+- The hero uses the approved structure (PromptHound Labs + tagline, CARDO GUARD, "Should we act on this AI risk score?", one-line description, single pair of synthetic/not-operational badges) and centers the spine sentence: "AI confidence is not the decision. Cost-weighted consequence is the decision gate." Guardrails appear once as compact reminders, not repeated blocks.
 - No unrelated copy changed when the feature changed.
 
 ## Do Not Ship If
