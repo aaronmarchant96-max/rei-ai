@@ -2157,6 +2157,28 @@ button { font-family: inherit; }
   letter-spacing: -0.01em;
 }
 
+.tracepoint__decision-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 5px 10px;
+  border: 1px solid rgba(240, 199, 94, 0.16);
+  border-radius: 999px;
+  background: rgba(214, 176, 76, 0.08);
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.tracepoint__decision-note {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .tracepoint__decision-formula {
   display: grid;
   gap: 6px;

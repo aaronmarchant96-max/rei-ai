@@ -472,6 +472,32 @@ export function getTracepointDecisionInputsFromScore(combinedScore) {
   };
 }
 
+export function getTracepointDecisionReadout(review, decision) {
+  const signalSummary =
+    review.status === "Review Recommended"
+      ? "High signal"
+      : review.status === "Watch"
+        ? "Moderate signal"
+        : "Low signal";
+  const gapSize = Math.abs(Number(decision?.expectedGap) || 0);
+  const economicSummary =
+    gapSize < 10000
+      ? "Thin economics"
+      : decision?.economicallyJustified
+        ? "Economics support acting"
+        : "Economics lean against acting";
+  const reviewNote =
+    decision?.economicallyJustified
+      ? "Inspection is supported by both the signal and the expected-cost check."
+      : "Review is justified on the evidence signal even though the expected-dollar case is weak.";
+
+  return {
+    signalSummary,
+    economicSummary,
+    reviewNote
+  };
+}
+
 export function formatTracepointMoney(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",

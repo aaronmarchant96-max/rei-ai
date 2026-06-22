@@ -4,6 +4,7 @@ import {
   calculateTracepointDecision,
   calculateTracepointReview,
   getTracepointDecisionInputsFromScore,
+  getTracepointDecisionReadout,
   getTracepointScenarioById,
   getTracepointStatus
 } from "./tracepoint.js";
@@ -136,6 +137,25 @@ describe("tracepoint", () => {
     expect(packet.cost_inputs.calibrated_probability_issue_is_real).toBe(inputs.calibratedProbability);
     expect(packet.limitation_statement).toMatch(/synthetic calibration demo only/i);
     expect(packet.export_timestamp).toBe("2026-06-22T00:00:00.000Z");
+  });
+
+  it("summarizes the signal and economics readout for the decision card", () => {
+    const review = calculateTracepointReview(buildTracepointRows());
+    const inputs = getTracepointDecisionInputsFromScore(review.combinedScore);
+    const decision = calculateTracepointDecision({
+      inspectionCost: 91900,
+      missCost: 163900,
+      calibratedProbability: inputs.calibratedProbability,
+      detectionRate: inputs.detectionRate,
+      followThroughRate: inputs.followThroughRate,
+      harmReduction: inputs.harmReduction
+    });
+
+    const readout = getTracepointDecisionReadout(review, decision);
+
+    expect(readout.signalSummary).toBe("High signal");
+    expect(readout.economicSummary).toBe("Economics lean against acting");
+    expect(readout.reviewNote).toMatch(/review is justified on the evidence signal/i);
   });
 
   it("keeps the calibration summary consistent with rolling review flags", () => {

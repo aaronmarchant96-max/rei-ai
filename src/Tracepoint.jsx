@@ -8,6 +8,7 @@ import {
   formatTracepointPercent,
   formatTracepointTimestamp,
   getTracepointDecisionInputsFromScore,
+  getTracepointDecisionReadout,
   getTracepointScenarioById,
   TRACEPOINT_REVIEW_MARKS,
   TRACEPOINT_SCENARIOS
@@ -240,6 +241,7 @@ export default function Tracepoint() {
   const scoreFill = Math.max(0, Math.min(100, review.combinedScore));
   const limitationStatement =
     "Synthetic calibration demo only. Not operational advice, not a forecasting system, and not a replacement for inspection, maintenance procedures, or safety controls.";
+  const decisionReadout = getTracepointDecisionReadout(review, decision);
   const reviewExplainer =
     review.status === "Review Recommended"
       ? `Review recommended. Vibration is ${vibrationEvidence ? vibrationEvidence.driftPercent : 0}% above its baseline median after EWMA smoothing. Bearing temperature is ${temperatureEvidence ? temperatureEvidence.driftPercent : 0}% above baseline and has stayed elevated for ${temperatureEvidence ? temperatureEvidence.persistenceCount : 0} readings. Pressure and flow are moving in the expected direction with ${Math.round((review.concordance || 0) * 100)}% sensor agreement.`
@@ -594,6 +596,10 @@ export default function Tracepoint() {
             <div className="tracepoint-card__note">probability × miss cost</div>
           </div>
           <div className="mini-card mini-card--wide">
+            <div className="card-label">Decision read</div>
+            <div className="tracepoint__decision-flag">
+              {decisionReadout.signalSummary} / {decisionReadout.economicSummary}
+            </div>
             <div className="tracepoint__decision-line">
               {decision.economicallyJustified ? "Inspection is economically justified." : "Inspection is not economically justified."}
             </div>
@@ -601,6 +607,7 @@ export default function Tracepoint() {
               Estimated gap: {formatTracepointMoney(Math.abs(decision.expectedGap))} in favor of{" "}
               {decision.economicallyJustified ? "acting" : "not acting"}.
             </div>
+            <div className="tracepoint__decision-note">{decisionReadout.reviewNote}</div>
             <div className="tracepoint__decision-formula">
               <div>
                 Acting: {formatTracepointMoney(inspectionCost)} +{" "}
