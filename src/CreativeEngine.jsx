@@ -512,6 +512,126 @@ const MUTATION_DESCRIPTIONS = [
   "Mythic symbols carry the conflict.",
   "Human conflict meets an unknowable system."
 ];
+const GENRE_PROFILES = {
+  "Sci-fi": {
+    tone: "clinical, speculative, and system-driven",
+    conflict: "a human team trying to survive inside a rule set they did not design",
+    turn: "the most technical solution exposes the human cost"
+  },
+  "Horror": {
+    tone: "dreadful, claustrophobic, and escalating",
+    conflict: "an unseen threat closing in while the characters lose control",
+    turn: "survival requires naming the threat plainly"
+  },
+  "Fantasy": {
+    tone: "mythic, symbolic, and vivid",
+    conflict: "ritual, destiny, and meaning turning pressure into lore",
+    turn: "a symbolic act changes the outcome"
+  },
+  "Western": {
+    tone: "austere, moral, and frontier-hardened",
+    conflict: "hard choices in a lawless or half-built system",
+    turn: "the cost of trust lands on the public"
+  },
+  "Political thriller": {
+    tone: "tense, strategic, and distrustful",
+    conflict: "power brokers shaping the story before the truth can settle",
+    turn: "the exposed narrative changes who can act"
+  },
+  "War drama": {
+    tone: "pressure-heavy, disciplined, and human",
+    conflict: "obedience, fatigue, and command under collapse",
+    turn: "the line between duty and denial breaks"
+  },
+  "Dark comedy": {
+    tone: "dry, absurd, and socially sharp",
+    conflict: "bad incentives, bad leadership, and people making worse choices for understandable reasons",
+    turn: "the only workable move is also the most ridiculous one"
+  },
+  "Game quest": {
+    tone: "goal-driven, reactive, and tactical",
+    conflict: "the player navigating a pressure system that keeps changing the rules",
+    turn: "the quest objective is revealed to be misleading"
+  },
+  "Anime arc": {
+    tone: "big, emotionally direct, and escalation-friendly",
+    conflict: "the cast’s loyalty and powers getting stressed by a larger force",
+    turn: "the arc pivots on a dramatic reveal"
+  },
+  "Fanfic setup": {
+    tone: "character-forward, intimate, and remix-friendly",
+    conflict: "relationships and loyalties being rewritten by the source pressure",
+    turn: "the familiar setup becomes emotionally different"
+  }
+};
+const FORMAT_PROFILES = {
+  Novel: {
+    shape: "A novel should carry the premise across multiple turns, with a clear arc, pressure build, and earned ending.",
+    protagonist: "the lead",
+    setting: "a sustained pressure cooker rather than a single scene",
+    turn: "the long-form payoff"
+  },
+  "Short story": {
+    shape: "A short story should move fast, compress the pressure, and end on a sharp change or image.",
+    protagonist: "the lead",
+    setting: "one tight situation with little room to hide",
+    turn: "the final image or reversal"
+  },
+  Movie: {
+    shape: "A movie should read as a three-act visual sequence with a setup, escalation, and payoff.",
+    protagonist: "the lead",
+    setting: "a cinematic pressure-cooker location",
+    turn: "the third-act reversal"
+  },
+  "TV episode": {
+    shape: "An episode should open hard, complicate the problem midstream, and end with a question or cliffhanger.",
+    protagonist: "the episode lead",
+    setting: "a recurring world with one active pressure point",
+    turn: "the cliffhanger"
+  },
+  "YouTube video": {
+    shape: "A YouTube video should hook quickly, explain the pattern clearly, and leave one memorable takeaway.",
+    protagonist: "the host or narrator",
+    setting: "a fast, explorable topic frame",
+    turn: "the closing takeaway"
+  },
+  "Game quest": {
+    shape: "A quest should present an objective, twist the objective, then pay off with a meaningful choice.",
+    protagonist: "the player character",
+    setting: "an interactive problem space",
+    turn: "the quest twist"
+  },
+  "D&D one-shot": {
+    shape: "A one-shot should give the party a clear objective, a rising complication, and a final confrontation.",
+    protagonist: "the party",
+    setting: "a compact adventure location",
+    turn: "the final encounter"
+  },
+  "Comic issue": {
+    shape: "A comic issue should make every beat visual, with a strong page-turn reveal and a sharp final panel.",
+    protagonist: "the central figure",
+    setting: "a sequence of strong visual beats",
+    turn: "the page-turn reveal"
+  },
+  "Podcast episode": {
+    shape: "A podcast episode should frame the topic, unpack the pressure, and close on a clear interpretation.",
+    protagonist: "the host or guest lens",
+    setting: "a story told through voice and evidence",
+    turn: "the interpretive close"
+  },
+  "Documentary outline": {
+    shape: "A documentary outline should balance evidence, tension, and interpretation without collapsing into retelling.",
+    protagonist: "the subject or witness",
+    setting: "an evidence-driven frame",
+    turn: "the final argument"
+  },
+  "Fanfic setup": {
+    shape: "A fanfic setup should keep one familiar anchor while moving the emotional center somewhere new.",
+    protagonist: "the familiar cast lens",
+    setting: "a recognizable world with a shifted premise",
+    turn: "the relationship pivot"
+  }
+};
 const BLUEPRINTS = [
   "Novel",
   "Short story",
@@ -566,15 +686,55 @@ function buildFuel(seed, genre) {
 }
 
 function buildStoryFuel(seed) {
-  const remix = seed.genreRemixes?.[0];
-  const secondRemix = seed.genreRemixes?.[1];
+  const firstDivergence = seed.whatIfDivergences?.[0];
+  const secondDivergence = seed.whatIfDivergences?.[1];
   return [
     `Start with the hinge: ${seed.hinge}`,
     `Keep the pressure on these forces: ${(seed.charactersForces || []).slice(0, 3).join(", ")}`,
     `Lean on the reusable pattern: ${(seed.storyDNA || []).slice(0, 4).join(", ")}`,
-    remix ? `First remix angle: ${remix.angle}` : "First remix angle: push the pattern into a new genre.",
-    secondRemix ? `Second remix angle: ${secondRemix.angle}` : "Second remix angle: keep the source recognizable but transformed."
+    firstDivergence ? `First divergence: ${firstDivergence}` : "First divergence: shift one pressure point and see what changes.",
+    secondDivergence ? `Second divergence: ${secondDivergence}` : "Second divergence: keep the source recognizable but transformed."
   ];
+}
+
+function getGenreProfile(genre) {
+  return GENRE_PROFILES[genre] || {
+    tone: "clear, genre-aware, and specific to the selected setting",
+    conflict: "the selected pressure being shaped into a new story form",
+    turn: "the premise changes in a visible way"
+  };
+}
+
+function getMutationProfile(mutation) {
+  return {
+    label: GENRE_MUTATION[mutation] || GENRE_MUTATION[0],
+    description: MUTATION_DESCRIPTIONS[mutation] || MUTATION_DESCRIPTIONS[0],
+    logic:
+      [
+        "Keep the source pressure grounded in observable cause and effect.",
+        "Tighten the original pressure without changing the rules of the world.",
+        "Introduce one altered rule so the outcome changes in a visible way.",
+        "Translate the pressure into symbolic or mythic logic.",
+        "Shift the system into an impersonal cosmic force that changes the survival math."
+      ][mutation] || "Keep the source pressure grounded in observable cause and effect."
+  };
+}
+
+function getFormatProfile(format) {
+  return FORMAT_PROFILES[format] || FORMAT_PROFILES.Movie;
+}
+
+function buildSelectedAngle(seed, genre, mutation) {
+  const genreProfile = getGenreProfile(genre);
+  const mutationProfile = getMutationProfile(mutation);
+  const sourceTag = seed.sourceType;
+
+  return [
+    `Selected genre tone: ${genreProfile.tone}.`,
+    `Mutation shift: ${mutationProfile.logic}`,
+    `Reference frame: keep the ${sourceTag} pattern visible while the tone, conflict, and causal system change.`,
+    `Angle: ${genreProfile.conflict}.`
+  ].join(" ");
 }
 
 function makeSeedPacket(seed, customAdditions = "") {
@@ -782,27 +942,35 @@ function makeBlueprintPacket(seed, format, customAdditions = "") {
 
 function makeRemixPacket(seed, genre, mutation, customAdditions = "") {
   const custom = cleanCustomAdditions(customAdditions);
+  const genreProfile = getGenreProfile(genre);
+  const mutationProfile = getMutationProfile(mutation);
+  const formatProfile = getFormatProfile("Movie");
   const variation = [
-    "Keep the real event visible, but shift the tone and stakes enough that the fiction feels like a new work.",
-    "Change the setting and cast, but preserve the pressure pattern.",
-    "Let one key assumption fail and see what new story emerges.",
-    "Translate the pressure into mythic symbolism and visual conflict.",
-    "Push the human problem into a larger and stranger system."
-  ][mutation];
-
-  const angle = (seed.genreRemixes || [])[mutation % (seed.genreRemixes?.length || 1)] || seed.genreRemixes?.[0];
+    `Keep the real event visible, but shape it through ${genreProfile.tone}.`,
+    `Change the setting and cast, but preserve the pressure pattern and let the ${mutationProfile.label.toLowerCase()} layer do the work.`,
+    `Let one key assumption fail and see how the selected genre changes the conflict.`,
+    `Translate the pressure into a more symbolic version of ${genreProfile.conflict}.`,
+    `Push the human problem into ${mutationProfile.logic.toLowerCase()}`
+  ][mutation] || `Keep the pressure visible while the selected genre and mutation both reshape the result.`;
 
   return {
     title: `${seed.title} / ${genre}`,
-    summary: `A ${GENRE_MUTATION[mutation].toLowerCase()} reinterpretation of ${seed.title} that keeps the source pattern intact.`,
+    summary: `A ${mutationProfile.label.toLowerCase()} ${genre.toLowerCase()} reinterpretation of ${seed.title} that keeps the source pattern intact.`,
     meta: [genre, GENRE_MUTATION[mutation], seed.sourceType],
     anchor: seed.hinge,
     sections: [
       { label: "Genre", body: genre },
+      { label: "Genre tone", body: genreProfile.tone },
       { label: "Mutation", body: GENRE_MUTATION[mutation] },
+      { label: "Mutation logic", body: mutationProfile.logic },
       { label: "Core pressure", body: seed.hinge },
+      { label: "Format shape", body: formatProfile.shape },
+      { label: "Protagonist", body: formatProfile.protagonist },
+      { label: "Setting", body: formatProfile.setting },
+      { label: "Central conflict", body: genreProfile.conflict },
+      { label: "Story turn", body: genreProfile.turn },
       { label: "Remix direction", body: variation },
-      { label: "Reference angle", body: angle ? `${angle.genre}: ${angle.angle}` : "No remix angle found." },
+      { label: "Selected angle", body: buildSelectedAngle(seed, genre, mutation) },
       ...(custom ? [{ label: "Custom additions", body: custom }] : [])
     ]
   };
@@ -812,13 +980,15 @@ function makeStoryIdeaPacket(seed, format, genre, mutation, customAdditions = ""
   const custom = cleanCustomAdditions(customAdditions);
   const blueprint = makeBlueprintLines(seed, format, custom);
   const remix = makeRemixPacket(seed, genre, mutation, custom);
-  const remixAngle = (seed.genreRemixes || [])[mutation % (seed.genreRemixes?.length || 1)] || seed.genreRemixes?.[0];
+  const genreProfile = getGenreProfile(genre);
+  const mutationProfile = getMutationProfile(mutation);
+  const formatProfile = getFormatProfile(format);
   const hinge = lowerClean(seed.hinge);
   const stakes = lowerClean(seed.stakes);
 
   return {
     title: `${seed.title} / ${format} / ${genre}`,
-    summary: `A full story idea that combines ${seed.title}, a ${format.toLowerCase()} format, and a ${GENRE_MUTATION[mutation].toLowerCase()} ${genre.toLowerCase()} remix.`,
+    summary: `A full story idea that combines ${seed.title}, a ${format.toLowerCase()} format, and a ${mutationProfile.label.toLowerCase()} ${genre.toLowerCase()} remix.`,
     meta: [seed.sourceType, format, genre, GENRE_MUTATION[mutation]],
     anchor: seed.hinge,
     sections: [
@@ -827,16 +997,40 @@ function makeStoryIdeaPacket(seed, format, genre, mutation, customAdditions = ""
         body: `${trimTerminalPunctuation(seed.summary)}. The central tension is ${hinge}, carried through ${seed.storyDNA.slice(0, 3).join(", ")}.`
       },
       {
+        label: "Format",
+        body: formatProfile.shape
+      },
+      {
         label: "Blueprint shape",
         body: blueprint.join(" ")
       },
       {
-        label: "Remix layer",
-        body: `${remix.summary} ${remixAngle ? remixAngle.prompt : ""}`.trim()
+        label: "Genre tone",
+        body: `The tone should be ${genreProfile.tone}, with the conflict built around ${genreProfile.conflict}.`
       },
       {
-        label: "Main pressure",
-        body: `The lead has to choose between ${stakes}, while the setting pushes back through ${seed.charactersForces.slice(0, 3).join(", ")}.`
+        label: "Mutation logic",
+        body: mutationProfile.logic
+      },
+      {
+        label: "Protagonist",
+        body: `${formatProfile.protagonist} is forced to navigate the pressure without losing the human core of the story.`
+      },
+      {
+        label: "Setting",
+        body: `${seed.region} during ${seed.era}, framed as ${formatProfile.setting}.`
+      },
+      {
+        label: "Central conflict",
+        body: `The lead has to choose between ${stakes}, while the setting pushes back through ${seed.charactersForces.slice(0, 3).join(", ")} and the selected genre keeps the pressure readable as ${genreProfile.tone}.`
+      },
+      {
+        label: "Story turn",
+        body: `${formatProfile.turn} comes when the group realizes ${genreProfile.turn.toLowerCase()}.`
+      },
+      {
+        label: "Remix layer",
+        body: `${remix.summary} ${buildSelectedAngle(seed, genre, mutation)}`.trim()
       },
       {
         label: "Story fuel",
@@ -1594,3 +1788,14 @@ export default function CreativeEngine() {
     </div>
   );
 }
+
+export {
+  buildSelectedAngle,
+  getFormatProfile,
+  getGenreProfile,
+  getMutationProfile,
+  makeBlueprintLines,
+  makeBlueprintPacket,
+  makeRemixPacket,
+  makeStoryIdeaPacket
+};
