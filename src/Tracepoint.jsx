@@ -570,12 +570,12 @@ export default function Tracepoint() {
             <div className="tracepoint-card__value">{formatTracepointPercent(decisionDefaults.followThroughRate, 0)}</div>
             <div className="tracepoint-card__note">Synthetic follow-through rate derived from the current review strength.</div>
           </div>
-          <div className="mini-card">
+            <div className="mini-card">
             <div className="card-label">Combined harm reduction</div>
             <div className="tracepoint-card__value">
               {formatTracepointPercent(
                 decisionDefaults.detectionRate * decisionDefaults.followThroughRate * harmReduction,
-                0
+                2
               )}
             </div>
             <div className="tracepoint-card__note">Detection × follow-through × intervention effectiveness.</div>
