@@ -110,22 +110,27 @@ function selectGroqModel(prompt = "") {
 
   // Ingest or long input (>6000 chars)
   if (len > 6000 || lower.includes("ingest") || lower.includes("--file")) {
-    return "mixtral-8x7b-32768";
+    return "openai/gpt-oss-120b";
   }
 
-  // Coding and Genealogy helper profiles require maximum reasoning
-  if (lower.includes("coding companion") || lower.includes("coding methodology") || lower.includes("genealogical") || lower.includes("genealogy")) {
+  // Coding Helper routes to the high-performance GPT OSS or Llama 4 Scout models
+  if (lower.includes("coding companion") || lower.includes("coding methodology")) {
+    return "openai/gpt-oss-120b";
+  }
+
+  // Genealogy Helper utilizes Llama 3.3 70B
+  if (lower.includes("genealogical") || lower.includes("genealogy")) {
     return "llama-3.3-70b-versatile";
   }
 
   // Story Builder outline generation
   if (lower.includes("story architect") || lower.includes("story blueprint") || lower.includes("story builder")) {
-    return len > 4000 ? "mixtral-8x7b-32768" : "llama-3.3-70b-versatile";
+    return "groq/compound";
   }
 
   // General Assistant (low-latency default)
   if (lower.includes("general assistant")) {
-    return "llama-3.1-8b-instant";
+    return "groq/compound-mini";
   }
 
   // Length fallback rules
