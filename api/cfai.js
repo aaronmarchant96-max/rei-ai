@@ -113,14 +113,19 @@ function selectGroqModel(prompt = "") {
     return "mixtral-8x7b-32768";
   }
 
-  // Validate or score (latency optimized)
-  if (lower.includes("validate") || lower.includes("score")) {
-    return "llama-3.1-8b-instant";
+  // Coding and Genealogy helper profiles require maximum reasoning
+  if (lower.includes("coding companion") || lower.includes("coding methodology") || lower.includes("genealogical") || lower.includes("genealogy")) {
+    return "llama-3.3-70b-versatile";
   }
 
-  // Discover or search (reasoning/accuracy optimized)
-  if (lower.includes("discover") || lower.includes("search")) {
-    return "llama-3.3-70b-versatile";
+  // Story Builder outline generation
+  if (lower.includes("story architect") || lower.includes("story blueprint") || lower.includes("story builder")) {
+    return len > 4000 ? "mixtral-8x7b-32768" : "llama-3.3-70b-versatile";
+  }
+
+  // General Assistant (low-latency default)
+  if (lower.includes("general assistant")) {
+    return "llama-3.1-8b-instant";
   }
 
   // Length fallback rules

@@ -108,13 +108,13 @@ export default function REI() {
       let systemContext = "You are a helpful CARDO REI methodology assistant. Help the user clarify reasoning, find hinges, and verify claims.";
       
       if (selectedDomain === "assistant") {
-        systemContext = "You are a standard, friendly LLM general assistant. Respond naturally, constructively, and helper-focused to any everyday query.";
+        systemContext = "You are a friendly general assistant utilizing the CARDO REI methodology to structure logical explanations. Help the user clarify evidence, distinguish assumptions, and locate decision hinges.";
       } else if (selectedDomain === "coding") {
-        systemContext = "You are REI.AI, a senior coding companion. Write code that is clean, obvious, and testable. Follow Phase 0 constraints and verify boundaries.";
+        systemContext = "You are REI.AI, a senior coding companion executing the CARDO REI coding methodology. Write code that is clean, obvious, and testable. Follow Phase 0 constraints: verify before writing code, explicitly isolate the Hinge, evaluate blast radius, and design test suites.";
       } else if (selectedDomain === "genealogy") {
-        systemContext = "You are a genealogical research assistant using CARDO REI methodology. Evaluate evidence with 🟢🔵🟠🟡 tier tags.";
+        systemContext = "You are a genealogical research assistant executing the CARDO REI genealogy methodology. Rigorously tier evidence (🟢 Primary Source, 🔵 Strong Evidence, 🟠 Needs Review, 🟡 Family Memory) and disambiguate same-name profiles.";
       } else if (selectedDomain === "story") {
-        systemContext = "You are a story builder helper using Story Forge principles. Generate rich, structural narrative blueprints and character arcs from raw details.";
+        systemContext = "You are a creative story architect utilizing the CARDO REI methodology. Decompose source details (Collect), analyze character driver hinges, organize story blueprints, and iterate narrative arcs.";
       }
 
       // Format previous chat history to send to backend (last 10 messages)
