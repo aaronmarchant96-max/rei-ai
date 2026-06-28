@@ -8,11 +8,40 @@ import fs from 'fs';
 const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH || '/home/potatoking/.local/bin/cfai';
 
+function selectGroqModel(prompt = '') {
+  const len = prompt.length;
+  const lower = prompt.toLowerCase();
+  
+  // Ingest or long input (>6000 chars)
+  if (len > 6000 || lower.includes("ingest") || lower.includes("--file")) {
+    return "mixtral-8x7b-32768";
+  }
+  
+  // Validate or score (latency optimized)
+  if (lower.includes("validate") || lower.includes("score")) {
+    return "llama-3.1-8b-instant";
+  }
+  
+  // Discover or search (reasoning/accuracy optimized)
+  if (lower.includes("discover") || lower.includes("search")) {
+    return "llama-3.3-70b-versatile";
+  }
+  
+  // Length fallback rules
+  if (len < 1500) {
+    return "llama-3.1-8b-instant";
+  }
+  
+  return "llama-3.3-70b-versatile";
+}
+
 async function callGroqDirectly(prompt) {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     throw new Error("GROQ_API_KEY is not configured in Vercel environment variables.");
   }
+
+  const selectedModel = selectGroqModel(prompt);
 
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
@@ -21,7 +50,7 @@ async function callGroqDirectly(prompt) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
+      model: selectedModel,
       messages: [
         {
           role: "system",
@@ -43,7 +72,10 @@ async function callGroqDirectly(prompt) {
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content || "No content returned from Groq.";
+  return {
+    content: data.choices?.[0]?.message?.content || "No content returned from Groq.",
+    model: selectedModel
+  };
 }
 
 async function handleCfaiRequest(command, args = [], input = '') {
@@ -53,7 +85,8 @@ async function handleCfaiRequest(command, args = [], input = '') {
       const directResult = await callGroqDirectly(input || args.join(' '));
       return {
         success: true,
-        result: directResult,
+        result: directResult.content,
+        model: directResult.model,
         command: "direct_groq_api_fallback",
         timestamp: new Date().toISOString()
       };
@@ -90,7 +123,8 @@ async function handleCfaiRequest(command, args = [], input = '') {
         const directResult = await callGroqDirectly(input || args.join(' '));
         return {
           success: true,
-          result: directResult,
+          result: directResult.content,
+          model: directResult.model,
           command: "direct_groq_api_fallback_after_cli_error",
           timestamp: new Date().toISOString()
         };

@@ -41,7 +41,7 @@ export default function REI() {
   const [messages, setMessages] = useState([
     {
       sender: "rei",
-      text: "System initialized. Welcome to REI.AI methodology engine. Select a domain profile from the header, then submit raw evidence or claims to evaluate under the CARDO REI framework.",
+      text: "System initialized. Welcome to REI.ai methodology engine. Select a domain profile from the header, then submit raw evidence or claims to evaluate under the CARDO REI framework.",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -110,6 +110,7 @@ export default function REI() {
             engine: "REI-Hinge-Core v0.3",
             domain: selectedDomain,
             command: "score",
+            model: data.model || "Local cfai CLI Executable",
             timestamp: data.timestamp || new Date().toISOString()
           }
         }

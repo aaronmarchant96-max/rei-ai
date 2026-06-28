@@ -48,6 +48,11 @@ const TOP_LEVEL = [
     id: "tracepoint",
     label: "Tracepoint",
     subtitle: "Industrial signals stay evidence-first."
+  },
+  {
+    id: "cfai",
+    label: "Hinge AI",
+    subtitle: "CARDO REI genealogy research assistant."
   }
 ];
 
@@ -60,6 +65,7 @@ function getInitialTool() {
   if (window.location.hash === "#hinge-meter") return "hinge-meter";
   if (window.location.hash === "#rei") return "rei";
   if (window.location.hash === "#tracepoint") return "tracepoint";
+  if (window.location.hash === "#cfai") return "cfai";
   return "furnace";
 }
 
@@ -71,6 +77,7 @@ function getToolPath(tool) {
   if (tool === "hinge-meter") return "/#hinge-meter";
   if (tool === "rei") return "/#rei";
   if (tool === "tracepoint") return "/#tracepoint";
+  if (tool === "cfai") return "/#cfai";
   return "/";
 }
 
@@ -98,7 +105,9 @@ export default function AppShell() {
                 ? "PromptHound Labs | REI"
                 : tool === "tracepoint"
                   ? "PromptHound Labs | Tracepoint"
-                : "PromptHound Labs | Debate Furnace";
+                  : tool === "cfai"
+                    ? "PromptHound Labs | Hinge AI (CFai)"
+                    : "PromptHound Labs | Debate Furnace";
   }, [tool]);
 
   return (
@@ -142,6 +151,8 @@ export default function AppShell() {
           <REI />
         ) : tool === "tracepoint" ? (
           <Tracepoint />
+        ) : tool === "cfai" ? (
+          <REI />
         ) : (
           <DebateFurnace />
         )}
