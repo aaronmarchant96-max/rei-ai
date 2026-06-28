@@ -3,37 +3,102 @@ import { useState, useRef, useEffect } from "react";
 const DOMAIN_PROFILES = [
   {
     id: "assistant",
-    label: "General Assistant",
+    label: "The Generalist",
     badge: "Active",
-    description: "A standard, friendly LLM assistant to converse naturally, answer general questions, and help with daily tasks.",
+    description: "Everyday reasoning using natural dialogue. Help the user clarify evidence, distinguish assumptions, and locate decision hinges.",
     rules: ["Clear and friendly replies", "Constructive, natural dialogue", "Brevity by default"],
     exemplar: "Conversing naturally on various everyday subjects."
   },
   {
     id: "coding",
-    label: "Coding Helper",
+    label: "The Hinge Finder",
     badge: "Active",
-    description: "Rigorous system evaluation engine designed to write obvious, testable, and boring code.",
+    description: "Senior coding logic executing CARDO REI coding methodology. obv, testable, and boring code.",
     rules: ["Verify API shapes before coding", "Name hinges explicitly", "Stop and ask if underspecified"],
     exemplar: "Decomposing complex requirements into small, testable coding iterations."
   },
   {
     id: "genealogy",
-    label: "Genealogy Helper",
+    label: "The Archivist",
     badge: "Active",
-    description: "Historian evidence evaluation framework tiering sources and separating same-name profiles.",
+    description: "Evidence-tiered genealogy and disambiguating same-name profiles.",
     rules: ["Compare parent-child age limits", "Assign primary/strong evidence tiers", "Log negative search query results"],
     exemplar: "Thomas Ramsey same-name disambiguation and parish register evaluation."
   },
   {
     id: "story",
-    label: "Story Builder",
+    label: "The Storyteller",
     badge: "Active",
-    description: "Creative orchestration assistant generating story blueprints and narrative arcs using Story Forge principles.",
+    description: "Narrative architecture assistant generating story blueprints and narrative arcs.",
     rules: ["Establish clear blueprint structure", "Identify core character driver hinges", "Avoid cliché tropes by default"],
     exemplar: "Expanding historical inspiration seeds into multi-part character outlines."
   }
 ];
+
+// ── HingeMark Logo Component ──
+function HingeMark({ size = 36, animated = false }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 36 36"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Pivot pin */}
+      <circle cx="18" cy="18" r="2.2" fill="#fde047" />
+
+      {/* Fixed arm (amber) */}
+      <path
+        d="M18 18 L18 6"
+        stroke="#fb923c"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+      <path
+        d="M18 6 L26 6"
+        stroke="#fb923c"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+
+      {/* Swinging arm (gold) — open-angle by default */}
+      <g
+        style={
+          animated
+            ? {
+                transformOrigin: "18px 18px",
+                animation: "rei-hinge-swing 1s ease-in-out infinite",
+              }
+            : undefined
+        }
+      >
+        <path
+          d="M18 18 L29 25"
+          stroke="#fde047"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+        <path
+          d="M29 25 L29 33"
+          stroke="#fde047"
+          strokeWidth="3"
+          strokeLinecap="round"
+          opacity="0.5"
+        />
+      </g>
+
+      {animated && (
+        <style>{`
+          @keyframes rei-hinge-swing {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-12deg); }
+          }
+        `}</style>
+      )}
+    </svg>
+  );
+}
 
 export default function REI() {
   // Add fade-in animation style
@@ -59,6 +124,113 @@ export default function REI() {
       @keyframes pulse {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.6; }
+      }
+      @keyframes pulse-ring {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 0.9; transform: scale(1.04); }
+      }
+      @keyframes swing {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(-18deg); }
+      }
+      
+      /* Theme styles override */
+      .rei-dashboard-wrapper {
+        background: #0a0505 !important;
+      }
+      .rei-custom-container {
+        background: radial-gradient(circle at 30% 15%, #4a1d0f 0%, #1a0d08 45%, #08050a 100%) !important;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(251,146,60,0.15) !important;
+        border-radius: 16px !important;
+      }
+      .rei-custom-container::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(251,146,60,0.1), transparent 55%);
+        pointer-events: none;
+      }
+      .rei-custom-container::after {
+        content: '';
+        position: absolute;
+        top: -40%;
+        right: -20%;
+        width: 60%;
+        height: 60%;
+        background: radial-gradient(circle, rgba(249,115,22,0.18), transparent 70%);
+        pointer-events: none;
+      }
+      .rei-logo-mark {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #f97316, #fbbf24);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 24px rgba(249,115,22,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+        flex-shrink: 0;
+        position: relative;
+      }
+      .rei-logo-mark::after {
+        content: '';
+        position: absolute;
+        inset: -2px;
+        border-radius: 16px;
+        border: 1px solid rgba(251,191,36,0.5);
+        animation: pulse-ring 2.4s ease-in-out infinite;
+      }
+      .rei-logo-title {
+        font-weight: 800;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+        background: linear-gradient(90deg, #fb923c, #fde047);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .rei-logo-sub {
+        font-size: 12.5px;
+        color: #d6a98a;
+        letter-spacing: 0.03em;
+        margin-top: 2px;
+      }
+      .rei-custom-tab {
+        padding: 9px 14px;
+        border-radius: 9px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border: 1px solid rgba(255,255,255,0.08);
+        color: #94a3b8;
+        background: rgba(255,255,255,0.02);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        line-height: 1.3;
+      }
+      .rei-custom-tab:hover {
+        border-color: rgba(251,146,60,0.4);
+        color: #fdba74;
+        transform: translateY(-1px);
+      }
+      .rei-custom-tab-active {
+        background: linear-gradient(135deg, rgba(249,115,22,0.22), rgba(251,191,36,0.14)) !important;
+        border-color: #f97316 !important;
+        color: #fed7aa !important;
+        box-shadow: 0 0 18px rgba(249,115,22,0.15);
+      }
+      .rei-custom-card {
+        width: 100%;
+        border-radius: 12px;
+        padding: 16px 18px;
+        background: rgba(0,0,0,0.2);
+        border: 1px solid rgba(251,146,60,0.15);
+        position: relative;
+        z-index: 1;
       }
     `;
     document.head.appendChild(style);
@@ -176,24 +348,36 @@ export default function REI() {
     setIsTyping(true);
 
     try {
-      // Build domain-specific prompt rules
-      let systemContext = "You are a helpful CARDO REI methodology assistant. Help the user clarify reasoning, find hinges, and verify claims.";
-      
+      // Build domain-specific prompt
+      let systemContext =
+        "You are REI, a careful reasoning assistant. Help the user clarify reasoning, find the real point of leverage (the 'hinge') in their problem, and verify claims before accepting them. Default to plain language over jargon.";
+
       if (selectedDomain === "assistant") {
-        systemContext = "You are a friendly general assistant utilizing the CARDO REI methodology to structure logical explanations. Help the user clarify evidence, distinguish assumptions, and locate decision hinges.";
+        systemContext =
+          "You are REI, a friendly, direct general-purpose assistant. Answer naturally and briefly by default — no preamble, no over-explaining. You're built on the CARDO REI methodology, but in this mode that only means: don't guess when something's unclear, and keep reasoning honest. Don't narrate the methodology or use terms like 'hinge,' 'CARDO,' or 'evidence tiers' unless the user brings up something where structured reasoning genuinely helps — and even then, use it quietly, in plain language, not as branded vocabulary.";
       } else if (selectedDomain === "coding") {
-        systemContext = "You are REI.AI, a senior coding companion executing the CARDO REI coding methodology. Write code that is clean, obvious, and testable. Follow Phase 0 constraints: verify before writing code, explicitly isolate the Hinge, evaluate blast radius, and design test suites.";
+        systemContext =
+          "You are REI.AI, a senior software engineer executing the CARDO REI coding methodology. Default stance: write code that is obvious, testable, and boring; prefer clarity over cleverness; fix root causes, not symptoms. " +
+          "Before writing code for any non-trivial request, silently check: what's the real problem, who uses this, what are the failure modes, what existing code does this touch, is there a simpler existing solution. If you can't answer two or more of these from the request as given, ask a clarifying question instead of writing code — do not guess and present it as confident. " +
+          "Name the Hinge explicitly (the smallest surface area your change touches) before proposing code. Classify risk as High/Medium/Low and state blast radius for High-risk changes. Never present a guessed API shape as verified — flag it as an assumption if you can't confirm it. Keep functions single-responsibility, name things by intent, comment the why not the what.";
       } else if (selectedDomain === "genealogy") {
-        systemContext = "You are a genealogical research assistant executing the CARDO REI genealogy methodology. Rigorously tier evidence (🟢 Primary Source, 🔵 Strong Evidence, 🟠 Needs Review, 🟡 Family Memory) and disambiguate same-name profiles.";
+        systemContext =
+          "You are REI.AI, a genealogical research assistant executing the CARDO REI evidence-evaluation methodology. Tier every claim explicitly: 🟢 Primary Source (original record, e.g. parish register, census, vital record), 🔵 Strong Evidence (secondary source with clear sourcing), 🟠 Needs Review (plausible but unverified or conflicting), 🟡 Family Memory (oral history, undocumented tradition). " +
+          "Always check for same-name disambiguation risk before accepting an identity match — compare parent-child age plausibility, geographic continuity, and record timing. If a search or record check comes back negative, log that explicitly as a result, not as silence — a negative result is evidence too. State your tier and reasoning inline with each claim, don't bury it in a summary at the end.";
       } else if (selectedDomain === "story") {
-        systemContext = "You are a creative story architect utilizing the CARDO REI methodology. Decompose source details (Collect), analyze character driver hinges, organize story blueprints, and iterate narrative arcs.";
+        systemContext =
+          "You are REI.AI, a creative story architect using the CARDO REI methodology adapted for narrative work: Collect (source material, inspiration, constraints), Analyze (character driver hinges — what each character actually wants and fears), Record (blueprint structure: arc, turning points, stakes), Distinguish (separate canon facts from invented details, especially when working from real historical sources), Organize (clean narrative structure), Iterate (refine based on what's not landing). " +
+          "Identify the core character driver hinge explicitly before expanding any outline — the single want/fear that the rest of the arc pivots on. Avoid cliché tropes by default; if a beat is a well-worn trope, name it as such and offer a less expected alternative. When working from real historical or biographical source material, keep a clear line between documented fact and creative invention.";
       }
 
-      // Format previous chat history to send to backend (last 10 messages)
-      const historyPayload = messages.slice(-10).map(msg => ({
-        role: msg.sender === "user" ? "user" : "assistant",
-        content: msg.text
-      }));
+      // Format previous chat history to send to backend (last 10 messages, filtering out system init messages)
+      const historyPayload = messages
+        .filter(msg => !msg.text.startsWith("System initialized. Welcome to REI.AI"))
+        .slice(-10)
+        .map(msg => ({
+          role: msg.sender === "user" ? "user" : "assistant",
+          content: msg.text
+        }));
 
       // Call route handler API with domain-specific context
       const response = await fetch('/api/cfai', {
@@ -203,7 +387,8 @@ export default function REI() {
         },
         body: JSON.stringify({
           command: 'score',
-          input: `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}\n\nUser Query: ${userMsg.text}`,
+          input: userMsg.text,
+          systemPrompt: systemContext,
           history: historyPayload
         })
       });
@@ -219,7 +404,7 @@ export default function REI() {
         {
           sender: "rei",
           text: data.result,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: new Date().toLocaleTimeString([], { hour: 'digit', minute: '2-digit' }),
           rawJson: {
             engine: "REI-Hinge-Core v0.3",
             domain: selectedDomain,
@@ -263,68 +448,38 @@ Limitations:
   }
 
   return (
-    <section className="rei-dashboard-wrapper" style={{ background: "#05161C", color: "#E2E8F0", fontFamily: "Inter, sans-serif", minHeight: "100vh", padding: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ width: "100%", maxWidth: "960px", display: "flex", flexDirection: "column", flex: 1 }}>
+    <section className="rei-dashboard-wrapper" style={{ color: "#E2E8F0", fontFamily: "Inter, sans-serif", minHeight: "100vh", padding: "30px", display: "flex", justifyContent: "center" }}>
+      <div className="rei-custom-container" style={{ width: "100%", maxWidth: "960px", padding: "28px", display: "flex", flexDirection: "column", gap: "18px" }}>
         
-        {/* Minimalist Header */}
-        <header className="rei-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #1A4B5C", paddingBottom: "16px", marginBottom: "20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            {/* Owl/Balance SVG Logo (Midnight Teal & Amber) */}
-            <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="REI owl logo">
-              <circle cx="50" cy="50" r="45" fill="#0B2B36" stroke="#1A4B5C" strokeWidth="3" />
-              <polygon points="35,65 50,45 65,65" fill="#FFB300" />
-              <circle cx="40" cy="40" r="6" fill="#FFB300" />
-              <circle cx="60" cy="40" r="6" fill="#FFB300" />
-              <line x1="50" y1="25" x2="50" y2="45" stroke="#1A4B5C" strokeWidth="4" />
-            </svg>
+        {/* Header */}
+        <header className="rei-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(251,146,60,0.15)", paddingBottom: "16px", marginBottom: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            {/* Logo Mark */}
+            <div className="rei-logo-mark">
+              <HingeMark size={28} animated={isTyping} />
+            </div>
             <div>
-              <h1 style={{ fontSize: "1.5em", fontWeight: "bold", margin: 0, letterSpacing: "-0.5px" }}>REI.AI</h1>
-              <p style={{ fontSize: "0.8em", color: "#94A3B8", margin: 0 }}>Methodology Assistant</p>
+              <h1 className="rei-logo-title" style={{ margin: 0, lineHeight: 1.1 }}>REI.AI</h1>
+              <p className="rei-logo-sub" style={{ margin: 0 }}>CARDO REI Methodology Engine</p>
             </div>
           </div>
 
-          {/* Active Profile Indicator */}
-          <div style={{ background: "#0B2B36", padding: "8px 12px", borderRadius: "4px", marginBottom: "12px", border: "1px solid #1A4B5C" }}>
-            <span style={{ color: "#FFB300", fontWeight: "bold", fontSize: "0.9em" }}>▶ Active Profile:</span>
-            <span style={{ color: "#FFFFFF", marginLeft: "8px", fontWeight: "bold" }}>{currentDomain.label}</span>
-            <span style={{ color: "#94A3B8", marginLeft: "16px", fontSize: "0.85em" }}>{currentDomain.description}</span>
-          </div>
-
-          {/* Domain selection badge strip */}
+          {/* Domain selection tab strip */}
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
             {DOMAIN_PROFILES.map((dom) => (
               <button
                 key={dom.id}
                 type="button"
                 onClick={() => setSelectedDomain(dom.id)}
-                style={{
-                  background: selectedDomain === dom.id ? "#0B2B36" : "transparent",
-                  color: selectedDomain === dom.id ? "#FFB300" : "#94A3B8",
-                  border: "1px solid",
-                  borderColor: selectedDomain === dom.id ? "#FFB300" : "#1A4B5C",
-                  padding: "6px 12px",
-                  borderRadius: "4px",
-                  fontSize: "0.8em",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  transform: selectedDomain === dom.id ? "scale(1.05)" : "scale(1)",
-                  boxShadow: selectedDomain === dom.id ? "0 2px 4px rgba(255, 179, 0, 0.2)" : "none"
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedDomain !== dom.id) {
-                    e.currentTarget.style.transform = "scale(1.03)";
-                    e.currentTarget.style.background = "#0B2B36";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedDomain !== dom.id) {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.background = "transparent";
-                  }
-                }}
+                className={`rei-custom-tab ${selectedDomain === dom.id ? "rei-custom-tab-active" : ""}`}
               >
-                {dom.label}
+                <span>{dom.label}</span>
+                <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
+                  {dom.id === "assistant" ? "Everyday reasoning" :
+                   dom.id === "coding" ? "Senior coding logic" :
+                   dom.id === "genealogy" ? "Evidence-tiered genealogy" :
+                   "Narrative architecture"}
+                </span>
               </button>
             ))}
             <button
@@ -334,9 +489,9 @@ Limitations:
                 background: "transparent",
                 color: "#EF4444",
                 border: "1px dashed #EF4444",
-                padding: "6px 12px",
-                borderRadius: "4px",
-                fontSize: "0.8em",
+                padding: "9px 14px",
+                borderRadius: "9px",
+                fontSize: "12.5px",
                 fontWeight: "bold",
                 cursor: "pointer",
                 transition: "all 0.2s ease",
@@ -350,20 +505,25 @@ Limitations:
           </div>
         </header>
 
-        {/* Active Domain Info Banner */}
-        <div style={{ background: "#0B2B36", border: "1px solid #1A4B5C", padding: "12px 16px", borderRadius: "6px", marginBottom: "20px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", fontSize: "0.85em" }}>
-          <div>
-            <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Domain:</span>
-            <span>{currentDomain.description}</span>
+        {/* Active Domain Info Banner (Custom Card Style) */}
+        <div className="rei-custom-card">
+          <div style={{ fontSize: "10.5px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", color: "#fb923c", marginBottom: "6px" }}>
+            Active Domain Focus
           </div>
-          <div>
-            <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Rules:</span>
-            <span style={{ color: "#94A3B8" }}>{currentDomain.rules.join(" | ")}</span>
+          <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", fontSize: "13px", color: "#cbd5e1" }}>
+            <div style={{ flex: 1, minWidth: "250px" }}>
+              <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Scope:</span>
+              <span>{currentDomain.description}</span>
+            </div>
+            <div>
+              <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Rules:</span>
+              <span style={{ color: "#94A3B8" }}>{currentDomain.rules.join(" | ")}</span>
+            </div>
           </div>
         </div>
 
         {/* Chat Interface Container */}
-        <div className="rei-chat-container" style={{ flex: 1, background: "#0B2B36", border: "1px solid #1A4B5C", borderRadius: "8px", display: "flex", flexDirection: "column", minHeight: "500px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)" }}>
+        <div className="rei-chat-container" style={{ flex: 1, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(251,146,60,0.15)", borderRadius: "12px", display: "flex", flexDirection: "column", minHeight: "500px", overflow: "hidden" }}>
           
           {/* Chat History Area */}
           <div className="rei-chat-history" style={{ flex: 1, padding: "20px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "18px" }}>
@@ -372,7 +532,7 @@ Limitations:
                 key={index}
                 style={{
                   alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
-                  maxWidth: "85%",
+                  maxWidth: "80%",
                   display: "flex",
                   flexDirection: "column",
                   alignItems: msg.sender === "user" ? "flex-end" : "flex-start",
@@ -385,23 +545,22 @@ Limitations:
               >
                 <div
                   style={{
-                    background: msg.sender === "user" ? "#1A4B5C" : "#05161C",
+                    background: msg.sender === "user" ? "rgba(255,255,255,0.06)" : "rgba(251,146,60,0.08)",
                     color: "#E2E8F0",
-                    border: msg.sender === "user" ? "1px solid #1A4B5C" : "1px solid #FFB300",
-                    borderRadius: "8px",
-                    padding: "14px 18px",
+                    border: msg.sender === "user" ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(251,146,60,0.18)",
+                    borderRadius: "10px",
+                    padding: "10px 14px",
                     fontFamily: msg.sender === "rei" ? "JetBrains Mono, Fira Code, monospace" : "inherit",
-                    fontSize: msg.sender === "rei" ? "1.02em" : "1.08em",
+                    fontSize: "13px",
                     whiteSpace: "pre-wrap",
-                    lineHeight: "1.5",
-                    boxShadow: msg.sender === "rei" ? "0 0 10px rgba(255, 179, 0, 0.05)" : "none"
+                    lineHeight: "1.4"
                   }}
                 >
                   {msg.text}
 
                   {/* Raw JSON details drawer */}
                   {msg.rawJson && (
-                    <details style={{ marginTop: "12px", borderTop: "1px dashed #1A4B5C", paddingTop: "8px" }}>
+                    <details style={{ marginTop: "12px", borderTop: "1px dashed rgba(251,146,60,0.18)", paddingTop: "8px" }}>
                       <summary style={{ color: "#94A3B8", fontSize: "0.85em", cursor: "pointer", outline: "none" }}>Raw JSON</summary>
                       <pre style={{ fontSize: "0.85em", color: "#94A3B8", overflowX: "auto", marginTop: "6px", background: "rgba(0,0,0,0.3)", padding: "8px", borderRadius: "4px" }}>
                         <code>{JSON.stringify(msg.rawJson, null, 2)}</code>
@@ -434,7 +593,7 @@ Limitations:
           </div>
 
           {/* Chat Input form area */}
-          <form onSubmit={handleSendMessage} style={{ borderTop: "1px solid #1A4B5C", background: "#05161C", padding: "16px", display: "flex", gap: "12px", alignItems: "center" }}>
+          <form onSubmit={handleSendMessage} style={{ borderTop: "1px solid rgba(251,146,60,0.15)", background: "rgba(0,0,0,0.3)", padding: "16px", display: "flex", gap: "12px", alignItems: "center" }}>
             <input
               type="text"
               value={inputMessage}
@@ -442,10 +601,10 @@ Limitations:
               placeholder="Type proof context or statements to evaluate..."
               style={{
                 flex: 1,
-                background: "#0B2B36",
+                background: "rgba(0,0,0,0.2)",
                 color: "#E2E8F0",
-                border: "1px solid #1A4B5C",
-                borderRadius: "4px",
+                border: "1px solid rgba(251,146,60,0.15)",
+                borderRadius: "6px",
                 padding: "12px 16px",
                 fontFamily: "inherit",
                 fontSize: "1.05em",
@@ -455,17 +614,17 @@ Limitations:
             <button
               type="submit"
               style={{
-                background: "#FFB300",
-                color: "#05161C",
+                background: "#f97316",
+                color: "#FFFFFF",
                 border: "none",
-                borderRadius: "4px",
+                borderRadius: "6px",
                 padding: "12px 24px",
                 fontWeight: "bold",
                 cursor: "pointer",
                 transition: "background 0.2s ease"
               }}
-              onMouseOver={(e) => e.currentTarget.style.background = "#e6a100"}
-              onMouseOut={(e) => e.currentTarget.style.background = "#FFB300"}
+              onMouseOver={(e) => e.currentTarget.style.background = "#fb923c"}
+              onMouseOut={(e) => e.currentTarget.style.background = "#f97316"}
             >
               Send
             </button>

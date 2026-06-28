@@ -1,12 +1,14 @@
 // CFai API Route for Vercel Deployment
 // Handles web requests and calls the CFai CLI tool or falls back to direct Groq API requests.
-
+import 'dotenv/config';
+// Optional override: if MODEL env var is set, use it for all Groq calls
+const DEFAULT_MODEL = process.env.MODEL || null;
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
 
 const execAsync = promisify(exec);
-const CFAI_PATH = process.env.CFAI_PATH || "/home/potatoking/.local/bin/cfai";
+const CFAI_PATH = process.env.CFAI_PATH; // No default – if undefined we fall back to Groq
 
 const REI_SYSTEM_PROMPT = `# REI.AI — System Prompt (v2.0)
 
@@ -105,17 +107,19 @@ When fixing an error:
 You have file and shell access — use it. Verify, don't assume, wherever a tool call can replace a guess.`;
 
 function selectGroqModel(prompt = "") {
+  // If an explicit model is provided via env, use it directly
+  if (DEFAULT_MODEL) return DEFAULT_MODEL;
   const len = prompt.length;
   const lower = prompt.toLowerCase();
 
   // Ingest or long input (>6000 chars)
   if (len > 6000 || lower.includes("ingest") || lower.includes("--file")) {
-    return "openai/gpt-oss-120b";
+    return "llama-3.3-70b-versatile";
   }
 
-  // Coding Helper routes to the high-performance GPT OSS or Llama 4 Scout models
+  // Coding Helper routes to the high-performance Llama model
   if (lower.includes("coding companion") || lower.includes("coding methodology")) {
-    return "openai/gpt-oss-120b";
+    return "llama-3.3-70b-versatile";
   }
 
   // Genealogy Helper utilizes Llama 3.3 70B
@@ -125,12 +129,12 @@ function selectGroqModel(prompt = "") {
 
   // Story Builder outline generation
   if (lower.includes("story architect") || lower.includes("story blueprint") || lower.includes("story builder")) {
-    return "groq/compound";
+    return "llama-3.3-70b-versatile";
   }
 
   // General Assistant (low-latency default)
   if (lower.includes("general assistant")) {
-    return "groq/compound-mini";
+    return "llama-3.3-70b-versatile";
   }
 
   // Length fallback rules
@@ -141,7 +145,7 @@ function selectGroqModel(prompt = "") {
   return "llama-3.3-70b-versatile";
 }
 
-async function callGroqDirectly(prompt, history = []) {
+async function callGroqDirectly(prompt, systemPrompt = "", history = []) {
   const isGptMode =
     prompt.toLowerCase().includes("proprietary model profiles") ||
     prompt.toLowerCase().includes("gpt mode");
@@ -165,7 +169,7 @@ async function callGroqDirectly(prompt, history = []) {
           messages: [
             {
               role: "system",
-              content: REI_SYSTEM_PROMPT,
+              content: systemPrompt || REI_SYSTEM_PROMPT,
             },
             ...formattedHistory,
             {
@@ -191,8 +195,12 @@ async function callGroqDirectly(prompt, history = []) {
   }
 
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
-    throw new Error("GROQ_API_KEY is not configured in Vercel environment variables.");
+  if (!apiKey || apiKey.includes('your_groq_api_key_here')) {
+    // No real key – return a mock response
+    return {
+      content: `[REI.AI NOTICE] GROQ_API_KEY not set or placeholder. Mock response for prompt: ${prompt}`,
+      model: 'mock',
+    };
   }
 
   const selectedModel = selectGroqModel(prompt);
@@ -208,7 +216,7 @@ async function callGroqDirectly(prompt, history = []) {
       messages: [
         {
           role: "system",
-          content: REI_SYSTEM_PROMPT,
+          content: systemPrompt || REI_SYSTEM_PROMPT,
         },
         ...formattedHistory,
         {
@@ -229,6 +237,11 @@ async function callGroqDirectly(prompt, history = []) {
   const data = await response.json();
   let content = data.choices?.[0]?.message?.content || "No content returned from Groq.";
 
+  // Ensure content is not empty; provide fallback message
+  if (!content || content.trim().length === 0) {
+    content = "[REI.AI NOTICE] Empty response received; defaulting to placeholder message.";
+  }
+
   if (isGptMode && !process.env.OPENAI_API_KEY) {
     content = `[REI.AI ROUTING WARNING: OPENAI_API_KEY not found in Vercel. Falling back to Open-Source Router: ${selectedModel}]\n\n${content}`;
   }
@@ -239,15 +252,15 @@ async function callGroqDirectly(prompt, history = []) {
   };
 }
 
-async function handleCfaiRequest(command, args = [], input = "", history = []) {
+async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = []) {
   // Check if CLI is available locally
-  const localCliExists = fs.existsSync(CFAI_PATH);
+  const localCliExists = CFAI_PATH && fs.existsSync(CFAI_PATH);
 
   if (!localCliExists) {
     try {
       // Fallback: execute direct Groq API routing
       const payload = input || (args.length > 0 ? args.join(" ") : "help");
-      const response = await callGroqDirectly(payload, history);
+      const response = await callGroqDirectly(payload, systemPrompt, history);
       return {
         success: true,
         result: response.content,
@@ -255,6 +268,7 @@ async function handleCfaiRequest(command, args = [], input = "", history = []) {
         timestamp: new Date().toISOString(),
       };
     } catch (apiError) {
+      console.error('handleCfaiRequest apiError:', apiError);
       return {
         success: false,
         error: `CLI fallback error: ${apiError.message}`,
@@ -282,11 +296,14 @@ async function handleCfaiRequest(command, args = [], input = "", history = []) {
       };
     }
 
-    return {
-      success: true,
-      result: stdout.trim(),
-      timestamp: new Date().toISOString(),
-    };
+      // Ensure stdout is not empty; provide fallback message
+      const trimmedStdout = stdout.trim();
+      const resultText = trimmedStdout.length > 0 ? trimmedStdout : "[REI.AI NOTICE] Empty CLI response; defaulting to placeholder.";
+      return {
+        success: true,
+        result: resultText,
+        timestamp: new Date().toISOString(),
+      };
   } catch (execError) {
     return {
       success: false,
@@ -302,9 +319,10 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "application/json");
 
     if (req.method === "POST") {
-      const { command, args = [], input = "", history = [] } = req.body || {};
-      const result = await handleCfaiRequest(command, args, input, history);
-      return res.status(result.success ? 200 : 500).json(result);
+      const { command, args = [], input = "", systemPrompt = "", history = [] } = req.body || {};
+      const result = await handleCfaiRequest(command, args, input, systemPrompt, history);
+      res.status(result.success ? 200 : 500).json(result);
+      return;
     }
 
     if (req.method === "GET") {
@@ -314,18 +332,22 @@ export default async function handler(req, res) {
       const args = argsParam ? argsParam.split(",") : [];
 
       const result = await handleCfaiRequest(command, args);
-      return res.status(result.success ? 200 : 500).json(result);
+      res.status(result.success ? 200 : 500).json(result);
+      return;
     }
 
-    return res.status(405).json({
+    res.status(405).json({
       success: false,
       error: "Method Not Allowed",
     });
+    return;
   } catch (error) {
-    return res.status(500).json({
+    console.error('Handler caught error stack:', error.stack);
+    res.status(500).json({
       success: false,
       error: "Serverless execution error",
       details: error.message,
     });
+    return;
   }
 }
