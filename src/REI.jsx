@@ -2,6 +2,30 @@ import { useState, useRef, useEffect } from "react";
 
 const DOMAIN_PROFILES = [
   {
+    id: "assistant",
+    label: "General Assistant",
+    badge: "Active",
+    description: "General-purpose methodology assistant applying CARDO REI to clarify reasoning, find hinges, and verify claims.",
+    rules: ["Separate facts from interpretation", "Isolate key decision variables", "Define bounds of evidence"],
+    exemplar: "Logical decomposition of complex qualitative policy queries."
+  },
+  {
+    id: "gpt",
+    label: "GPT Mode",
+    badge: "Active",
+    description: "Proprietary reasoning router mapping requests to high-performance closed-source models.",
+    rules: ["Identify logic loops", "Coerce structured JSON output format"],
+    exemplar: "Multi-layered debate summary and sentiment breakdown."
+  },
+  {
+    id: "oss",
+    label: "OSS Mode",
+    badge: "Active",
+    description: "Strict open-source routing using highly performant Llama and Mixtral models.",
+    rules: ["Optimize for low latency", "Enforce local model fallback triggers"],
+    exemplar: "Context-aware token routing for long telemetry files."
+  },
+  {
     id: "genealogy",
     label: "Genealogy",
     badge: "Active",
@@ -36,12 +60,12 @@ const DOMAIN_PROFILES = [
 ];
 
 export default function REI() {
-  const [selectedDomain, setSelectedDomain] = useState("genealogy");
+  const [selectedDomain, setSelectedDomain] = useState("assistant");
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState([
     {
       sender: "rei",
-      text: "System initialized. Welcome to REI.AI methodology engine. Select a domain profile from the header, then submit raw evidence or claims to evaluate under the CARDO REI framework.",
+      text: "System initialized. Welcome to REI.AI, your CARDO REI methodology assistant. How can I help you evaluate context, organize evidence, or locate decision hinges today?",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -71,8 +95,15 @@ export default function REI() {
 
     try {
       // Build domain-specific prompt rules
-      let systemContext = "You are a CARDO REI methodology assistant. Apply rigorous evidence evaluation.";
-      if (selectedDomain === "genealogy") {
+      let systemContext = "You are a helpful CARDO REI methodology assistant. Help the user clarify reasoning, find hinges, and verify claims.";
+      
+      if (selectedDomain === "assistant") {
+        systemContext = "You are REI.AI, a general-purpose methodology assistant. Help the user decompose arguments, identify unproven assertions, and find the hinge using CARDO REI.";
+      } else if (selectedDomain === "gpt") {
+        systemContext = "You are REI.AI routing to proprietary model profiles. Focus on structured reasoning, detailed breakdowns, and high-performance evaluations.";
+      } else if (selectedDomain === "oss") {
+        systemContext = "You are REI.AI routing to open-source model configurations (Llama/Mixtral). Apply strict evidentiary criteria and keep your bounds visible.";
+      } else if (selectedDomain === "genealogy") {
         systemContext = "You are a genealogical research assistant using CARDO REI methodology. Evaluate evidence with 🟢🔵🟠🟡 tier tags.";
       } else if (selectedDomain === "llm") {
         systemContext = "You are an LLM adversarial testing assistant. Apply CARDO REI to evaluate prompt injections and semantic leakage.";
@@ -170,7 +201,7 @@ Limitations:
           </div>
 
           {/* Domain selection badge strip */}
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {DOMAIN_PROFILES.map((dom) => (
               <button
                 key={dom.id}

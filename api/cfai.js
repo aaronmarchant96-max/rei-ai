@@ -36,6 +36,45 @@ function selectGroqModel(prompt = '') {
 }
 
 async function callGroqDirectly(prompt) {
+  const isGptMode = prompt.toLowerCase().includes("proprietary model profiles") || prompt.toLowerCase().includes("gpt mode");
+  
+  if (isGptMode && process.env.OPENAI_API_KEY) {
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "system",
+              content: "You are REI.AI, an illuminated truth assistant using the CARDO REI evaluation methodology (Collect, Analyze, Record, Distinguish, Organize, Review, Evaluate, Iterate). Present results clearly under evidence tiers."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 2048
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          content: data.choices?.[0]?.message?.content || "No content returned from OpenAI.",
+          model: "gpt-4o"
+        };
+      }
+    } catch (e) {
+      console.warn("OpenAI API routing failed, falling back to Groq:", e);
+    }
+  }
+
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     throw new Error("GROQ_API_KEY is not configured in Vercel environment variables.");
@@ -72,8 +111,14 @@ async function callGroqDirectly(prompt) {
   }
 
   const data = await response.json();
+  let content = data.choices?.[0]?.message?.content || "No content returned from Groq.";
+  
+  if (isGptMode && !process.env.OPENAI_API_KEY) {
+    content = `[REI.AI ROUTING WARNING: OPENAI_API_KEY not found in Vercel. Falling back to Open-Source Router: ${selectedModel}]\n\n${content}`;
+  }
+
   return {
-    content: data.choices?.[0]?.message?.content || "No content returned from Groq.",
+    content: content,
     model: selectedModel
   };
 }
