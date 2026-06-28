@@ -307,10 +307,10 @@ export default function REI() {
     }
   }, [selectedDomain]);
 
-  // Auto scroll to bottom of chat
+  // Auto scroll to bottom of chat only when messages length changes
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages.length]);
 
   // Sync to local storage (domain-specific)
   useEffect(() => {
@@ -455,7 +455,7 @@ Limitations:
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
             {/* Logo Mark */}
             <div className="rei-logo-mark">
-              <HingeMark size={28} animated={isTyping} />
+              <HingeMark size={28} animated={true} />
             </div>
             <div>
               <h1 className="rei-logo-title" style={{ margin: 0, lineHeight: 1.1 }}>REI.AI</h1>
@@ -550,7 +550,7 @@ Limitations:
                     borderRadius: "10px",
                     padding: "10px 14px",
                     fontFamily: msg.sender === "rei" ? "JetBrains Mono, Fira Code, monospace" : "inherit",
-                    fontSize: "13px",
+                    fontSize: "14.5px",
                     whiteSpace: "pre-wrap",
                     lineHeight: "1.4"
                   }}
