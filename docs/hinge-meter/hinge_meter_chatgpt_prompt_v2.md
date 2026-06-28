@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # Improved ChatGPT Prompt for Hinge Meter (v2)
 
 Copy and paste the entire block below into ChatGPT (or another strong image model).

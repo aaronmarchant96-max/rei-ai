@@ -1,6 +1,11 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # CARDO GUARD — Flagship Vision & Phase 1 Plan
 
-**Status**: In planning (as of late May 2026)  
+**Status**: In planning (as of June 2026)  
 **Goal**: Turn CARDO GUARD into a genuine standout piece that makes technically sharp people stop and pay attention.
 
 ---

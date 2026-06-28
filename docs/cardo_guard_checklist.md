@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # CARDO GUARD Launch Gate Checklist
 
 Use this before shipping anything that uses CARDO GUARD language, logic, or reports.

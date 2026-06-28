@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # OpenAI Safety Bug Bounty Test Plan
 
 Goal: test a real OpenAI agentic workflow for indirect prompt injection, data exfiltration, unauthorized action, or cross-user boundary failures. Do not test raw jailbreaks or model-only behavior.

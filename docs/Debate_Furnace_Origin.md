@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # The Origin of Debate Furnace
 
 Debate Furnace began as a strange little experiment: a roast battle arena for AI personalities. It was built fast, partly for fun, partly from curiosity, and partly from the same instinct that started in construction: look for the failure point, apply pressure, and see what breaks.

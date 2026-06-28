@@ -3,8 +3,11 @@ import DebateFurnace from "./DebateFurnace.jsx";
 import CreativeEngine from "./CreativeEngine.jsx";
 import StormReplay from "./StormReplay.jsx";
 import CardoGuard from "./CardoGuard.jsx";
+import HingeMeter from "./HingeMeter.jsx";
+import REI from "./REI.jsx";
 import Tracepoint from "./Tracepoint.jsx";
 import ToolsLanding from "./ToolsLanding.jsx";
+import CfaiInterface from "./components/Cfai/CfaiInterface.jsx";
 
 const TOP_LEVEL = [
   {
@@ -33,9 +36,24 @@ const TOP_LEVEL = [
     subtitle: "AI scores get checked against cost."
   },
   {
+    id: "hinge-meter",
+    label: "Hinge Meter",
+    subtitle: "Visualize balance & decision flips."
+  },
+  {
+    id: "rei",
+    label: "REI",
+    subtitle: "Methodology engine overview."
+  },
+  {
     id: "tracepoint",
     label: "Tracepoint",
     subtitle: "Industrial signals stay evidence-first."
+  },
+  {
+    id: "cfai",
+    label: "Hinge AI",
+    subtitle: "CARDO REI genealogy research assistant."
   }
 ];
 
@@ -45,7 +63,10 @@ function getInitialTool() {
   if (window.location.hash === "#story-forge") return "story-forge";
   if (window.location.hash === "#storm-replay") return "storm-replay";
   if (window.location.hash === "#cardo-guard") return "cardo-guard";
+  if (window.location.hash === "#hinge-meter") return "hinge-meter";
+  if (window.location.hash === "#rei") return "rei";
   if (window.location.hash === "#tracepoint") return "tracepoint";
+  if (window.location.hash === "#cfai") return "cfai";
   return "furnace";
 }
 
@@ -54,7 +75,10 @@ function getToolPath(tool) {
   if (tool === "story-forge") return "/#story-forge";
   if (tool === "storm-replay") return "/#storm-replay";
   if (tool === "cardo-guard") return "/#cardo-guard";
+  if (tool === "hinge-meter") return "/#hinge-meter";
+  if (tool === "rei") return "/#rei";
   if (tool === "tracepoint") return "/#tracepoint";
+  if (tool === "cfai") return "/#cfai";
   return "/";
 }
 
@@ -76,9 +100,15 @@ export default function AppShell() {
           ? "PromptHound Labs | Storm Replay"
         : tool === "cardo-guard"
             ? "PromptHound Labs | CARDO GUARD"
-            : tool === "tracepoint"
-              ? "PromptHound Labs | Tracepoint"
-            : "PromptHound Labs | Debate Furnace";
+            : tool === "hinge-meter"
+              ? "PromptHound Labs | Hinge Meter"
+              : tool === "rei"
+                ? "PromptHound Labs | REI"
+                : tool === "tracepoint"
+                  ? "PromptHound Labs | Tracepoint"
+                  : tool === "cfai"
+                    ? "PromptHound Labs | Hinge AI (CFai)"
+                : "PromptHound Labs | Debate Furnace";
   }, [tool]);
 
   return (
@@ -116,8 +146,14 @@ export default function AppShell() {
           <StormReplay />
         ) : tool === "cardo-guard" ? (
           <CardoGuard />
+        ) : tool === "hinge-meter" ? (
+          <HingeMeter />
+        ) : tool === "rei" ? (
+          <REI />
         ) : tool === "tracepoint" ? (
           <Tracepoint />
+        ) : tool === "cfai" ? (
+          <CfaiInterface />
         ) : (
           <DebateFurnace />
         )}

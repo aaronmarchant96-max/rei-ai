@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # PromptHound Labs — Debate Furnace & Companions
 
 > Bring the hard question. We’ll find the hinge.

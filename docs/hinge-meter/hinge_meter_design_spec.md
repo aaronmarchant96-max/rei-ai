@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # Hinge Meter — Design Spec (v0.2)
 
 **Purpose:** Create a visceral yet technically serious visualization that makes the decision *hinge* feel physically real and emotionally immediate.

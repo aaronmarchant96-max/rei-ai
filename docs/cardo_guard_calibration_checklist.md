@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # CARDO GUARD Calibration Implementation Checklist
 
 Use this when moving CARDO GUARD from the synthetic demo into an Arena-backed calibration mode.

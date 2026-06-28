@@ -338,6 +338,13 @@ function inferSides(question, type) {
   if (type === "extraordinary") return ["UAPs are most likely advanced non-human technology", "Conventional explanations are more likely"];
   if (type === "policy" && l.includes("gun")) return ["Gun control reduces harm", "Gun control does not reduce harm enough to justify the tradeoffs"];
   if (type === "policy" && l.includes("ai")) return ["Governments should regulate frontier AI more aggressively", "Aggressive AI regulation would cause more harm than good"];
+  if (l.includes("genetically modify")) return ["Parents should be allowed to genetically modify babies", "Genetic modification of babies should not be allowed"];
+  if (l.includes("workweek") || l.includes("4-day")) return ["The 4-day workweek should become standard", "The 4-day workweek should not become standard"];
+  if (l.includes("rehabilitation") && l.includes("prison")) return ["Prisons should prioritize rehabilitation", "Prisons should prioritize punishment"];
+  if (l.includes("age-gated") || (l.includes("social media") && l.includes("under 16"))) return ["Social media should be age-gated for teens under 16", "Social media should not be age-gated for teens under 16"];
+  if (l.includes("housing") && l.includes("human right")) return ["Housing should be treated as a human right", "Housing should not be treated as a human right"];
+  if (l.includes("capital punishment")) return ["Capital punishment should be abolished", "Capital punishment should not be abolished"];
+  if (l.includes("encryption") && l.includes("human right")) return ["Encryption should be a human right", "Encryption should not be a human right"];
   return ["Yes", "No"];
 }
 
@@ -371,6 +378,22 @@ function shortLabel(side) {
   if (l.includes("money is not")) return "Not The Root";
   if (l.includes("cats are better")) return "Cats";
   if (l.includes("dogs are better")) return "Dogs";
+  if (l.includes("regulate frontier ai") || l.includes("should regulate")) return "Regulate";
+  if (l.includes("regulation would cause") || l.includes("would cause more harm")) return "Light Touch";
+  if (l.includes("genetically modify") && l.includes("should be allowed")) return "Allow GM";
+  if (l.includes("genetic modification") && l.includes("not be allowed")) return "Ban GM";
+  if (l.includes("4-day workweek should become")) return "4-Day Week";
+  if (l.includes("4-day workweek should not")) return "5-Day Default";
+  if (l.includes("prioritize rehabilitation")) return "Rehab First";
+  if (l.includes("prioritize punishment")) return "Punish First";
+  if (l.includes("age-gated") && l.includes("should be")) return "Age-Gate";
+  if (l.includes("age-gated") && l.includes("should not")) return "No Age-Gate";
+  if (l.includes("housing should be treated")) return "Housing Right";
+  if (l.includes("housing should not")) return "Market Housing";
+  if (l.includes("capital punishment should be abolished")) return "Abolish";
+  if (l.includes("capital punishment should not")) return "Keep Death Penalty";
+  if (l.includes("encryption should be a human right")) return "Encryption Right";
+  if (l.includes("encryption should not")) return "Limited Encryption";
   const words = side.trim().split(/\s+/).slice(0, 3).join(" ");
   return titleCase(words || "Side");
 }
@@ -931,7 +954,29 @@ function getArgs(question, type, a, b) {
     comp: ["sweet-acid contrast and playful topping rules", "savory balance, texture, and tradition", "whether acceptable means 'works sometimes' or 'belongs by default'"]
   };
 
-  if (l.includes("social media")) return {
+  if (l.includes("age-gated") || (l.includes("social media") && l.includes("under 16"))) return {
+    label: "Policy Debate",
+    icon: "⚖",
+    criteria: ["youth mental health", "enforcement", "parental rights", "privacy", "platform design", "evasion risk"],
+    desc: "This is a youth-safety policy debate. The question is whether banning or restricting social media access for teens under 16 reduces meaningful harm enough to justify enforcement costs, privacy tradeoffs, and limits on parental discretion.",
+    rounds: [
+      ["Social media should be age-gated for teens under 16 because the strongest harms cluster early: comparison pressure, bullying, algorithmic compulsion, sexual exploitation risk, and identity formation under permanent visibility. A hard age floor is blunt, but it is also legible. Platforms have repeatedly failed to self-police youth exposure. The strongest case is not that every teen is harmed; it is that the default product design is unsafe for developing brains and that society should not treat childhood attention as an open market.", "Social media should not be age-gated under 16 because bans are easy to evade, hard to verify without invasive age checks, and likely to push teens into less supervised spaces. Parents, schools, and platform design reforms may work better than a categorical cutoff. The strongest skeptical case is that enforcement creates privacy costs, false blocks for legitimate users, and a false sense of safety while harm continues off-platform."],
+      ["The enforcement objection is real but not decisive. Many laws are imperfectly enforced and still change norms, product design, and corporate incentives. Age-gating can combine with parental override, graduated access, and platform liability rather than pretending one switch solves everything. The pro side gains ground when it treats the policy as a floor for corporate behavior, not a fantasy of perfect compliance.", "The pro side still has to answer what happens when teens use VPNs, borrow accounts, or migrate to platforms with even weaker safeguards. Age verification also pressures companies to collect more identity data, which creates its own youth risk. A policy that sounds protective can become a surveillance mandate. The skeptical side wins when it forces the debate onto workable enforcement, not moral urgency alone."],
+      ["The final case for age-gating is that childhood deserves a higher protection standard than adult consumer choice. If the product is engineered for compulsion and social comparison, waiting until damage is obvious is too late. A clear under-16 restriction gives regulators, parents, and platforms a shared line: this audience is not the default market.", "The final case against age-gating is that the harms are real but the tool is mismatched. Better youth defaults, parental tools, algorithm transparency, and liability for predatory design may reduce harm without building a nationwide identity-checking layer around teenage life. The question is whether a ban is the best fix or the most visible one."]
+    ],
+    take: [["Enforcement is part of the policy", "A youth ban that cannot be implemented may be symbolism, not safety."], ["Platform incentives matter", "Age limits only help if they change design and corporate behavior."], ["Parental discretion is a real value", "Families do not all agree on when a teen is ready."]],
+    strongA: "Age-Gate's strongest case is that early-teen brains face unique risks from compulsion, comparison, and permanent visibility on engagement-driven platforms.",
+    strongB: "No Age-Gate's strongest case is that bans are evaded easily, age checks raise privacy costs, and design reform may target the harm more precisely.",
+    crackA: "Age-Gate cracks if it assumes compliance without changing platform incentives or offering safer alternatives.",
+    crackB: "No Age-Gate cracks if it treats parental discretion as enough while platforms keep optimizing for youth capture.",
+    verify: ["Mental-health outcomes by age and usage pattern.", "How age verification would work in practice.", "Evasion rates in comparable jurisdictions.", "Whether design reforms alone reduce youth harms.", "Parental override and graduated-access models."],
+    changeA: ["Evidence age limits reduce harm in comparable countries.", "A credible enforcement model with minimal surveillance.", "Platform liability tied to youth-safe defaults."],
+    changeB: ["Evidence design reforms outperform bans.", "Data on evasion and off-platform migration.", "A youth-safety plan that preserves privacy and parental choice."],
+    core: "The hinge is whether a hard under-16 restriction reduces youth harm enough to justify enforcement costs and limits on access.",
+    comp: ["youth protection, mental health, and corporate accountability", "privacy, parental discretion, and workable enforcement", "whether a ban changes behavior or just moves it"]
+  };
+
+  if (l.includes("social media") && !l.includes("under 16") && !l.includes("age-gated")) return {
     label: "Policy Debate",
     icon: "⚖",
     criteria: ["mental health", "connection", "information quality", "business incentives", "youth harms", "civic impact"],
@@ -995,6 +1040,182 @@ function getArgs(question, type, a, b) {
     changeB: ["A household that wants outdoor routines and training.", "Time for exercise and socialization.", "Preference for highly expressive companionship."],
     core: "The dispute is not which animal is objectively superior; it is which style of companionship fits the owner.",
     comp: ["independence, quiet, and low-maintenance affection", "active partnership, trainability, and visible enthusiasm", "what kind of relationship the owner actually wants"]
+  };
+
+  if (l.includes("ai art")) return {
+    label: "Moral / Philosophical",
+    icon: "🎨",
+    criteria: ["authorship", "intention", "skill", "aesthetic value", "labor", "meaning"],
+    desc: "This debate asks whether AI-generated images count as real art. The pressure point is not whether the outputs can look impressive. It is whether art requires human authorship, struggle, intention, and cultural meaning in a way prompt-and-render workflows do not fully provide.",
+    rounds: [
+      ["AI art is real art because art has never been one thing. Photography, collage, sampling, and digital tools all changed what 'making' means without ending art. If a human chooses the prompt, curates the outputs, edits, sequences, and frames the result, authorship is still present. The strongest case is that art is a relationship between maker, medium, and audience — not a purity test about hand movement.", "AI art is not real art because the core act of artistic authorship is being outsourced to a statistical engine. A person can direct, but the model supplies the craft, composition, and style memory at scale. The strongest skeptical case is that impressive images are not enough. Art usually involves selective human judgment earned through practice, constraint, and risk. Prompting is curation, not the same kind of making."],
+      ["The skeptical side is defending a gate that history keeps breaking. Tools change; authorship migrates. What matters is whether a human decision shapes the final object enough to carry meaning. AI art can still express taste, reference, irony, grief, or politics through selection and framing. Calling it fake because the brush is new repeats old snobbery against photography and electronic music.", "The pro side is stretching 'authorship' until it means almost any choice. If the model supplies most of the visual intelligence, the human role can shrink to a sentence and a scroll bar. That may produce decoration, illustration, or design — useful categories, but not necessarily art in the stronger sense of earned vision. The skeptical side gains when it asks what is left once generation becomes trivial."],
+      ["The final case for real art is modest: AI output can be art when human intention, editing, and context do enough work. The category should expand with the medium, not panic at it. If the question is whether some AI-assisted works can be art, yes. If the question is whether generation alone is enough, no — but that is not the whole story.", "The final case against is that mass-generated prettiness floods the meaning market. When anyone can produce slick images instantly, the scarcity that once forced artistic choice disappears. AI images can be useful, beautiful, and commercially valuable without being art in the sense that depends on human struggle, signature, and consequence."]
+    ],
+    take: [["Art is not one fixed thing", "New tools have expanded the category before."], ["Authorship is the hinge", "Selection and prompting may be enough for some works, but not for every claim of art."], ["Impressive is not the same as meaningful", "Visual quality alone does not settle the category."]],
+    strongA: "Real Art's strongest case is that human intention, curation, and framing can still count as authorship even when the engine does the rendering.",
+    strongB: "Not Real Art's strongest case is that outsourcing craft and composition to a model weakens the kind of earned judgment art traditionally requires.",
+    crackA: "Real Art cracks if it treats any prompted image as art without enough human shaping or meaning.",
+    crackB: "Not Real Art cracks if it cannot explain why photography, collage, or digital tools deserved a different standard.",
+    verify: ["What definition of art each side is using.", "How much human editing or sequencing was involved.", "Whether the work carries intentional meaning beyond novelty.", "Commercial illustration versus personal authorship.", "Audience response versus maker process."],
+    changeA: ["A clearer standard for how much human shaping is required.", "Examples where AI-assisted work carries unmistakable authorial intent.", "A defense against the 'anyone can do it' objection."],
+    changeB: ["A sharper line between art, design, and decoration.", "Evidence that trivial generation erodes artistic meaning.", "An account of why struggle or risk matters to the category."],
+    core: "The hinge is whether human intention and authorship can survive when the model supplies most of the craft.",
+    comp: ["human intention, curation, and medium expansion", "earned judgment, struggle, and artistic authorship", "which definition of art you are willing to defend"]
+  };
+
+  if (l.includes("frontier ai") || (l.includes("regulate") && l.includes("frontier") && l.includes("ai"))) return {
+    label: "Policy Debate",
+    icon: "⚖",
+    criteria: ["catastrophic risk", "innovation speed", "accountability", "global competition", "enforcement", "open-source edge cases"],
+    desc: "This is a frontier AI governance debate. The question is whether governments should regulate advanced AI more aggressively now, or whether heavy rules would slow innovation, push development offshore, and fail against fast-moving technology.",
+    rounds: [
+      ["Governments should regulate frontier AI more aggressively because the downside tail is asymmetric. A misaligned or misused frontier system can scale fraud, cyberattack, biological misuse, persuasion, and institutional disruption faster than any prior general-purpose technology. Waiting for perfect evidence before acting is how societies arrive late to nuclear, financial, and environmental guardrails. The strongest case is targeted obligations: pre-deployment testing, incident reporting, liability, compute oversight, and limits on the riskiest deployment contexts.", "Aggressive AI regulation would cause more harm than good if it freezes the countries that need AI productivity most, pushes cutting-edge work into less accountable jurisdictions, and regulates models instead of harms. The strongest skeptical case is that broad rules often punish responsible labs while missing bad actors, open-weight misuse, and application-layer abuse. Innovation has public-good upside in medicine, science, accessibility, and defense. Bad regulation can trade real progress for symbolic safety."],
+      ["The innovation objection is real but cannot be a blank check. Frontier systems are not ordinary apps. They are general capabilities with uncertain failure modes and strong incentive to race. The pro side only needs to show that some obligations reduce expected harm without banning research outright. Licensing, evals, and deployment conditions are not the same as stopping science.", "The pro side still has to name rules that are enforceable, proportionate, and technically literate. Vague 'safety' mandates can become compliance theater. Export controls and compute caps may leak. Open models cannot be recalled. If regulation mainly burdens domestic startups while foreign or underground actors keep moving, the policy fails its own safety goal."],
+      ["The final case for aggressive regulation is that society should not discover catastrophic failure modes through live deployment at scale. The right standard is not zero risk; it is whether major labs face real accountability before release, whether high-risk uses face scrutiny, and whether governments can intervene when capabilities outrun norms.", "The final case against is that speed and openness have saved lives too — in drug discovery, translation, accessibility tools, and security research. Heavy-handed rules can centralize power in a few firms, reduce transparency, and make the safest-looking systems the least inspectable. The hinge is whether regulation improves accountability or merely relocates risk."]
+    ],
+    take: [["Risk is asymmetric", "A small number of frontier failures could matter more than average innovation gains."], ["Enforcement must be specific", "Model-centric bans are easier to announce than to make work."], ["Global competition changes the math", "Domestic rules do not stop all dangerous development."]],
+    strongA: "Regulate's strongest case is that frontier AI has tail-risk scale and needs pre-deployment accountability before society learns by disaster.",
+    strongB: "Light Touch's strongest case is that vague or heavy rules can chill beneficial innovation while pushing the riskiest work elsewhere.",
+    crackA: "Regulate cracks if it cannot define enforceable rules that target harms rather than slowing all progress.",
+    crackB: "Light Touch cracks if it treats innovation benefits as automatic proof that catastrophic-risk guardrails can wait.",
+    verify: ["Which capabilities are actually 'frontier' in the proposal.", "Evidence from existing model-release incidents.", "How open-weight models would be treated.", "International regulatory leakage.", "Cost to startups versus large labs."],
+    changeA: ["Concrete eval, reporting, and liability rules with examples.", "Evidence similar safeguards reduced harm elsewhere.", "A plan for open-source and national-security edge cases."],
+    changeB: ["Evidence targeted rules preserve innovation while reducing misuse.", "A credible alternative to licensing beyond voluntary commitments.", "Data showing domestic slowdown would not simply offshore risk."],
+    core: "The hinge is whether aggressive regulation reduces catastrophic AI risk enough to justify innovation and competitiveness costs.",
+    comp: ["catastrophic-risk reduction and institutional accountability", "innovation speed, openness, and global competitiveness", "whether the proposed rules would actually bind the riskiest actors"]
+  };
+
+  if (l.includes("genetically modify")) return {
+    label: "Policy Debate",
+    icon: "🧬",
+    criteria: ["consent", "safety", "inequality", "eugenics risk", "parental liberty", "medical benefit"],
+    desc: "This debate is about whether parents should be allowed to genetically modify babies for intelligence or health. The real tension is between preventing serious disease and opening a path toward enhancement, selection, and unequal biological advantage.",
+    rounds: [
+      ["Parents should be allowed to genetically modify babies when the intervention prevents serious suffering: fatal genetic disorders, severe immune deficiencies, or conditions that destroy quality of life. The strongest case is medical, not cosmetic. If parents already make high-stakes reproductive choices, editing out catastrophic disease is an extension of care, not hubris. Allowing narrow therapeutic use with oversight is different from a free-for-all.", "Genetic modification of babies should not be allowed because once the line is drawn, pressure moves quickly from therapy to enhancement: height, intelligence, beauty, temperament. That creates a eugenics market, deepens inequality, and edits a person before they can consent. The strongest skeptical case is that 'health only' rules are unstable when wealthy parents, clinics, and status competition stand on the other side."],
+      ["The consent objection is serious, but society already makes pre-birth decisions with lifelong effects. Vaccines, surgery, nutrition, and family environment all shape a child without asking permission. The difference is degree, not kind. A tightly regulated therapeutic window with independent review may prevent the worst diseases without endorsing designer babies.", "The pro side is asking regulators to hold a line history suggests will bend. Intelligence and health are not cleanly separable in public desire or marketing. Global regulatory arbitrage is real: one permissive jurisdiction can become a boutique eugenics hub. The skeptical side gains when it forces the debate onto slope risk, not just single-case compassion."],
+      ["The final case for allowance is narrow and conditional: permit edits that remove severe disease under strict medical review, transparency, and bans on enhancement. That is not a blank license; it is a scalpel. If the alternative is preventable suffering, moral caution should not become paralysis.", "The final case against is that even therapeutic permission normalizes editing humans as products. Once fertility clinics advertise smarter, healthier, more marketable children, consent, equality, and human dignity are already damaged. The safer principle may be to fix disease in other ways and keep germline enhancement off the table."]
+    ],
+    take: [["Therapy and enhancement are hard to separate", "The policy must survive marketing and status pressure."], ["Consent matters", "A child cannot agree to the edit that defines their body."], ["Inequality is not a side issue", "Biological upgrades would likely follow money first."]],
+    strongA: "Allow GM's strongest case is preventing catastrophic genetic disease when the intervention is narrow, medical, and tightly reviewed.",
+    strongB: "Ban GM's strongest case is the eugenics slope: enhancement pressure, consent failure, and biological inequality once editing becomes normalized.",
+    crackA: "Allow GM cracks if 'health only' cannot be enforced against enhancement demand and regulatory arbitrage.",
+    crackB: "Ban GM cracks if it blocks interventions that prevent severe suffering with no equally good alternative.",
+    verify: ["Which conditions count as therapeutic versus enhancement.", "Long-term safety data for germline edits.", "Enforcement across countries and clinics.", "How inequality would change if enhancements were allowed.", "Alternative treatments for the same conditions."],
+    changeA: ["A credible enforcement model with public audit.", "Evidence therapeutic edits are safe and necessary.", "Strict legal separation from enhancement."],
+    changeB: ["A stronger answer to preventable disease cases.", "Evidence slopes from therapy to enhancement in comparable tech.", "Non-germline alternatives that avoid consent problems."],
+    core: "The hinge is whether narrowly allowed medical edits can be contained, or whether they open enhancement and inequality by default.",
+    comp: ["preventing severe disease and parental medical choice", "child consent, eugenics risk, and biological inequality", "whether regulators can hold the therapy-enhancement line"]
+  };
+
+  if (l.includes("workweek") || l.includes("4-day")) return {
+    label: "Practical Decision",
+    icon: "📅",
+    criteria: ["productivity", "burnout", "coverage", "customer service", "pay", "industry fit"],
+    desc: "This is a work-design policy question. The debate is whether the four-day workweek should become the standard for office jobs, or whether the productivity and wellbeing gains are uneven and too costly for coordination-heavy work.",
+    rounds: [
+      ["The 4-day workweek should become standard because most office work wastes time that better focus could recover. Trials in several countries report equal or better output with fewer hours when meetings, performative busyness, and poor prioritization are cut. Workers get recovery, employers keep results, and burnout drops. The strongest case is not laziness; it is redesigning work around output instead of chair time.", "The 4-day workweek should not become standard because many roles need daily coverage, customer response windows, handoffs, and synchronous collaboration that do not compress cleanly. A four-day default can push hidden work into evenings, burden smaller teams, and become a perk for privileged knowledge workers while service roles stay behind. The strongest skeptical case is fit, not moral opposition."],
+      ["Coverage problems are real but solvable with staggered schedules, handoff discipline, and clearer async norms. The office world already pretends five days are productive when they are not. If a team cannot cover four days without collapse, the problem may be staffing or process, not the calendar. The pro side gains when it points to measured pilots rather than vibes.", "The pro side is extrapolating from favorable pilots to every office. Healthcare, education, logistics, support, and junior-heavy teams often need more live overlap, not less. Pay compression is another risk: some employers may keep salaries flat while demanding the same output in fewer paid hours. A policy that works in one firm can become stress elsewhere."],
+      ["The final case for a four-day standard is that burnout is now a business and public-health issue. If output can be preserved, society should stop treating long presence as virtue. Make four days the norm where evidence supports it, with room for industry exceptions.", "The final case against is that standardization matters less than honest workload design. A bad five-day job and a crushed four-day job can both harm people. The better target is manageable hours, sane meetings, and fair pay — not a slogan that sounds progressive while shifting pressure underground."]
+    ],
+    take: [["Output matters more than days", "The case depends on whether work actually gets more focused."], ["Industry fit is uneven", "Coverage-heavy roles do not compress the same way."], ["Pay and hidden work matter", "Fewer days can become the same load in less time."]],
+    strongA: "4-Day Week's strongest case is higher focus, lower burnout, and equal output in trials that cut waste rather than essential work.",
+    strongB: "5-Day Default's strongest case is coverage, coordination, and the risk that a trendy standard ignores service and junior-heavy roles.",
+    crackA: "4-Day Week cracks when productivity gains come from unpaid compression or unsustainable intensity.",
+    crackB: "5-Day Default cracks when it defends performative attendance instead of necessary coordination.",
+    verify: ["Pilot results by industry and role type.", "Customer coverage and handoff models.", "Whether pay stayed flat or dropped.", "Overtime and weekend spillover after adoption.", "Differences between knowledge work and service work."],
+    changeA: ["Sector-specific pilots with measured output.", "Coverage plans that avoid hidden overtime.", "Evidence burnout and retention improved."],
+    changeB: ["Evidence four-day adoption harmed coverage or pay.", "A stronger case for flexible schedules over one standard.", "Examples where coordination needs blocked compression."],
+    core: "The hinge is whether office work can be redesigned for equal output in fewer days without shifting harm to coverage, pay, or intensity.",
+    comp: ["burnout reduction, focus, and output per hour", "coverage, coordination, and fair pay across roles", "whether a four-day standard fits the work being done"]
+  };
+
+  if (l.includes("rehabilitation") && l.includes("prison")) return {
+    label: "Policy Debate",
+    icon: "⚖",
+    criteria: ["recidivism", "public safety", "accountability", "victim justice", "cost", "human dignity"],
+    desc: "This debate asks whether prisons should prioritize rehabilitation over punishment. The hinge is whether the system's main job is to reduce future harm and reintegrate people, or to deliver moral desert and visible accountability for wrongdoing.",
+    rounds: [
+      ["Prisons should prioritize rehabilitation because punishment alone does not reliably reduce crime. Education, addiction treatment, job training, mental-health care, and transitional housing lower recidivism and save public money over time. The strongest case is public safety: a system that returns people more dangerous than they entered has failed its core mission.", "Prisons should prioritize punishment because justice is not only a spreadsheet of future risk. Victims and communities often need accountability, proportionality, and a moral signal that serious harm has consequences. The strongest skeptical case is that rehabilitation rhetoric can soften consequences for violent crime and erode trust in the rule of law."],
+      ["The skeptical side is right that optics matter, but confinement is already punishment. Rehabilitation does not mean absolution. It means using incarceration to change behavior, not merely warehouse humans. Countries that invest in reentry often see lower reoffending without denying the seriousness of the original crime.", "The pro side has to answer cases where rehabilitation became permissiveness: repeat violent offenders, ignored victims, or programs that exist on paper but not in practice. If rehabilitation is underfunded, performative, or decoupled from accountability, the public is right to resist it."],
+      ["The final case for rehabilitation is pragmatic moral policy: reduce the next crime, repair what can be repaired, and reserve the harshest containment for the truly dangerous. Punishment remains present in loss of liberty; the question is what the years inside are for.", "The final case for punishment priority is that some crimes require a stronger moral response than skills training can provide. If the system appears indifferent to victims, deterrence and legitimacy suffer. Rehabilitation can supplement punishment, but should not swallow it."]
+    ],
+    take: [["Public safety is the bridge", "Both sides care about future harm, but weigh moral desert differently."], ["Programs must be real", "Underfunded rehabilitation is an easy target for skepticism."], ["Victims are not optional", "Accountability language matters to legitimacy."]],
+    strongA: "Rehab First's strongest case is lower recidivism, safer communities, and better use of incarceration time.",
+    strongB: "Punish First's strongest case is moral accountability and public trust when crimes are serious or repeat offending continues.",
+    crackA: "Rehab First cracks when programs are weak, underfunded, or used to avoid hard accountability.",
+    crackB: "Punish First cracks when harsh warehousing raises reoffending and long-run public-safety costs.",
+    verify: ["Recidivism data by program type.", "Funding levels for education, addiction care, and reentry.", "Victim satisfaction and accountability measures.", "Violent versus non-violent offense mix.", "Comparative outcomes in other countries."],
+    changeA: ["Evidence rehabilitation reduced reoffending for similar offenders.", "A model that keeps proportionality for violent crime.", "Fully funded programs with measurable outcomes."],
+    changeB: ["Evidence punishment-focused systems deter serious crime better.", "Examples where rehabilitation rhetoric outran safety.", "Stronger victim-centered accountability mechanisms."],
+    core: "The hinge is whether prisons should mainly reduce future harm through rehabilitation or mainly deliver moral accountability through punishment.",
+    comp: ["public safety, reintegration, and long-term cost", "moral desert, victim justice, and institutional legitimacy", "which goal should dominate when they conflict"]
+  };
+
+  if (l.includes("housing") && l.includes("human right")) return {
+    label: "Policy Debate",
+    icon: "🏠",
+    criteria: ["supply", "affordability", "dignity", "enforcement", "fiscal cost", "property rights"],
+    desc: "This debate asks whether housing should be treated as a human right. The question is whether shelter should be guaranteed by law and public provision, or whether housing is better secured through markets, subsidies, and supply expansion without a universal entitlement.",
+    rounds: [
+      ["Housing should be treated as a human right because without stable shelter, other rights become theoretical. Health, education, work, family stability, and dignity all collapse when people bounce between couches, cars, shelters, and unsafe rentals. The strongest case is not luxury for all; it is a floor: no one should be left unhoused in a society capable of building roofs.", "Housing should not be treated as a human right because rights language is stronger than governments can deliver without tradeoffs. A universal entitlement can strain budgets, distort markets, reduce maintenance incentives, and create legal conflicts with property owners. The stronger skeptical case is targeted housing assistance plus supply reform, not a broad right that outruns capacity."],
+      ["A right does not have to mean identical apartments for everyone. It can mean enforceable access to safe basic housing, emergency prevention, and public investment when markets fail. Treating housing as fundamental changes how cities plan, zone, and budget. The pro side gains when it defines the right narrowly and operationally.", "The pro side still has to answer scarcity. Building, land, labor, and location are finite. If demand outpaces supply, declaring a right without building more homes mainly creates queues, bureaucracy, and political disappointment. Rights talk can also crowd out reforms that actually lower prices: zoning, permitting, and construction."],
+      ["The final case for a housing right is moral realism: mass homelessness is a policy choice visible in budgets and zoning. A society that can finance stadiums and subsidies can finance a housing floor if it decides homelessness is unacceptable.", "The final case against is that housing policy succeeds through supply, vouchers, and incentives more than rights rhetoric. What unhoused people need are homes built and paid for, not a slogan that courts cannot fully enforce. The better fight may be abundant housing, not entitlement language alone."]
+    ],
+    take: [["A right is not a mansion", "The strongest pro case is a basic floor, not unlimited housing."], ["Supply still matters", "Rights language without building does not create roofs."], ["Enforcement is hard", "Legal rights need budgets, land, and administration."]],
+    strongA: "Housing Right's strongest case is dignity and stability: shelter underpins health, work, education, and family life.",
+    strongB: "Market Housing's strongest case is feasibility: supply, subsidies, and property rights may secure housing better than broad entitlement law.",
+    crackA: "Housing Right cracks if it promises more than governments can build or fund.",
+    crackB: "Market Housing cracks if it tolerates mass homelessness as an acceptable market outcome.",
+    verify: ["Homelessness counts and housing waitlists.", "Cost of a basic housing guarantee.", "Zoning and construction bottlenecks.", "Outcomes in places with strong housing rights language.", "Effects on landlords and maintenance incentives."],
+    changeA: ["A defined minimum standard and funding plan.", "Evidence rights language improved housing access.", "Supply reforms paired with the entitlement."],
+    changeB: ["Evidence supply and voucher programs outperformed rights frameworks.", "A credible anti-homelessness plan without universal entitlement.", "Fiscal and legal limits on enforcement."],
+    core: "The hinge is whether housing should be legally guaranteed as a basic right or secured through supply and targeted assistance.",
+    comp: ["dignity, stability, and a floor against homelessness", "fiscal feasibility, supply, and property rights", "whether rights language produces homes or mainly signals intent"]
+  };
+
+  if (l.includes("capital punishment")) return {
+    label: "Policy Debate",
+    icon: "⚖",
+    criteria: ["deterrence", "innocence risk", "moral limits", "victim justice", "cost", "proportionality"],
+    desc: "This debate asks whether capital punishment should be abolished. The hinge is whether execution is a necessary moral response to the worst crimes, or whether an irreversible state killing is too risky and too corrosive to justify.",
+    rounds: [
+      ["Capital punishment should be abolished because the state should not hold an irreversible power it will sometimes misuse. Innocent people have been sentenced to death, racial and class bias infects outcomes, and decades of appeals make the process costly without clearly outperforming life imprisonment on public safety. The strongest case is moral and practical: if error is possible, finality is obscene.", "Capital punishment should not be abolished because some crimes are so extreme that life imprisonment feels inadequate to victims and communities. Execution can express society's strongest condemnation, may deter in marginal cases, and removes the worst offenders permanently. The strongest retention case is not that the system is perfect; it is that abolition removes the only penalty that matches certain crimes."],
+      ["The retention side must answer innocence, bias, and decades-long legal churn. A punishment that cannot be undone requires near-perfect justice, which no system provides. Life without parole can protect the public without turning the state into an executioner.", "The abolition side must answer the moral intuition that some crimes break the social contract so completely that lesser punishment feels hollow. Victims' families are not irrational for wanting the harshest available response. If the alternative is expensive lifetime incarceration with uncertain remorse, retention can still feel proportionate."],
+      ["The final abolition case is that a decent society should not kill in its name when fallibility is guaranteed. Justice can be severe without being irreversible. The goal is public safety and accountability, not ritualized state violence.", "The final retention case is narrow: reserve death for the clearest, most aggravated cases with overwhelming evidence and rigorous review. If the standard is that high, the penalty remains rare but available for crimes society refuses to treat as ordinary."]
+    ],
+    take: [["Irreversibility changes everything", "One wrongful execution is not a rounding error."], ["Victims matter", "Abolition must answer the need for moral condemnation."], ["Deterrence is contested", "Neither side should treat it as settled."]],
+    strongA: "Abolish's strongest case is innocence risk, bias, cost, and the moral limit on irreversible state killing.",
+    strongB: "Keep Death Penalty's strongest case is proportionality and moral condemnation for the worst crimes.",
+    crackA: "Abolish cracks if it cannot offer a punishment victims and the public see as serious enough.",
+    crackB: "Keep Death Penalty cracks on wrongful conviction, unequal application, and the gap between theory and practice.",
+    verify: ["Innocence exoneration rates.", "Racial and socioeconomic disparities in death sentences.", "Deterrence studies.", "Cost of capital cases versus life imprisonment.", "Victim-family perspectives and crime severity thresholds."],
+    changeA: ["Evidence life without parole protects public safety equally.", "Reforms that reduce bias without retaining execution.", "Strong victim-support systems."],
+    changeB: ["A narrowly defined standard with extraordinary evidence.", "Evidence deterrence for targeted crimes.", "Reforms that minimize wrongful conviction risk."],
+    core: "The hinge is whether society should retain an irreversible punishment for the worst crimes or rule out state killing because error and bias are guaranteed.",
+    comp: ["innocence risk, moral limits, and state fallibility", "proportionality, victim justice, and condemnation of the worst crimes", "whether any execution standard can be safe enough in practice"]
+  };
+
+  if (l.includes("encryption") && l.includes("human right")) return {
+    label: "Policy Debate",
+    icon: "🔐",
+    criteria: ["privacy", "security", "law enforcement access", "dissent", "child safety", "implementation"],
+    desc: "This debate asks whether encryption should be a human right. The question is whether strong encryption is essential to privacy, security, and free communication, or whether absolute encryption rights block legitimate investigation of crime and child exploitation.",
+    rounds: [
+      ["Encryption should be a human right because digital life is now where banking, health, journalism, protest, and intimate relationships live. Without strong encryption, surveillance expands by default, criminals and governments alike gain access, and ordinary people cannot trust their devices. The strongest case is that privacy and security are paired: weakening encryption for investigators also weakens everyone against attackers.", "Encryption should not be a human right because unbreakable or inaccessible encryption can shield serious crime: child abuse networks, trafficking, terrorism planning, and fraud at scale. Lawful access with judicial oversight is not the same as mass surveillance. The strongest skeptical case is that a right to absolute encryption makes society pay in preventable harm."],
+      ["The law-enforcement argument often asks for exceptional access that becomes a universal vulnerability. Backdoors leak, standards spread globally, and authoritarian states exploit the same openings. The pro side only needs to show that strong default encryption protects billions of ordinary users and that targeted investigation has other tools.", "The pro side must answer cases where encryption genuinely blocks rescue or prosecution: device data, coordinated abuse rings, and rapid harm scenarios. If the right is framed as absolute, it can sound indifferent to victims. The skeptical side gains when it demands a balance model, not blanket surveillance."],
+      ["The final case for encryption as a right is defensive: people need secure communications in a world of hacking, stalking, corporate data mining, and state overreach. Protect the default, protect the keys, and keep exceptional state access narrow, audited, and rare.", "The final case against is that rights language should not outlaw reasonable lawful access in serious cases. Encryption is vital, but so is investigating crimes that hide behind it. The better standard may be strong encryption with tightly governed exceptions, not an absolute right that ties investigators' hands."]
+    ],
+    take: [["Privacy and security are linked", "Weakening encryption hurts ordinary users, not only criminals."], ["Serious crime is real", "Investigators do face cases where encryption blocks access."], ["Implementation decides everything", "Backdoors and lawful access are not the same thing."]],
+    strongA: "Encryption Right's strongest case is that strong default encryption protects privacy, security, and dissent for everyone.",
+    strongB: "Limited Encryption's strongest case is that absolute encryption can shield serious crime and block lawful investigation.",
+    crackA: "Encryption Right cracks if it cannot answer high-harm cases where data access could prevent injury.",
+    crackB: "Limited Encryption cracks if exceptional access becomes a universal backdoor exploited by criminals and states.",
+    verify: ["How 'human right' would be defined legally.", "Cases where encryption blocked investigations.", "Evidence of harm from prior backdoor proposals.", "Alternative investigative methods.", "Child-safety and fraud enforcement impacts."],
+    changeA: ["A model that preserves default encryption without absolute immunity.", "Evidence weak encryption harmed ordinary users.", "Strong warrant and audit standards for any access."],
+    changeB: ["A technically credible lawful-access design without systemic backdoors.", "Evidence encryption blocked serious prosecutions at scale.", "Safeguards against mass surveillance abuse."],
+    core: "The hinge is whether encryption should be protected as a default right for everyone or limited when it blocks investigation of serious harm.",
+    comp: ["privacy, security, and protection from surveillance", "lawful investigation, child safety, and crime prevention", "whether any exception model can avoid becoming a universal backdoor"]
   };
 
   return genericProfile(question, a, b);
@@ -1112,6 +1333,51 @@ function scoreRound(type, question, i, intensity) {
     if (i === 0) return [8.3, 8.2];
     if (i === 1) return [8.0, 8.5];
     return [8.1, 8.4];
+  }
+  if (l.includes("ai art")) {
+    if (i === 0) return [8.2, 8.3];
+    if (i === 1) return [8.1, 8.4];
+    return [8.2, 8.3];
+  }
+  if (l.includes("frontier ai") || (l.includes("regulate") && l.includes("frontier"))) {
+    if (i === 0) return [8.4, 8.1];
+    if (i === 1) return [8.1, 8.4];
+    return [8.2, 8.3];
+  }
+  if (l.includes("genetically modify")) {
+    if (i === 0) return [8.3, 8.2];
+    if (i === 1) return [8.0, 8.5];
+    return [8.1, 8.4];
+  }
+  if (l.includes("workweek") || l.includes("4-day")) {
+    if (i === 0) return [8.3, 8.1];
+    if (i === 1) return [8.0, 8.4];
+    return [8.2, 8.3];
+  }
+  if (l.includes("rehabilitation") && l.includes("prison")) {
+    if (i === 0) return [8.3, 8.2];
+    if (i === 1) return [8.1, 8.4];
+    return [8.3, 8.2];
+  }
+  if (l.includes("age-gated") || (l.includes("social media") && l.includes("under 16"))) {
+    if (i === 0) return [8.4, 8.1];
+    if (i === 1) return [8.0, 8.5];
+    return [8.2, 8.3];
+  }
+  if (l.includes("housing") && l.includes("human right")) {
+    if (i === 0) return [8.4, 8.1];
+    if (i === 1) return [8.1, 8.4];
+    return [8.2, 8.3];
+  }
+  if (l.includes("capital punishment")) {
+    if (i === 0) return [8.4, 8.2];
+    if (i === 1) return [8.1, 8.5];
+    return [8.3, 8.2];
+  }
+  if (l.includes("encryption") && l.includes("human right")) {
+    if (i === 0) return [8.3, 8.2];
+    if (i === 1) return [8.2, 8.4];
+    return [8.3, 8.2];
   }
   if (l.includes("college") && l.includes("free")) {
     if (i === 0) return [8.3, 8.0];

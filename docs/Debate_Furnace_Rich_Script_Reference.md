@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 DEBATE FURNACE
 Rich Script Reference
 Archive copy for the richer V4 script language and product logic

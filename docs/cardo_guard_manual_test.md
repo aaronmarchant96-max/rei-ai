@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # CARDO GUARD Manual Test Script
 
 Use this as a pass/fail check while clicking through the live tool.

@@ -1,3 +1,8 @@
+<!--
+CARDO REI methodology applied to this document.
+Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+-->
+
 # HingeMarket — v1 Scope (Atlanta Only, Locked)
 
 **Status:** Locked for implementation.  

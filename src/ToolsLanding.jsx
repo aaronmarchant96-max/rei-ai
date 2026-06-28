@@ -46,12 +46,45 @@ export const TOOL_CARDS = [
     repoLabel: "GitHub repo"
   },
   {
+    id: "hinge-meter",
+    label: "Hinge Meter",
+    title: "Decision forces balanced on a pivot.",
+    description:
+      "Visualize Expected Action Waste vs Risk-Adjusted Miss Loss. Watch the needle snap as the threshold flips.",
+    liveHref: "/#hinge-meter",
+    liveLabel: "Open demo",
+    repoHref: REPO_URL,
+    repoLabel: "GitHub repo"
+  },
+  {
+    id: "rei",
+    label: "REI",
+    title: "The CARDO REI Methodology Engine.",
+    description:
+      "Unified command line interface and profile registry executing the CARDO REI framework across all tools.",
+    liveHref: "/#rei",
+    liveLabel: "Open demo",
+    repoHref: REPO_URL,
+    repoLabel: "GitHub repo"
+  },
+  {
     id: "tracepoint",
     label: "Tracepoint",
     title: "Industrial signal review for costly decisions.",
     description:
       "Find the signal. Show the evidence. Keep the decision human.",
     liveHref: "/#tracepoint",
+    liveLabel: "Open demo",
+    repoHref: REPO_URL,
+    repoLabel: "GitHub repo"
+  },
+  {
+    id: "cfai",
+    label: "Hinge AI",
+    title: "CARDO REI genealogy research assistant.",
+    description:
+      "Score evidence, ingest documents, and discover lineage connections with structured, reviewable outputs. Grounded in the CARDO REI methodology.",
+    liveHref: "/#cfai",
     liveLabel: "Open demo",
     repoHref: REPO_URL,
     repoLabel: "GitHub repo"
