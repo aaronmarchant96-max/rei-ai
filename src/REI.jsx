@@ -36,6 +36,37 @@ const DOMAIN_PROFILES = [
 ];
 
 export default function REI() {
+  // Add fade-in animation style
+  const fadeInStyle = {
+    animation: "fadeIn 0.3s ease-in-out forwards",
+    opacity: 0
+  };
+
+  // Inject CSS animation definition
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   const [selectedDomain, setSelectedDomain] = useState("assistant");
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState(() => {
@@ -62,29 +93,41 @@ export default function REI() {
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
 
+  // Clear chat and initialize domain-specific context when domain changes
+  useEffect(() => {
+    const domainSpecificMessage = {
+      sender: "rei",
+      text: `System initialized. Welcome to REI.AI ${currentDomain.label}. ${currentDomain.description} Let's begin our ${currentDomain.id === 'coding' ? 'coding session' : currentDomain.id === 'genealogy' ? 'research analysis' : currentDomain.id === 'story' ? 'story building' : 'conversation'}!`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    setMessages([domainSpecificMessage]);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`rei_chat_history_${selectedDomain}`, JSON.stringify([domainSpecificMessage]));
+    }
+  }, [selectedDomain]);
+
   // Auto scroll to bottom of chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  // Sync to local storage
+  // Sync to local storage (domain-specific)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("rei_chat_history_v2", JSON.stringify(messages));
+      localStorage.setItem(`rei_chat_history_${selectedDomain}`, JSON.stringify(messages));
     }
-  }, [messages]);
+  }, [messages, selectedDomain]);
 
   const handleClearHistory = () => {
-    const defaultMsg = [
-      {
-        sender: "rei",
-        text: "System initialized. Welcome to REI.AI. Select a helper profile from the header, and let's work on something together today!",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      }
-    ];
-    setMessages(defaultMsg);
+    const domainSpecificMessage = {
+      sender: "rei",
+      text: `System initialized. Welcome to REI.AI ${currentDomain.label}. ${currentDomain.description} Let's begin our ${currentDomain.id === 'coding' ? 'coding session' : currentDomain.id === 'genealogy' ? 'research analysis' : currentDomain.id === 'story' ? 'story building' : 'conversation'}!`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setMessages([domainSpecificMessage]);
     if (typeof window !== "undefined") {
-      localStorage.removeItem("rei_chat_history_v2");
+      localStorage.removeItem(`rei_chat_history_${selectedDomain}`);
     }
   };
 
@@ -123,7 +166,7 @@ export default function REI() {
         content: msg.text
       }));
 
-      // Call route handler API
+      // Call route handler API with domain-specific context
       const response = await fetch('/api/cfai', {
         method: 'POST',
         headers: {
@@ -131,7 +174,8 @@ export default function REI() {
         },
         body: JSON.stringify({
           command: 'score',
-          input: `${systemContext}\n\nUser Query: ${userMsg.text}`,
+          domain: selectedDomain,
+          input: `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}\n\nUser Query: ${userMsg.text}`,
           history: historyPayload
         })
       });
@@ -211,6 +255,13 @@ Limitations:
             </div>
           </div>
 
+          {/* Active Profile Indicator */}
+          <div style={{ background: "#0B2B36", padding: "8px 12px", borderRadius: "4px", marginBottom: "12px", border: "1px solid #1A4B5C" }}>
+            <span style={{ color: "#FFB300", fontWeight: "bold", fontSize: "0.9em" }}>▶ Active Profile:</span>
+            <span style={{ color: "#FFFFFF", marginLeft: "8px", fontWeight: "bold" }}>{currentDomain.label}</span>
+            <span style={{ color: "#94A3B8", marginLeft: "16px", fontSize: "0.85em" }}>{currentDomain.description}</span>
+          </div>
+
           {/* Domain selection badge strip */}
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
             {DOMAIN_PROFILES.map((dom) => (
@@ -228,7 +279,21 @@ Limitations:
                   fontSize: "0.8em",
                   fontWeight: "bold",
                   cursor: "pointer",
-                  transition: "all 0.2s ease"
+                  transition: "all 0.2s ease",
+                  transform: selectedDomain === dom.id ? "scale(1.05)" : "scale(1)",
+                  boxShadow: selectedDomain === dom.id ? "0 2px 4px rgba(255, 179, 0, 0.2)" : "none"
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedDomain !== dom.id) {
+                    e.currentTarget.style.transform = "scale(1.03)";
+                    e.currentTarget.style.background = "#0B2B36";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedDomain !== dom.id) {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.background = "transparent";
+                  }
                 }}
               >
                 {dom.label}
@@ -282,7 +347,12 @@ Limitations:
                   maxWidth: "85%",
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: msg.sender === "user" ? "flex-end" : "flex-start"
+                  alignItems: msg.sender === "user" ? "flex-end" : "flex-start",
+                  animation: "fadeIn 0.3s ease-in-out forwards",
+                  opacity: 0
+                }}
+                onAnimationEnd={(e) => {
+                  e.currentTarget.style.opacity = "1";
                 }}
               >
                 <div
@@ -318,8 +388,18 @@ Limitations:
             ))}
 
             {isTyping && (
-              <div style={{ alignSelf: "flex-start", color: "#FFB300", fontFamily: "JetBrains Mono, Fira Code, monospace", fontSize: "1.02em" }}>
-                REI.AI is thinking...
+              <div style={{ 
+                alignSelf: "flex-start", 
+                color: "#FFB300", 
+                fontFamily: "JetBrains Mono, Fira Code, monospace", 
+                fontSize: "1.02em",
+                animation: "pulse 1.5s ease-in-out infinite",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px"
+              }}>
+                <span>●</span>
+                <span>REI.ai is thinking...</span>
               </div>
             )}
             <div ref={chatEndRef} />
