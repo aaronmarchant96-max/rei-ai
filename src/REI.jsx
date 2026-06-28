@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const DOMAIN_PROFILES = [
   {
@@ -37,78 +37,94 @@ const DOMAIN_PROFILES = [
 
 export default function REI() {
   const [selectedDomain, setSelectedDomain] = useState("genealogy");
-  const [proofInput, setProofInput] = useState("");
-  const [claimInput, setClaimInput] = useState("");
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evaluationOutput, setEvaluationOutput] = useState(null);
+  const [inputMessage, setInputMessage] = useState("");
+  const [messages, setMessages] = useState([
+    {
+      sender: "rei",
+      text: "System initialized. Welcome to REI.AI methodology engine. Select a domain profile from the header, then submit raw evidence or claims to evaluate under the CARDO REI framework.",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const chatEndRef = useRef(null);
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
 
-  function runREIEvaluation() {
-    if (!proofInput.trim() || !claimInput.trim()) {
-      alert("Please provide inputs in both the Proof and Claim panels to run the evaluation.");
-      return;
-    }
+  // Auto scroll to bottom of chat
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isTyping]);
 
-    setIsEvaluating(true);
-    setEvaluationOutput(null);
+  function handleSendMessage(e) {
+    e.preventDefault();
+    if (!inputMessage.trim()) return;
 
-    // Simulate terminal execution of Hinge AI engine
+    const userMsg = {
+      sender: "user",
+      text: inputMessage,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setInputMessage("");
+    setIsTyping(true);
+
+    // Simulate REI.AI response calculation
     setTimeout(() => {
-      // Basic rule-based dynamic evaluation matching inputs
-      const proofLower = proofInput.toLowerCase();
-      const claimLower = claimInput.toLowerCase();
+      const userText = userMsg.text.toLowerCase();
+      const hasPrimary = userText.includes("primary") || userText.includes("original") || userText.includes("certified");
+      const hasInconsistency = userText.includes("always") || userText.includes("never") || userText.length > 80;
 
-      // Find keywords in proof and claim to calculate a mock delta/confidence
-      const hasPrimary = proofLower.includes("primary") || proofLower.includes("original") || proofLower.includes("certified");
-      const hasInconsistency = claimLower.includes("always") || claimLower.includes("never") || (claimLower.length > proofLower.length * 1.5);
-      
-      let score = 70; // baseline
+      let score = 70;
       if (hasPrimary) score += 15;
       if (hasInconsistency) score -= 10;
       score = Math.max(55, Math.min(97, score));
 
-      // Extract unburned claims (simulated delta)
       const claimsList = [];
-      if (!proofLower.includes("marriage") && claimLower.includes("marriage")) {
-        claimsList.push("Assertion of marriage date is unsupported by the provided source context.");
+      if (!userText.includes("marriage") && userText.includes("married")) {
+        claimsList.push("Assertion of marriage date lacks physical document citations.");
       }
-      if (claimLower.length > proofLower.length) {
-        claimsList.push("Claim introduces detail extensions not explicitly present in the proof trail.");
+      if (userText.length > 50) {
+        claimsList.push("Extended claim expands details beyond raw scope parameters.");
       }
       if (claimsList.length === 0) {
-        claimsList.push("No obvious unburned claims identified; the claim stays within context boundaries.");
+        claimsList.push("Claim keeps strict semantic mapping to the source bounds.");
       }
 
-      const mockJSONResult = {
-        meta: {
-          engine: "REI-Hinge-Core v0.3",
-          domain: selectedDomain,
-          timestamp: new Date().toISOString(),
-          delta_check: "passed"
-        },
-        evaluation: {
-          confidence_score: `${score}%`,
-          decision_hinge: `Whether the proof bounds explicitly confirm the assertions in the claim or leave critical gaps in evidence.`,
-          unburned_claims: claimsList,
-          limitations: [
-            "REI does not forecast or assume missing links.",
-            "Evaluation depends entirely on user-provided proof context.",
-            "Always enforce the human verification gate before pushing rules."
-          ]
-        }
-      };
+      const responseText = `[REI.AI EVALUATION RESULT]
+Confidence Score: ${score}%
+Decision Hinge: Whether the provided context boundaries explicitly justify the assertions or present structural evidence gaps.
 
-      setEvaluationOutput(mockJSONResult);
-      setIsEvaluating(false);
-    }, 900);
+Unburned Claims:
+${claimsList.map(c => `• ${c}`).join("\n")}
+
+Limitations:
+• REI does not assume missing links or forecast parameters.
+• Verification depends entirely on user-provided proof context.`;
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "rei",
+          text: responseText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          rawJson: {
+            engine: "REI-Hinge-Core v0.3",
+            domain: selectedDomain,
+            confidence_score: `${score}%`,
+            unburned_claims: claimsList
+          }
+        }
+      ]);
+      setIsTyping(false);
+    }, 1000);
   }
 
   return (
-    <section className="rei-dashboard-wrapper" style={{ background: "#05161C", color: "#E2E8F0", fontFamily: "Inter, sans-serif", minHeight: "100vh", padding: "20px" }}>
+    <section className="rei-dashboard-wrapper" style={{ background: "#05161C", color: "#E2E8F0", fontFamily: "Inter, sans-serif", minHeight: "100vh", padding: "20px", display: "flex", flexDirection: "column" }}>
       
       {/* 4A. Minimalist Header */}
-      <header className="rei-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #1A4B5C", paddingBottom: "16px", marginBottom: "24px" }}>
+      <header className="rei-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #1A4B5C", paddingBottom: "16px", marginBottom: "20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           {/* Owl/Balance SVG Logo (Midnight Teal & Amber) */}
           <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="REI owl logo">
@@ -119,8 +135,8 @@ export default function REI() {
             <line x1="50" y1="25" x2="50" y2="45" stroke="#1A4B5C" strokeWidth="4" />
           </svg>
           <div>
-            <h1 style={{ fontSize: "1.5em", fontWeight: "bold", margin: 0, letterSpacing: "-0.5px" }}>REI</h1>
-            <p style={{ fontSize: "0.8em", color: "#94A3B8", margin: 0 }}>Methodology-First Evaluation Engine</p>
+            <h1 style={{ fontSize: "1.5em", fontWeight: "bold", margin: 0, letterSpacing: "-0.5px" }}>REI.AI</h1>
+            <p style={{ fontSize: "0.8em", color: "#94A3B8", margin: 0 }}>Methodology Assistant</p>
           </div>
         </div>
 
@@ -150,163 +166,112 @@ export default function REI() {
         </div>
       </header>
 
-      {/* Domain Context Information Bar */}
-      <div style={{ background: "#0B2B36", border: "1px solid #1A4B5C", padding: "12px 16px", borderRadius: "6px", marginBottom: "24px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+      {/* Active Domain Info Banner */}
+      <div style={{ background: "#0B2B36", border: "1px solid #1A4B5C", padding: "10px 14px", borderRadius: "6px", marginBottom: "20px", display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", fontSize: "0.85em" }}>
         <div>
-          <span style={{ fontSize: "0.75em", textTransform: "uppercase", color: "#FFB300", fontWeight: "bold", display: "block" }}>Active Domain Description</span>
-          <span style={{ fontSize: "0.9em" }}>{currentDomain.description}</span>
+          <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Domain:</span>
+          <span>{currentDomain.description}</span>
         </div>
-        <div style={{ display: "flex", gap: "24px" }}>
-          <div>
-            <span style={{ fontSize: "0.75em", textTransform: "uppercase", color: "#FFB300", fontWeight: "bold", display: "block" }}>Validation Rules</span>
-            <span style={{ fontSize: "0.9em", color: "#94A3B8" }}>{currentDomain.rules.join(" | ")}</span>
-          </div>
-          <div>
-            <span style={{ fontSize: "0.75em", textTransform: "uppercase", color: "#FFB300", fontWeight: "bold", display: "block" }}>Grounding Exemplar</span>
-            <span style={{ fontSize: "0.9em", color: "#94A3B8" }}>{currentDomain.exemplar}</span>
-          </div>
+        <div>
+          <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Rules:</span>
+          <span style={{ color: "#94A3B8" }}>{currentDomain.rules.join(" | ")}</span>
         </div>
       </div>
 
-      {/* 4B. The Split Workspace */}
-      <div className="rei-workspace" style={{ display: "flex", gap: "20px", marginBottom: "24px", position: "relative" }}>
-        {/* Left Pane (The Proof) */}
-        <div className="rei-pane" style={{ flex: 1, background: "#0B2B36", border: "1px solid #1A4B5C", padding: "16px", borderRadius: "8px", display: "flex", flexDirection: "column" }}>
-          <div style={{ borderBottom: "1px solid #1A4B5C", paddingBottom: "8px", marginBottom: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: "bold", fontSize: "0.9em", letterSpacing: "0.5px" }}>LEFT PANE: THE PROOF</span>
-            <span style={{ fontSize: "0.75em", color: "#94A3B8" }}>Context / Source Telemetry</span>
-          </div>
-          <textarea
-            value={proofInput}
-            onChange={(e) => setProofInput(e.target.value)}
-            placeholder="Input raw context, documents, transcripts, or radar telemetry here..."
+      {/* Chat Interface Container */}
+      <div className="rei-chat-container" style={{ flex: 1, background: "#0B2B36", border: "1px solid #1A4B5C", borderRadius: "8px", display: "flex", flexDirection: "column", minHeight: "450px", overflow: "hidden" }}>
+        
+        {/* Chat History Area */}
+        <div className="rei-chat-history" style={{ flex: 1, padding: "20px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "16px" }}>
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              style={{
+                alignSelf: msg.sender === "user" ? "flex-end" : "flex-start",
+                maxWidth: "80%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: msg.sender === "user" ? "flex-end" : "flex-start"
+              }}
+            >
+              <div
+                style={{
+                  background: msg.sender === "user" ? "#05161C" : "#05161C",
+                  color: "#E2E8F0",
+                  border: msg.sender === "user" ? "1px solid #1A4B5C" : "1px solid #FFB300",
+                  borderRadius: "6px",
+                  padding: "12px 16px",
+                  fontFamily: msg.sender === "rei" ? "JetBrains Mono, Fira Code, monospace" : "inherit",
+                  fontSize: msg.sender === "rei" ? "0.9em" : "0.95em",
+                  whiteSpace: "pre-wrap",
+                  boxShadow: msg.sender === "rei" ? "0 0 10px rgba(255, 179, 0, 0.05)" : "none"
+                }}
+              >
+                {msg.text}
+
+                {/* Optional expandable raw JSON response for REI assistant bubbles */}
+                {msg.rawJson && (
+                  <details style={{ marginTop: "12px", borderTop: "1px dashed #1A4B5C", paddingTop: "8px" }}>
+                    <summary style={{ color: "#94A3B8", fontSize: "0.85em", cursor: "pointer", outline: "none" }}>Raw JSON</summary>
+                    <pre style={{ fontSize: "0.8em", color: "#94A3B8", overflowX: "auto", marginTop: "6px", background: "rgba(0,0,0,0.2)", padding: "6px", borderRadius: "4px" }}>
+                      <code>{JSON.stringify(msg.rawJson, null, 2)}</code>
+                    </pre>
+                  </details>
+                )}
+              </div>
+              <span style={{ fontSize: "0.75em", color: "#94A3B8", marginTop: "4px" }}>
+                {msg.sender === "user" ? "You" : "REI.AI"} • {msg.timestamp}
+              </span>
+            </div>
+          ))}
+
+          {isTyping && (
+            <div style={{ alignSelf: "flex-start", color: "#FFB300", fontFamily: "JetBrains Mono, Fira Code, monospace", fontSize: "0.9em" }}>
+              REI.AI is thinking...
+            </div>
+          )}
+          <div ref={chatEndRef} />
+        </div>
+
+        {/* Chat Input form area */}
+        <form onSubmit={handleSendMessage} style={{ borderTop: "1px solid #1A4B5C", background: "#05161C", padding: "16px", display: "flex", gap: "12px", alignItems: "center" }}>
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Type proof context or statements to evaluate..."
             style={{
               flex: 1,
-              minHeight: "180px",
-              background: "#05161C",
+              background: "#0B2B36",
               color: "#E2E8F0",
               border: "1px solid #1A4B5C",
               borderRadius: "4px",
-              padding: "12px",
-              fontFamily: "JetBrains Mono, Fira Code, monospace",
-              fontSize: "0.9em",
-              resize: "vertical"
+              padding: "12px 16px",
+              fontFamily: "inherit",
+              fontSize: "0.95em",
+              outline: "none"
             }}
           />
-        </div>
-
-        {/* The Center Evaluation Button */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", zIndex: 10 }}>
           <button
-            type="button"
-            onClick={runREIEvaluation}
-            disabled={isEvaluating}
+            type="submit"
             style={{
               background: "#FFB300",
               color: "#05161C",
               border: "none",
-              borderRadius: "50%",
-              width: "70px",
-              height: "70px",
-              fontWeight: "bold",
-              fontSize: "0.9em",
-              cursor: "pointer",
-              boxShadow: "0 0 15px rgba(255, 179, 0, 0.4)",
-              transition: "transform 0.2s ease, background 0.2s ease",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-            onMouseOver={(e) => e.currentTarget.style.transform = "translate(-50%, -50%) scale(1.08)"}
-            onMouseOut={(e) => e.currentTarget.style.transform = "translate(-50%, -50%) scale(1)"}
-          >
-            <span style={{ fontSize: "1.4em", marginBottom: "-4px" }}>⚡</span>
-            <span style={{ fontSize: "0.7em", fontWeight: "900" }}>{isEvaluating ? "..." : "REI"}</span>
-          </button>
-        </div>
-
-        {/* Right Pane (The Claim) */}
-        <div className="rei-pane" style={{ flex: 1, background: "#0B2B36", border: "1px solid #1A4B5C", padding: "16px", borderRadius: "8px", display: "flex", flexDirection: "column" }}>
-          <div style={{ borderBottom: "1px solid #1A4B5C", paddingBottom: "8px", marginBottom: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontWeight: "bold", fontSize: "0.9em", letterSpacing: "0.5px" }}>RIGHT PANE: THE CLAIM</span>
-            <span style={{ fontSize: "0.75em", color: "#94A3B8" }}>Consensus / Theory / Text</span>
-          </div>
-          <textarea
-            value={claimInput}
-            onChange={(e) => setClaimInput(e.target.value)}
-            placeholder="Input generated text, consensus assertions, or theories to evaluate..."
-            style={{
-              flex: 1,
-              minHeight: "180px",
-              background: "#05161C",
-              color: "#E2E8F0",
-              border: "1px solid #1A4B5C",
               borderRadius: "4px",
-              padding: "12px",
-              fontFamily: "JetBrains Mono, Fira Code, monospace",
-              fontSize: "0.9em",
-              resize: "vertical"
+              padding: "12px 24px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              transition: "background 0.2s ease"
             }}
-          />
-        </div>
+            onMouseOver={(e) => e.currentTarget.style.background = "#e6a100"}
+            onMouseOut={(e) => e.currentTarget.style.background = "#FFB300"}
+          >
+            Send
+          </button>
+        </form>
       </div>
 
-      {/* 4C. The Output Console */}
-      <section className="rei-output-console" style={{ background: "#0B2B36", border: "1px solid #1A4B5C", padding: "20px", borderRadius: "8px" }}>
-        <div style={{ borderBottom: "1px solid #1A4B5C", paddingBottom: "8px", marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontWeight: "bold", fontSize: "0.95em", letterSpacing: "0.5px" }}>EVALUATION CONSOLE OUTPUT</span>
-          <span style={{ fontSize: "0.8em", color: "#FFB300", fontFamily: "monospace" }}>cfai --evaluate</span>
-        </div>
-
-        {evaluationOutput ? (
-          <div style={{ background: "#05161C", border: "1px solid #1A4B5C", padding: "16px", borderRadius: "4px", fontFamily: "JetBrains Mono, Fira Code, monospace" }}>
-            {/* Score Delta */}
-            <div style={{ marginBottom: "16px" }}>
-              <span style={{ color: "#94A3B8", fontSize: "0.8em", display: "block" }}>CONFIDENCE DELTA SCORE</span>
-              <span style={{ fontSize: "2.2em", fontWeight: "bold", color: "#FFB300" }}>{evaluationOutput.evaluation.confidence_score}</span>
-            </div>
-
-            {/* Decision Hinge */}
-            <div style={{ marginBottom: "16px" }}>
-              <span style={{ color: "#94A3B8", fontSize: "0.8em", display: "block" }}>DECISION HINGE</span>
-              <p style={{ color: "#E2E8F0", margin: "4px 0 0 0", fontSize: "0.95em" }}>{evaluationOutput.evaluation.decision_hinge}</p>
-            </div>
-
-            {/* Unburned Claims */}
-            <div style={{ marginBottom: "16px" }}>
-              <span style={{ color: "#94A3B8", fontSize: "0.8em", display: "block" }}>UNBURNED CLAIMS (DELTA GAP)</span>
-              <ul style={{ color: "#E2E8F0", margin: "6px 0 0 0", paddingLeft: "20px", fontSize: "0.9em" }}>
-                {evaluationOutput.evaluation.unburned_claims.map((claim, idx) => (
-                  <li key={idx} style={{ marginBottom: "4px" }}>{claim}</li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Raw JSON Stream Output */}
-            <details style={{ marginTop: "20px", borderTop: "1px dashed #1A4B5C", paddingTop: "12px" }}>
-              <summary style={{ color: "#94A3B8", fontSize: "0.8em", cursor: "pointer", outline: "none" }}>Show Raw Response JSON</summary>
-              <pre style={{ fontSize: "0.85em", color: "#94A3B8", overflowX: "auto", marginTop: "10px", background: "rgba(0,0,0,0.2)", padding: "10px", borderRadius: "4px" }}>
-                <code>{JSON.stringify(evaluationOutput, null, 2)}</code>
-              </pre>
-            </details>
-
-            {/* Slate Grey Limitations Block */}
-            <div style={{ borderTop: "1px solid #1A4B5C", marginTop: "20px", paddingTop: "12px", color: "#94A3B8", fontSize: "0.75em" }}>
-              {evaluationOutput.evaluation.limitations.map((limit, idx) => (
-                <div key={idx} style={{ marginBottom: "2px" }}>• {limit}</div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px", color: "#94A3B8" }}>
-            <span style={{ fontSize: "2.5em", marginBottom: "10px" }}>⏳</span>
-            <span style={{ fontFamily: "JetBrains Mono, Fira Code, monospace", fontSize: "0.9em" }}>
-              {isEvaluating ? "Executing REI verification engine..." : "Awaiting input trigger. Input Proof and Claim, then ignite the Hinge."}
-            </span>
-          </div>
-        )}
-      </section>
     </section>
   );
 }
