@@ -46,6 +46,17 @@ export const TOOL_CARDS = [
     repoLabel: "GitHub repo",
   },
   {
+    id: "hinge-meter",
+    label: "Hinge Meter",
+    title: "Decision forces balanced on a pivot.",
+    description:
+      "Visualize Expected Action Waste vs Risk-Adjusted Miss Loss. Watch the needle snap as the threshold flips.",
+    liveHref: "/#hinge-meter",
+    liveLabel: "Open demo",
+    repoHref: REPO_URL,
+    repoLabel: "GitHub repo",
+  },
+  {
     id: "rei",
     label: "REI",
     title: "The CARDO REI Methodology Engine.",

@@ -19,12 +19,16 @@ describe("ToolsLanding", () => {
     const onOpenTool = jest.fn();
     render(<ToolsLanding onOpenTool={onOpenTool} />);
 
-    // Click the REI link (index 4)
+    // Click the Hinge Meter link (index 4)
     fireEvent.click(screen.getAllByRole("link", { name: /open demo/i })[4]);
+    expect(onOpenTool).toHaveBeenCalledWith("hinge-meter");
+
+    // Click the REI link (index 5)
+    fireEvent.click(screen.getAllByRole("link", { name: /open demo/i })[5]);
     expect(onOpenTool).toHaveBeenCalledWith("rei");
 
-    // Click the Tracepoint link (index 5)
-    fireEvent.click(screen.getAllByRole("link", { name: /open demo/i })[5]);
+    // Click the Tracepoint link (index 6)
+    fireEvent.click(screen.getAllByRole("link", { name: /open demo/i })[6]);
     expect(onOpenTool).toHaveBeenCalledWith("tracepoint");
   });
 });
