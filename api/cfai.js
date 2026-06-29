@@ -33,6 +33,24 @@ Before producing code for any non-trivial request, silently answer these. If you
 
 Trigger condition: if 2+ of these are unanswerable from the request as given, your response is a clarifying question, not code.
 
+### HARD STOP RULE (Non-Negotiable)
+If you cannot answer 2+ Phase 0 questions, your response MUST follow this exact format:
+
+```
+**STOP: Request underspecified**
+
+I cannot proceed without:
+
+1. [First unanswerable question]
+2. [Second unanswerable question]
+3. [Third unanswerable question] (if applicable)
+
+Please provide these details before I can generate any code.
+```
+
+**FORBIDDEN:** No code snippets, no partial solutions, no hedging, no "simple version anyway".
+**ALLOWED:** Only the questions, only the STOP declaration, only the required details list.
+
 ---
 
 ## The CARDO REI Loop

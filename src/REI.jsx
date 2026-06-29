@@ -278,6 +278,16 @@ function HingeMark({ size = 36, animated = false }) {
 }
 
 export default function REI() {
+  // Copy text to clipboard function
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // Could add a toast notification here if needed
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
   // Add fade-in animation style
   const fadeInStyle = {
     animation: "fadeIn 0.3s ease-in-out forwards",
@@ -921,7 +931,8 @@ Limitations:
                     fontFamily: msg.sender === "rei" ? "JetBrains Mono, Fira Code, monospace" : "inherit",
                     fontSize: "14.5px",
                     whiteSpace: "pre-wrap",
-                    lineHeight: "1.4"
+                    lineHeight: "1.4",
+                    position: "relative"
                   }}
                 >
                   {selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback ? (
@@ -972,6 +983,28 @@ Limitations:
                       </pre>
                     </details>
                   )}
+                  <button
+                    onClick={() => copyText(msg.text)}
+                    style={{
+                      position: "absolute",
+                      top: "8px",
+                      right: "8px",
+                      background: "rgba(251,146,60,0.15)",
+                      border: "1px solid rgba(251,146,60,0.3)",
+                      borderRadius: "4px",
+                      color: "#fb923c",
+                      cursor: "pointer",
+                      fontSize: "0.75em",
+                      padding: "2px 6px",
+                      opacity: 0.7,
+                      transition: "opacity 0.2s"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                    onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+                    title="Copy message"
+                  >
+                    Copy
+                  </button>
                 </div>
                 <span style={{ fontSize: "0.78em", color: "#94A3B8", marginTop: "4px" }}>
                   {msg.sender === "user" ? "You" : "REI.AI"} • {msg.timestamp}
