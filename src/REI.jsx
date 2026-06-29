@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useMobile, useKeyboardVisible } from "./useMobile";
+import { useMobile, useKeyboardVisible } from "./useMobile.js";
 
 const MAX_RECORD_CHARS = 12000;
 

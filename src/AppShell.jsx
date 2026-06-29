@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useMobile, useSwipe } from "./useMobile";
+import { useMobile, useSwipe } from "./useMobile.js";
 import DebateFurnace from "./DebateFurnace.jsx";
 import CreativeEngine from "./CreativeEngine.jsx";
 import StormReplay from "./StormReplay.jsx";
