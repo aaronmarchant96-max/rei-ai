@@ -778,25 +778,22 @@ Limitations:
   }
 
   return (
-    <section className="rei-dashboard-wrapper" style={{ 
+    <div className="mobile-container safe-area h-dvh" style={{
       color: "#E2E8F0", 
-      fontFamily: "Inter, sans-serif", 
-      minHeight: "100vh", 
-      padding: mobile ? "12px" : "30px", 
-      display: "flex", 
-      justifyContent: "center" 
+      fontFamily: "Inter, sans-serif"
     }}>
-      <div className="rei-custom-container" style={{ 
-        width: "100%", 
-        maxWidth: mobile ? "100%" : "min(960px, 100vw - 32px)", 
-        padding: mobile ? "12px" : "28px", 
-        display: "flex", 
-        flexDirection: "column", 
-        gap: mobile ? "12px" : "18px"
+      {/* Sticky Header with safe area top */}
+      <header className="safe-top" style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        background: "var(--surface)",
+        borderBottom: "1px solid rgba(251,146,60,0.15)",
+        padding: "16px 16px 12px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center"
       }}>
-        
-        {/* Header */}
-        <header className="rei-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(251,146,60,0.15)", paddingBottom: "16px", marginBottom: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
             {/* Logo Mark */}
             <div className="rei-logo-mark">
@@ -810,8 +807,8 @@ Limitations:
             </div>
           </div>
 
-          {/* Domain selection tab strip */}
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+          {/* Domain selection tab strip - mobile grid */}
+          <div className="grid grid-cols-1 gap-3" style={{ alignItems: "center" }}>
             {DOMAIN_PROFILES.map((dom) => (
               <button
                 key={dom.id}
@@ -871,8 +868,10 @@ Limitations:
           </div>
         </header>
 
-        {/* Active Domain Info Banner (Custom Card Style) */}
-        <div className="rei-custom-card">
+        {/* Scrollable Main Content with keyboard space */}
+        <main className="flex-1 overflow-y-auto pb-32" style={{ padding: "16px 16px 0" }}>
+          {/* Active Domain Info Banner (Custom Card Style) */}
+        <div className="bg-[#2c1f14] rounded-3xl p-5 border border-amber-900">
           <div style={{ fontSize: "10.5px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", color: "#fb923c", marginBottom: "6px" }}>
             Active Voice
           </div>
@@ -1065,11 +1064,14 @@ Limitations:
             )}
             <div ref={chatEndRef} />
           </div>
+        </div>
+        </main>
 
-          {/* Chat Input form area */}
-          <form onSubmit={handleSendMessage} style={{ borderTop: "1px solid rgba(251,146,60,0.15)", background: "rgba(0,0,0,0.3)", padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+        {/* Fixed Input Area at Bottom with safe area */}
+        <div className="fixed bottom-0 safe-bottom" style={{ width: "100%", background: "var(--surface)", borderTop: "1px solid rgba(251,146,60,0.15)", padding: "16px" }}>
+          <form onSubmit={handleSendMessage} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {selectedDomain === "assistant" && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+              <div className="grid grid-cols-3 gap-2.5">
                 {GENERALIST_PROMPTS.map((prompt, index) => (
                   <button
                     key={prompt}
@@ -1078,15 +1080,7 @@ Limitations:
                       setInputMessage(prompt);
                       setAssistantPromptIndex(index);
                     }}
-                    style={{
-                      border: "1px solid rgba(251,146,60,0.18)",
-                      background: "rgba(255,255,255,0.03)",
-                      color: "#fed7aa",
-                      borderRadius: "999px",
-                      padding: "6px 10px",
-                      fontSize: "11px",
-                      cursor: "pointer"
-                    }}
+                    className="bg-[#3a2a1f] py-4 rounded-2xl text-xs tracking-wider"
                   >
                     {prompt}
                   </button>
@@ -1138,7 +1132,6 @@ Limitations:
             </div>
           </form>
         </div>
-      </div>
       
       {/* Philosophy Modal Overlay */}
       {isPhilosophyOpen && (
@@ -1174,6 +1167,6 @@ Limitations:
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }
