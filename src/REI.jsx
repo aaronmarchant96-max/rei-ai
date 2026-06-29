@@ -5,16 +5,16 @@ const DOMAIN_PROFILES = [
     id: "assistant",
     label: "The Generalist",
     badge: "Active",
-    description: "A sharp everyday reasoning model that talks like a real person, spots the hinge fast, and calls out assumptions without sounding stiff.",
-    rules: ["Plainspoken replies", "Keep the hinge visible", "Be warm without being generic"],
+    description: "Everyday reasoning, judgment, and decision support.",
+    rules: ["Short sentences", "Hinge first", "Facts with sources", "Flag uncertainty"],
     exemplar: "Turning loose thoughts into a clean, usable decision path."
   },
   {
     id: "coding",
     label: "The Hinge Finder",
     badge: "Active",
-    description: "Senior coding logic executing CARDO REI coding methodology. obv, testable, and boring code.",
-    rules: ["Verify API shapes before coding", "Name hinges explicitly", "Stop and ask if underspecified"],
+    description: "Senior coding logic executing CARDO REI methodology.",
+    rules: ["Verify API shapes", "Name hinges explicitly", "Stop and ask if underspecified"],
     exemplar: "Decomposing complex requirements into small, testable coding iterations."
   },
   {
@@ -22,15 +22,15 @@ const DOMAIN_PROFILES = [
     label: "The Archivist",
     badge: "Active",
     description: "Evidence-tiered genealogy and disambiguating same-name profiles.",
-    rules: ["Compare parent-child age limits", "Assign primary/strong evidence tiers", "Log negative search query results"],
+    rules: ["Compare parent-child age limits", "Assign evidence tiers", "Log negative search results"],
     exemplar: "Thomas Ramsey same-name disambiguation and parish register evaluation."
   },
   {
     id: "story",
     label: "The Storyteller",
     badge: "Active",
-    description: "Narrative architecture assistant generating story blueprints and narrative arcs.",
-    rules: ["Establish clear blueprint structure", "Identify core character driver hinges", "Avoid cliché tropes by default"],
+    description: "Narrative architecture generating story blueprints.",
+    rules: ["Establish blueprint structure", "Identify character driver hinges", "Avoid cliché tropes"],
     exemplar: "Expanding historical inspiration seeds into multi-part character outlines."
   }
 ];
@@ -596,7 +596,7 @@ Limitations:
           </div>
           {selectedDomain === "assistant" && (
             <div style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
-              {["Collect", "Distinguish", "Hinge", "Review", "Evaluate"].map((step) => (
+              {["Collect", "Analyze", "Record", "Distinguish", "Organize", "Review", "Evaluate", "Iterate"].map((step) => (
                 <span
                   key={step}
                   style={{
