@@ -47,7 +47,7 @@ const TOP_LEVEL = [
 ];
 
 function getInitialTool() {
-  if (typeof window === "undefined") return "furnace";
+  if (typeof window === "undefined") return "rei";
   if (window.location.pathname === "/tools" || window.location.pathname === "/tools/")
     return "tools";
   if (window.location.hash === "#story-forge") return "story-forge";
@@ -56,7 +56,7 @@ function getInitialTool() {
   if (window.location.hash === "#rei" || window.location.hash === "#cfai") return "rei";
   if (window.location.hash === "#tracepoint") return "tracepoint";
   if (window.location.hash === "#hinge-meter") return "tools"; // redirect unauthorized hash to tools landing
-  return "furnace";
+  return "rei";
 }
 
 function getToolPath(tool) {
@@ -66,7 +66,7 @@ function getToolPath(tool) {
   if (tool === "cardo-guard") return "/#cardo-guard";
   if (tool === "rei") return "/#rei";
   if (tool === "tracepoint") return "/#tracepoint";
-  return "/";
+  return "/#rei";
 }
 
 export default function AppShell() {
@@ -133,18 +133,20 @@ export default function AppShell() {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "flex-start",
-                      padding: "16px",
-                      minWidth: "48px",
-                      minHeight: "48px",
+                      padding: "20px 16px",
+                      minWidth: "100%",
+                      minHeight: "72px",
                       background: "none",
                       border: "none",
                       color: "#E2E8F0",
                       cursor: "pointer",
-                      fontSize: "16px"
+                      fontSize: "16px",
+                      borderBottom: "1px solid rgba(255,255,255,0.1)",
+                      textAlign: "left"
                     }}
                   >
-                    <span style={{ fontWeight: "bold" }}>{item.label}</span>
-                    <span style={{ fontSize: "0.85em", opacity: 0.7 }}>{item.subtitle}</span>
+                    <span style={{ fontWeight: "bold", fontSize: "16px" }}>{item.label}</span>
+                    <span style={{ fontSize: "0.85em", opacity: 0.7, marginTop: "4px" }}>{item.subtitle}</span>
                   </button>
                 ))}
               </nav>
@@ -198,12 +200,37 @@ export default function AppShell() {
                 key={item.id}
                 type="button"
                 className={tool === item.id ? "top-tab is-active" : "top-tab touch-target"}
+                style={{
+                  minWidth: "120px", 
+                  minHeight: "60px",
+                  padding: "12px 16px",
+                  borderRadius: "10px",
+                  transition: "all 0.2s ease",
+                  cursor: "pointer",
+                  margin: "0 4px",
+                  position: "relative",
+                  overflow: "hidden",
+                  ...(tool === item.id && {
+                    background: "linear-gradient(135deg, rgba(249,115,22,0.15), rgba(251,191,36,0.1))",
+                    border: "1px solid rgba(249,115,22,0.3)",
+                    boxShadow: "0 0 12px rgba(249,115,22,0.2)"
+                  })
+                }}
                 onClick={() => setTool(item.id)}
                 aria-pressed={tool === item.id}
-                style={{ minWidth: "48px", minHeight: "48px" }}
+                onMouseEnter={tool !== item.id ? (e) => {
+                  e.currentTarget.style.background = "rgba(251,146,60,0.08)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(251,146,60,0.15)";
+                } : undefined}
+                onMouseLeave={tool !== item.id ? (e) => {
+                  e.currentTarget.style.background = "";
+                  e.currentTarget.style.transform = "";
+                  e.currentTarget.style.boxShadow = "";
+                } : undefined}
               >
-                <span className="top-tab__label">{item.label}</span>
-                <span className="top-tab__sub">{item.subtitle}</span>
+                <span className="top-tab__label" style={{ fontSize: "14px", fontWeight: "600" }}>{item.label}</span>
+                <span className="top-tab__sub" style={{ fontSize: "11px", opacity: "0.8" }}>{item.subtitle}</span>
               </button>
             ))}
           </nav>

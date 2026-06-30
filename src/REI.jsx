@@ -607,7 +607,7 @@ export default function REI() {
 
   // Auto scroll to bottom of chat only when messages length changes
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    chatEndRef.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [messages.length]);
 
   // Sync to local storage (domain-specific)

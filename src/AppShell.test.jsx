@@ -7,15 +7,15 @@ describe("AppShell", () => {
     document.title = "";
   });
 
-  it("defaults to Debate Furnace and updates the hash and title when switching tools", async () => {
+  it("defaults to REI.ai and updates the hash and title when switching tools", async () => {
     render(<AppShell />);
 
     expect(screen.getByText("PromptHound Labs")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /debate furnace/i })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: /rei\.ai/i })).toHaveAttribute(
       "aria-pressed",
       "true"
     );
-    expect(document.title).toBe("PromptHound Labs | Debate Furnace");
+    expect(document.title).toBe("PromptHound Labs | REI.ai");
 
     fireEvent.click(screen.getByRole("button", { name: /story forge/i }));
 

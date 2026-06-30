@@ -49,8 +49,8 @@ The broader suite in this repo also includes Story Forge (source-faithful story 
 
 The same app contains:
 
-- **Debate Furnace** (default)
-- **REI.ai** (shared reasoning layer)
+- **REI.ai** (default — the platform reasoning layer)
+- **Debate Furnace**
 - **Story Forge**
 - **CARDO GUARD** — the synthetic decision validation / launch gate tool
 - **Storm Replay** — historical storm imagery analysis and calibration
