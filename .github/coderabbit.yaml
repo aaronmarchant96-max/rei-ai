@@ -10,6 +10,17 @@ reviews:
   poem: false
   sequence_diagrams: false
   path_instructions:
+    - path: "api/**/*.js"
+      instructions: |
+        - Check for runtime regressions in serverless functions and API handlers.
+        - Flag template literal escaping issues, environment variable assumptions,
+          and missing error handling.
+        - Prefer minimal, safe changes that preserve existing behavior.
+    - path: "src/**/*.{js,jsx,ts,tsx}"
+      instructions: |
+        - Review UI behavior, accessibility, and regression risk.
+        - Flag state management issues, broken component props, and brittle tests.
+        - Prefer small, maintainable changes with clear user impact.
     - path: "**/*.{js,jsx,ts,tsx}"
       instructions: |
         - Prefer concise, maintainable code.
