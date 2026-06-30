@@ -4049,7 +4049,7 @@ input:focus:not(:focus-visible) {
   }
 
   .pb-32 {
-    padding-bottom: 1rem;
+    padding-bottom: 6rem;
   }
 }
 

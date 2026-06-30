@@ -779,8 +779,12 @@ Limitations:
 
   return (
     <div className="mobile-container safe-area h-dvh" style={{
-      color: "#E2E8F0", 
-      fontFamily: "Inter, sans-serif"
+      color: "#E2E8F0",
+      fontFamily: "Inter, sans-serif",
+      width: "100%",
+      maxWidth: mobile ? undefined : "1200px",
+      marginLeft: mobile ? undefined : "auto",
+      marginRight: mobile ? undefined : "auto"
     }}>
       {/* Sticky Header with safe area top */}
       <header className="safe-top" style={{
@@ -791,8 +795,10 @@ Limitations:
         borderBottom: "1px solid rgba(251,146,60,0.15)",
         padding: "16px 16px 12px",
         display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center"
+        flexDirection: mobile ? "row" : "column",
+        justifyContent: mobile ? "space-between" : "center",
+        alignItems: "center",
+        gap: mobile ? "0" : "16px"
       }}>
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
             {/* Logo Mark */}
@@ -807,8 +813,15 @@ Limitations:
             </div>
           </div>
 
-          {/* Domain selection tab strip - mobile grid */}
-          <div className="grid grid-cols-1 gap-3" style={{ alignItems: "center" }}>
+          {/* Domain selection tab strip */}
+          <div style={{
+            display: "flex",
+            flexDirection: mobile ? "column" : "row",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "10px"
+          }}>
             {DOMAIN_PROFILES.map((dom) => (
               <button
                 key={dom.id}
@@ -1068,10 +1081,25 @@ Limitations:
         </main>
 
         {/* Fixed Input Area at Bottom with safe area */}
-        <div className="fixed bottom-0 safe-bottom" style={{ width: "100%", background: "var(--surface)", borderTop: "1px solid rgba(251,146,60,0.15)", padding: "16px" }}>
+        <div className="fixed bottom-0 safe-bottom" style={{
+          width: "100%",
+          maxWidth: mobile ? undefined : "1200px",
+          left: 0,
+          right: 0,
+          marginLeft: mobile ? undefined : "auto",
+          marginRight: mobile ? undefined : "auto",
+          background: "var(--surface)",
+          borderTop: "1px solid rgba(251,146,60,0.15)",
+          padding: "16px"
+        }}>
           <form onSubmit={handleSendMessage} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {selectedDomain === "assistant" && (
-              <div className="grid grid-cols-3 gap-2.5">
+              <div style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "10px",
+                justifyContent: mobile ? "stretch" : "center"
+              }}>
                 {GENERALIST_PROMPTS.map((prompt, index) => (
                   <button
                     key={prompt}
@@ -1081,6 +1109,10 @@ Limitations:
                       setAssistantPromptIndex(index);
                     }}
                     className="bg-[#3a2a1f] py-4 rounded-2xl text-xs tracking-wider"
+                    style={{
+                      flex: mobile ? "1 1 30%" : "1 1 auto",
+                      minWidth: mobile ? "80px" : "140px"
+                    }}
                   >
                     {prompt}
                   </button>
