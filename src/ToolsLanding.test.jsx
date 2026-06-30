@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import ToolsLanding, { TOOL_CARDS } from "./ToolsLanding.jsx";
 
 describe("ToolsLanding", () => {
-  it("renders a card for each REI.ai tool", () => {
+  it("renders the tools header and a button for each tool", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
     expect(screen.getByRole("heading", { name: /^tools$/i })).toBeInTheDocument();
@@ -10,21 +10,19 @@ describe("ToolsLanding", () => {
       expect(screen.getByText(tool.label)).toBeInTheDocument();
       expect(screen.getByText(tool.description)).toBeInTheDocument();
     });
-    expect(
-      screen.getByText(/does the scoring logic make sense for your use case\?/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/flagship/i)).toBeInTheDocument();
   });
 
   it("opens the selected tool from the landing page", () => {
     const onOpenTool = jest.fn();
     render(<ToolsLanding onOpenTool={onOpenTool} />);
 
-    // Click the REI.ai link (index 4)
-    fireEvent.click(screen.getAllByRole("link", { name: /open demo/i })[4]);
+    // Click the REI.ai button (first / flagship)
+    fireEvent.click(screen.getByRole("button", { name: /rei\.ai/i }));
     expect(onOpenTool).toHaveBeenCalledWith("rei");
 
-    // Click the Tracepoint link (index 5)
-    fireEvent.click(screen.getAllByRole("link", { name: /open demo/i })[5]);
+    // Click the Tracepoint button
+    fireEvent.click(screen.getByRole("button", { name: /tracepoint/i }));
     expect(onOpenTool).toHaveBeenCalledWith("tracepoint");
   });
 });

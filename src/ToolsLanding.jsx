@@ -2,156 +2,131 @@ const REPO_URL = "https://github.com/aaronmarchant96-max/debate-furnace";
 
 export const TOOL_CARDS = [
   {
+    id: "rei",
+    label: "REI.ai",
+    description: "Platform reasoning layer.",
+    liveHref: "/#rei",
+    flagship: true,
+  },
+  {
     id: "furnace",
     label: "Debate Furnace",
-    title: "Pressure-test the hinge.",
-    description:
-      "Turn a question into a clean pressure test. Find the hinge, separate the noise, and decide what matters.",
+    description: "Pressure-test the hinge.",
     liveHref: "/",
-    liveLabel: "Open demo",
-    repoHref: REPO_URL,
-    repoLabel: "GitHub repo",
   },
   {
     id: "story-forge",
     label: "Story Forge",
-    title: "Old sources turn into story blueprints.",
-    description:
-      "Transform source material into story scaffolds while keeping the trail visible and the source boundary intact.",
+    description: "Old sources into story blueprints.",
     liveHref: "/#story-forge",
-    liveLabel: "Open demo",
-    repoHref: REPO_URL,
-    repoLabel: "GitHub repo",
   },
   {
     id: "storm-replay",
     label: "Storm Replay",
-    title: "Storm imagery gets a careful read.",
-    description:
-      "Replay historical storm imagery with calibration-minded review, explicit limits, and no forecasting claims.",
+    description: "Storm imagery, carefully read.",
     liveHref: "/#storm-replay",
-    liveLabel: "Open demo",
-    repoHref: REPO_URL,
-    repoLabel: "GitHub repo",
   },
   {
     id: "cardo-guard",
     label: "CARDO GUARD",
-    title: "Cost beats confidence.",
-    description:
-      "Compare expected action cost versus expected miss cost, then keep the real decision gate visible.",
+    description: "Cost beats confidence.",
     liveHref: "/#cardo-guard",
-    liveLabel: "Open demo",
-    repoHref: REPO_URL,
-    repoLabel: "GitHub repo",
-  },
-  {
-    id: "rei",
-    label: "REI.ai",
-    title: "Your reasoning style, made visible.",
-    description:
-      "A shared reasoning layer that shows your hinge-first, evidence-first style across the whole suite.",
-    liveHref: "/#rei",
-    liveLabel: "Open demo",
-    repoHref: REPO_URL,
-    repoLabel: "GitHub repo",
   },
   {
     id: "tracepoint",
     label: "Tracepoint",
-    title: "Industrial signal review with a human gate.",
-    description: "Find the signal, show the evidence, and keep the call in human hands.",
+    description: "Industrial signal review.",
     liveHref: "/#tracepoint",
-    liveLabel: "Open demo",
-    repoHref: REPO_URL,
-    repoLabel: "GitHub repo",
   },
-  {
-    id: "cfai",
-    label: "Hinge AI",
-    title: "Evidence-first genealogy, no guesswork.",
-    description:
-      "Score evidence, ingest documents, and discover lineage connections with structured, reviewable outputs grounded in CARDO REI.",
-    liveHref: "/#cfai",
-    liveLabel: "Open demo",
-    repoHref: REPO_URL,
-    repoLabel: "GitHub repo",
-  },
-];
-
-const FEEDBACK_PROMPTS = [
-  "Does the scoring logic make sense for your use case?",
-  "What other scenarios would you want to see?",
-  "Are the thresholds intuitive, or would you adjust them?",
 ];
 
 export default function ToolsLanding({ onOpenTool }) {
   return (
-    <section className="tools-page">
-      <header className="panel tools-hero">
+    <section className="tools-page" style={{ padding: "24px 16px" }}>
+      <header
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: "12px",
+          marginBottom: "24px",
+          borderBottom: "1px solid rgba(251,146,60,0.15)",
+          paddingBottom: "16px",
+        }}
+      >
         <div>
-          <div className="eyebrow">PromptHound Labs</div>
-          <h1>Tools</h1>
-          <p className="lead">
-            Pick the slice you need. REI.ai is the platform layer; each tool is a focused slice with its own job.
-          </p>
-          <div className="tools-hero__sub">
-            Each tool is a focused, reviewable prototype with the same discipline: show the hinge,
-            surface the limits, and make the next move obvious.
+          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", color: "#fb923c" }}>
+            PromptHound Labs
           </div>
+          <h1 style={{ margin: "4px 0 0", fontSize: "28px", lineHeight: 1.1 }}>Tools</h1>
         </div>
-        <div className="tools-hero__aside">
-          <div className="status-badge status-badge--muted">Live demos</div>
-          <div className="status-badge status-badge--muted">Public repo links</div>
-          <div className="status-badge status-badge--muted">Mobile-friendly</div>
-        </div>
+        <p style={{ margin: 0, color: "#94a3b8", fontSize: "14px" }}>
+          REI.ai is the platform layer. Each tool is a focused slice.
+        </p>
       </header>
 
-      <section className="tools-grid" aria-label="PromptHound tools">
-        {TOOL_CARDS.map((tool) => (
-          <article key={tool.id} className="panel tools-card">
-            <div className="card-label">{tool.label}</div>
-            <h2>{tool.title}</h2>
-            <p>{tool.description}</p>
-            <div className="button-row tools-card__actions">
-              <a
-                className="pill pill--primary"
-                href={tool.liveHref}
-                onClick={(event) => {
-                  event.preventDefault();
-                  onOpenTool(tool.id);
-                }}
-              >
-                {tool.liveLabel}
-              </a>
-              <a
-                className="pill tools-card__link"
-                href={tool.repoHref}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {tool.repoLabel}
-              </a>
-            </div>
-          </article>
-        ))}
-      </section>
-
-      <section className="panel tools-feedback">
-        <div className="panel__head">
-          <div>
-            <div className="eyebrow">Feedback</div>
-            <h2>What to ask after a demo</h2>
-          </div>
-        </div>
-        <div className="tools-feedback__grid">
-          {FEEDBACK_PROMPTS.map((prompt) => (
-            <div key={prompt} className="mini-card">
-              <div className="tools-feedback__prompt">{prompt}</div>
-            </div>
+      <nav aria-label="PromptHound tools">
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "12px",
+          }}
+        >
+          {TOOL_CARDS.map((tool) => (
+            <button
+              key={tool.id}
+              type="button"
+              onClick={() => onOpenTool(tool.id)}
+              style={{
+                flex: "1 1 220px",
+                textAlign: "left",
+                background: tool.flagship
+                  ? "linear-gradient(135deg, rgba(249,115,22,0.15), rgba(251,191,36,0.1))"
+                  : "rgba(17, 24, 39, 0.85)",
+                border: tool.flagship
+                  ? "1px solid rgba(249,115,22,0.35)"
+                  : "1px solid rgba(240, 199, 94, 0.12)",
+                borderRadius: "12px",
+                padding: "16px",
+                color: "#E2E8F0",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(249,115,22,0.5)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = tool.flagship
+                  ? "rgba(249,115,22,0.35)"
+                  : "rgba(240, 199, 94, 0.12)";
+                e.currentTarget.style.transform = "";
+              }}
+            >
+              <div style={{ fontWeight: "700", fontSize: "16px", marginBottom: "4px" }}>
+                {tool.label}
+                {tool.flagship && (
+                  <span style={{ marginLeft: "8px", fontSize: "10px", color: "#fb923c", fontWeight: "700" }}>FLAGSHIP</span>
+                )}
+              </div>
+              <div style={{ fontSize: "13px", color: "#94a3b8" }}>{tool.description}</div>
+            </button>
           ))}
         </div>
-      </section>
+      </nav>
+
+      <footer style={{ marginTop: "32px", textAlign: "center" }}>
+        <a
+          href={REPO_URL}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "#94a3b8", fontSize: "13px", textDecoration: "underline" }}
+        >
+          GitHub repo
+        </a>
+      </footer>
     </section>
   );
 }

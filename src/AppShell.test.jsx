@@ -83,13 +83,13 @@ describe("AppShell", () => {
     expect(document.title).toBe("PromptHound Labs | Tracepoint");
   });
 
-  it("loads Tools from the pathname", () => {
+  it("loads REI.ai from the /tools pathname", () => {
     window.history.replaceState({}, "", "/tools");
 
     render(<AppShell />);
 
-    expect(screen.getByRole("button", { name: /^tools/i })).toHaveAttribute("aria-pressed", "true");
-    expect(document.title).toBe("PromptHound Labs | Tools");
-    expect(screen.getByRole("heading", { name: /^tools$/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /rei\.ai/i })).toHaveAttribute("aria-pressed", "true");
+    expect(document.title).toBe("PromptHound Labs | REI.ai");
+    expect(screen.getByRole("heading", { name: /^rei\.ai$/i })).toBeInTheDocument();
   });
 });

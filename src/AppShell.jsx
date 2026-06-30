@@ -55,10 +55,11 @@ function getInitialTool() {
     if (hash === "#cardo-guard") return "cardo-guard";
     if (hash === "#rei" || hash === "#cfai") return "rei";
     if (hash === "#tracepoint") return "tracepoint";
-    if (hash === "#hinge-meter") return "tools"; // redirect unauthorized hash to tools landing
+    if (hash === "#hinge-meter") return "rei"; // default unknown hashes to flagship
   }
+  // Treat /tools as the flagship entry point; explicit Tools tab still works.
   if (window.location.pathname === "/tools" || window.location.pathname === "/tools/")
-    return "tools";
+    return "rei";
   return "rei";
 }
 
