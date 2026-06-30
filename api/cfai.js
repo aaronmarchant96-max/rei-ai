@@ -125,43 +125,10 @@ When fixing an error:
 ## Note for Agent Environments
 You have file and shell access — use it. Verify, don't assume, wherever a tool call can replace a guess.`;
 
-function selectGroqModel(prompt = "") {
-  // If an explicit model is provided via env, use it directly
-  if (DEFAULT_MODEL) return DEFAULT_MODEL;
-  const len = prompt.length;
-  const lower = prompt.toLowerCase();
-
-  // Ingest or long input (>6000 chars)
-  if (len > 6000 || lower.includes("ingest") || lower.includes("--file")) {
-    return "llama-3.3-70b-versatile";
-  }
-
-  // Coding Helper routes to the high-performance Llama model
-  if (lower.includes("coding companion") || lower.includes("coding methodology")) {
-    return "llama-3.3-70b-versatile";
-  }
-
-  // Genealogy Helper utilizes Llama 3.3 70B
-  if (lower.includes("genealogical") || lower.includes("genealogy")) {
-    return "llama-3.3-70b-versatile";
-  }
-
-  // Story Builder outline generation
-  if (lower.includes("story architect") || lower.includes("story blueprint") || lower.includes("story builder")) {
-    return "llama-3.3-70b-versatile";
-  }
-
-  // General Assistant (low-latency default)
-  if (lower.includes("general assistant")) {
-    return "llama-3.3-70b-versatile";
-  }
-
-  // Length fallback rules
-  if (len < 1500) {
-    return "llama-3.1-8b-instant";
-  }
-
-  return "llama-3.3-70b-versatile";
+function selectGroqModel() {
+  // Always use the 70B model. The 8B instant model ignores the system prompt
+  // and hallucinates off-topic responses, so it is not used.
+  return DEFAULT_MODEL || "llama-3.3-70b-versatile";
 }
 
 async function callGroqDirectly(prompt, systemPrompt = "", history = []) {
@@ -224,50 +191,69 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = []) {
 
   const selectedModel = selectGroqModel(prompt);
 
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: selectedModel,
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt || REI_SYSTEM_PROMPT,
-        },
-        ...formattedHistory,
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 2048,
-    }),
-  });
-
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Groq API returned status ${response.status}: ${errText}`);
-  }
-
-  const data = await response.json();
-  let content = data.choices?.[0]?.message?.content || "No content returned from Groq.";
-
-  // Ensure content is not empty; provide fallback message
-  if (!content || content.trim().length === 0) {
-    content = "[REI.AI NOTICE] Empty response received; defaulting to placeholder message.";
-  }
-
-  if (isGptMode && !process.env.OPENAI_API_KEY) {
-    content = `[REI.AI ROUTING WARNING: OPENAI_API_KEY not found in Vercel. Falling back to Open-Source Router: ${selectedModel}]\n\n${content}`;
-  }
-
-  return {
-    content: content,
+  const requestBody = {
     model: selectedModel,
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt || REI_SYSTEM_PROMPT,
+      },
+      ...formattedHistory,
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    temperature: 0.7,
+    max_tokens: 2048,
+  };
+
+  // Retry transient failures (rate limits, 5xx) to avoid spiking the error rate.
+  let lastError = null;
+  const maxRetries = 2;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    if (attempt > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+    }
+
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      let content = data.choices?.[0]?.message?.content || "No content returned from Groq.";
+
+      if (!content || content.trim().length === 0) {
+        content = "[REI.AI NOTICE] Empty response received; defaulting to placeholder message.";
+      }
+
+      if (isGptMode && !process.env.OPENAI_API_KEY) {
+        content = `[REI.AI ROUTING WARNING: OPENAI_API_KEY not found in Vercel. Falling back to Open-Source Router: ${selectedModel}]\n\n${content}`;
+      }
+
+      return { content, model: selectedModel };
+    }
+
+    const errText = await response.text();
+    lastError = `Groq API returned status ${response.status}: ${errText}`;
+
+    // Retry on rate limit or server errors; fail fast on auth/bad request.
+    if (response.status !== 429 && response.status < 500) {
+      break;
+    }
+  }
+
+  // Return a graceful user-facing message instead of throwing a 500.
+  return {
+    content: `[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.`,
+    model: "rate-limited",
+    rateLimited: true,
   };
 }
 

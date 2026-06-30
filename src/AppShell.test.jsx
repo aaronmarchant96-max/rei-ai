@@ -7,35 +7,20 @@ describe("AppShell", () => {
     document.title = "";
   });
 
-  it("defaults to REI.ai and updates the hash and title when switching tools", async () => {
+  it("defaults to REI.ai and shows the breadcrumb", async () => {
     render(<AppShell />);
 
-    expect(screen.getByText(/PromptHound/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /rei\.ai/i })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
-    expect(document.title).toBe("PromptHound Labs | REI.ai");
-
-    fireEvent.click(screen.getByRole("button", { name: /story forge/i }));
-
+    expect(screen.getByRole("button", { name: /PromptHound Labs/i })).toBeInTheDocument();
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("REI.ai");
     await waitFor(() => {
-      expect(window.location.hash).toBe("#story-forge");
+      expect(document.title).toBe("PromptHound Labs | REI.ai");
     });
-    await waitFor(() => {
-      expect(document.title).toBe("PromptHound Labs | Story Forge");
-    });
-    expect(screen.getByRole("button", { name: /story forge/i })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
-    expect(screen.getByText("Find the real pattern. Forge a new story.")).toBeInTheDocument();
   });
 
-  it("routes to the Tools landing page", async () => {
+  it("navigates back to Tools landing from a tool", async () => {
     render(<AppShell />);
 
-    fireEvent.click(screen.getByRole("button", { name: /^tools/i }));
+    fireEvent.click(screen.getByRole("button", { name: /PromptHound Labs/i }));
 
     await waitFor(() => {
       expect(window.location.pathname).toBe("/tools");
@@ -43,8 +28,25 @@ describe("AppShell", () => {
     await waitFor(() => {
       expect(document.title).toBe("PromptHound Labs | Tools");
     });
-    expect(screen.getByRole("button", { name: /^tools/i })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("heading", { name: /^tools$/i })).toBeInTheDocument();
+  });
+
+  it("opens a tool from the Tools landing page", async () => {
+    render(<AppShell />);
+
+    fireEvent.click(screen.getByRole("button", { name: /PromptHound Labs/i }));
+    await waitFor(() => {
+      expect(window.location.pathname).toBe("/tools");
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Old sources into story blueprints/i }));
+
+    await waitFor(() => {
+      expect(window.location.hash).toBe("#story-forge");
+    });
+    await waitFor(() => {
+      expect(document.title).toBe("PromptHound Labs | Story Forge");
+    });
   });
 
   it("respects the initial hash on load", () => {
@@ -52,10 +54,7 @@ describe("AppShell", () => {
 
     render(<AppShell />);
 
-    expect(screen.getByRole("button", { name: /storm replay/i })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("Storm Replay");
     expect(document.title).toBe("PromptHound Labs | Storm Replay");
   });
 
@@ -64,10 +63,7 @@ describe("AppShell", () => {
 
     render(<AppShell />);
 
-    expect(screen.getByRole("button", { name: /cardo guard/i })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("CARDO GUARD");
     expect(document.title).toBe("PromptHound Labs | CARDO GUARD");
   });
 
@@ -76,10 +72,7 @@ describe("AppShell", () => {
 
     render(<AppShell />);
 
-    expect(screen.getByRole("button", { name: /tracepoint/i })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("Tracepoint");
     expect(document.title).toBe("PromptHound Labs | Tracepoint");
   });
 
@@ -88,8 +81,7 @@ describe("AppShell", () => {
 
     render(<AppShell />);
 
-    expect(screen.getByRole("button", { name: /rei\.ai/i })).toHaveAttribute("aria-pressed", "true");
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("REI.ai");
     expect(document.title).toBe("PromptHound Labs | REI.ai");
-    expect(screen.getByRole("heading", { name: /^rei\.ai$/i })).toBeInTheDocument();
   });
 });

@@ -247,6 +247,23 @@ structured final report renderer
 copyable markdown output
 ```
 
+## Evidence Gates and Testing Philosophy
+
+This project uses Jest as an evidence gate before promoting a claim, rule, or workflow from prototype to something I would trust in a public-facing or portfolio context.
+
+The emphasis is not just "tests exist". The emphasis is: every meaningful behavior is captured as a fixed input → expected output contract so the logic stays explicit, repeatable, and reviewable.
+
+Typical coverage includes:
+
+- UI flow tests for navigation, tool selection, debate progression, history persistence, and form interactions.
+- Decision-logic tests for scoring and recommendation engines such as CARDO GUARD and Tracepoint.
+- Contract tests for exported reports, handoff packets, and review artifacts.
+- Guardrail tests to ensure the documented limits, warning language, and QA checklist stay intact.
+
+In practice, this means a feature is not treated as reliable until the relevant Jest cases pass. If a tool claims to surface a hinge, a recommendation, or a review signal, the underlying behavior is backed by a deterministic test case rather than intuition alone.
+
+That is a core part of the REI / PromptHound approach: evidence first, limits visible, and claims verified before promotion.
+
 Environment variables:
 
 ```text

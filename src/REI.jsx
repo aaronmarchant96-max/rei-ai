@@ -91,23 +91,20 @@ const GENERALIST_PROMPTS = [
 
 function parseAssistantStyleReply(text = "") {
   const sections = { Hinge: "", Facts: "", Assumptions: "", Move: "", intro: "" };
-  const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+  // Strip markdown bold markers so "**Hinge**: text" parses cleanly.
+  const cleaned = text.replace(/\*\*/g, "");
+  const lines = cleaned.split("\n").map((line) => line.trim()).filter(Boolean);
   let current = "intro";
   for (const line of lines) {
-    if (/^hinge:?$/i.test(line)) {
-      current = "Hinge";
-      continue;
-    }
-    if (/^facts:?$/i.test(line)) {
-      current = "Facts";
-      continue;
-    }
-    if (/^assumptions:?$/i.test(line)) {
-      current = "Assumptions";
-      continue;
-    }
-    if (/^move:?$/i.test(line)) {
-      current = "Move";
+    // Match "Hinge:" or "Hinge" on its own line, plus inline "Hinge: content"
+    const inlineMatch = line.match(/^(Hinge|Facts|Assumptions|Move):?\s*(.*)$/i);
+    if (inlineMatch) {
+      const key = inlineMatch[1].charAt(0).toUpperCase() + inlineMatch[1].slice(1).toLowerCase();
+      const rest = inlineMatch[2].trim();
+      if (rest) {
+        sections[key] = sections[key] ? `${sections[key]} ${rest}` : rest;
+      }
+      current = key;
       continue;
     }
     if (current === "intro") {
@@ -462,7 +459,7 @@ export default function REI() {
         max-width: 580px;
         width: 90%;
         color: #e2e8f0;
-        font-family: 'JetBrains Mono', 'Fira Code', Courier, monospace;
+        font-family: inherit;
         box-shadow: 0 20px 40px rgba(0,0,0,0.5);
       }
       .rei-modal-header {
@@ -778,56 +775,42 @@ Limitations:
   }
 
   return (
-    <div className="mobile-container safe-area h-dvh" style={{
-      color: "#E2E8F0",
-      fontFamily: "Inter, sans-serif",
-      width: "100%",
-      maxWidth: mobile ? undefined : "1400px",
-      marginLeft: mobile ? undefined : "auto",
-      marginRight: mobile ? undefined : "auto"
-    }}>
-      {/* Sticky Header with safe area top */}
-      <header className="safe-top" style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        background: "var(--surface)",
-        borderBottom: "1px solid rgba(251,146,60,0.15)",
-        padding: "16px 16px 12px",
+    <div
+      className="mobile-container safe-area rei-shell"
+      style={{
+        width: "100%",
+        height: "100%",
         display: "flex",
-        flexDirection: mobile ? "row" : "column",
-        justifyContent: mobile ? "space-between" : "center",
-        alignItems: "center",
-        gap: mobile ? "0" : "16px"
-      }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+        flexDirection: "column",
+        overflow: "hidden",
+        maxWidth: mobile ? undefined : "1400px",
+        marginLeft: mobile ? undefined : "auto",
+        marginRight: mobile ? undefined : "auto"
+      }}
+    >
+      {/* Sticky Header with safe area top */}
+      <header className="safe-top rei-header">
+          <div className="rei-header__brand">
             {/* Logo Mark */}
             <div className="rei-logo-mark">
               <HingeMark size={28} animated={true} />
             </div>
             <div>
-              <h1 className="rei-logo-title" style={{ margin: 0, lineHeight: 1.1 }}>REI.ai</h1>
-              <p className="rei-logo-sub" style={{ margin: "4px 0 0", fontSize: "12px", color: "#94a3b8", letterSpacing: "0.02em" }}>
+              <h1 className="rei-logo-title">REI.ai</h1>
+              <p className="rei-logo-sub">
                 Latin: <em>Rei</em> (The Matter / Hinge) &nbsp;|&nbsp; Loop: <strong>Record • Evaluate • Iterate</strong>
               </p>
             </div>
           </div>
-
+ 
           {/* Domain selection tab strip */}
-          <div style={{
-            display: "flex",
-            flexDirection: mobile ? "column" : "row",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "10px"
-          }}>
+          <div className="rei-domain-tabs">
             {DOMAIN_PROFILES.map((dom) => (
               <button
                 key={dom.id}
                 type="button"
                 onClick={() => setSelectedDomain(dom.id)}
-                className={`rei-custom-tab ${selectedDomain === dom.id ? "rei-custom-tab-active" : ""}`}
+                className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
               >
                 <span>{dom.label}</span>
                 <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
@@ -841,39 +824,14 @@ Limitations:
             <button
               type="button"
               onClick={handleClearHistory}
-              style={{
-                background: "rgba(239, 68, 68, 0.08)",
-                color: "#EF4444",
-                border: "1px solid rgba(239, 68, 68, 0.4)",
-                padding: "9px 14px",
-                borderRadius: "9px",
-                fontSize: "12.5px",
-                fontWeight: "bold",
-                cursor: "pointer",
-                transition: "all 0.2s ease"
-              }}
-              onMouseOver={(e) => e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)"}
-              onMouseOut={(e) => e.currentTarget.style.background = "transparent"}
+              className="rei-action-btn rei-action-btn--danger"
             >
               Clear Chat
             </button>
             <button
               type="button"
               onClick={() => setIsPhilosophyOpen(true)}
-              style={{
-                background: "rgba(251,146,60,0.1)",
-                color: "#fb923c",
-                border: "1px solid rgba(251,146,60,0.3)",
-                padding: "9px 14px",
-                borderRadius: "9px",
-                fontSize: "12.5px",
-                fontWeight: "bold",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                marginLeft: "8px"
-              }}
-              onMouseOver={(e) => e.currentTarget.style.background = "rgba(251, 146, 60, 0.2)"}
-              onMouseOut={(e) => e.currentTarget.style.background = "rgba(251,146,60,0.1)"}
+              className="rei-action-btn rei-action-btn--accent"
             >
               (?) Philosophy
             </button>
@@ -881,44 +839,30 @@ Limitations:
         </header>
 
         {/* Scrollable Main Content with keyboard space */}
-        <main className="flex-1 overflow-y-auto pb-32" style={{ padding: "16px 16px 0" }}>
+        <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
           {/* Active Domain Info Banner (Custom Card Style) */}
-        <div className="bg-[#2c1f14] rounded-3xl p-5 border border-amber-900" style={{ marginBottom: "20px" }}>
-          <div style={{ fontSize: "10.5px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", color: "#fb923c", marginBottom: "6px" }}>
-            Active Voice
+          <div className="rei-domain-banner">
+            <div className="rei-domain-banner__eyebrow">Active Voice</div>
+            <div className="rei-domain-banner__row">
+              <div className="rei-domain-banner__meta">
+                <span className="rei-domain-banner__label">Mode:</span>
+                <span>{currentDomain.description}</span>
+              </div>
+              <div className="rei-domain-banner__meta rei-domain-banner__meta--secondary">
+                <span className="rei-domain-banner__label">Voice cues:</span>
+                <span>{currentDomain.rules.join(" | ")}</span>
+              </div>
+            </div>
+            {selectedDomain === "assistant" && (
+              <div className="rei-domain-banner__steps">
+                {["Collect", "Analyze", "Record", "Distinguish", "Organize", "Review", "Evaluate", "Iterate"].map((step) => (
+                  <span key={step} className="rei-domain-banner__step">
+                    {step}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", fontSize: "13px", color: "#cbd5e1" }}>
-            <div style={{ flex: 1, minWidth: "250px" }}>
-              <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Mode:</span>
-              <span>{currentDomain.description}</span>
-            </div>
-            <div>
-              <span style={{ color: "#FFB300", fontWeight: "bold", marginRight: "6px" }}>Voice cues:</span>
-              <span style={{ color: "#94A3B8" }}>{currentDomain.rules.join(" | ")}</span>
-            </div>
-          </div>
-          {selectedDomain === "assistant" && (
-            <div style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
-              {["Collect", "Analyze", "Record", "Distinguish", "Organize", "Review", "Evaluate", "Iterate"].map((step) => (
-                <span
-                  key={step}
-                  style={{
-                    padding: "5px 10px",
-                    borderRadius: "999px",
-                    border: "1px solid rgba(251,146,60,0.18)",
-                    background: "rgba(255,255,255,0.03)",
-                    color: "#fed7aa",
-                    fontSize: "11px",
-                    letterSpacing: "0.04em",
-                    textTransform: "uppercase"
-                  }}
-                >
-                  {step}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
 
         {/* Ingest Panel - only shown for genealogy domain */}
         <IngestPanel
@@ -932,10 +876,10 @@ Limitations:
         />
 
         {/* Chat Interface Container */}
-        <div className="rei-chat-container" style={{ flex: 1, background: "rgba(0,0,0,0.2)", border: "1px solid rgba(251,146,60,0.15)", borderRadius: "12px", display: "flex", flexDirection: "column", minHeight: "300px", overflow: "hidden" }}>
+        <div className="rei-chat-container">
           
           {/* Chat History Area */}
-          <div className="rei-chat-history" style={{ flex: 1, padding: "20px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "18px" }}>
+          <div className="rei-chat-history">
             {messages.map((msg, index) => (
               <div
                 key={index}
@@ -972,7 +916,7 @@ Limitations:
                     border: msg.sender === "user" ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(251,146,60,0.18)",
                     borderRadius: "10px",
                     padding: "10px 60px 10px 14px",
-                    fontFamily: msg.sender === "rei" ? "JetBrains Mono, Fira Code, monospace" : "inherit",
+                    fontFamily: "inherit",
                     fontSize: "14.5px",
                     whiteSpace: "pre-wrap",
                     lineHeight: "1.4",
@@ -1064,7 +1008,7 @@ Limitations:
               <div style={{ 
                 alignSelf: "flex-start", 
                 color: "#FFB300", 
-                fontFamily: "JetBrains Mono, Fira Code, monospace", 
+                fontFamily: "inherit",
                 fontSize: "1.02em",
                 animation: "pulse 1.5s ease-in-out infinite",
                 display: "flex",
