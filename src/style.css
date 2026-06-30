@@ -4033,6 +4033,27 @@ input:focus:not(:focus-visible) {
 }
 
 /* ==========================================================================
+   DESKTOP OVERRIDES FOR REI.ai MOBILE-FIRST LAYOUT
+   ========================================================================== */
+
+@media (min-width: 56.25em) {
+  .mobile-container {
+    max-width: 1000px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .grid-cols-1 {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .pb-32 {
+    padding-bottom: 1rem;
+  }
+}
+
+/* ==========================================================================
    SCROLL BEHAVIOR
    ========================================================================== */
 
