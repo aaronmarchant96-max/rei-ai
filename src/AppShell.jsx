@@ -48,14 +48,17 @@ const TOP_LEVEL = [
 
 function getInitialTool() {
   if (typeof window === "undefined") return "rei";
+  const hash = window.location.hash;
+  if (hash && hash !== "") {
+    if (hash === "#story-forge") return "story-forge";
+    if (hash === "#storm-replay") return "storm-replay";
+    if (hash === "#cardo-guard") return "cardo-guard";
+    if (hash === "#rei" || hash === "#cfai") return "rei";
+    if (hash === "#tracepoint") return "tracepoint";
+    if (hash === "#hinge-meter") return "tools"; // redirect unauthorized hash to tools landing
+  }
   if (window.location.pathname === "/tools" || window.location.pathname === "/tools/")
     return "tools";
-  if (window.location.hash === "#story-forge") return "story-forge";
-  if (window.location.hash === "#storm-replay") return "storm-replay";
-  if (window.location.hash === "#cardo-guard") return "cardo-guard";
-  if (window.location.hash === "#rei" || window.location.hash === "#cfai") return "rei";
-  if (window.location.hash === "#tracepoint") return "tracepoint";
-  if (window.location.hash === "#hinge-meter") return "tools"; // redirect unauthorized hash to tools landing
   return "rei";
 }
 
