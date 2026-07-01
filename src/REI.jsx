@@ -69,13 +69,19 @@ function buildAssistantStyleReply(userText) {
 
   return [
     "Hinge:",
-    "the part that actually changes the answer.",
+    "the turning point that changes the answer.",
     "",
     "Facts:",
-    "what you know for sure.",
+    "what is known and why it matters.",
     "",
     "Assumptions:",
-    "what still needs proof.",
+    "what is still inferred or uncertain.",
+    "",
+    "Evaluation:",
+    "how strong the case is and where the real risk sits.",
+    "",
+    "What would change my mind:",
+    "the evidence that would flip the conclusion.",
     "",
     "Move:",
     "the smallest useful next step."
@@ -90,23 +96,42 @@ const GENERALIST_PROMPTS = [
   "What would change my mind?"
 ];
 
+const REASONING_LOOP_STEPS = [
+  { id: "facts", label: "Facts", detail: "What is known" },
+  { id: "assumptions", label: "Assumptions", detail: "What remains uncertain" },
+  { id: "evaluation", label: "Evaluation", detail: "How strong the case is" },
+  { id: "change", label: "What changes it", detail: "What would flip the answer" },
+  { id: "move", label: "Next move", detail: "Smallest useful step" },
+];
+
 function parseAssistantStyleReply(text = "") {
-  const sections = { Hinge: "", Facts: "", Assumptions: "", Move: "", intro: "" };
-  // Strip markdown bold markers so "**Hinge**: text" parses cleanly.
-  const cleaned = text.replace(/\*\*/g, "");
+  const sections = { Hinge: "", Facts: "", Assumptions: "", Evaluation: "", ChangeMind: "", Move: "", intro: "" };
+  const cleaned = text.replace(/\*\*/g, "").replace(/^\s*[-*]\s+/gm, "• ");
   const lines = cleaned.split("\n").map((line) => line.trim()).filter(Boolean);
   let current = "intro";
-  for (const line of lines) {
-    // Match "Hinge:" or "Hinge" on its own line, plus inline "Hinge: content"
-    const inlineMatch = line.match(/^(Hinge|Facts|Assumptions|Move):?\s*(.*)$/i);
+  for (const rawLine of lines) {
+    const line = rawLine.replace(/^•\s*/, "");
+    const inlineMatch = line.match(/^(Hinge|Facts|Assumptions|Evaluation|Move|Next move|Next step|What would change my mind|What would change my mind\?):?\s*(.*)$/i);
     if (inlineMatch) {
-      const key = inlineMatch[1].charAt(0).toUpperCase() + inlineMatch[1].slice(1).toLowerCase();
+      const normalized = inlineMatch[1].trim().toLowerCase();
+      const keyMap = {
+        hinge: "Hinge",
+        facts: "Facts",
+        assumptions: "Assumptions",
+        evaluation: "Evaluation",
+        move: "Move",
+        "next move": "Move",
+        "next step": "Move",
+        "what would change my mind": "ChangeMind",
+        "what would change my mind?": "ChangeMind",
+      };
+      const key = keyMap[normalized] || null;
       const rest = inlineMatch[2].trim();
-      if (rest) {
+      if (key && rest) {
         sections[key] = sections[key] ? `${sections[key]} ${rest}` : rest;
+        current = key;
+        continue;
       }
-      current = key;
-      continue;
     }
     if (current === "intro") {
       sections.intro = sections.intro ? `${sections.intro} ${line}` : line;
@@ -554,6 +579,33 @@ export default function REI() {
         font-size: 11px;
         font-weight: 600;
       }
+      .rei-reasoning-loop {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .rei-reasoning-loop__step {
+        border: 1px solid rgba(251,146,60,0.16);
+        border-radius: 10px;
+        background: rgba(255,255,255,0.03);
+        padding: 8px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .rei-reasoning-loop__label {
+        color: #fb923c;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .rei-reasoning-loop__detail {
+        color: #f5d7c4;
+        font-size: 12px;
+        line-height: 1.35;
+      }
       .rei-chat-container {
         display: flex;
         flex-direction: column;
@@ -955,7 +1007,7 @@ export default function REI() {
 
       if (selectedDomain === "assistant") {
         systemContext =
-          "You are REI, The Generalist: a distinct everyday reasoning model for ordinary conversation, judgment, and decision support. CARDO REI is the practice of finding the hinge of the problem—the exact turning point that changes the answer. Speak in a signature pattern: short opener, hinge label, facts, assumptions, move. Keep the tone warm but not bland, sharp but not hostile, and concrete rather than corporate. For LITERAL greetings ONLY (hello, hi, hey, hey there): respond with one warm sentence inviting a real topic. FOR ALL OTHER INPUTS: default to full CARDO REI structure (hinge, facts, assumptions, move). Never use casual one-word or one-line responses for actual queries. Quality Check: Before sending, verify your response contains at least ONE of: a named Hinge, a Facts/Assumptions separation, or a concrete Move. If not, re-structure using CARDO REI.";
+          "You are REI, The Generalist: a distinct everyday reasoning model for ordinary conversation, judgment, and decision support. CARDO REI is the practice of finding the hinge of the problem—the exact turning point that changes the answer. For every non-greeting response, make the reasoning visible in a structured loop: first name the Hinge, then separate Facts from Assumptions, then add an Evaluation of how strong the case is, then explain what would change your mind, and finish with a concrete Move. Keep the tone warm but not bland, sharp but not hostile, and concrete rather than corporate. For LITERAL greetings ONLY (hello, hi, hey, hey there): respond with one warm sentence inviting a real topic. FOR ALL OTHER INPUTS: default to full CARDO REI structure. Never use casual one-word or one-line responses for actual queries. Quality Check: Before sending, verify your response contains at least one named Hinge plus either a Facts/Assumptions separation or a concrete Move. If not, re-structure using the reasoning loop.";
       } else if (selectedDomain === "coding") {
         systemContext =
           "You are REI.ai, a senior software engineer executing the CARDO REI methodology. CARDO REI is Latin for finding the hinge of the problem—the core turning point. Dissect codebases and requirements to locate the single point of pivot (the Hinge) before proposing any change. Default stance: write code that is obvious, testable, and boring; prefer clarity over cleverness; fix root causes, not symptoms. Keep functions single-responsibility, name things by intent, comment the why not the what.\n\n## Phase 0 — The Questioning Stance (runs before any code is written)\nBefore producing code for any non-trivial request, silently answer these. If you cannot answer in 1-2 sentences each, stop and ask the user instead of writing code:\n1. What is the real problem (not the symptom being described)?\n2. Who uses this, and in what context?\n3. What are the failure modes — bad input, network failure, race conditions?\n4. What existing code does this touch? What's the dependency surface?\n5. Is there a simpler existing solution — reuse over rewrite?\n6. What are the non-functional constraints (perf, memory, bundle size, accessibility, privacy)?\n7. How will this be verified before it's considered done?\n\nTrigger condition: if 2+ of these are unanswerable from the request as given, your response is a clarifying question, not code.\n\n### HARD STOP RULE (Non-Negotiable)\nIf you cannot answer 2+ Phase 0 questions, your response MUST follow this exact format:\n\n```\n**STOP: Request underspecified**\n\nI cannot proceed without:\n\n1. [First unanswerable question]\n2. [Second unanswerable question]\n3. [Third unanswerable question] (if applicable)\n\nPlease provide these details before I can generate any code.\n```\n\n**FORBIDDEN:** No code snippets, no partial solutions, no hedging, no \"simple version anyway\".\n**ALLOWED:** Only the questions, only the STOP declaration, only the required details list.";
@@ -1149,13 +1201,23 @@ Limitations:
               </div>
             </div>
             {selectedDomain === "assistant" && (
-              <div className="rei-domain-banner__steps">
-                {["Collect", "Analyze", "Record", "Distinguish", "Organize", "Review", "Evaluate", "Iterate"].map((step) => (
-                  <span key={step} className="rei-domain-banner__step">
-                    {step}
-                  </span>
-                ))}
-              </div>
+               <>
+                 <div className="rei-reasoning-loop">
+                   {REASONING_LOOP_STEPS.map((step) => (
+                     <div key={step.id} className="rei-reasoning-loop__step">
+                       <span className="rei-reasoning-loop__label">{step.label}</span>
+                       <span className="rei-reasoning-loop__detail">{step.detail}</span>
+                     </div>
+                   ))}
+                 </div>
+                 <div className="rei-domain-banner__steps">
+                   {["Collect", "Analyze", "Record", "Distinguish", "Organize", "Review", "Evaluate", "Iterate"].map((step) => (
+                     <span key={step} className="rei-domain-banner__step">
+                       {step}
+                     </span>
+                   ))}
+                 </div>
+               </>
             )}
           </div>
 
@@ -1217,33 +1279,24 @@ Limitations:
                   {selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback ? (
                     (() => {
                       const sections = parseAssistantStyleReply(msg.text);
-                      return sections.intro ? (
+                      const sectionOrder = [
+                        { key: "Hinge", label: "Hinge" },
+                        { key: "Facts", label: "Facts" },
+                        { key: "Assumptions", label: "Assumptions" },
+                        { key: "Evaluation", label: "Evaluation" },
+                        { key: "ChangeMind", label: "What would change my mind" },
+                        { key: "Move", label: "Move" },
+                      ];
+                      const visibleSections = sectionOrder.filter(({ key }) => sections[key] && sections[key].trim());
+                      return sections.intro || visibleSections.length > 0 ? (
                         <div style={{ display: "grid", gap: "10px" }}>
-                          <div>{sections.intro}</div>
-                          {sections.Hinge && (
-                            <div>
-                              <div style={{ color: "#fb923c", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Hinge</div>
-                              <div>{sections.Hinge}</div>
+                          {sections.intro && <div>{sections.intro}</div>}
+                          {visibleSections.map(({ key, label }) => (
+                            <div key={key}>
+                              <div style={{ color: "#fb923c", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>{label}</div>
+                              <div>{sections[key]}</div>
                             </div>
-                          )}
-                          {sections.Facts && (
-                            <div>
-                              <div style={{ color: "#fb923c", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Facts</div>
-                              <div>{sections.Facts}</div>
-                            </div>
-                          )}
-                          {sections.Assumptions && (
-                            <div>
-                              <div style={{ color: "#fb923c", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Assumptions</div>
-                              <div>{sections.Assumptions}</div>
-                            </div>
-                          )}
-                          {sections.Move && (
-                            <div>
-                              <div style={{ color: "#fb923c", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>Move</div>
-                              <div>{sections.Move}</div>
-                            </div>
-                          )}
+                          ))}
                         </div>
                       ) : (
                         <div>{msg.text}</div>
