@@ -95,6 +95,17 @@ Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
 
+**Architecture/Technical-Debt Routing Extension (2026-07-02):**
+- **Issue Found**: SaaS monolith rewrite scenario was being routed to Genealogy Deep Dive (wrong)
+- **Root Cause**: Initial pump maintenance fix added operational keywords but not software architecture terms
+- **Solution**: Extended structured-reasoning fingerprint with architecture keywords (monolith, microservices, rewrite, technical debt, breach, cost-benefit analysis, etc.)
+- **Changes**:
+  - `data/fingerprints.json` - Added 9 architecture/infrastructure keywords
+  - `src/lib/nightShiftRouter.test.js` - Added test for architecture decision routing (SaaS scenario)
+  - `src/lib/cardoGuard.test.js` - Added cost-benefit test validating monolith rewrite recommendation
+- **Test coverage**: 58 tests passing (was 56)
+- **Key insight**: Routing fingerprints need to be continuously expanded as new decision domains emerge
+
 **Pump Maintenance Scenario: All 4 Flaws Fixed (2026-07-01):**
 - **FLAW #1 - Wrong Routing**: Added operational keywords to `data/fingerprints.json` (pump, vibration, sensor, shutdown, maintenance, equipment). Now routes maintenance decisions to Structured Reasoning (Generalist) instead of Genealogy.
 - **FLAW #2 - Hard-Stop Rule Not Triggered**: System prompt enforces cost/context gathering. HARD_STOP_RULE validates Phase 0 questions before proceeding.
@@ -128,10 +139,10 @@ Use Jest as the main evidence gate.
 
 ### Current Test Status
 
-- **Total tests**: 56 passing (all suites green, +1 from pump scenario work)
+- **Total tests**: 58 passing (all suites green, +2 from architecture routing work)
 - **Key test files**:
-  - `src/lib/cardoGuard.test.js` - Core decision logic tests (15 tests including pump scenario)
-  - `src/lib/nightShiftRouter.test.js` - Routing logic tests (10 tests including maintenance routing)
+  - `src/lib/cardoGuard.test.js` - Core decision logic tests (16 tests including pump + SaaS scenarios)
+  - `src/lib/nightShiftRouter.test.js` - Routing logic tests (11 tests including maintenance + architecture)
   - `src/CardoGuard.test.jsx` - UI component tests
   - `src/REI.test.jsx` - Chat persistence and error recovery
 - **Build status**: ✅ Passing with warnings about chunk size
