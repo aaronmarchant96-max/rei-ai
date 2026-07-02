@@ -95,6 +95,15 @@ Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
 
+**REI Chat History Refactoring (2026-07-01):**
+- **What changed**: Refactored chat persistence and domain system messages
+- **New functions**:
+  - `buildDomainSystemMessage()` - Centralized domain-specific welcome message generation
+  - `readStoredMessages()` - Safe localStorage reading with error recovery
+- **Why it matters**: Improves chat history reliability, adds error handling for corrupted localStorage data
+- **Test coverage**: New `src/REI.test.jsx` tests recovery from corrupted chat history (1 test passing)
+- **Verification**: All 55 tests passing, build succeeds
+
 **CardoGuard Test Fix (2026-07-01):**
 - **Problem**: Test "shows the cautious synthetic band for low-confidence scenarios" was failing
 - **Root Cause**: UI wasn't rendering "cautious synthetic band" text for low confidence scenarios
@@ -104,12 +113,15 @@ Use Jest as the main evidence gate.
 
 ### Current Test Status
 
-- **Total tests**: 17 passing (after fix)
+- **Total tests**: 55 passing (all suites green)
 - **Key test files**:
   - `src/lib/cardoGuard.test.js` - Core decision logic tests
   - `src/CardoGuard.test.jsx` - UI component tests
+  - `src/REI.test.jsx` - Chat persistence and error recovery
+  - `src/lib/nightShiftRouter.test.js` - Routing logic tests
 - **Build status**: ✅ Passing with warnings about chunk size
 - **Production status**: ✅ Live demo verified accessible
+- **Dependency status**: ESLint v8 configured, all React testing libraries installed
 
 Common commands:
 
@@ -183,3 +195,66 @@ npm run build  # Build check
 ```
 
 **Remember:** Mistakes are expected. What matters is catching them early and fixing them properly.
+
+## CLI Guidelines for This Session and Future Sessions
+
+### Pre-work Checklist
+
+Before starting ANY task:
+1. ✅ Read this document (`docs/fortis-et-liber.md`) completely
+2. ✅ Check `git log --oneline -10` to see recent work
+3. ✅ Run `git status` to understand current state
+4. ✅ Review `CLI_ENTRY.md` for quick reference and token goals
+5. ✅ Read relevant entry point files (REI.jsx, api/cfai.js, etc.)
+
+### During Work
+
+**Code changes:**
+- Follow existing patterns (no new architectures without discussion)
+- Extract repeated logic into helper functions (like `buildDomainSystemMessage()`)
+- Add error handling for user-facing features (like localStorage recovery)
+- Use double quotes for strings (ESLint rule)
+- Use 2-space indentation (ESLint rule)
+
+**Testing:**
+- Write tests for new behavior (especially error cases)
+- Always run `npm test` before committing
+- Target specific tests with `npm test -- --testPathPatterns="pattern"` for faster feedback
+- Verify build passes: `npm run build`
+
+**Git hygiene:**
+- Keep commits focused and descriptive
+- Include "token impact: low|medium|high" in commit messages
+- Add `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` trailer
+- Reference the issue or task being addressed
+
+### Updating This Document
+
+Update `docs/fortis-et-liber.md` when:
+- ✅ New major components or refactors are completed
+- ✅ New test files or entry points are added
+- ✅ Important dependency changes (e.g., ESLint downgrade)
+- ✅ Architecture or workflow materially changes
+- ✅ Verification steps or build process changes
+
+Do NOT update when:
+- ❌ Making minor bug fixes
+- ❌ Small refactoring without architectural impact
+- ❌ Adding documentation-only changes
+- ❌ Fixing style or formatting
+
+### Token Efficiency Discipline
+
+**Goal: Keep onboarding under 12K tokens (88% savings from baseline 100K)**
+
+To maintain this:
+- Use the documented entry points, not exploratory search
+- Follow the existing patterns instead of inventing new ones
+- Verify with provided commands instead of running custom diagnostics
+- Keep this document updated so next session doesn't need repeated exploration
+
+**What this enables:**
+- Faster handoffs between sessions
+- More tokens for actual feature work
+- Lower context switching overhead
+- Better predictability for time estimates
