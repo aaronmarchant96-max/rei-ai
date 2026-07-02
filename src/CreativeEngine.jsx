@@ -932,8 +932,8 @@ function buildFuel(seed, genre) {
   return [
     `Logline: A ${genre.toLowerCase()} story built around ${hinge}.`,
     `Story DNA: Pull on ${focus} until the event becomes a usable narrative engine.`,
-    `Character pressure: Force the lead to choose between survival, truth, and belonging.`,
-    `Source rule: keep the real event visible so the fiction feels grounded instead of generic.`,
+    "Character pressure: Force the lead to choose between survival, truth, and belonging.",
+    "Source rule: keep the real event visible so the fiction feels grounded instead of generic.",
   ];
 }
 
@@ -999,32 +999,32 @@ function makeSeedPacket(seed, customAdditions = "") {
   const custom = cleanCustomAdditions(customAdditions);
   const lines = [
     `# ${seed.title}`,
-    ``,
+    "",
     `**Source type:** ${seed.sourceType}`,
     `**Era:** ${seed.era}`,
     `**Region:** ${seed.region}`,
-    ``,
-    `## Summary`,
+    "",
+    "## Summary",
     seed.summary,
-    ``,
-    `## Why It's Wild`,
+    "",
+    "## Why It's Wild",
     seed.whyWild,
-    ``,
-    `## Stakes`,
+    "",
+    "## Stakes",
     seed.stakes,
-    ``,
-    `## Hinge`,
+    "",
+    "## Hinge",
     seed.hinge,
-    ``,
-    `## Story DNA`,
+    "",
+    "## Story DNA",
     seed.storyDNA.map((item) => `- ${item}`).join("\n"),
-    ``,
-    `## Source Trail`,
+    "",
+    "## Source Trail",
     seed.sourceTrail.map((source) => `- ${source.label}: ${source.url}`).join("\n"),
   ];
 
   if (custom) {
-    lines.push(``, `## Custom Additions`, custom);
+    lines.push("", "## Custom Additions", custom);
   }
 
   return lines.join("\n");
@@ -1039,69 +1039,69 @@ function makeBlueprintLines(seed, format, customAdditions = "") {
       `Premise: ${seed.hinge}`,
       `Character arc: the lead starts inside ${seed.storyDNA[0]} and ends somewhere changed.`,
       `Act turns: pressure builds through ${seed.storyDNA.slice(1, 4).join(", ")}.`,
-      `Final consequence: the choice lands with a cost that feels earned.`,
+      "Final consequence: the choice lands with a cost that feels earned.",
     ],
     "Short story": [
       `Opening image: ${seed.summary}`,
-      `Pressure turn: the hidden truth surfaces.`,
+      "Pressure turn: the hidden truth surfaces.",
       `Choice: someone has to pick between ${stakes}.`,
-      `Closing image: the hinge is still visible.`,
+      "Closing image: the hinge is still visible.",
     ],
     Movie: [
       `Logline: A ${seed.sourceType} pattern built around ${hinge}.`,
       `Act 1 setup: establish ${seed.charactersForces.slice(0, 2).join(" and ")}.`,
       `Act 2 escalation: push ${seed.storyDNA.slice(0, 3).join(", ")} into conflict.`,
-      `Act 3 payoff: the central choice changes what survives.`,
-      `Ending options: keep the source visible, but the fiction distinct.`,
+      "Act 3 payoff: the central choice changes what survives.",
+      "Ending options: keep the source visible, but the fiction distinct.",
     ],
     "TV episode": [
-      `Cold open: the audience sees the pressure before the explanation.`,
-      `Inciting incident: the seed's hidden problem becomes active.`,
-      `Midpoint twist: the apparent truth is incomplete.`,
-      `Cliffhanger: the real hinge is not solved yet.`,
+      "Cold open: the audience sees the pressure before the explanation.",
+      "Inciting incident: the seed's hidden problem becomes active.",
+      "Midpoint twist: the apparent truth is incomplete.",
+      "Cliffhanger: the real hinge is not solved yet.",
     ],
     "YouTube video": [
       `Title ideas: ${seed.title} as a curiosity hook.`,
-      `Opening hook: why this story is stranger than it first looks.`,
-      `Main beats: what happened, why it matters, what it could inspire.`,
-      `Outro question: what does this pattern remind you of?`,
+      "Opening hook: why this story is stranger than it first looks.",
+      "Main beats: what happened, why it matters, what it could inspire.",
+      "Outro question: what does this pattern remind you of?",
     ],
     "Game quest": [
       `Quest title: build from ${seed.title}.`,
       `Objective: force the player to navigate ${hinge}.`,
-      `Hidden twist: the real enemy is not obvious at first.`,
-      `Reward: a choice, not just loot.`,
-      `Failure consequence: the world changes around the player.`,
+      "Hidden twist: the real enemy is not obvious at first.",
+      "Reward: a choice, not just loot.",
+      "Failure consequence: the world changes around the player.",
     ],
     "D&D one-shot": [
       `Quest frame: the party enters a situation shaped by ${seed.sourceType}.`,
-      `Key locations: use the source trail as map anchors.`,
-      `NPC pressure: let the characters represent competing interpretations.`,
-      `Boss reveal: the final conflict is the hinge made physical.`,
+      "Key locations: use the source trail as map anchors.",
+      "NPC pressure: let the characters represent competing interpretations.",
+      "Boss reveal: the final conflict is the hinge made physical.",
     ],
     "Comic issue": [
       `Cover hook: a visual version of ${hinge}.`,
-      `Scene beats: compress the pressure into clean page turns.`,
-      `Page turn: the hidden force is revealed.`,
-      `Final panel: leave a question, not a lecture.`,
+      "Scene beats: compress the pressure into clean page turns.",
+      "Page turn: the hidden force is revealed.",
+      "Final panel: leave a question, not a lecture.",
     ],
     "Podcast episode": [
-      `Cold open: start with the weirdest true detail.`,
-      `Question framing: why this source still matters.`,
-      `Interview beats: trace fact, interpretation, and inspiration separately.`,
-      `Wrap-up: the story engine, not just the event.`,
+      "Cold open: start with the weirdest true detail.",
+      "Question framing: why this source still matters.",
+      "Interview beats: trace fact, interpretation, and inspiration separately.",
+      "Wrap-up: the story engine, not just the event.",
     ],
     "Documentary outline": [
       `Thesis: ${seed.hinge}`,
-      `Evidence blocks: follow the source trail first.`,
-      `Counterpoint: separate proven fact from artistic inference.`,
-      `Closing takeaway: the pattern is the real value.`,
+      "Evidence blocks: follow the source trail first.",
+      "Counterpoint: separate proven fact from artistic inference.",
+      "Closing takeaway: the pattern is the real value.",
     ],
     "Fanfic setup": [
       `Canon anchor: keep one recognizable element from ${seed.title}.`,
-      `What changes: move the conflict into a new emotional frame.`,
-      `Relationship tension: let the hinge reshape who trusts whom.`,
-      `Pivot scene: the source becomes fiction with a clear boundary.`,
+      "What changes: move the conflict into a new emotional frame.",
+      "Relationship tension: let the hinge reshape who trusts whom.",
+      "Pivot scene: the source becomes fiction with a clear boundary.",
     ],
   };
 
@@ -1209,11 +1209,11 @@ function makeRemixPacket(seed, genre, mutation, customAdditions = "") {
     [
       `Keep the real event visible, but shape it through ${genreProfile.tone}.`,
       `Change the setting and cast, but preserve the pressure pattern and let the ${mutationProfile.label.toLowerCase()} layer do the work.`,
-      `Let one key assumption fail and see how the selected genre changes the conflict.`,
+      "Let one key assumption fail and see how the selected genre changes the conflict.",
       `Translate the pressure into a more symbolic version of ${genreProfile.conflict}.`,
       `Push the human problem into ${mutationProfile.logic.toLowerCase()}`,
     ][mutation] ||
-    `Keep the pressure visible while the selected genre and mutation both reshape the result.`;
+    "Keep the pressure visible while the selected genre and mutation both reshape the result.";
 
   return {
     title: `${seed.title} / ${genre}`,
@@ -1307,11 +1307,11 @@ function makeStoryIdeaPacket(seed, format, genre, mutation, customAdditions = ""
       },
       ...(custom
         ? [
-            {
-              label: "Custom additions",
-              body: `Use this as the transformation layer: ${custom}. Keep the seed's hinge underneath it.`,
-            },
-          ]
+          {
+            label: "Custom additions",
+            body: `Use this as the transformation layer: ${custom}. Keep the seed's hinge underneath it.`,
+          },
+        ]
         : []),
       {
         label: "Source boundary",

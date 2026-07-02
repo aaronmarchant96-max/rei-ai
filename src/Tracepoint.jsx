@@ -869,8 +869,8 @@ export default function Tracepoint() {
     review.status === "Review Recommended"
       ? `Review recommended. Vibration is ${vibrationEvidence ? vibrationEvidence.driftPercent : 0}% above its asset-specific baseline after EWMA smoothing. Bearing temperature is ${temperatureEvidence ? temperatureEvidence.driftPercent : 0}% above baseline and has stayed elevated for ${temperatureEvidence ? temperatureEvidence.persistenceCount : 0} readings. Pressure and flow are moving in the expected direction with ${Math.round((review.concordance || 0) * 100)}% multi-sensor correlation.`
       : review.status === "Watch"
-        ? `Watch. The signal is moving away from baseline, but it has not crossed the review threshold yet.`
-        : `Normal. The combined signal stays within the conservative threshold band used for this synthetic demo.`;
+        ? "Watch. The signal is moving away from baseline, but it has not crossed the review threshold yet."
+        : "Normal. The combined signal stays within the conservative threshold band used for this synthetic demo.";
   const evaluationSummary = review.summary;
 
   function handleMark(mark) {
@@ -952,8 +952,8 @@ export default function Tracepoint() {
       "## Audit trail",
       ...(report.audit_trail.length
         ? report.audit_trail.map(
-            (entry) => `- ${formatAuditStamp(entry.timestamp)}: ${entry.message}`
-          )
+          (entry) => `- ${formatAuditStamp(entry.timestamp)}: ${entry.message}`
+        )
         : ["- No workflow actions logged."]),
       "",
       `Limitation: ${report.limitation_statement}`,

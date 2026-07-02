@@ -110,16 +110,16 @@ export default function AppShell() {
       tool === "tools"
         ? "PromptHound Labs | Tools"
         : tool === "story-forge"
-        ? "PromptHound Labs | Story Forge"
-        : tool === "storm-replay"
-          ? "PromptHound Labs | Storm Replay"
-        : tool === "cardo-guard"
-            ? "PromptHound Labs | CARDO GUARD"
-            : tool === "rei"
-            ? "PromptHound Labs | REI.ai"
-              : tool === "tracepoint"
-                ? "PromptHound Labs | Tracepoint"
-                : "PromptHound Labs | Debate Furnace";
+          ? "PromptHound Labs | Story Forge"
+          : tool === "storm-replay"
+            ? "PromptHound Labs | Storm Replay"
+            : tool === "cardo-guard"
+              ? "PromptHound Labs | CARDO GUARD"
+              : tool === "rei"
+                ? "PromptHound Labs | REI.ai"
+                : tool === "tracepoint"
+                  ? "PromptHound Labs | Tracepoint"
+                  : "PromptHound Labs | Debate Furnace";
   }, [tool]);
 
   const currentToolLabel = getToolLabel(tool);

@@ -240,10 +240,10 @@ export function buildTracepointRows(scenarioId = TRACEPOINT_SCENARIOS[0].id) {
       instabilityRamp * profile.pressureInstabilityDrop;
     const pressureTransient = isPressureInstabilityWindow
       ? wave(
-          hourIndex - profile.pressureInstabilityHour,
-          profile.pressureTransientCycle,
-          profile.pressureTransientAmplitude
-        ) +
+        hourIndex - profile.pressureInstabilityHour,
+        profile.pressureTransientCycle,
+        profile.pressureTransientAmplitude
+      ) +
         wave(
           hourIndex - profile.pressureInstabilityHour,
           profile.pressureTransientCycle * 2,
@@ -741,13 +741,13 @@ export function buildTracepointHandoverReport({
     },
     baseline_metadata: baselineState
       ? {
-          asset_id: baselineState.assetId || scenario.assetId,
-          label: baselineState.label || scenario.label,
-          source: baselineState.source || "first 24 stable hours",
-          start_timestamp: baselineState.startTimestamp || "",
-          end_timestamp: baselineState.endTimestamp || "",
-          operator: baselineState.operator || "local",
-        }
+        asset_id: baselineState.assetId || scenario.assetId,
+        label: baselineState.label || scenario.label,
+        source: baselineState.source || "first 24 stable hours",
+        start_timestamp: baselineState.startTimestamp || "",
+        end_timestamp: baselineState.endTimestamp || "",
+        operator: baselineState.operator || "local",
+      }
       : null,
     review_snapshot: {
       status: review.status,

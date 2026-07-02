@@ -994,7 +994,7 @@ function getArgs(question, type, a, b) {
         "tone",
         "ecosystem",
       ],
-      desc: `This is a product comparison. The real question is not which model is universally better. The real question is which tool is better for the user's actual use case: structured work, coding, current events, speed, tone, or reliability.`,
+      desc: "This is a product comparison. The real question is not which model is universally better. The real question is which tool is better for the user's actual use case: structured work, coding, current events, speed, tone, or reliability.",
       rounds: [
         [
           "ChatGPT's strongest case is consistency across serious everyday work. For structured writing, coding help, document review, debugging, and planning, it usually gives cleaner formatting and more reliable follow-through. Its advantage is not that it is always smarter than Grok. The advantage is that it behaves more like a dependable general-purpose work tool. If better means the tool most users can trust for professional output, ChatGPT has the stronger default case.",
@@ -2486,20 +2486,20 @@ function normalizeAiProfile(ai, fallback, question = "") {
     q.includes("free will") || (q.includes("punish") && q.includes("free will"));
   const comp = isFreeWillPunishment
     ? [
-        "public safety, deterrence, and rehabilitation",
-        "moral desert, dignity, and limits on state power",
-        "whether punishment needs moral blame, or whether harm reduction is enough",
-      ]
+      "public safety, deterrence, and rehabilitation",
+      "moral desert, dignity, and limits on state power",
+      "whether punishment needs moral blame, or whether harm reduction is enough",
+    ]
     : asList(ai?.comp, fallback.comp, 3)
-        .slice(0, 3)
-        .map((item, i) => {
-          const normalized = asCompass(item, fallback.comp[i] || "");
-          if (i === 2) {
-            const words = normalized.split(/\s+/).filter(Boolean).length;
-            if (words < 6) return fallback.comp[i] || "";
-          }
-          return normalized;
-        });
+      .slice(0, 3)
+      .map((item, i) => {
+        const normalized = asCompass(item, fallback.comp[i] || "");
+        if (i === 2) {
+          const words = normalized.split(/\s+/).filter(Boolean).length;
+          if (words < 6) return fallback.comp[i] || "";
+        }
+        return normalized;
+      });
 
   return {
     ...fallback,
@@ -3282,7 +3282,7 @@ export default function DebateFurnace() {
       comp: debate.comp,
       core: debate.core,
     });
-    const cardoReiBlock = `\n## CARDO REI Method\n- Axis 1: Does the response land?\n- Axis 2: Does the reasoning hold?\n- Final judgment: What is the hinge of the matter?\n`;
+    const cardoReiBlock = "\n## CARDO REI Method\n- Axis 1: Does the response land?\n- Axis 2: Does the reasoning hold?\n- Final judgment: What is the hinge of the matter?\n";
     const decisionPathBlock = showDecisionPath
       ? `\n## Recommended Decision Path\n- Framework: ${decisionPath.framework}\n- Driver: ${decisionPath.driver}\n- Approver: ${decisionPath.approver}\n- Contributors: ${decisionPath.contributors}\n- Input deadline: ${decisionPath.deadline}\n- Decision log template: ${decisionPath.logTemplate}\n- Why this path fits: ${decisionPath.why}\n`
       : "";

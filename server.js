@@ -1,6 +1,6 @@
-import 'dotenv/config';
-import express from 'express';
-import cfaiHandler from './api/cfai.js';
+import "dotenv/config";
+import express from "express";
+import cfaiHandler from "./api/cfai.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // API endpoint
-app.post('/api/cfai', async (req, res) => {
+app.post("/api/cfai", async (req, res) => {
   try {
     const mockRes = {
       setHeader: (name, value) => res.setHeader(name, value),
@@ -23,7 +23,7 @@ app.post('/api/cfai', async (req, res) => {
     };
     await cfaiHandler(req, mockRes);
   } catch (error) {
-    console.error('API Error Stack Trace:', error);
+    console.error("API Error Stack Trace:", error);
     if (!res.headersSent) {
       res.status(500).json({
         success: false,

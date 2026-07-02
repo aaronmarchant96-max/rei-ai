@@ -23,6 +23,7 @@
     "qualityGate": "Hinge + Facts + Move",
     "enforce": null,
     "description": "Default routing for general decision support and analysis.",
+    "matchTerms": ["pump", "vibration", "sensor", "shutdown", "maintenance", "operational", "failure probability", "equipment", "preventive", "predictive", "risk score", "reliability", "downtime"],
     "temperature": 0.6,
     "fallbackPriority": "adversarial-validation"
   },

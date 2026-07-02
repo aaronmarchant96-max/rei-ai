@@ -133,8 +133,8 @@ export function calculateCardoGuardReview({ scenarioId, confidence, costToAct, c
     decisionStrength,
     shouldAct,
     explanation: shouldAct
-      ? `Acting clears the gate because the risk-adjusted cost of missing it is higher than the expected waste of acting.`
-      : `Do not act because the expected waste of acting is higher than the risk-adjusted cost of missing it.`,
+      ? "Acting clears the gate because the risk-adjusted cost of missing it is higher than the expected waste of acting."
+      : "Do not act because the expected waste of acting is higher than the risk-adjusted cost of missing it.",
   };
 }
 

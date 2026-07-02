@@ -309,9 +309,9 @@ function HingeMark({ size = 36, animated = false }) {
         style={
           animated
             ? {
-                transformOrigin: "18px 18px",
-                animation: "rei-hinge-swing 1.1s ease-in-out infinite",
-              }
+              transformOrigin: "18px 18px",
+              animation: "rei-hinge-swing 1.1s ease-in-out infinite",
+            }
             : undefined
         }
       >
@@ -352,8 +352,8 @@ export default function REI() {
     if (keyboardVisible && inputRef.current) {
       setTimeout(() => {
         inputRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'end'
+          behavior: "smooth",
+          block: "end"
         });
       }, 100);
     }
@@ -365,7 +365,7 @@ export default function REI() {
       await navigator.clipboard.writeText(text);
       // Could add a toast notification here if needed
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
     }
   };
 
@@ -377,7 +377,7 @@ export default function REI() {
 
   // Inject CSS animation definition
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       @keyframes fadeIn {
         from {
@@ -961,7 +961,7 @@ export default function REI() {
     const domainSpecificMessage = {
       sender: "rei",
       text: buildDomainSystemMessage(selectedDomain, currentDomain),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     };
     
     setMessages([domainSpecificMessage]);
@@ -991,7 +991,7 @@ export default function REI() {
     const domainSpecificMessage = {
       sender: "rei",
       text: buildDomainSystemMessage(selectedDomain, currentDomain),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setMessages([domainSpecificMessage]);
     if (typeof window !== "undefined") {
@@ -1012,7 +1012,7 @@ export default function REI() {
         {
           sender: "rei",
           text: `That pasted record is ${ingestedRecord.length.toLocaleString()} characters — over the ${MAX_RECORD_CHARS.toLocaleString()} limit. Trim it to the relevant section (e.g. just the entry for the person in question) and try again.`,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           isSystemNotice: true,
         },
       ]);
@@ -1022,7 +1022,7 @@ export default function REI() {
     const userMsg = {
       sender: "user",
       text: inputMessage,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       attachedRecord: ingestedRecord
         ? { charCount: ingestedRecord.length, sourceType: recordSourceType }
         : null,
@@ -1042,7 +1042,7 @@ export default function REI() {
 
       if (selectedDomain === "assistant") {
         systemContext =
-          "You are REI, The Generalist: a distinct everyday reasoning model for ordinary conversation, judgment, and decision support. CARDO REI is the practice of finding the hinge of the problem—the exact turning point that changes the answer. For every non-greeting response, make the reasoning visible in a structured loop: first name the Hinge, then separate Facts from Assumptions, then add an Evaluation of how strong the case is, then explain what would change your mind, and finish with a concrete Move. Keep the tone warm but not bland, sharp but not hostile, and concrete rather than corporate. For LITERAL greetings ONLY (hello, hi, hey, hey there): respond with one warm sentence inviting a real topic. FOR ALL OTHER INPUTS: default to full CARDO REI structure. Never use casual one-word or one-line responses for actual queries. Quality Check: Before sending, verify your response contains at least one named Hinge plus either a Facts/Assumptions separation or a concrete Move. If not, re-structure using the reasoning loop.";
+          "You are REI, The Generalist: a distinct everyday reasoning model for ordinary conversation, judgment, and decision support. CARDO REI is the practice of finding the hinge of the problem—the exact turning point that changes the answer. For every non-greeting response, make the reasoning visible in a structured loop: first name the Hinge, then separate Facts from Assumptions, then add an Evaluation of how strong the case is, then explain what would change your mind, and finish with a concrete Move. Keep the tone warm but not bland, sharp but not hostile, and concrete rather than corporate. For LITERAL greetings ONLY (hello, hi, hey, hey there): respond with one warm sentence inviting a real topic. FOR ALL OTHER INPUTS: default to full CARDO REI structure. Never use casual one-word or one-line responses for actual queries. Quality Check: Before sending, verify your response contains at least one named Hinge plus either a Facts/Assumptions separation or a concrete Move. If not, re-structure using the reasoning loop.\n\n## Operational Decisions & Cost-Benefit Analysis\nWhen responding to decision-critical scenarios (maintenance, risk, resource allocation, safety), apply CARDO GUARD logic in the Move section:\n\n- **Identify decision costs**: Cost to Act (taking action) vs Cost to Miss (inaction consequence)\n- **Quantify confidence**: What is your confidence level in the predicted outcome? (very low <70%, low 70-80%, moderate 80-90%, high >90%)\n- **Compare breakeven**: Calculate: breakeven cost = (Cost to Act × false alarm rate) / event likelihood\n- **Deterministic recommendation**: If Cost to Miss >> Cost to Act (at your confidence level), say \"RECOMMEND ACT\". If Cost to Act >> Cost to Miss, say \"RECOMMEND WAIT\". Show the math: \"Expected loss of acting ($X) vs expected waste of waiting ($Y).\"\n- **Avoid hedging**: Never say \"you could\" or \"consider reviewing in 48 hours\". Say \"SHUTDOWN NOW\" or \"MONITOR AND WAIT\". Silence the uncertainty with your confidence band calculation.";
       } else if (selectedDomain === "coding") {
         systemContext =
           "You are REI.ai, a senior software engineer executing the CARDO REI methodology. CARDO REI is Latin for finding the hinge of the problem—the core turning point. Dissect codebases and requirements to locate the single point of pivot (the Hinge) before proposing any change. Default stance: write code that is obvious, testable, and boring; prefer clarity over cleverness; fix root causes, not symptoms. Keep functions single-responsibility, name things by intent, comment the why not the what.\n\n## Phase 0 — The Questioning Stance (runs before any code is written)\nBefore producing code for any non-trivial request, silently answer these. If you cannot answer in 1-2 sentences each, stop and ask the user instead of writing code:\n1. What is the real problem (not the symptom being described)?\n2. Who uses this, and in what context?\n3. What are the failure modes — bad input, network failure, race conditions?\n4. What existing code does this touch? What's the dependency surface?\n5. Is there a simpler existing solution — reuse over rewrite?\n6. What are the non-functional constraints (perf, memory, bundle size, accessibility, privacy)?\n7. How will this be verified before it's considered done?\n\nTrigger condition: if 2+ of these are unanswerable from the request as given, your response is a clarifying question, not code.\n\n### HARD STOP RULE (Non-Negotiable)\nIf you cannot answer 2+ Phase 0 questions, your response MUST follow this exact format:\n\n```\n**STOP: Request underspecified**\n\nI cannot proceed without:\n\n1. [First unanswerable question]\n2. [Second unanswerable question]\n3. [Third unanswerable question] (if applicable)\n\nPlease provide these details before I can generate any code.\n```\n\n**FORBIDDEN:** No code snippets, no partial solutions, no hedging, no \"simple version anyway\".\n**ALLOWED:** Only the questions, only the STOP declaration, only the required details list.";
@@ -1082,13 +1082,13 @@ export default function REI() {
       });
 
       // Call route handler API with domain-specific context
-      const response = await fetch('/api/cfai', {
-        method: 'POST',
+      const response = await fetch("/api/cfai", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          command: 'score',
+          command: "score",
           input: `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`,
           systemPrompt: systemContext,
           history: historyPayload,
@@ -1099,7 +1099,7 @@ export default function REI() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Server returned failure response status');
+        throw new Error(data.error || "Server returned failure response status");
       }
 
       setMessages((prev) => [
@@ -1108,7 +1108,7 @@ export default function REI() {
         {
           sender: "rei",
           text: data.result,
-          timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+          timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
           rawJson: {
             engine: "REI-Hinge-Core v0.3",
             domain: selectedDomain,
@@ -1122,7 +1122,7 @@ export default function REI() {
         }
       ]);
     } catch (error) {
-      console.error('REI.ai API error:', error);
+      console.error("REI.ai API error:", error);
       
       // Fallback: local evaluation if Vercel serverless function throws
       const fallbackText = `[REI.ai FALLBACK RESPONSE]
@@ -1141,7 +1141,7 @@ Limitations:
         {
           sender: "rei",
           text: fallbackText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           rawJson: {
             engine: "REI-Fallback v0.3",
             domain: selectedDomain,
@@ -1172,89 +1172,89 @@ Limitations:
     >
       {/* Sticky Header with safe area top */}
       <header className="safe-top rei-header">
-          <div className="rei-header__brand">
-            {/* Logo Mark */}
-            <div className="rei-logo-mark">
-              <HingeMark size={28} animated={true} />
-            </div>
-            <div>
-              <h1 className="rei-logo-title">REI.ai</h1>
-              <p className="rei-logo-sub">
+        <div className="rei-header__brand">
+          {/* Logo Mark */}
+          <div className="rei-logo-mark">
+            <HingeMark size={28} animated={true} />
+          </div>
+          <div>
+            <h1 className="rei-logo-title">REI.ai</h1>
+            <p className="rei-logo-sub">
                 Latin: <em>Rei</em> (The Matter / Hinge) &nbsp;|&nbsp; Loop: <strong>Record • Evaluate • Iterate</strong>
-              </p>
-            </div>
+            </p>
           </div>
+        </div>
  
-          {/* Domain selection tab strip */}
-          <div className="rei-domain-tabs">
-            {DOMAIN_PROFILES.map((dom) => (
-              <button
-                key={dom.id}
-                type="button"
-                onClick={() => setSelectedDomain(dom.id)}
-                className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
-              >
-                <span>{dom.label}</span>
-                <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
-                  {dom.id === "assistant" ? "Everyday reasoning" :
-                   dom.id === "coding" ? "Senior coding logic" :
-                   dom.id === "genealogy" ? "Evidence-tiered genealogy" :
-                   "Narrative architecture"}
-                </span>
-              </button>
-            ))}
+        {/* Domain selection tab strip */}
+        <div className="rei-domain-tabs">
+          {DOMAIN_PROFILES.map((dom) => (
             <button
+              key={dom.id}
               type="button"
-              onClick={handleClearHistory}
-              className="rei-action-btn rei-action-btn--danger"
+              onClick={() => setSelectedDomain(dom.id)}
+              className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
             >
+              <span>{dom.label}</span>
+              <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
+                {dom.id === "assistant" ? "Everyday reasoning" :
+                  dom.id === "coding" ? "Senior coding logic" :
+                    dom.id === "genealogy" ? "Evidence-tiered genealogy" :
+                      "Narrative architecture"}
+              </span>
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={handleClearHistory}
+            className="rei-action-btn rei-action-btn--danger"
+          >
               Clear Chat
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsPhilosophyOpen(true)}
-              className="rei-action-btn rei-action-btn--accent"
-            >
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsPhilosophyOpen(true)}
+            className="rei-action-btn rei-action-btn--accent"
+          >
               (?) Philosophy
-            </button>
-          </div>
-        </header>
+          </button>
+        </div>
+      </header>
 
-        {/* Scrollable Main Content with keyboard space */}
-        <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
-          {/* Active Domain Info Banner (Custom Card Style) */}
-          <div className="rei-domain-banner">
-            <div className="rei-domain-banner__eyebrow">Active Voice</div>
-            <div className="rei-domain-banner__row">
-              <div className="rei-domain-banner__meta">
-                <span className="rei-domain-banner__label">Mode:</span>
-                <span>{currentDomain.description}</span>
-              </div>
-              <div className="rei-domain-banner__meta rei-domain-banner__meta--secondary">
-                <span className="rei-domain-banner__label">Voice cues:</span>
-                <span>{currentDomain.rules.join(" | ")}</span>
-              </div>
+      {/* Scrollable Main Content with keyboard space */}
+      <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
+        {/* Active Domain Info Banner (Custom Card Style) */}
+        <div className="rei-domain-banner">
+          <div className="rei-domain-banner__eyebrow">Active Voice</div>
+          <div className="rei-domain-banner__row">
+            <div className="rei-domain-banner__meta">
+              <span className="rei-domain-banner__label">Mode:</span>
+              <span>{currentDomain.description}</span>
             </div>
-            {selectedDomain === "assistant" && (
-               <>
-                 <div className="rei-reasoning-loop">
-                   {REASONING_LOOP_STEPS.map((step) => (
-                     <div key={step.id} className="rei-reasoning-loop__step">
-                       <span className="rei-reasoning-loop__label">{step.label}</span>
-                       <span className="rei-reasoning-loop__detail">{step.detail}</span>
-                     </div>
-                   ))}
-                 </div>
-                 <div className="rei-domain-banner__steps">
-                   {["Collect", "Analyze", "Record", "Distinguish", "Organize", "Review", "Evaluate", "Iterate"].map((step) => (
-                     <span key={step} className="rei-domain-banner__step">
-                       {step}
-                     </span>
-                   ))}
-                 </div>
-               </>
-            )}
+            <div className="rei-domain-banner__meta rei-domain-banner__meta--secondary">
+              <span className="rei-domain-banner__label">Voice cues:</span>
+              <span>{currentDomain.rules.join(" | ")}</span>
+            </div>
           </div>
+          {selectedDomain === "assistant" && (
+            <>
+              <div className="rei-reasoning-loop">
+                {REASONING_LOOP_STEPS.map((step) => (
+                  <div key={step.id} className="rei-reasoning-loop__step">
+                    <span className="rei-reasoning-loop__label">{step.label}</span>
+                    <span className="rei-reasoning-loop__detail">{step.detail}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="rei-domain-banner__steps">
+                {["Collect", "Analyze", "Record", "Distinguish", "Organize", "Review", "Evaluate", "Iterate"].map((step) => (
+                  <span key={step} className="rei-domain-banner__step">
+                    {step}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
 
         {/* Ingest Panel - only shown for genealogy domain */}
         <IngestPanel
@@ -1393,67 +1393,67 @@ Limitations:
             <div ref={chatEndRef} />
           </div>
         </div>
-        </main>
+      </main>
 
-        {/* Fixed Input Area at Bottom with safe area */}
-        <div className="rei-input-shell fixed bottom-0 safe-bottom" style={{
-          maxWidth: mobile ? undefined : "1400px"
-        }}>
-          <form className="rei-input-form" onSubmit={handleSendMessage}>
-            {selectedDomain === "assistant" && (
-              <div className="rei-input-row" style={{
-                flexWrap: "wrap",
-                justifyContent: mobile ? "stretch" : "center"
-              }}>
-                {GENERALIST_PROMPTS.map((prompt, index) => (
-                  <button
-                    key={prompt}
-                    type="button"
-                    onClick={() => {
-                      setInputMessage(prompt);
-                      setAssistantPromptIndex(index);
-                    }}
-                    className="rei-quick-prompt"
-                    style={{
-                      flex: mobile ? "1 1 30%" : "1 1 auto",
-                      minWidth: mobile ? "100px" : "180px"
-                    }}
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="rei-input-row">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder={selectedDomain === "assistant" ? "What are you thinking through?" : "Type proof context or statements to evaluate..."}
-                className="rei-input-area"
-                style={{
-                  flex: 1,
-                  padding: mobile ? "14px 16px" : "12px 16px",
-                  minHeight: "48px"
-                }}
-              />
-              <button
-                type="submit"
-                className="rei-touch-button touch-target"
-                style={{
-                  padding: mobile ? "14px 28px" : "12px 24px",
-                  minHeight: "48px",
-                  height: "48px"
-                }}
-                onMouseOver={(e) => e.currentTarget.style.background = "#fb923c"}
-                onMouseOut={(e) => e.currentTarget.style.background = "#f97316"}
-              >
-                Send
-              </button>
+      {/* Fixed Input Area at Bottom with safe area */}
+      <div className="rei-input-shell fixed bottom-0 safe-bottom" style={{
+        maxWidth: mobile ? undefined : "1400px"
+      }}>
+        <form className="rei-input-form" onSubmit={handleSendMessage}>
+          {selectedDomain === "assistant" && (
+            <div className="rei-input-row" style={{
+              flexWrap: "wrap",
+              justifyContent: mobile ? "stretch" : "center"
+            }}>
+              {GENERALIST_PROMPTS.map((prompt, index) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  onClick={() => {
+                    setInputMessage(prompt);
+                    setAssistantPromptIndex(index);
+                  }}
+                  className="rei-quick-prompt"
+                  style={{
+                    flex: mobile ? "1 1 30%" : "1 1 auto",
+                    minWidth: mobile ? "100px" : "180px"
+                  }}
+                >
+                  {prompt}
+                </button>
+              ))}
             </div>
-          </form>
-        </div>
+          )}
+          <div className="rei-input-row">
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder={selectedDomain === "assistant" ? "What are you thinking through?" : "Type proof context or statements to evaluate..."}
+              className="rei-input-area"
+              style={{
+                flex: 1,
+                padding: mobile ? "14px 16px" : "12px 16px",
+                minHeight: "48px"
+              }}
+            />
+            <button
+              type="submit"
+              className="rei-touch-button touch-target"
+              style={{
+                padding: mobile ? "14px 28px" : "12px 24px",
+                minHeight: "48px",
+                height: "48px"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = "#fb923c"}
+              onMouseOut={(e) => e.currentTarget.style.background = "#f97316"}
+            >
+                Send
+            </button>
+          </div>
+        </form>
+      </div>
       
       {/* Philosophy Modal Overlay */}
       {isPhilosophyOpen && (

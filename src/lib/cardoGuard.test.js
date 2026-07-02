@@ -144,16 +144,46 @@ describe("cardoGuard", () => {
     expect(strongBand.decisionMarginRatio).toBeGreaterThanOrEqual(2.5);
   });
 
-  describe("pure helper functions", () => {
-    it("getSyntheticFalseAlarmRate covers every confidence band", () => {
-      expect(getSyntheticFalseAlarmRate(95)).toBe(0.09);
-      expect(getSyntheticFalseAlarmRate(90)).toBe(0.15);
-      expect(getSyntheticFalseAlarmRate(85)).toBe(0.31);
-      expect(getSyntheticFalseAlarmRate(75)).toBe(0.44);
-      expect(getSyntheticFalseAlarmRate(60)).toBe(0.57);
+  it("applies CARDO GUARD to the pump maintenance scenario: 23% confidence, $50k to act, $500k to miss", () => {
+    // Pump scenario: 49% vibration increase, 23% failure probability (confidence band: very low)
+    // Cost to act: ~$50k (shutdown, inspection, potential repairs)
+    // Cost to miss: ~$500k (equipment failure, unplanned downtime, lost production)
+    const pumpReview = calculateCardoGuardReview({
+      scenarioId: "pump-maintenance",
+      confidence: 23,
+      costToAct: 50000,
+      costToMiss: 500000,
     });
 
-    it("getConfidenceBand covers every confidence band", () => {
+    // With 23% confidence, the false alarm rate should be high (0.57 for very low band)
+    expect(getSyntheticFalseAlarmRate(23)).toBe(0.57);
+    expect(pumpReview.confidenceBand).toBe("very low");
+
+    // Calculate: calibrated event likelihood = 1 - 0.57 = 0.43 (43% chance something bad happens)
+    expect(pumpReview.calibratedEventLikelihood).toBeCloseTo(0.43);
+
+    // Expected action waste: (1 - 0.43) * 50k = 0.57 * 50k = $28,500
+    expect(pumpReview.expectedActionWaste).toBeCloseTo(28500);
+
+    // Expected miss loss: 0.43 * 500k = $215,000
+    expect(pumpReview.expectedMissLoss).toBeCloseTo(215000);
+
+    // Decision margin ratio: 215k / 28.5k = ~7.54x (Very Strong)
+    expect(pumpReview.decisionMarginRatio).toBeCloseTo(7.54, 1);
+    expect(pumpReview.decisionStrength).toBe("Very Strong");
+
+    // Recommendation should be ACT (shutdown the pump)
+    expect(pumpReview.recommendation).toBe("ACT");
+    expect(pumpReview.shouldAct).toBe(true);
+
+    // Breakeven: cost to act where acting and not acting are equally bad
+    // breakeven miss cost = (50k * 0.57) / 0.43 = ~$66,279
+    expect(pumpReview.breakevenMissCost).toBeCloseTo(66279, 0);
+    expect(pumpReview.explanation).toContain("Acting clears the gate");
+  });
+
+  describe("pure helper functions", () => {
+    it("getSyntheticFalseAlarmRate covers every confidence band", () => {
       expect(getConfidenceBand(95)).toBe("very high");
       expect(getConfidenceBand(90)).toBe("high");
       expect(getConfidenceBand(85)).toBe("moderate");

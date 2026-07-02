@@ -1,6 +1,6 @@
 // CFai API Route for Vercel Deployment
 // Handles web requests and calls the CFai CLI tool or falls back to direct Groq API requests.
-import 'dotenv/config';
+import "dotenv/config";
 // Optional override: if MODEL env var is set, use it for all Groq calls
 const DEFAULT_MODEL = process.env.MODEL || null;
 import { exec } from "child_process";
@@ -183,11 +183,11 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   }
 
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey || apiKey.includes('your_groq_api_key_here')) {
+  if (!apiKey || apiKey.includes("your_groq_api_key_here")) {
     // No real key – return a mock response
     return {
       content: `[REI.AI NOTICE] GROQ_API_KEY not set or placeholder. Mock response for prompt: ${prompt}`,
-      model: 'mock',
+      model: "mock",
       routerDecision,
     };
   }
@@ -255,7 +255,7 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
 
   // Return a graceful user-facing message instead of throwing a 500.
   return {
-    content: `[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.`,
+    content: "[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.",
     model: "rate-limited",
     routerDecision,
     rateLimited: true,
@@ -279,7 +279,7 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
         timestamp: new Date().toISOString(),
       };
     } catch (apiError) {
-      console.error('handleCfaiRequest apiError:', apiError);
+      console.error("handleCfaiRequest apiError:", apiError);
       return {
         success: false,
         error: `CLI fallback error: ${apiError.message}`,
@@ -307,14 +307,14 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
       };
     }
 
-      // Ensure stdout is not empty; provide fallback message
-      const trimmedStdout = stdout.trim();
-      const resultText = trimmedStdout.length > 0 ? trimmedStdout : "[REI.AI NOTICE] Empty CLI response; defaulting to placeholder.";
-      return {
-        success: true,
-        result: resultText,
-        timestamp: new Date().toISOString(),
-      };
+    // Ensure stdout is not empty; provide fallback message
+    const trimmedStdout = stdout.trim();
+    const resultText = trimmedStdout.length > 0 ? trimmedStdout : "[REI.AI NOTICE] Empty CLI response; defaulting to placeholder.";
+    return {
+      success: true,
+      result: resultText,
+      timestamp: new Date().toISOString(),
+    };
   } catch (execError) {
     return {
       success: false,
@@ -362,7 +362,7 @@ export default async function handler(req, res) {
     });
     return;
   } catch (error) {
-    console.error('Handler caught error stack:', error.stack);
+    console.error("Handler caught error stack:", error.stack);
     res.status(500).json({
       success: false,
       error: "Serverless execution error",
