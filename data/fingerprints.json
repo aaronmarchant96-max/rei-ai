@@ -8,7 +8,8 @@
     "costPer1k": 0.3,
     "qualityGate": "Single sentence + invitation",
     "enforce": null,
-    "description": "Fast, cheap responses for greetings and light warm-up context."
+    "description": "Fast, cheap responses for greetings and light warm-up context.",
+    "matchTerms": ["hi", "hello", "hey", "yo", "good morning", "good afternoon", "good evening", "hiya"]
   },
   {
     "id": "structured-reasoning",
@@ -30,7 +31,8 @@
     "costPer1k": 1.0,
     "qualityGate": "Phase 0 + HARD STOP",
     "enforce": "HARD_STOP",
-    "description": "Coding tasks that need clarification, root-cause analysis, and explicit verification."
+    "description": "Coding tasks that need clarification, root-cause analysis, and explicit verification.",
+    "matchTerms": ["implement", "build", "debug", "fix", "refactor", "function", "component", "module", "api", "jest", "vite", "react", "node", "typescript", "javascript", "python", "test", "patch", "class", "service", "hook", "route"]
   },
   {
     "id": "genealogy-deep-dive",
@@ -41,7 +43,8 @@
     "costPer1k": 1.0,
     "qualityGate": "Evidence tiers + citations",
     "enforce": "EVIDENCE_TIERS",
-    "description": "Genealogy, archival record analysis, and evidence-tiered reasoning."
+    "description": "Genealogy, archival record analysis, and evidence-tiered reasoning.",
+    "matchTerms": ["ancestor", "descendant", "birth", "death", "marriage", "census", "familysearch", "find a grave", "pedigree", "genealogy", "lineage", "archive", "parish", "baptism", "burial", "probate", "will", "surname", "provenance", "citation", "source"]
   },
   {
     "id": "story-architect",
@@ -52,7 +55,8 @@
     "costPer1k": 1.0,
     "qualityGate": "Character hinge + timeline",
     "enforce": "NARRATIVE_BLUEPRINT",
-    "description": "Narrative planning, outlines, and story architecture."
+    "description": "Narrative planning, outlines, and story architecture.",
+    "matchTerms": ["story", "plot", "character", "scene", "narrative", "outline", "dialogue", "arc", "worldbuilding", "conflict", "hero", "villain"]
   },
   {
     "id": "adversarial-validation",
@@ -63,6 +67,7 @@
     "costPer1k": 5.0,
     "qualityGate": "Red-team validation",
     "enforce": "RED_TEAM",
-    "description": "High-stakes critique, adversarial review, or stress-testing."
+    "description": "High-stakes critique, adversarial review, or stress-testing.",
+    "matchTerms": ["red team", "red-team", "adversarial", "stress test", "attack", "challenge", "prove wrong", "counterargument", "break it", "stress-test"]
   }
 ]

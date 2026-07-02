@@ -10,6 +10,34 @@ function getCatalogEntry(id) {
   return ROUTER_CATALOG.find((entry) => entry.id === id) || ROUTER_CATALOG[1] || ROUTER_CATALOG[0];
 }
 
+function escapeKeyword(term = "") {
+  return String(term ?? "")
+    .trim()
+    .replace(/\s+/g, "\\s+")
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function keywordMatches(text, term = "") {
+  const escaped = escapeKeyword(term);
+  if (!escaped) {
+    return false;
+  }
+
+  const pattern = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i");
+  return pattern.test(text);
+}
+
+function getCatalogRouteMatch(text) {
+  for (const entry of ROUTER_CATALOG) {
+    const terms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
+    if (terms.some((term) => keywordMatches(text, term))) {
+      return entry;
+    }
+  }
+
+  return null;
+}
+
 function buildDecision(id, overrides = {}) {
   const baseEntry = getCatalogEntry(id) || {};
   return {
@@ -79,19 +107,21 @@ export function buildRouterDecision({
     });
   }
 
-  if (domainName === "genealogy" || isLikelyGenealogyRequest(text)) {
+  const catalogRoute = getCatalogRouteMatch(text);
+
+  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || isLikelyGenealogyRequest(text)) {
     return buildDecision("genealogy-deep-dive", {
       rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
     });
   }
 
-  if (domainName === "coding" || isLikelyCodingRequest(text)) {
+  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || isLikelyCodingRequest(text)) {
     return buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",
     });
   }
 
-  if (domainName === "story" || isLikelyStoryRequest(text)) {
+  if (domainName === "story" || catalogRoute?.id === "story-architect" || isLikelyStoryRequest(text)) {
     return buildDecision("story-architect", {
       rationale: "Story or narrative language detected; route through the storytelling blueprint path.",
     });

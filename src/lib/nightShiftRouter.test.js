@@ -24,10 +24,17 @@ describe("nightShiftRouter", () => {
   });
 
   it("routes genealogy prompts to the evidence-tier path", () => {
-    const decision = buildRouterDecision({ input: "Did this ancestor marry in 1846 and which record is strongest?", domain: "assistant" });
+   const decision = buildRouterDecision({ input: "Did this ancestor marry in 1846 and which record is strongest?", domain: "assistant" });
 
-    expect(decision.id).toBe("genealogy-deep-dive");
-    expect(decision.enforce).toBe("EVIDENCE_TIERS");
+   expect(decision.id).toBe("genealogy-deep-dive");
+   expect(decision.enforce).toBe("EVIDENCE_TIERS");
+  });
+
+  it("routes evidence-heavy genealogy prompts using catalog keyword matches", () => {
+   const decision = buildRouterDecision({ input: "Which burial record is strongest for this family line?", domain: "assistant" });
+
+   expect(decision.id).toBe("genealogy-deep-dive");
+   expect(decision.enforce).toBe("EVIDENCE_TIERS");
   });
 
   it("routes adversarial prompts to the premium validation path", () => {
