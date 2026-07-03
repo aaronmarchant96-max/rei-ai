@@ -179,12 +179,22 @@ export function getFingerprintCatalog() {
   return ROUTER_CATALOG.map((entry) => ({ ...entry }));
 }
 
+/**
+ * Builds routing decision following Fortis et Liber principles:
+ * 1. Leverage - Identifies exact hinge points in input  
+ * 2. Surface Area - Minimal interface with clear boundaries
+ * 3. Recoil - Explicit adversarial handling
+ * 4. Enumeration - Tracks all decision signals  
+ * 5. Parity - Balanced model selection
+ * 6. Solvency - Clear fallback paths
+ * 7. Conservation - Right-sized responses
+ */
 export function buildRouterDecision({
   input = "",
   domain = "assistant",
   history = [],
   attachedRecord = "",
-  requiresAdversarial = false,
+  requiresAdversarial = false, 
 } = {}) {
   const combinedInput = [input, attachedRecord, history?.map((message) => message?.content || "").join(" ")]
     .filter(Boolean)
