@@ -88,6 +88,46 @@ function buildAssistantStyleReply(userText) {
   ].join("\n");
 }
 
+function buildDomainSystemMessage(domainId, currentDomain) {
+  const domainLabel = currentDomain?.label || "REI.ai";
+  const domainDescription = currentDomain?.description || "reasoning assistant";
+
+  if (domainId === "assistant") {
+    return `System initialized. ${getAssistantWelcomeCopy()}`;
+  }
+
+  return `System initialized. Welcome to REI.ai ${domainLabel}. ${domainDescription} Let's begin our ${domainId === 'coding' ? 'coding session' : domainId === 'genealogy' ? 'research analysis' : 'story building'}!`;
+}
+
+function readStoredMessages(selectedDomain) {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const storageKey = `rei_chat_history_${selectedDomain}`;
+  const saved = window.localStorage.getItem(storageKey);
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(saved);
+    if (!Array.isArray(parsed)) {
+      throw new Error("Stored chat history is not an array");
+    }
+    return parsed;
+  } catch (error) {
+    console.error("Failed to parse saved chat history:", error);
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch (cleanupError) {
+      console.warn("Unable to clear corrupted chat history storage:", cleanupError);
+    }
+    return null;
+  }
+}
+
 const GENERALIST_PROMPTS = [
   "Help me sort this out",
   "What am I missing here?",
@@ -896,24 +936,19 @@ export default function REI() {
 
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState(() => {
-  if (typeof window !== "undefined") {
-    const saved = localStorage.getItem(`rei_chat_history_${selectedDomain}`);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse saved chat history:", e);
+    const storedMessages = readStoredMessages(selectedDomain);
+    if (storedMessages) {
+      return storedMessages;
+    }
+
+    return [
+      {
+        sender: "rei",
+        text: buildDomainSystemMessage(selectedDomain, DOMAIN_PROFILES.find((domain) => domain.id === selectedDomain) || DOMAIN_PROFILES[0]),
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       }
-    }
-  }
-  return [
-    {
-      sender: "rei",
-      text: `System initialized. ${getAssistantWelcomeCopy()}`,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    }
-  ];
-});
+    ];
+  });
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
   const [assistantPromptIndex, setAssistantPromptIndex] = useState(0);
@@ -925,7 +960,7 @@ export default function REI() {
   useEffect(() => {
     const domainSpecificMessage = {
       sender: "rei",
-      text: `System initialized. ${currentDomain.id === 'assistant' ? getAssistantWelcomeCopy() : `Welcome to REI.ai ${currentDomain.label}. ${currentDomain.description} Let's begin our ${currentDomain.id === 'coding' ? 'coding session' : currentDomain.id === 'genealogy' ? 'research analysis' : 'story building'}!`}`,
+      text: buildDomainSystemMessage(selectedDomain, currentDomain),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     
@@ -955,7 +990,7 @@ export default function REI() {
   const handleClearHistory = () => {
     const domainSpecificMessage = {
       sender: "rei",
-      text: `System initialized. ${currentDomain.id === 'assistant' ? getAssistantWelcomeCopy() : `Welcome to REI.ai ${currentDomain.label}. ${currentDomain.description} Let's begin our ${currentDomain.id === 'coding' ? 'coding session' : currentDomain.id === 'genealogy' ? 'research analysis' : 'story building'}!`}`,
+      text: buildDomainSystemMessage(selectedDomain, currentDomain),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
     setMessages([domainSpecificMessage]);
