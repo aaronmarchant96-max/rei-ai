@@ -1,4 +1,14 @@
-# CLI Entry Point — Read This First
+# CLI Entry Point — Fortis et Liber Principles:
+
+1. **Leverage** - Focused entry points  
+2. **Surface Area** - Minimal onboarding  
+3. **Recoil** - Clear mistake recovery  
+4. **Enumeration** - Explicit verification  
+5. **Parity** - Balanced task coverage  
+6. **Solvency** - Guaranteed completion  
+7. **Conservation** - Token efficiency
+
+## Read This First
 
 **Token Goal:** Reduce onboarding from 100K → 12K tokens (88% savings).
 

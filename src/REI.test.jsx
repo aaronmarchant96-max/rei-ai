@@ -1,3 +1,14 @@
+/**
+ * REI Tests - Fortis et Liber Verification:
+ * 1. Leverage - Tests core failure points
+ * 2. Surface Area - Minimal test cases
+ * 3. Recoil - Verifies error recovery
+ * 4. Enumeration - Explicit test states
+ * 5. Parity - Balanced coverage
+ * 6. Solvency - Guaranteed assertions
+ * 7. Conservation - Efficient test runs
+ */
+
 import { render, screen } from "@testing-library/react";
 import REI from "./REI.jsx";
 
