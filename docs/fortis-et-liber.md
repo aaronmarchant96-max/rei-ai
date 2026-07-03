@@ -97,15 +97,24 @@ Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
 
-**Adaptive Context Persistence / Hierarchical Context Memory (HCM) (2026-07-03):**
-- **Issue Found**: Memory/storage constraints and corruption recovery on lightweight hardware.
-- **Solution**: Replaced raw chat arrays with Hierarchical Context Memory (HCM). Prioritizes core identity, pinned facts, and summarizes oldest messages when size thresholds are breached.
-- **Changes**:
-  - `src/lib/persistentContextEngine.js` - Progressive compression, prioritizing pins, and structured summaries.
-  - `src/lib/persistentContextEngine.test.js` - Strict testing for compression bounds, ranking, and recovery.
-  - `src/REI.jsx` - Integrated HCM loaders and savers into domain-switching effects and message syncs.
-  - `src/REI.test.jsx` - Refactored recovery tests to validate the new structured object persistence model.
-- **Test coverage**: 67 tests passing (was 58)
+**Adaptive Context Persistence / Hierarchical Context Memory (HCM) - Code Quality Improvements (2026-07-03):**
+- **Previous issue**: HCM implementation had critical bugs and code quality issues preventing commit.
+- **Bugs fixed**:
+  1. **Unsafe object cloning** (line 93): Replaced `JSON.parse(JSON.stringify())` with `structuredClone()` fallback to preserve object types
+  2. **Broken array filtering** (line 109): Fixed reference equality bug in `compressHCM()` - now uses index-based comparison for filtering pinned messages
+  3. **Brittle message detection** (line 182-183): Added explicit type validation for message filtering instead of fragile exclusion pattern
+- **Improvements**:
+  - Extracted 4 repeated regex patterns into `DOMAIN_KEYWORDS` constant (architecture, genealogy, maintenance, decision)
+  - Added `getTimestamp()` helper to eliminate timestamp formatting duplication
+  - Fixed `summarizeMessages()` to include decision counts even when no topics matched
+  - Added null/undefined safety checks to `scoreMessage()`
+  - Added HCM structure validation with explicit error messages
+- **Test coverage expanded**: 78 tests passing (was 67, +11 from edge cases)
+  - New edge case tests: empty arrays, null text, cascade compression, hard limit repeats
+  - All new tests validate preservation of facts across compression cycles
+  - All localStorage integration tests passing
+- **ESLint**: No errors, 4 console warnings in error recovery (acceptable)
+- **Verification**: `npm test` (78/78 passing), `npm run build` (succeeds), `npm run lint` (no errors)
 
 **Architecture/Technical-Debt Routing Extension (2026-07-02):**
 - **Issue Found**: SaaS monolith rewrite scenario was being routed to Genealogy Deep Dive (wrong)
@@ -151,9 +160,9 @@ Use Jest as the main evidence gate.
 
 ### Current Test Status
 
-- **Total tests**: 67 passing (all suites green, +9 from HCM work)
+- **Total tests**: 78 passing (all suites green, +11 from edge case coverage on HCM)
 - **Key test files**:
-  - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks (9 tests)
+  - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks (15 tests)
   - `src/lib/cardoGuard.test.js` - Core decision logic tests (16 tests including pump + SaaS scenarios)
   - `src/lib/nightShiftRouter.test.js` - Routing logic tests (11 tests including maintenance + architecture)
   - `src/CardoGuard.test.jsx` - UI component tests
