@@ -76,8 +76,10 @@ Repository: https://github.com/aaronmarchant96-max/rei-ai-platform
 - src/lib/nightShiftRouter.js: Night Shift routing logic
 - data/fingerprints.json: routing catalog and cost model
 - src/lib/cardoGuard.js: deterministic decision gate
+- src/lib/persistentContextEngine.js: Hierarchical Context Memory (HCM) engine
 - src/lib/nightShiftRouter.test.js: routing tests
 - src/lib/cardoGuard.test.js: CARDO GUARD tests
+- src/lib/persistentContextEngine.test.js: HCM unit tests
 
 ## Important architecture notes
 
@@ -94,6 +96,16 @@ The app shell keeps the experience structured and reviewable rather than leaving
 Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
+
+**Adaptive Context Persistence / Hierarchical Context Memory (HCM) (2026-07-03):**
+- **Issue Found**: Memory/storage constraints and corruption recovery on lightweight hardware.
+- **Solution**: Replaced raw chat arrays with Hierarchical Context Memory (HCM). Prioritizes core identity, pinned facts, and summarizes oldest messages when size thresholds are breached.
+- **Changes**:
+  - `src/lib/persistentContextEngine.js` - Progressive compression, prioritizing pins, and structured summaries.
+  - `src/lib/persistentContextEngine.test.js` - Strict testing for compression bounds, ranking, and recovery.
+  - `src/REI.jsx` - Integrated HCM loaders and savers into domain-switching effects and message syncs.
+  - `src/REI.test.jsx` - Refactored recovery tests to validate the new structured object persistence model.
+- **Test coverage**: 67 tests passing (was 58)
 
 **Architecture/Technical-Debt Routing Extension (2026-07-02):**
 - **Issue Found**: SaaS monolith rewrite scenario was being routed to Genealogy Deep Dive (wrong)
@@ -139,8 +151,9 @@ Use Jest as the main evidence gate.
 
 ### Current Test Status
 
-- **Total tests**: 58 passing (all suites green, +2 from architecture routing work)
+- **Total tests**: 67 passing (all suites green, +9 from HCM work)
 - **Key test files**:
+  - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks (9 tests)
   - `src/lib/cardoGuard.test.js` - Core decision logic tests (16 tests including pump + SaaS scenarios)
   - `src/lib/nightShiftRouter.test.js` - Routing logic tests (11 tests including maintenance + architecture)
   - `src/CardoGuard.test.jsx` - UI component tests

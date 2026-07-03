@@ -12,7 +12,8 @@ describe("REI", () => {
     render(<REI />);
 
     expect(screen.getByText(/REI is live/i)).toBeInTheDocument();
-    expect(JSON.parse(window.localStorage.getItem("rei_chat_history_assistant") || "[]"))
-      .toEqual(expect.any(Array));
+    const stored = JSON.parse(window.localStorage.getItem("rei_chat_history_assistant") || "{}");
+    expect(stored.version).toBe("hcm_v1");
+    expect(stored.domainId).toBe("assistant");
   });
 });

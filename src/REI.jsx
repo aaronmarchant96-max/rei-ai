@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useMobile, useKeyboardVisible } from "./useMobile.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
+import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
 
 const MAX_RECORD_CHARS = 12000;
 
@@ -100,32 +101,9 @@ function buildDomainSystemMessage(domainId, currentDomain) {
 }
 
 function readStoredMessages(selectedDomain) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  const storageKey = `rei_chat_history_${selectedDomain}`;
-  const saved = window.localStorage.getItem(storageKey);
-
-  if (!saved) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      throw new Error("Stored chat history is not an array");
-    }
-    return parsed;
-  } catch (error) {
-    console.error("Failed to parse saved chat history:", error);
-    try {
-      window.localStorage.removeItem(storageKey);
-    } catch (cleanupError) {
-      console.warn("Unable to clear corrupted chat history storage:", cleanupError);
-    }
-    return null;
-  }
+  const currentDomain = DOMAIN_PROFILES.find((domain) => domain.id === selectedDomain) || DOMAIN_PROFILES[0];
+  const welcomeText = buildDomainSystemMessage(selectedDomain, currentDomain);
+  return readChatHistoryHCM(selectedDomain, welcomeText);
 }
 
 const GENERALIST_PROMPTS = [
@@ -966,7 +944,7 @@ export default function REI() {
     
     setMessages([domainSpecificMessage]);
     if (typeof window !== "undefined") {
-      localStorage.setItem(`rei_chat_history_${selectedDomain}`, JSON.stringify([domainSpecificMessage]));
+      saveChatHistoryHCM(selectedDomain, [domainSpecificMessage]);
     }
 
     // Prevent a pasted record from leaking into a different domain
@@ -983,7 +961,7 @@ export default function REI() {
   // Sync to local storage (domain-specific)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem(`rei_chat_history_${selectedDomain}`, JSON.stringify(messages));
+      saveChatHistoryHCM(selectedDomain, messages);
     }
   }, [messages, selectedDomain]);
 
@@ -995,7 +973,7 @@ export default function REI() {
     };
     setMessages([domainSpecificMessage]);
     if (typeof window !== "undefined") {
-      localStorage.removeItem(`rei_chat_history_${selectedDomain}`);
+      saveChatHistoryHCM(selectedDomain, [domainSpecificMessage]);
     }
   };
 
