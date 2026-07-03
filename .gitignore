@@ -24,3 +24,4 @@ yarn-error.log*
 api_keys.md
 API_ENDPOINT_SETUP.md
 handoff_*.txt
+.aider*
