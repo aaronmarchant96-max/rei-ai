@@ -382,7 +382,9 @@ function HingeMark({ size = 36, animated = false }) {
  */
 export default function REI() {
   // Mobile detection
-  const mobile = useMobile();
+  const { isMobile, keyboardVisible } = useMobile();
+  const inputRows = isMobile ? 3 : 5;
+  const MAX_MOBILE_TOKENS = keyboardVisible ? 75 : 150;
   const keyboardVisible = useKeyboardVisible();
   const inputRef = useRef(null);
 
