@@ -299,16 +299,28 @@ interface Fingerprint {
 | `scripts/validate-fingerprints.sh` | Verify fingerprint DB integrity | `./scripts/validate-fingerprints.sh` |
 | `scripts/token-audit.sh` | Weekly token usage report | `./scripts/token-audit.sh` |
 
-### Battle Arena Validation
+### Test Suite (72 tests, 12 suites)
+| Test File | Tests | What It Covers |
+|-----------|-------|----------------|
+| `src/lib/nightShiftRouter.test.js` | 15+ | Routing edge cases: empty input, null domain, keyword routing, substring non-match, stored preference, adversarial flag, domain override |
+| `api/cfai.test.js` | 8 | Domain prompt resolution, input length guard, Groq retry, GET/POST/405 routing, missing-key response |
+| `src/AppShell.test.jsx` | 7 | Tool navigation, hash routing, breadcrumb, lazy-loaded tool rendering |
+| `src/REI.test.jsx` | — | REI chat component behavior |
+| Remaining suites | — | CardoGuard, CreativeEngine, DebateFurnace, ToolsLanding, tracepoint, cardoGuardChecklist, loadSeedLibrary |
+
+### Run Commands
 ```bash
-# Run single arena test
-npm test -- --testNamePattern="Hinge Finder STOP rule"
+# All tests
+npm test
 
-# Run all battle tests
-npm test -- --testPathPattern="battle"
+# Single test file
+npx jest src/lib/nightShiftRouter.test.js
 
-# Validate against production
-npm run validate:production
+# Test with pattern
+npx jest --testNamePattern="router"
+
+# Watch mode
+npm run test:watch
 ```
 
 ### Quality Gates
@@ -316,6 +328,7 @@ npm run validate:production
 2. **STOP Rule Enforcement:** 100% of underspecified coding requests trigger STOP
 3. **Evidence Tiers:** 100% of genealogy claims have explicit 🟢🔵🟠🟡 tier
 4. **Token Efficiency:** Average response ≤ token budget for arena
+5. **Build Size:** No chunk >500 kB (current max: 339 kB)
 
 ---
 
@@ -337,8 +350,21 @@ npm run validate:production
 ### Key Components
 - **Domain Selector:** 4 personas, active badge, descriptions
 - **Chat UI:** Message bubbles, copy button, timestamps, sender labels
-- **System Prompts:** Domain-specific, CARDO REI compliant
+- **System Prompts:** Domain-specific, CARDO REI compliant (stored in `api/cfai.js`)
 - **Record Ingest:** Archivist only, 12000 char limit, source type selection
+- **Code-Splitting:** All 7 tools (`AppShell.jsx`) use `React.lazy()` + `<Suspense>` — initial chunk 339 kB, largest secondary 197 kB
+
+### Build Output (Post-Sprint)
+| Chunk | Size (gzip) |
+|-------|-------------|
+| `index-*.js` (shell + React) | 339 kB (103 kB) |
+| `DebateFurnace-*.js` | 197 kB (56 kB) |
+| `Tracepoint-*.js` | 95 kB (17 kB) |
+| `CreativeEngine-*.js` | 92 kB (19 kB) |
+| `REI-*.js` | 57 kB (14 kB) |
+| `StormReplay-*.js` | 38 kB (6 kB) |
+| `CardoGuard-*.js` | 28 kB (5 kB) |
+| `ToolsLanding-*.js` | 4 kB (1 kB) |
 
 ---
 
@@ -388,7 +414,12 @@ npm run token-audit
 | Find deployment issues | `DEPLOYMENT_VERIFICATION.md` | Verification Checklist |
 | See battle test cases | This file | Battle Arena Contexts |
 | Configure model routing | `groq_router_v2_plan.md` | Routing Logic |
-| Add new domain | `REI.jsx` | DOMAIN_PROFILES |
+| Add new domain prompt | `api/cfai.js` | `DOMAIN_SYSTEM_PROMPTS` |
+| Edit persona profiles | `src/REI.jsx` | `DOMAIN_PROFILES` |
+| Run CI/CD | `.github/workflows/ci.yml` | N/A |
+| Check logs | `api/lib/logger.js` | `LOG_LEVEL` env |
+| Read router tests | `src/lib/nightShiftRouter.test.js` | Edge cases |
+| Read API integration tests | `api/cfai.test.js` | Full-route tests |
 | Update fingerprints | `data/fingerprints.json` | N/A |
 | Check token usage | `data/token-usage.log` | N/A |
 
@@ -402,23 +433,33 @@ npm run token-audit
 | `PROMPTHOUND-DOCS/CARDO-REI.md` | 8-step framework | ✅ |
 | `PROMPTHOUND-DOCS/CLI-HANDBOOK.md` | CLI workflow | ✅ |
 | `TOKEN_SAVERS.md` | Token optimization guide | ✅ |
+| `docs/GRANT_APPENDIX.md` | Sprint case study (2026-07-03) | ✅ New |
 
 ### REI App
 | File | Purpose | Status |
 |------|---------|--------|
-| `debate-furnace/src/REI.jsx` | Main chat component | ✅ |
-| `debate-furnace/src/AppShell.jsx` | Navigation | ✅ |
-| `debate-furnace/api/cfai.js` | Backend route | ✅ |
+| `debate-furnace/src/REI.jsx` | Main chat component (prompt strings removed) | ✅ |
+| `debate-furnace/src/AppShell.jsx` | Navigation, now lazy-loads all tools | ✅ Updated |
+| `debate-furnace/api/cfai.js` | Backend route + domain prompt owner | ✅ Updated |
+| `debate-furnace/api/lib/logger.js` | Structured JSON logger | ✅ New |
+| `debate-furnace/api/cfai.test.js` | Integration tests (8) | ✅ New |
 
 ### Night Shift / Router
 | File | Purpose | Status |
 |------|---------|--------|
 | `debate-furnace/docs/groq_router_v2_plan.md` | Routing spec | ✅ |
 | `debate-furnace/docs/rei_platform_map.md` | Platform architecture | ✅ |
+| `debate-furnace/src/lib/nightShiftRouter.js` | Word-boundary matching, null-safe | ✅ Updated |
+| `debate-furnace/src/lib/nightShiftRouter.test.js` | Edge case tests (9 added) | ✅ Updated |
+
+### CI/CD
+| File | Purpose | Status |
+|------|---------|--------|
+| `.github/workflows/ci.yml` | Test + build on push/PR to main | ✅ New |
 
 ---
 
-## 📊 CURRENT STATE SUMMARY *(As of June 29, 2026)*
+## 📊 CURRENT STATE SUMMARY *(As of July 3, 2026)*
 
 ### ✅ What's Done
 - 4 REI personas live in code and UI
@@ -426,21 +467,32 @@ npm run token-audit
 - Phase 0 questions integrated into coding prompt
 - Token-saving tools deployed (verify-deploy.sh, pre-commit hooks)
 - Battle arena contexts defined for each persona
+- **Chat history persistence fixed** — no longer wiped on mount (`src/REI.jsx`)
+- **Prompt deduplication** — all 4 domain prompts moved to `api/cfai.js DOMAIN_SYSTEM_PROMPTS`
+- **Router hardened** — word-boundary matching, null-safe catalog lookups, 9 edge case tests
+- **Error recovery** — categorized errors (Network/Server) + Retry button restores input
+- **Observability** — structured JSON logger (`api/lib/logger.js`, `LOG_LEVEL` env)
+- **Accessibility** — `role="log"`, `aria-live="polite"`, `aria-modal`, `aria-pressed`
+- **CI/CD** — `.github/workflows/ci.yml` (test + build on push/PR to main)
+- **JSDoc types** — added to `nightShiftRouter.js` and `cardoGuard.js`
+- **+17 tests** (55→72, 10→12 suites): 9 router edge cases + 8 API integration tests
+- **Code-splitting** — all 7 tools switched to `React.lazy()`; initial bundle **849 kB → 339 kB (−60%)**
+- **Dead code removed** — unused `MAX_MOBILE_TOKENS`, `assistantQuickPrompt`, shadowed variables
 
 ### 🎯 What's Next
-- [ ] Deploy Night Shift / Fingerprint Router to production
-- [ ] Integrate battle history tracking
-- [ ] Weekly fingerprint update automation
-- [ ] Adversarial testing suite for all personas
+- [ ] Review live performance of domain prompt resolution on deployment
+- [ ] Refine system prompt profiles if requested
+- [ ] Consider dynamic import() for further code-splitting (build clean, no remaining chunk warnings)
+- [ ] State management extraction (custom hooks) — deferred, needs hook-level test harness
 
 ### ⚠️ Blockers
-- None (GROQ_API_KEY verified in Vercel)
+- ESLint v10 requires flat config (eslint.config.js) but project has `.eslintrc.json` — pre-existing, not a regression
 
 ### 🤖 Automation
-- **Weekly:** `npm run update-fingerprints` (Sunday 2am UTC)
+- **On push/PR to main:** `npm test` + `npm run build` via GitHub Actions
 - **On commit:** Pre-commit hooks block secrets
 - **On deploy:** Auto-verify deployment status
-- **On PR:** Run battle arena validation suite
+- **Test count:** 72 tests, 12 suites — all passing
 
 ---
 
@@ -448,10 +500,11 @@ npm run token-audit
 
 | Date | Update | Author |
 |------|--------|--------|
-| 2026-06-29 | Created template structure | Vibe (picked up from vibe code) |
+| 2026-06-29 | Created template structure | Vibe |
 | 2026-06-29 | Added Battle Arena contexts | Vibe |
 | 2026-06-29 | Added Night Shift / Fingerprint Router | Vibe |
 | 2026-06-29 | Enhanced with validation, testing, glossary | Vibe |
+| 2026-07-03 | Sprint: bugfixes, prompt dedup, router hardening, +17 tests, code-splitting (−60% bundle), CI/CD, observability, accessibility, JSDoc types. See `docs/GRANT_APPENDIX.md` | OpenCode + User |
 
 ---
 
@@ -469,6 +522,8 @@ npm run token-audit
 
 ---
 
-**Last Updated:** June 29, 2026  
-**Status:** Template ready for implementation  
-**Next Review:** Weekly or after major battle arena updates
+**Last Updated:** July 3, 2026  
+**Status:** Live — current state of REI.ai platform  
+**Next Review:** After next sprint or major architectural change  
+
+> **Grant Appendix:** See `docs/GRANT_APPENDIX.md` for the full sprint case study — a textbook example of modern, AI-assisted, cost-aware engineering.

@@ -1,45 +1,123 @@
-# REI.ai Platform by PromptHound Labs
+# PromptHound Labs — Applied AI Engineering
 
-REI.ai is a reasoning-first web app for structured decision support. The repo combines a live UI, a routing layer, a cost-aware decision gate, and a test suite that treats behavior as something to verify rather than simply observe.
+An applied AI engineering lab exploring how AI-assisted work should be done well. We build tools, methods, and evaluation frameworks for structured reasoning, adaptive model routing, and evidence-aware workflows.
 
-Live demo: https://debate-furnace.vercel.app/#rei
+**Lab portfolio:** https://debate-furnace.vercel.app  
+**Repository:** https://github.com/aaronmarchant96-max/rei-ai-platform  
+**Research index:** [docs/RESEARCH_INDEX.md](docs/RESEARCH_INDEX.md) — full timeline and category view  
+**Project timeline:** [docs/PROJECT_TIMELINE.md](docs/PROJECT_TIMELINE.md) — milestones from first commit to REI.ai sprint  
+**Lab repos:** 6 active repositories across AI engineering, evaluation, computer vision, and archival research
 
-Repository: https://github.com/aaronmarchant96-max/rei-ai-platform
+---
 
-What the repo contains
+## Experiments
 
-The core experience lives in src/REI.jsx and api/cfai.js. The app shell in src/AppShell.jsx routes between tools and keeps REI as the flagship experience. The Night Shift router in src/lib/nightShiftRouter.js classifies prompts before the model call. CARDO GUARD in src/lib/cardoGuard.js evaluates whether acting is worth the cost. The tests under src and api give the work a clear evidence trail.
+25 completed experiments across Architecture, Evaluation, Computer Vision, Cost, and UX categories — spanning 6 repositories. Lab reports available for select experiments.
 
-Architecture decisions
+### 2026-05
 
-The Night Shift router is rule-based and explicit. It sends simple greetings down a cheap fast path and preserves a premium path for adversarial or high-risk requests. That makes cost behavior easy to inspect and test.
+| Experiment | What | Repo |
+|-----------|------|------|
+| UAP Footage Analyzer | Multi-source video anomaly detection with normalized pipeline (OpenCV, Python) | uap-footage-analyzer |
+| GOES Anomaly Hunter | Satellite thermal hotspot detection from NOAA public data | goes-anomaly-hunter |
+| Local Video Motion Zone Detector | Zone-based motion events from local video files | local-video-motion-zone-detector |
+| Debate Furnace | Gemini-backed structured debate engine with verdict templates, round management, and async decision paths | rei-ai-platform |
+| Story Forge | Inspiration engine with curated seed library (JSON-sourced), genre alignment, and onboarding flow | rei-ai-platform |
+| Testing Infrastructure | Jest + React Testing Library setup, first persistence test, app shell drift checks | rei-ai-platform |
+| CARDO GUARD | Deterministic decision gate — evaluates whether acting is worth the cost using breakeven math and confidence bands | rei-ai-platform |
 
-The backend prompt scaffolding in api/cfai.js uses a hard-stop rule for underspecified requests. Instead of guessing, it asks for the missing context.
+### 2026-04
 
-CARDO GUARD is deterministic. It makes a recommendation from cost and confidence, which makes it suitable for regression testing.
+| Experiment | What | Repo |
+|-----------|------|------|
+| Arena Harness | Local LLM evaluation harness for instruction adherence, structured output integrity, and adversarial pressure testing | llm-adversarial-testing |
+| Manuscript Comparison | Multi-model evaluation (Claude, Le Chat, Manus) on structured manuscript tasks | llm-adversarial-testing |
+| Dual-Axis Arena | Multi-turn adversarial testing with control vs. pressure axis comparison | llm-adversarial-testing |
+| Prompt Injection Resistance | Case studies on file injection, roleplay jailbreaks, and positive reinforcement exploits | llm-adversarial-testing |
 
-The app shell keeps the experience structured and reviewable rather than leaving everything inside a single chat flow.
+### 2026-06
 
-Testing and evidence
+| Experiment | What | Repo |
+|-----------|------|------|
+| Marchant Family Archive | Private genealogy archive with confidence labels, source scans, ancestor browser, evidence tiers | family-archive |
+| Tracepoint | Precision scan tool with snapshot tests, decision readout, and combined reduction display | rei-ai-platform |
+| REI.ai Platform | Domain-switching chat (generalist, coding, genealogy, story) with model routing, conversation memory, CARDO REI methodology, and Groq/OpenRouter backend | rei-ai-platform |
+| Archivist Ingest v2 | Raw record paste for genealogy with source type selection, client/server length guards, and attachment trace | rei-ai-platform |
+| Mobile-First Redesign | Responsive layout overhaul with safe area insets, breakpoint repairs, and Phase 0/1/2 hooks | rei-ai-platform |
+| [Night Shift Fingerprint Router](docs/experiments/night-shift-routing.md) | Weighted keyword catalog for prompt classification — 9 fingerprints, 19 tests, < 1 ms per decision | rei-ai-platform |
 
-The repo includes Jest coverage for routing behavior, app-shell flow, and CARDO GUARD decision logic. The tests are written as evidence gates and cover both happy paths and boundary cases.
+### 2026-07
 
-Docs and references
+| Experiment | What | Repo |
+|-----------|------|------|
+| [Prompt Evaluation Suite](docs/experiments/prompt-eval-suite.md) | 22 deterministic tests for prompt structure and response parsing — caught 2 regressions | rei-ai-platform |
+| State Extraction | 4 custom hooks extracted from REI.jsx (useChatHistory, useSessionTracker, useThriftyMode, useDomainHint) | rei-ai-platform |
+| Code Splitting | 7 tool components via React.lazy() — 849 kB → 339 kB initial bundle | rei-ai-platform |
+| Cost-Awareness UX | Per-message cost badges, pre-send token/route/cost estimates, 5K token budget gauge, session accumulator with markdown export | rei-ai-platform |
+| Fingerprint Data Overhaul | Real USD pricing, weighted matching with negativeMatchTerms, fallback chains, 3 new entries | rei-ai-platform |
+| Routing False-Positive Fix | Removed `record`/`will` from genealogy regex, added negativeMatchTerms, fixed history filter prefix | rei-ai-platform |
 
-Case study: CASE_STUDY.md
+## Methods
 
-Master documentation: docs/REI_VIBE_MASTER_INDEX_TEMPLATE.md
+- **Fortis et Liber** — Seven engineering principles (Leverage, Surface Area, Recoil, Enumeration, Parity, Solvency, Conservation) that guide architectural decisions
+- **CARDO REI** — A structured reasoning methodology (Capture, Analyze, Reframe, Decide, Operationalize)
+- **CARDO GUARD** — A deterministic decision gate that evaluates whether acting is worth the cost
 
-Prompt and workflow notes: TOKEN_SAVERS.md
+## Lab Reports
 
-Development setup: DEVELOPMENT_SETUP.md
+Every experiment gets a structured report: Question → Hypothesis → Implementation → Measurements → Results → Limitations → Next Iteration.
 
-Token-saving workflow: TOKEN_SAVERS.md
+[Lab report template](docs/lab-report-template.md)
 
-Working reference: docs/fortis-et-liber.md
+## Evidence
 
-How to run
+| Metric | Value |
+|--------|-------|
+| Test suite (primary repo) | 95 tests, 13 suites |
+| Bundle size (primary repo) | 339 kB initial |
+| Active repositories | 6 |
+| Total experiments | 25 completed, 5 planned |
+| Active since | April 7, 2026 (~3 months) |
+| Total commits | 387 across 7 repos |
+| Routing latency | < 1 ms per decision |
+| Monthly operating cost | ~$20/month (GitHub Copilot + OpenRouter API) |
+| CI | GitHub Actions (test + build on push/PR) |
+| Active months | 3 (May 2026 – Jul 2026) |
 
+## Repository Structure
+
+```
+src/
+  REI.jsx              — Chat interface (flagship experiment)
+  AppShell.jsx         — Lazy-loaded tool shell (7 tools)
+  lib/
+    nightShiftRouter.js — Fingerprint routing engine
+    cardoGuard.js       — Decision gate
+  hooks/
+    useChatHistory.js   — Persistent chat state
+    useSessionTracker.js— Session cost tracking
+    useThriftyMode.js   — Cheap-path toggle
+    useDomainHint.js    — Auto domain detection
+api/
+  cfai.js              — Domain prompt resolution + model routing
+  lib/logger.js        — Structured JSON logging
+data/
+  fingerprints.json    — 9-entry fingerprint catalog (pricing + routing)
+docs/
+  experiments/         — Lab reports
+  RESEARCH_INDEX.md    — Full experiment index
+  fortis-et-liber.md   — Engineering principles reference
+```
+
+## How to Run
+
+```
 npm install
-npm test
-npm run build
+npm test       # 95 tests, 13 suites
+npm run build  # 339 kB initial, 48 modules
+```
+
+---
+
+*PromptHound Labs — Applied AI Engineering*  
+*"How should AI-assisted work be done well?"*

@@ -31,7 +31,8 @@ Repository: https://github.com/aaronmarchant96-max/rei-ai-platform
 
 Current local state in this session:
 - Branch: `main`
-- Latest local commit: `eb0bf12` (`Update case study with Night Shift improvements`)
+- Test count: **72 tests, 12 suites** (all passing)
+- Build: `npm run build` produces `dist/`
 
 ## Main entry points
 
@@ -39,19 +40,22 @@ Current local state in this session:
 - `src/REI.jsx`: flagship REI reasoning experience
 - `src/CardoGuard.jsx`: CARDO GUARD UI and explanation rendering
 - `src/DebateFurnace.jsx`, `src/CreativeEngine.jsx`, `src/StormReplay.jsx`, `src/Tracepoint.jsx`: additional tools in the shell
-- `api/cfai.js`: backend route, prompt scaffolding, and routing integration
-- `src/lib/nightShiftRouter.js`: Night Shift routing logic and storage-backed preferences
+- `api/cfai.js`: backend route, **domain prompt resolution** (prompts live here, not in frontend), and Groq/OpenAI routing
+- `api/lib/logger.js`: structured JSON logger (debug/info/warn/error, controlled by `LOG_LEVEL`)
+- `src/lib/nightShiftRouter.js`: Night Shift routing logic, word-boundary matching, null-safe catalog lookups
 - `src/lib/cardoGuard.js`: deterministic cost/risk decision logic
 - `data/fingerprints.json`: routing catalog and model-selection metadata
 - `scripts/validate-app-shell.mjs`, `scripts/validate-inspiration-seeds.mjs`: local validation helpers
 
 ## Important architecture notes
 
-- The Night Shift router is explicit and deterministic. It routes before the model call using a fingerprint catalog and a small set of lexical heuristics.
-- The backend prompt scaffolding in `api/cfai.js` uses a hard-stop rule for underspecified requests. Instead of guessing, it asks for the missing context.
+- The Night Shift router is explicit and deterministic. It routes before the model call using a fingerprint catalog and small lexical heuristics. Catalog lookups return `null` on miss (no silent fallback). Lexical matching uses word boundaries — `"uncertain"` does not match `"uncertainty"`.
+- All four domain prompts (assistant, coding, genealogy, story) live in `api/cfai.js` under `DOMAIN_SYSTEM_PROMPTS`. The frontend sends only the domain ID. To change a prompt, edit `DOMAIN_SYSTEM_PROMPTS` in `api/cfai.js` — not in `src/REI.jsx`.
+- The backend prompt scaffolding in `api/cfai.js` uses a hard-stop rule for underspecified requests. Instead of guessing, it asks for the missing context. Retry logic handles transient Groq rate limits (429/5xx) with up to 2 retries.
 - CARDO GUARD evaluates whether acting is worth the cost by comparing expected action waste against expected miss loss, using confidence and false-alarm assumptions.
-- The app shell keeps the experience structured and reviewable rather than burying everything inside one chat flow.
-- The repo is built around testable behavior: routing, shell flow, and decision logic all have explicit checks.
+- The app shell keeps the experience structured and reviewable rather than burying everything inside one chat flow. REI persists chat history per domain in localStorage.
+- Error fallbacks categorize failures as "Network error" or "Server error" with a Retry button that restores the user's original input.
+- The repo is built around testable behavior: routing, shell flow, and decision logic all have explicit checks. CI pipeline (`.github/workflows/ci.yml`) runs tests and build on push/PR.
 
 ## Evidence and testing
 
@@ -66,9 +70,10 @@ Common commands:
 - `npm run dev:full` - run the local server and Vite dev server together
 
 Key test coverage areas:
-- `src/lib/nightShiftRouter.test.js` - routing decisions and fallback logic
-- `src/lib/cardoGuard.test.js` - core decision-gate logic
+- `src/lib/nightShiftRouter.test.js` - routing decisions, fallback logic, edge cases (empty input, null domain, keyword boundaries, stored preference)
+- `src/lib/cardoGuard.test.js` - core decision-gate logic, boundary bands, zero-cost edge cases
 - `src/CardoGuard.test.jsx` - UI rendering and confidence-band behavior
+- `api/cfai.test.js` - integration tests for domain prompt resolution, input validation, Groq retry, GET/POST routing
 
 ## Useful supporting docs
 

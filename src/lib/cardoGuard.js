@@ -32,6 +32,10 @@ export function getScenarioById(id) {
   return CARDO_GUARD_SCENARIOS.find((scenario) => scenario.id === id) || CARDO_GUARD_SCENARIOS[0];
 }
 
+/**
+ * @param {number} confidence
+ * @returns {number} false alarm rate between 0.09 and 0.57
+ */
 export function getSyntheticFalseAlarmRate(confidence) {
   const numericConfidence = Number(confidence);
 
@@ -42,6 +46,10 @@ export function getSyntheticFalseAlarmRate(confidence) {
   return 0.57;
 }
 
+/**
+ * @param {number} confidence
+ * @returns {"very high"|"high"|"moderate"|"low"|"very low"}
+ */
 export function getConfidenceBand(confidence) {
   const numericConfidence = Number(confidence);
 

@@ -331,6 +331,10 @@ button {
   overflow: auto;
 }
 
+.shell-loading {
+  min-height: 40vh;
+}
+
 .creative-engine,
 .panel-stack {
   max-width: 1200px;

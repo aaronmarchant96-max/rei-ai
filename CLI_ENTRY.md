@@ -18,11 +18,14 @@
 
 ## What is debate-furnace?
 
-REI.ai is a reasoning-first web app for structured decision support. It uses cost-aware routing (Night Shift), a deterministic decision gate (CARDO GUARD), and domain-specific reasoning modes.
+This is the experiment repository for **PromptHound Labs** — an applied AI engineering lab. The lab explores how AI-assisted work should be done well via structured reasoning, adaptive model routing, and evidence-aware workflows. Every experiment has a structured report (Question → Hypothesis → Implementation → Measurements → Results → Limitations → Next Iteration).
 
-- **Live:** https://debate-furnace.vercel.app/#rei
+The flagship experiment is **REI.ai**, a reasoning-first chat interface that applies the lab's methods in a live setting. It uses cost-aware routing (Night Shift), a deterministic decision gate (CARDO GUARD), and domain-specific reasoning modes.
+
+- **Lab portfolio:** https://debate-furnace.vercel.app
 - **Repo:** https://github.com/aaronmarchant96-max/rei-ai-platform
-- **Goal:** Build AI systems that are testable, reviewable, and cost-conscious
+- **Lab reports:** `docs/experiments/`
+- **Goal:** Build AI systems that are testable, reviewable, cost-conscious, and well-documented
 
 ---
 
@@ -30,10 +33,11 @@ REI.ai is a reasoning-first web app for structured decision support. It uses cos
 
 | File | Purpose |
 |------|---------|
-| `src/REI.jsx` | Main chat experience, personas, prompt scaffolding |
+| `src/REI.jsx` | Main chat experience, domain profiles, retry on fallback |
 | `src/AppShell.jsx` | App navigation and tool routing |
-| `api/cfai.js` | Backend route, request handling, source-aware behavior |
-| `src/lib/nightShiftRouter.js` | Cost-aware routing logic and fingerprints |
+| `api/cfai.js` | Backend route, **domain prompt resolution**, Groq/OpenAI routing |
+| `api/lib/logger.js` | Structured JSON logger |
+| `src/lib/nightShiftRouter.js` | Cost-aware routing, word-boundary matching, null-safe catalog |
 | `src/lib/cardoGuard.js` | Decision gate (confidence bands, cost analysis) |
 | `data/fingerprints.json` | Routing catalog (models, costs, quality gates) |
 
@@ -65,11 +69,14 @@ npm run build
 
 ### 4. Grep for Answers (0 tokens)
 ```bash
-# Find domain prompts
-rg "systemContext" src/REI.jsx
+# Find domain prompts (now in backend)
+rg "DOMAIN_SYSTEM_PROMPTS" api/cfai.js
 
 # Find routing rules
 rg "buildRouterDecision" src/
+
+# Find logger usage
+rg "logger\." api/
 ```
 
 ---
@@ -77,8 +84,8 @@ rg "buildRouterDecision" src/
 ## Common Tasks
 
 ### "I want to change the assistant prompt"
-**File:** `src/REI.jsx` line ~1083  
-**Pattern:** Edit the `systemContext` string directly  
+**File:** `api/cfai.js` → `DOMAIN_SYSTEM_PROMPTS`  
+**Pattern:** Edit the prompt string for `assistant` directly  
 **Verify:** `npm run lint && npm run build`
 
 ### "I want to understand the routing"

@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useMobile, useSwipe } from "./useMobile.js";
-import DebateFurnace from "./DebateFurnace.jsx";
-import CreativeEngine from "./CreativeEngine.jsx";
-import StormReplay from "./StormReplay.jsx";
-import CardoGuard from "./CardoGuard.jsx";
-import REI from "./REI.jsx";
-import Tracepoint from "./Tracepoint.jsx";
-import ToolsLanding from "./ToolsLanding.jsx";
+
+const ToolsLanding = lazy(() => import("./ToolsLanding.jsx"));
+const DebateFurnace = lazy(() => import("./DebateFurnace.jsx"));
+const CreativeEngine = lazy(() => import("./CreativeEngine.jsx"));
+const StormReplay = lazy(() => import("./StormReplay.jsx"));
+const CardoGuard = lazy(() => import("./CardoGuard.jsx"));
+const REI = lazy(() => import("./REI.jsx"));
+const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
 
 const TOP_LEVEL = [
   {
@@ -234,23 +235,25 @@ export default function AppShell() {
       ) : null}
 
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
-        {tool === "tools" ? (
-          <ToolsLanding onOpenTool={setTool} />
-        ) : tool === "story-forge" ? (
-          <CreativeEngine />
-        ) : tool === "storm-replay" ? (
-          <StormReplay />
-        ) : tool === "cardo-guard" ? (
-          <CardoGuard />
-        ) : tool === "rei" ? (
-          <REI />
-        ) : tool === "tracepoint" ? (
-          <Tracepoint />
-        ) : tool === "cfai" ? (
-          <REI />
-        ) : (
-          <DebateFurnace />
-        )}
+        <Suspense fallback={<div className="shell-loading" />}>
+          {tool === "tools" ? (
+            <ToolsLanding onOpenTool={setTool} />
+          ) : tool === "story-forge" ? (
+            <CreativeEngine />
+          ) : tool === "storm-replay" ? (
+            <StormReplay />
+          ) : tool === "cardo-guard" ? (
+            <CardoGuard />
+          ) : tool === "rei" ? (
+            <REI />
+          ) : tool === "tracepoint" ? (
+            <Tracepoint />
+          ) : tool === "cfai" ? (
+            <REI />
+          ) : (
+            <DebateFurnace />
+          )}
+        </Suspense>
       </main>
     </div>
   );

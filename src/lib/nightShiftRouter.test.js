@@ -74,4 +74,57 @@ describe("nightShiftRouter", () => {
     expect(decision.id).toBe("structured-reasoning");
     expect(decision.model).toBe("llama-3.3-70b-versatile");
   });
+
+  describe("edge cases", () => {
+    it("returns structured-reasoning for empty input", () => {
+      const decision = buildRouterDecision({ input: "", domain: "assistant" });
+      expect(decision.id).toBe("structured-reasoning");
+    });
+
+    it("handles missing input gracefully", () => {
+      const decision = buildRouterDecision({});
+      expect(decision.id).toBe("structured-reasoning");
+    });
+
+    it("handles null domain", () => {
+      const decision = buildRouterDecision({ input: "hello", domain: null });
+      expect(decision.id).toBe("simple-greeting");
+    });
+
+    it("routes genealogy by keyword even without domain match", () => {
+      const decision = buildRouterDecision({ input: "burial record for john smith", domain: "assistant" });
+      expect(decision.id).toBe("genealogy-deep-dive");
+    });
+
+    it("routes story by keyword", () => {
+      const decision = buildRouterDecision({ input: "outline a character arc for a reluctant hero", domain: "assistant" });
+      expect(decision.id).toBe("story-architect");
+    });
+
+    it("detects adversarial request via requiresAdversarial flag", () => {
+      const decision = buildRouterDecision({ input: "tell me a story", domain: "assistant", requiresAdversarial: true });
+      expect(decision.id).toBe("adversarial-validation");
+    });
+
+    it("does not match substrings in getHighStructureSignals", () => {
+      const decision = buildRouterDecision({ input: "uncertainty is not the same as uncertain", domain: "assistant" });
+      expect(decision.id).toBe("structured-reasoning");
+    });
+
+    it("persists route history and retrieves stored preference", () => {
+      window.localStorage.setItem("night-shift-user-fingerprint", JSON.stringify(["coding-hinge", "coding-hinge", "coding-hinge"]));
+      const decision = buildRouterDecision({ input: "help me review this module", domain: "assistant" });
+      expect(decision.id).toBe("coding-hinge");
+    });
+
+    it("respects domain override over keyword match", () => {
+      const decision = buildRouterDecision({ input: "what is the best plot twist", domain: "story" });
+      expect(decision.id).toBe("story-architect");
+    });
+
+    it("simple greeting does not route to Genealogy Deep Dive", () => {
+      const decision = buildRouterDecision({ input: "System initialized. REI is live.", domain: "assistant" });
+      expect(decision.id).not.toBe("genealogy-deep-dive");
+    });
+  });
 });

@@ -126,6 +126,67 @@ When fixing an error:
 ## Note for Agent Environments
 You have file and shell access — use it. Verify, don't assume, wherever a tool call can replace a guess.`;
 
+const DOMAIN_SYSTEM_PROMPTS = {
+  assistant: `You are REI, The Generalist: a distinct everyday reasoning model for ordinary conversation, judgment, and decision support. CARDO REI is the practice of finding the hinge of the problem—the exact turning point that changes the answer. For every non-greeting response, make the reasoning visible in a structured loop: first name the Hinge, then separate Facts from Assumptions, then add an Evaluation of how strong the case is, then explain what would change your mind, and finish with a concrete Move. Keep the tone warm but not bland, sharp but not hostile, and concrete rather than corporate. For LITERAL greetings ONLY (hello, hi, hey, hey there): respond with one warm sentence inviting a real topic. FOR ALL OTHER INPUTS: default to full CARDO REI structure. Never use casual one-word or one-line responses for actual queries. Quality Check: Before sending, verify your response contains at least one named Hinge plus either a Facts/Assumptions separation or a concrete Move. If not, re-structure using the reasoning loop.`,
+  coding: `You are REI.ai, a senior software engineer executing the CARDO REI methodology. CARDO REI is Latin for finding the hinge of the problem—the core turning point. Dissect codebases and requirements to locate the single point of pivot (the Hinge) before proposing any change. Default stance: write code that is obvious, testable, and boring; prefer clarity over cleverness; fix root causes, not symptoms. Keep functions single-responsibility, name things by intent, comment the why not the what.
+
+## Phase 0 — The Questioning Stance (runs before any code is written)
+Before producing code for any non-trivial request, silently answer these. If you cannot answer in 1-2 sentences each, stop and ask the user instead of writing code:
+1. What is the real problem (not the symptom being described)?
+2. Who uses this, and in what context?
+3. What are the failure modes — bad input, network failure, race conditions?
+4. What existing code does this touch? What's the dependency surface?
+5. Is there a simpler existing solution — reuse over rewrite?
+6. What are the non-functional constraints (perf, memory, bundle size, accessibility, privacy)?
+7. How will this be verified before it's considered done?
+
+Trigger condition: if 2+ of these are unanswerable from the request as given, your response is a clarifying question, not code.
+
+### HARD STOP RULE (Non-Negotiable)
+If you cannot answer 2+ Phase 0 questions, your response MUST follow this exact format:
+
+\`\`\`
+**STOP: Request underspecified**
+
+I cannot proceed without:
+
+1. [First unanswerable question]
+2. [Second unanswerable question]
+3. [Third unanswerable question] (if applicable)
+
+Please provide these details before I can generate any code.
+\`\`\`
+
+**FORBIDDEN:** No code snippets, no partial solutions, no hedging, no "simple version anyway".
+**ALLOWED:** Only the questions, only the STOP declaration, only the required details list.`,
+  genealogy: `You are REI.ai, a genealogical research assistant executing the CARDO REI evidence-evaluation methodology. CARDO REI is Latin for finding the hinge of the problem—the core turning point (such as a disputed parentage, a same-name disambiguation, or a key birth record). Dissect records to isolate this pivot. Tier every claim explicitly: 🟢 Primary Source, 🔵 Strong Evidence, 🟠 Needs Review, 🟡 Family Memory. State your tier and reasoning inline with each claim.
+
+Your reasoning is grounded in the Marchant Family Archive canonical profiles:
+1. **Charles Dyer**: Confirmed direct patriot ancestor. Honorably discharged September 25, 1778 after serving as a soldier in Captain William McKee's company of the 12th Virginia Regiment at Fort Randolph. Father of Jonathan Dyer (b. 1802). Disambiguation note: Not the William Dyer of the 15th Virginia (sick in Eastern Virginia).
+2. **William Moore**: Painter of Springwell Street, Ballymena, County Antrim. Married Isabella Law on March 29, 1846. Emigrated to Canada (Hull, Quebec) shortly after, then later to New York City by 1865. Father of James Moore (b. 1860) and Robert Harvey Moore.
+3. **Josiah Ramsey Sr.**: Born 1728 in Delaware Colony, died 1811 in Davidson, Tennessee. Confirmed North Carolina Militia Revolutionary War veteran with verified 1782 pay voucher. Married Alice Bower (1744, Delaware). Father of Josiah Ramsey Jr. (1769-1835).
+Dissect all queries regarding these lines against these verified facts. Do not allow oral family traditions or same-name duplicates to override these primary sources.`,
+  story: `You are REI.ai, a creative story architect using the CARDO REI narrative methodology. CARDO REI is Latin for finding the hinge of the story—the core turning point or character driver hinge (what each character actually wants and fears that pivots the arc). Dissect the narrative blueprint to isolate this hinge before expanding any outline. Speak with direct narrative clarity, avoid cliché tropes, and structure clear structural timelines.`,
+};
+
+function resolveSystemPrompt(systemPrompt, domain, domainLabel, domainRules) {
+  if (domain && DOMAIN_SYSTEM_PROMPTS[domain]) {
+    return DOMAIN_SYSTEM_PROMPTS[domain];
+  }
+  if (systemPrompt && DOMAIN_SYSTEM_PROMPTS[systemPrompt]) {
+    return DOMAIN_SYSTEM_PROMPTS[systemPrompt];
+  }
+  return systemPrompt || REI_SYSTEM_PROMPT;
+}
+
+function buildPromptWithContext(prompt, domainLabel, domainRules, recordBlock) {
+  const label = domainLabel || "REI.ai";
+  const rules = Array.isArray(domainRules) ? domainRules.join(", ") : "";
+  const record = recordBlock || "";
+  const userQuery = prompt;
+  return `Domain: ${label}\nRules: ${rules}${record}\n\nUser Query: ${userQuery}`;
+}
+
 function selectGroqModel(prompt = "", routerDecision = null) {
   const decision = routerDecision || buildRouterDecision({ input: prompt });
   return resolveRoutingModel(decision) || DEFAULT_MODEL || "llama-3.3-70b-versatile";
@@ -241,7 +302,8 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
         content = `[REI.AI ROUTING WARNING: OPENAI_API_KEY not found in Vercel. Falling back to Open-Source Router: ${selectedModel}]\n\n${content}`;
       }
 
-      return { content, model: selectedModel, routerDecision };
+      const usage = data.usage || null;
+      return { content, model: selectedModel, routerDecision, usage };
     }
 
     const errText = await response.text();
@@ -262,20 +324,24 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   };
 }
 
-async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null) {
+async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null, domain = "", domainLabel = "", domainRules = [], recordBlock = "") {
+  const resolvedPrompt = resolveSystemPrompt(systemPrompt, domain, domainLabel, domainRules);
+  const payload = input || (args.length > 0 ? args.join(" ") : "help");
+  const contextPayload = buildPromptWithContext(payload, domainLabel || domain, domainRules, recordBlock);
+
   // Check if CLI is available locally
   const localCliExists = CFAI_PATH && fs.existsSync(CFAI_PATH);
 
   if (!localCliExists) {
     try {
       // Fallback: execute direct Groq API routing
-      const payload = input || (args.length > 0 ? args.join(" ") : "help");
-      const response = await callGroqDirectly(payload, systemPrompt, history, routerDecision);
+      const response = await callGroqDirectly(contextPayload, resolvedPrompt, history, routerDecision);
       return {
         success: true,
         result: response.content,
         model: response.model,
         routerDecision: response.routerDecision || routerDecision,
+        usage: response.usage || null,
         timestamp: new Date().toISOString(),
       };
     } catch (apiError) {
@@ -303,6 +369,7 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
         success: true,
         result: stdout.trim(),
         warning: stderr.trim(),
+        routerDecision: routerDecision,
         timestamp: new Date().toISOString(),
       };
     }
@@ -313,12 +380,15 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
       return {
         success: true,
         result: resultText,
+        routerDecision: routerDecision,
+        model: routerDecision?.model || "cli",
         timestamp: new Date().toISOString(),
       };
   } catch (execError) {
     return {
       success: false,
       error: `Local execution error: ${execError.message}`,
+      routerDecision: routerDecision,
       timestamp: new Date().toISOString(),
     };
   }
@@ -330,7 +400,7 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "application/json");
 
     if (req.method === "POST") {
-      const { command, args = [], input = "", systemPrompt = "", history = [], routerDecision } = req.body || {};
+      const { command, args = [], input = "", systemPrompt = "", history = [], routerDecision, domain, domainLabel, domainRules, recordBlock } = req.body || {};
       
       // Backend length guard - never trust client-side validation alone
       if (typeof input === "string" && input.length > MAX_INPUT_CHARS) {
@@ -340,7 +410,7 @@ export default async function handler(req, res) {
         });
       }
       
-      const result = await handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision);
+      const result = await handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision, domain, domainLabel, domainRules, recordBlock);
       res.status(result.success ? 200 : 500).json(result);
       return;
     }
