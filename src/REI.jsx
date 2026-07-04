@@ -4,36 +4,16 @@ import { useChatHistory } from "./hooks/useChatHistory.js";
 import { useSessionTracker } from "./hooks/useSessionTracker.js";
 import { useThriftyMode } from "./hooks/useThriftyMode.js";
 import { useDomainHint } from "./hooks/useDomainHint.js";
-import { buildRouterDecision, estimateTokens, detectDomain, getRouterCosts } from "./lib/nightShiftRouter.js";
+import { buildRouterDecision, estimateTokens } from "./lib/nightShiftRouter.js";
 import { computeMsgCost, formatCostDisplay, estimateInputTokens, nextMessageId } from "./lib/contracts.js";
+import { getModelCostRate } from "./lib/costHelpers.js";
 import PhilosophyModal from "./components/PhilosophyModal.jsx";
 import SessionSummary from "./components/SessionSummary.jsx";
-import RouterBadge from "./components/RouterBadge.jsx";
-import RouterPanel from "./components/RouterPanel.jsx";
+import IngestPanel, { MAX_RECORD_CHARS, SOURCE_TYPES } from "./components/IngestPanel.jsx";
+import ChatMessage from "./components/ChatMessage.jsx";
 import { parseEvidenceTiers } from "./components/EvidenceCard.jsx";
+import { parseAssistantStyleReply } from "./lib/replyParser.js";
 import "./rei.css";
-
-const FINGERPRINT_COSTS = getRouterCosts();
-const DEFAULT_COST_MODEL = "llama-3.3-70b-versatile";
-const MODEL_COST_PER_1K = {
-  ...Object.fromEntries(
-    Object.entries(FINGERPRINT_COSTS).map(([model, costs]) => [
-      model,
-      (costs.costPer1kInput + costs.costPer1kOutput) / 2,
-    ])
-  ),
-  mock: 0,
-  "rate-limited": 0,
-};
-
-const MAX_RECORD_CHARS = 12000;
-
-const SOURCE_TYPES = [
-  { id: "ancestry", label: "Ancestry transcript" },
-  { id: "familysearch", label: "FamilySearch record" },
-  { id: "findagrave", label: "Find A Grave memorial" },
-  { id: "other", label: "Other / unspecified" },
-];
 
 const DOMAIN_PROFILES = [
   {
@@ -124,13 +104,8 @@ function buildDomainSystemMessage(domainId, currentDomain) {
 }
 
 function formatCost(totalTokens, model) {
-  const rate = MODEL_COST_PER_1K[model] || MODEL_COST_PER_1K[DEFAULT_COST_MODEL];
+  const rate = getModelCostRate(model);
   return formatCostDisplay(computeMsgCost(totalTokens, rate));
-}
-
-function getCostBadgeLabel(model, tokens) {
-  const cost = formatCost(tokens, model);
-  return `⚡ ${tokens} tok · ${cost}`;
 }
 
 const GENERALIST_PROMPTS = [
@@ -148,142 +123,6 @@ const REASONING_LOOP_STEPS = [
   { id: "change", label: "What changes it", detail: "What would flip the answer" },
   { id: "move", label: "Next move", detail: "Smallest useful step" },
 ];
-
-function parseAssistantStyleReply(text) {
-  if (text == null) text = "";
-  const sections = { Hinge: "", Facts: "", Assumptions: "", Evaluation: "", ChangeMind: "", Move: "", intro: "" };
-  const cleaned = text.replace(/\*\*/g, "").replace(/^\s*[-*]\s+/gm, "• ");
-  const lines = cleaned.split("\n").map((line) => line.trim()).filter(Boolean);
-  let current = "intro";
-  for (const rawLine of lines) {
-    const line = rawLine.replace(/^•\s*/, "");
-    const inlineMatch = line.match(/^(Hinge|Facts|Assumptions|Evaluation|Move|Next move|Next step|What would change my mind|What would change my mind\?):?\s*(.*)$/i);
-    if (inlineMatch) {
-      const normalized = inlineMatch[1].trim().toLowerCase();
-      const keyMap = {
-        hinge: "Hinge",
-        facts: "Facts",
-        assumptions: "Assumptions",
-        evaluation: "Evaluation",
-        move: "Move",
-        "next move": "Move",
-        "next step": "Move",
-        "what would change my mind": "ChangeMind",
-        "what would change my mind?": "ChangeMind",
-      };
-      const key = keyMap[normalized] || null;
-      const rest = inlineMatch[2].trim();
-      if (key) {
-        current = key;
-        if (rest) {
-          sections[key] = sections[key] ? `${sections[key]} ${rest}` : rest;
-        }
-        continue;
-      }
-    }
-    if (current === "intro") {
-      sections.intro = sections.intro ? `${sections.intro} ${line}` : line;
-    } else {
-      sections[current] = sections[current] ? `${sections[current]} ${line}` : line;
-    }
-  }
-  return sections;
-}
-
-// ── Ingest Panel Component ──
-function IngestPanel({ selectedDomain, rawRecordText, setRawRecordText, showIngest, setShowIngest, recordSourceType, setRecordSourceType }) {
-  if (selectedDomain !== "genealogy") return null;
-
-  const charCount = rawRecordText.length;
-  const overLimit = charCount > MAX_RECORD_CHARS;
-  const nearLimit = charCount > MAX_RECORD_CHARS * 0.85;
-
-  return (
-    <div style={{ width: "100%", marginBottom: "10px" }}>
-      <button
-        type="button"
-        onClick={() => setShowIngest((v) => !v)}
-        style={{
-          background: "rgba(251,146,60,0.08)",
-          border: "1px solid rgba(251,146,60,0.25)",
-          color: "#fdba74",
-          borderRadius: "8px",
-          padding: "8px 12px",
-          fontSize: "12.5px",
-          fontWeight: 600,
-          cursor: "pointer",
-          marginBottom: showIngest ? "8px" : "0",
-        }}
-      >
-        {showIngest ? "− Hide Record Ingest" : "+ Paste a Record (Ancestry / FamilySearch / Find A Grave)"}
-      </button>
-
-      {showIngest && (
-        <div>
-          <div style={{ display: "flex", gap: "6px", marginBottom: "8px", flexWrap: "wrap" }}>
-            {SOURCE_TYPES.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setRecordSourceType(s.id)}
-                style={{
-                  fontSize: "11px",
-                  padding: "5px 10px",
-                  borderRadius: "6px",
-                  border: recordSourceType === s.id
-                    ? "1px solid #f97316"
-                    : "1px solid rgba(255,255,255,0.1)",
-                  background: recordSourceType === s.id
-                    ? "rgba(249,115,22,0.18)"
-                    : "rgba(255,255,255,0.02)",
-                  color: recordSourceType === s.id ? "#fed7aa" : "#94a3b8",
-                  cursor: "pointer",
-                }}
-              >
-                {s.label}
-              </button>
-            ))}
-          </div>
-
-          <textarea
-            value={rawRecordText}
-            onChange={(e) => setRawRecordText(e.target.value)}
-            placeholder="Paste raw record text here — Ancestry transcript, FamilySearch page text, Find A Grave memorial details, census entry, etc. REI will evaluate and tier it as evidence alongside your question."
-            rows={6}
-            style={{
-              width: "100%",
-              background: "rgba(0,0,0,0.25)",
-              border: overLimit
-                ? "1px solid #ef4444"
-                : "1px solid rgba(251,146,60,0.2)",
-              borderRadius: "8px",
-              color: "#E2E8F0",
-              fontSize: "12.5px",
-              padding: "10px 12px",
-              fontFamily: "monospace",
-              resize: "vertical",
-            }}
-          />
-
-          {charCount > 0 && (
-            <div
-              style={{
-                fontSize: "11px",
-                marginTop: "4px",
-                color: overLimit ? "#f87171" : nearLimit ? "#fbbf24" : "#94a3b8",
-              }}
-            >
-              {charCount.toLocaleString()} / {MAX_RECORD_CHARS.toLocaleString()} characters
-              {overLimit && " — too long, trim before sending"}
-              {!overLimit && nearLimit && " — approaching limit"}
-              {!overLimit && !nearLimit && " — will attach to your next message, then clear"}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── HingeMark Logo Component ──
 function HingeMark({ size = 36, animated = false }) {
@@ -576,7 +415,7 @@ export default function REI() {
       const usage = data.usage || null;
       const responseModel = data.model || "Local cfai CLI Executable";
       const totalTokens = usage?.total_tokens || 0;
-      const modelRate = MODEL_COST_PER_1K[responseModel] || MODEL_COST_PER_1K[DEFAULT_COST_MODEL];
+      const modelRate = getModelCostRate(responseModel);
       const msgCost = computeMsgCost(totalTokens, modelRate);
 
       trackMessage(totalTokens, responseModel, msgCost);
@@ -667,7 +506,7 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
                 className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
               >
                 <span>{dom.label}</span>
-                <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
+                <span className="rei-domain-tab__sub">
                   {dom.id === "assistant" ? "Everyday reasoning" :
                    dom.id === "coding" ? "Senior coding logic" :
                    dom.id === "genealogy" ? "Evidence-tiered genealogy" :
@@ -754,54 +593,26 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
 
         {/* Domain Hint Banner — detects input mismatch */}
         {domainHint && (
-          <div className="rei-domain-hint" style={{
-            margin: "8px 12px",
-            padding: "8px 12px",
-            borderRadius: "8px",
-            background: "rgba(251,191,36,0.12)",
-            border: "1px solid rgba(251,191,36,0.25)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "8px",
-            fontSize: "13px",
-            color: "#fbbf24",
-          }}>
+          <div className="rei-domain-hint">
             <span>
               This looks like a <strong>{domainHint}</strong> question.
               Switch to{' '}
               <strong>{DOMAIN_PROFILES.find(d => d.id === domainHint)?.label || domainHint}</strong>?
             </span>
-            <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+            <div className="rei-domain-hint__actions">
               <button
                 type="button"
                 onClick={() => {
                   setSelectedDomain(switchDomain(domainHint));
                 }}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: "4px",
-                  border: "none",
-                  background: "rgba(251,191,36,0.3)",
-                  color: "#fbbf24",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
+                className="rei-domain-hint__switch-btn"
               >
                 Switch
               </button>
               <button
                 type="button"
                 onClick={dismissDomainHint}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: "4px",
-                  border: "none",
-                  background: "transparent",
-                  color: "#94a3b8",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
+                className="rei-domain-hint__dismiss-btn"
               >
                 Dismiss
               </button>
@@ -815,127 +626,19 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
           {/* Chat History Area */}
           <div className="rei-chat-history" role="log" aria-live="polite" aria-label="Chat messages">
             {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`rei-chat-message ${msg.sender === "user" ? "rei-chat-message--user" : "rei-chat-message--rei"}`}
-                style={{
-                  maxWidth: "95%",
-                  width: "100%"
-                }}
-                onAnimationEnd={(e) => {
-                  e.currentTarget.style.opacity = "1";
-                }}
-              >
-                {msg.sender === "user" && msg.attachedRecord && (
-                  <div style={{
-                    fontSize: "10.5px",
-                    color: "#fdba74",
-                    marginBottom: "4px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px",
-                  }}>
-                    📋 Record attached — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
-                  </div>
-                )}
-                {msg.sender === "rei" && (
-                  <RouterBadge
-                    routerDecision={msg.routerDecision}
-                    usage={msg.usage}
-                  />
-                )}
-                <div
-                  className={`rei-chat-bubble ${msg.sender === "user" ? "rei-chat-bubble--user" : "rei-chat-bubble--rei"}`}
-                  style={{
-                    padding: "10px 60px 10px 14px"
-                  }}
-                >
-                  {selectedDomain === "assistant" && msg.sender === "rei" && !msg.fallback ? (
-                    (() => {
-                      const sections = parseAssistantStyleReply(msg.text);
-                      const sectionOrder = [
-                        { key: "Hinge", label: "Hinge" },
-                        { key: "Facts", label: "Facts" },
-                        { key: "Assumptions", label: "Assumptions" },
-                        { key: "Evaluation", label: "Evaluation" },
-                        { key: "ChangeMind", label: "What would change my mind" },
-                        { key: "Move", label: "Move" },
-                      ];
-                      const visibleSections = sectionOrder.filter(({ key }) => sections[key] && sections[key].trim());
-                      return sections.intro || visibleSections.length > 0 ? (
-                        <div style={{ display: "grid", gap: "10px" }}>
-                          {sections.intro && <div>{sections.intro}</div>}
-                          {visibleSections.map(({ key, label }) => (
-                            <div key={key}>
-                              <div style={{ color: "#fb923c", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>{label}</div>
-                              <div>{sections[key]}</div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div>{msg.text}</div>
-                      );
-                    })()
-                  ) : (
-                    msg.text
-                  )}
-
-                  {/* Router summary */}
-                  <RouterPanel
-                    routerDecision={msg.routerDecision}
-                    model={msg.model}
-                  />
-                  <button
-                    onClick={() => copyText(msg.text)}
-                    className="rei-copy-btn touch-target"
-                    aria-label="Copy message"
-                    style={{
-                      fontSize: mobile ? "0.85em" : "0.75em",
-                      padding: mobile ? "6px 10px" : "2px 6px"
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                    onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-                    title="Copy message"
-                  >
-                    Copy
-                  </button>
-                  {msg.fallback && (
-                    <button
-                      onClick={() => retryMessage(index)}
-                      className="rei-copy-btn touch-target"
-                      aria-label="Retry request"
-                      style={{
-                        fontSize: mobile ? "0.85em" : "0.75em",
-                        padding: mobile ? "6px 10px" : "2px 6px",
-                        background: "rgba(251,191,36,0.15)",
-                        borderColor: "rgba(251,191,36,0.3)",
-                        color: "#fbbf24"
-                      }}
-                      onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                      onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-                      title="Retry request"
-                    >
-                      Retry
-                    </button>
-                  )}
-                </div>
-                <span className="rei-chat-meta">
-                  {msg.sender === "user" ? "You" : "REI.ai"} • {msg.timestamp}
-                </span>
-              </div>
+              <ChatMessage
+                key={msg.id || index}
+                msg={msg}
+                index={index}
+                selectedDomain={selectedDomain}
+                mobile={mobile}
+                onCopy={copyText}
+                onRetry={retryMessage}
+              />
             ))}
 
             {isTyping && (
-              <div aria-live="polite" aria-label="REI is replying" style={{ 
-                alignSelf: "flex-start", 
-                color: "#FFB300", 
-                fontFamily: "inherit",
-                fontSize: "1.02em",
-                animation: "pulse 1.5s ease-in-out infinite",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px"
-              }}>
+              <div className="rei-typing-indicator" aria-live="polite" aria-label="REI is replying">
                 <span>●</span>
                 <span>REI is shaping the reply...</span>
               </div>

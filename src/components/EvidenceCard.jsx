@@ -35,11 +35,13 @@ export function parseEvidenceTiers(text) {
         claim: match[1].trim(),
         tier: pattern.tier,
         label: pattern.label,
+        index: match.index,
       });
     }
   }
 
-  return results;
+  results.sort((a, b) => a.index - b.index);
+  return results.map(({ claim, tier, label }) => ({ claim, tier, label }));
 }
 
 /**
