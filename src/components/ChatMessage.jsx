@@ -1,67 +1,88 @@
-import RouterBadge from "./RouterBadge.jsx";
 import RouterPanel from "./RouterPanel.jsx";
 import EvidenceCard from "./EvidenceCard.jsx";
 import { parseAssistantStyleReply } from "../lib/replyParser.js";
+
+function StructuredReply({ text }) {
+  const sections = parseAssistantStyleReply(text);
+  const sectionOrder = [
+    { key: "Hinge", label: "Hinge" },
+    { key: "Facts", label: "Facts" },
+    { key: "Assumptions", label: "Assumptions" },
+    { key: "Evaluation", label: "Evaluation" },
+    { key: "ChangeMind", label: "What would change my mind" },
+    { key: "Move", label: "Move" },
+  ];
+  const visible = sectionOrder.filter(({ key }) => sections[key]?.trim());
+  if (!sections.intro && visible.length === 0) return <>{text}</>;
+  return (
+    <div style={{ display: "grid", gap: "10px" }}>
+      {sections.intro && <div>{sections.intro}</div>}
+      {visible.map(({ key, label }) => (
+        <div key={key}>
+          <div className="rei-section-label">{label}</div>
+          <div>{sections[key]}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function RouterSummary({ routerDecision, model }) {
+  if (!routerDecision) return null;
+  const savings = (routerDecision.premiumCost || 0) - (routerDecision.estimatedCost || 0);
+  const savingsPct = routerDecision.premiumCost > 0
+    ? Math.round((savings / routerDecision.premiumCost) * 100)
+    : 100;
+  return (
+    <div className="rei-chat-msg__router">
+      <span className="rei-chat-msg__router-pathway">
+        {routerDecision.pathway === "deterministic" ? "⚡" : "🌙"}
+        {" "}{routerDecision.label} &middot; {model || routerDecision.model}
+      </span>
+      {savings > 0 && (
+        <span className="rei-chat-msg__router-savings">
+          {savingsPct}% saved vs premium
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function ChatMessage({
   msg,
   index,
   selectedDomain,
-  mobile,
   onCopy,
   onRetry,
 }) {
+  const isRei = msg.sender === "rei";
+  const isUser = msg.sender === "user";
+  const avatar = isRei ? "R" : "U";
+
   return (
     <div
       key={msg.id || index}
-      className={`rei-chat-message ${msg.sender === "user" ? "rei-chat-message--user" : "rei-chat-message--rei"}`}
-      style={{ maxWidth: "95%", width: "100%" }}
+      className={`rei-chat-msg ${isUser ? "rei-chat-msg--user" : "rei-chat-msg--rei"}`}
       onAnimationEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
-      {msg.sender === "user" && msg.attachedRecord && (
-        <div className="rei-record-attached">
-          &#x1F4CB; Record attached — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
-        </div>
-      )}
-      {msg.sender === "rei" && (
-        <RouterBadge
-          routerDecision={msg.routerDecision}
-          usage={msg.usage}
-        />
-      )}
-      <div
-        className={`rei-chat-bubble ${msg.sender === "user" ? "rei-chat-bubble--user" : "rei-chat-bubble--rei"}`}
-        style={{ padding: "10px 60px 10px 14px" }}
-      >
-        {selectedDomain === "assistant" && msg.sender === "rei" && !msg.fallback ? (
-          (() => {
-            const sections = parseAssistantStyleReply(msg.text);
-            const sectionOrder = [
-              { key: "Hinge", label: "Hinge" },
-              { key: "Facts", label: "Facts" },
-              { key: "Assumptions", label: "Assumptions" },
-              { key: "Evaluation", label: "Evaluation" },
-              { key: "ChangeMind", label: "What would change my mind" },
-              { key: "Move", label: "Move" },
-            ];
-            const visibleSections = sectionOrder.filter(({ key }) => sections[key] && sections[key].trim());
-            return sections.intro || visibleSections.length > 0 ? (
-              <div style={{ display: "grid", gap: "10px" }}>
-                {sections.intro && <div>{sections.intro}</div>}
-                {visibleSections.map(({ key, label }) => (
-                  <div key={key}>
-                    <div className="rei-section-label">{label}</div>
-                    <div>{sections[key]}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div>{msg.text}</div>
-            );
-          })()
-        ) : (
-          msg.text
+      <div className="rei-chat-msg__sender">
+        <span className={`rei-chat-msg__avatar ${isRei ? "rei-chat-msg__avatar--rei" : "rei-chat-msg__avatar--user"}`}>
+          {avatar}
+        </span>
+        {isRei ? "REI" : "You"} &bull; {msg.timestamp}
+      </div>
+
+      <div className={`rei-chat-msg__bubble ${isUser ? "rei-chat-msg__bubble--user" : "rei-chat-msg__bubble--rei"}`}>
+        {isRei && msg.attachedRecord && (
+          <div className="rei-record-attached">
+            📋 Record attached &mdash; {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
+          </div>
         )}
+
+        {isRei && selectedDomain === "assistant" && !msg.fallback
+          ? <StructuredReply text={msg.text} />
+          : msg.text
+        }
 
         {msg.evidence && msg.evidence.length > 0 && (
           <div className="rei-evidence-cards" role="list" aria-label="Evidence tiers">
@@ -71,46 +92,25 @@ export default function ChatMessage({
           </div>
         )}
 
-        <RouterPanel
-          routerDecision={msg.routerDecision}
-          model={msg.model}
-        />
+        {isRei && <RouterSummary routerDecision={msg.routerDecision} model={msg.model} />}
+      </div>
 
+      {isRei && <RouterPanel routerDecision={msg.routerDecision} model={msg.model} />}
+
+      <div className="rei-chat-msg__actions">
         <button
           onClick={() => onCopy(msg.text)}
-          className="rei-copy-btn touch-target"
-          aria-label="Copy message"
-          style={{
-            fontSize: mobile ? "0.85em" : "0.75em",
-            padding: mobile ? "6px 10px" : "2px 6px"
-          }}
-          onMouseOver={(e) => { e.currentTarget.style.opacity = "1"; }}
-          onMouseOut={(e) => { e.currentTarget.style.opacity = "0.7"; }}
-          title="Copy message"
-        >
-          Copy
-        </button>
-
+          aria-label="Copy"
+          title="Copy"
+        >📋</button>
         {msg.fallback && (
           <button
             onClick={() => onRetry(index)}
-            className="rei-copy-btn touch-target rei-retry-btn"
-            aria-label="Retry request"
-            style={{
-              fontSize: mobile ? "0.85em" : "0.75em",
-              padding: mobile ? "6px 10px" : "2px 6px",
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.opacity = "1"; }}
-            onMouseOut={(e) => { e.currentTarget.style.opacity = "0.7"; }}
-            title="Retry request"
-          >
-            Retry
-          </button>
+            aria-label="Retry"
+            title="Retry"
+          >↻</button>
         )}
       </div>
-      <span className="rei-chat-meta">
-        {msg.sender === "user" ? "You" : "REI.ai"} &bull; {msg.timestamp}
-      </span>
     </div>
   );
 }

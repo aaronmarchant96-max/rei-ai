@@ -587,7 +587,6 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
                 msg={msg}
                 index={index}
                 selectedDomain={selectedDomain}
-                mobile={mobile}
                 onCopy={copyText}
                 onRetry={retryMessage}
               />

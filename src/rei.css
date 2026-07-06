@@ -285,59 +285,172 @@ code, pre, .rei-code {
   line-height: 1.35;
 }
 
-/* ─── Chat container ─── */
+/* ─── Chat messages ─── */
 .rei-chat-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--rei-space-12);
+  padding: 0 var(--rei-space-16);
 }
+
 .rei-chat-history {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-bottom: 8px;
+  gap: var(--rei-space-16);
+  padding-bottom: var(--rei-space-8);
 }
-.rei-chat-message {
+
+.rei-chat-msg {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  animation: fadeIn 0.3s ease-in-out forwards;
+  gap: var(--rei-space-8);
+  max-width: 75%;
+  animation: fadeIn 0.25s ease-out forwards;
   opacity: 0;
 }
-.rei-chat-message--user {
+
+.rei-chat-msg--user {
+  align-self: flex-end;
   align-items: flex-end;
+  max-width: 60%;
 }
-.rei-chat-message--rei {
+
+.rei-chat-msg--rei {
+  align-self: flex-start;
   align-items: flex-start;
+  max-width: 75%;
 }
-.rei-chat-bubble {
-  border-radius: 8px;
-  padding: 12px 14px;
+
+.rei-chat-msg__sender {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--rei-text-muted);
+}
+
+.rei-chat-msg__avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rei-chat-msg__avatar--rei {
+  background: var(--rei-accent);
+  color: #09090b;
+}
+
+.rei-chat-msg__avatar--user {
+  background: rgba(255,255,255,0.08);
+  color: var(--rei-text-secondary);
+}
+
+.rei-chat-msg__bubble {
+  padding: var(--rei-space-12) var(--rei-space-16);
+  border-radius: var(--rei-radius);
   font-family: inherit;
   font-size: 14px;
-  white-space: pre-wrap;
-  line-height: 1.5;
+  line-height: 1.55;
+  color: var(--rei-text);
   position: relative;
-  width: 100%;
-  box-sizing: border-box;
-  word-break: break-word;
 }
-.rei-chat-bubble--user {
-  background: rgba(214,176,76,0.06);
-  color: #E2E8F0;
-  border: 1px solid rgba(214,176,76,0.1);
-  border-right: 2px solid rgba(214,176,76,0.2);
+
+.rei-chat-msg__bubble--rei {
+  background: var(--rei-surface-raised);
+  border: 1px solid var(--rei-border);
+  border-radius: var(--rei-radius) var(--rei-radius) var(--rei-radius) 4px;
 }
-.rei-chat-bubble--rei {
-  background: rgba(255,255,255,0.03);
-  color: #E2E8F0;
-  border: 1px solid rgba(255,255,255,0.06);
+
+.rei-chat-msg__bubble--user {
+  background: var(--rei-accent-dim);
+  border: 1px solid var(--rei-accent-glow);
+  border-radius: var(--rei-radius) var(--rei-radius) 4px var(--rei-radius);
 }
+
+/* ─── Structured reply sections ─── */
+.rei-section-label {
+  color: var(--rei-accent);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+/* ─── Message actions (copy/retry) — hidden until hover ─── */
+.rei-chat-msg__actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  margin-top: var(--rei-space-8);
+}
+
+.rei-chat-msg:hover .rei-chat-msg__actions {
+  opacity: 1;
+}
+
+.rei-chat-msg:hover .rei-chat-msg__router {
+  opacity: 1;
+}
+
+.rei-chat-msg__actions button {
+  background: none;
+  border: 1px solid var(--rei-border);
+  border-radius: 4px;
+  color: var(--rei-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 3px 6px;
+  min-width: 32px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.rei-chat-msg__actions button:hover {
+  border-color: var(--rei-accent);
+  color: var(--rei-accent);
+  background: var(--rei-accent-dim);
+}
+
+/* ─── Router summary (hover) ─── */
+.rei-chat-msg__router {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--rei-border);
+  font-size: 10px;
+  color: var(--rei-text-muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.rei-chat-msg__router-pathway {
+  font-weight: 500;
+  color: var(--rei-text-secondary);
+}
+
+.rei-chat-msg__router-savings {
+  color: var(--rei-success);
+  font-weight: 500;
+}
+
 .rei-chat-meta {
-  font-size: 0.78em;
-  color: #94A3B8;
-  margin-top: 4px;
+  display: none;
 }
+
+/* ─── Keep old classes for router components ─── */
 
 /* ─── Router badge / panel ─── */
 .rei-router-badge {
