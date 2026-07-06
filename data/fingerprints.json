@@ -11,7 +11,7 @@
     "qualityGate": "Single sentence + invitation",
     "enforce": null,
     "description": "Fast, cheap responses for greetings and light warm-up context.",
-    "matchTerms": ["hi", "hello", "hey", "yo", "good morning", "good afternoon", "good evening", "hiya", "sup", "howdy"],
+    "matchTerms": ["hi", "hello", "hey", "yo", "good morning", "good afternoon", "good evening", "hiya", "sup", "howdy", "heya", "hola", "how are you", "how's it going", "what's up", "how are things", "thanks", "thank you", "ok", "okay", "yeah", "yep", "right", "sure", "alright", "fine", "test", "ping"],
     "negativeMatchTerms": [],
     "temperature": 0.9,
     "fallbackPriority": null,

@@ -387,6 +387,29 @@ export default function REI() {
         thrifty: thriftyMode,
       });
 
+      if (routerDecision.deterministicLayer) {
+        trackMessage(0, "deterministic", 0);
+
+        setMessages((prev) => [
+          ...prev,
+          userMsg,
+          {
+            id: nextMessageId(),
+            sender: "rei",
+            text: routerDecision.deterministicResponse,
+            timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+            usage: { total_tokens: 0 },
+            model: "deterministic",
+            cost: 0,
+            routerDecision,
+          }
+        ]);
+
+        setIsTyping(false);
+        setInputMessage("");
+        return;
+      }
+
       // Call route handler API with domain-specific context
       const response = await fetch('/api/cfai', {
         method: 'POST',

@@ -1,4 +1,5 @@
 import fingerprintCatalog from "../../data/fingerprints.json" with { type: "json" };
+import { resolveDeterministic } from "./deterministicEngine.js";
 
 const ROUTER_CATALOG = Array.isArray(fingerprintCatalog) ? fingerprintCatalog : [];
 const STORAGE_KEY = "night-shift-user-fingerprint";
@@ -214,7 +215,7 @@ function buildDecision(id, overrides = {}) {
 }
 
 function isSimpleGreeting(text) {
-  return /^(hi|hello|hey|yo|hiya|good (morning|afternoon|evening))([\s!.?]|$)/i.test(text.trim());
+  return /^(hi|hello|hey|yo|hiya|sup|howdy|heya|hola|good\s+(morning|afternoon|evening)|how\s+are\s+(you|things|it\s+going)|how('s|s)\s+(it\s+going|everything|life)|what('s|s)\s+up|thanks|thank\s+you|thx|ty|ok|okay|k+|yeah|yep|nope|sure|right|alright|fine|test|ping|appreciate\s+(it|that|you))([\s!,.]|$)/i.test(text.trim());
 }
 
 function isLikelyCodingRequest(text) {
@@ -357,8 +358,26 @@ export function buildRouterDecision({
 
   let decision;
 
+  const deterministicResult = text ? resolveDeterministic(text) : null;
+
   if (!text) {
     decision = buildDecision("structured-reasoning");
+  } else if (deterministicResult) {
+    decision = buildDecision("simple-greeting", {
+      rationale: "Greeting or smalltalk detected; routed through Layer 0 deterministic engine. No API call required.",
+      costPer1kInput: 0,
+      costPer1kOutput: 0,
+      maxTokens: 0,
+      model: "deterministic",
+      deterministicLayer: true,
+      deterministicResponse: deterministicResult.response,
+      routingSignals: {
+        complexityTier: "low",
+        matchedTerms: [],
+        highStructureSignals,
+        storedPreference,
+      },
+    });
   } else if (isSimpleGreeting(text)) {
     decision = buildDecision("simple-greeting", {
       rationale: "Greeting detected; use the cheapest fast path.",
