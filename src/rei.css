@@ -1032,87 +1032,82 @@ code, pre, .rei-code {
 }
 
 /* ─── Responsive ─── */
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   .rei-header {
-    padding: 8px 10px;
-    gap: 6px;
-  }
-
-  .rei-logo-mark {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+    padding: 0 var(--rei-space-8);
+    height: 44px;
+    min-height: 44px;
   }
 
   .rei-logo-title {
-    font-size: 14px;
-  }
-
-  .rei-logo-sub {
-    display: none;
+    font-size: 13px;
   }
 
   .rei-domain-tab {
-    padding: 4px 8px;
-    font-size: 11px;
-  }
-
-  .rei-action-btn {
     padding: 3px 6px;
     font-size: 10px;
   }
 
-  .rei-chat-bubble {
+  .rei-domain-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rei-chat-msg {
+    max-width: 90%;
+  }
+  .rei-chat-msg--user {
+    max-width: 80%;
+  }
+
+  .rei-chat-msg__bubble {
     font-size: 13px;
-    padding: 10px 12px;
+    padding: var(--rei-space-8) var(--rei-space-12);
   }
 
   .rei-input-shell {
-    padding: 8px 10px;
+    padding: var(--rei-space-8);
   }
 
   .rei-input-area {
-    font-size: 14px;
-    padding: 10px 12px;
+    font-size: 13px;
+    padding: var(--rei-space-8) var(--rei-space-12);
+    min-height: 36px;
   }
 
   .rei-touch-button {
+    padding: 0 14px;
+    font-size: 13px;
     min-width: 40px;
-    font-size: 14px;
-    padding: 10px 14px;
   }
 
   .rei-quick-prompt {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  .rei-domain-banner {
+    padding: 6px 10px;
     font-size: 11px;
-    padding: 4px 10px;
   }
 
-  .rei-chat-history {
-    gap: 8px;
-  }
-
-  .rei-chat-meta {
-    font-size: 0.7em;
-  }
-
-  .rei-copy-btn {
-    font-size: 0.65em;
-    min-width: 36px;
-    min-height: 36px;
-    top: 4px;
-    right: 4px;
+  .rei-chat-msg__sender {
+    font-size: 10px;
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 720px) {
   .rei-shell {
-    max-width: 1200px;
+    max-width: 720px;
     margin: 0 auto;
+    border-left: 1px solid var(--rei-border);
+    border-right: 1px solid var(--rei-border);
+  }
+
+  .rei-input-shell {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rei-shell {
+    max-width: 860px;
   }
 }
 
