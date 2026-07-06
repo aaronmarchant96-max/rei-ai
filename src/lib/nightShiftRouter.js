@@ -240,7 +240,7 @@ function isLikelyStoryRequest(text) {
 }
 
 function isAdversarialRequest(text) {
-  return /\b(red[- ]?team|adversarial|stress test|attack|challenge|prove.*wrong|counterargument|break it|stress-test|break.*argument|find.*flaw|poke holes)\b/i.test(text);
+  return /\b(red[- ]?team|adversarial|stress test|attack|challenge|prove\b.*\bwrong|counterargument|break it|stress-test|break\b.*\bargument|find\b.*\bflaw|poke\s+holes)\b/i.test(text);
 }
 
 function getComplexityTier(text) {
@@ -367,7 +367,6 @@ export function buildRouterDecision({
   let decision;
 
   const deterministicResult = input ? resolveDeterministic(input) : null;
-  const routingConfidence = catalogRoute?.score || null;
 
   if (!text) {
     decision = buildDecision("structured-reasoning");
@@ -491,7 +490,11 @@ export function buildRouterDecision({
   const selectedCostPer1k = (decision.costPer1kInput + decision.costPer1kOutput);
   decision.estimatedInputTokens = estimatedInputTokens;
   decision.alternativeRoutes = buildAlternativeRoutes(text, selectedCostPer1k);
-  decision.routingConfidence = decision.deterministicLayer ? 1.0 : Math.min(routingConfidence || 0, 1.0);
+  const catalogMatchId = catalogRoute?.entry?.id;
+  const catalogConfidence = (catalogMatchId && catalogMatchId === decision.id)
+    ? Math.min(catalogRoute.score || 0, 1.0)
+    : 0;
+  decision.routingConfidence = decision.deterministicLayer ? 1.0 : catalogConfidence;
 
   const premiumEntry = ROUTER_CATALOG.find((e) => e.id === "adversarial-validation");
   const premiumCostPer1k = premiumEntry

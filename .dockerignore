@@ -6,6 +6,7 @@ coverage
 *.md
 !README.md
 .DS_Store
+.env
 .env.local
 *.backup.*
 .patches/

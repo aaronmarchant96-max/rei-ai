@@ -10,7 +10,7 @@
  * savings %, and rationale for every routing decision.
  */
 
-import { buildRouterDecision, detectDomain } from "../src/lib/nightShiftRouter.js";
+import { buildRouterDecision } from "../src/lib/nightShiftRouter.js";
 
 const DEMO_PROMPTS = [
   {
