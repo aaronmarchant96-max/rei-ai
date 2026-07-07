@@ -57,7 +57,6 @@ export default function ChatMessage({
 }) {
   const isRei = msg.sender === "rei";
   const isUser = msg.sender === "user";
-  const avatar = isRei ? "R" : "U";
 
   return (
     <div
@@ -65,15 +64,23 @@ export default function ChatMessage({
       className={`rei-chat-msg ${isUser ? "rei-chat-msg--user" : "rei-chat-msg--rei"}`}
       onAnimationEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
-      <div className="rei-chat-msg__sender">
-        <span className={`rei-chat-msg__avatar ${isRei ? "rei-chat-msg__avatar--rei" : "rei-chat-msg__avatar--user"}`}>
-          {avatar}
-        </span>
-        {isRei ? "REI" : "You"} &bull; {msg.timestamp}
+      <div className={`rei-chat-msg__sender ${isUser ? "rei-chat-msg__sender--user" : ""}`}>
+        {isRei && (
+          <>
+            <span className="rei-chat-msg__avatar rei-chat-msg__avatar--rei">R</span>
+            REI &bull; {msg.timestamp}
+          </>
+        )}
+        {isUser && (
+          <>
+            {msg.timestamp} &bull; You
+            <span className="rei-chat-msg__avatar rei-chat-msg__avatar--user">Y</span>
+          </>
+        )}
       </div>
 
       <div className={`rei-chat-msg__bubble ${isUser ? "rei-chat-msg__bubble--user" : "rei-chat-msg__bubble--rei"}`}>
-        {isRei && msg.attachedRecord && (
+        {isUser && msg.attachedRecord && (
           <div className="rei-record-attached">
             📋 Record attached &mdash; {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
           </div>
