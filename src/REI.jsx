@@ -12,6 +12,7 @@ import SessionSummary from "./components/SessionSummary.jsx";
 import IngestPanel, { MAX_RECORD_CHARS, SOURCE_TYPES } from "./components/IngestPanel.jsx";
 import ChatMessage from "./components/ChatMessage.jsx";
 import ContextPanel from "./components/ContextPanel.jsx";
+import InstrumentRail from "./components/InstrumentRail.jsx";
 import { parseEvidenceTiers } from "./components/EvidenceCard.jsx";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
 import "./rei.css";
@@ -612,6 +613,16 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
           </div>
         </div>
         </main>
+
+        <InstrumentRail
+          sessionTokens={sessionTokens}
+          sessionMessages={sessionMessages}
+          sessionCost={sessionCost}
+          savingsVsPremium={savingsVsPremium}
+          escalationCount={escalationCount}
+          modelBreakdown={modelBreakdown}
+          formatCost={formatCost}
+        />
 
         <SessionSummary
           sessionTokens={sessionTokens}

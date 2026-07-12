@@ -12,7 +12,7 @@
   --rei-accent-glow: rgba(240,199,94,0.20);
   --rei-success: #4ade80;
   --rei-danger: #f87171;
-  --rei-radius: 12px;
+  --rei-radius: 2px;
   --rei-space-8: 8px;
   --rei-space-12: 12px;
   --rei-space-16: 16px;
@@ -87,13 +87,54 @@ code, pre, .rei-code {
 
 /* ─── Shell ─── */
 .rei-shell {
-  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 48px 1fr auto auto;
   height: 100dvh;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
   background: var(--rei-bg);
   max-width: 100%;
+}
+
+@media (min-width: 720px) {
+  .rei-shell {
+    grid-template-columns: 1fr 280px;
+    grid-template-rows: 48px 1fr auto auto;
+  }
+
+  .rei-header {
+    grid-column: 1 / -1;
+  }
+
+  .rei-main-content {
+    grid-column: 1;
+  }
+
+  .rei-instrument-rail {
+    display: flex;
+    grid-column: 2;
+    grid-row: 2 / 4;
+  }
+
+  .rei-session-footer {
+    grid-column: 1;
+  }
+
+  .rei-input-shell {
+    grid-column: 1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .rei-shell {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .rei-shell {
+    grid-template-columns: 1fr 360px;
+  }
 }
 
 /* ─── Header / branding ─── */
@@ -1093,6 +1134,12 @@ code, pre, .rei-code {
 
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
+  .rei-shell {
+    display: flex;
+    grid-template-columns: none;
+    grid-template-rows: none;
+  }
+
   .rei-header {
     padding: 0 var(--rei-space-8);
     height: 44px;
@@ -1152,22 +1199,40 @@ code, pre, .rei-code {
 }
 
 @media (min-width: 720px) {
-  .rei-shell {
-    max-width: 720px;
-    margin: 0 auto;
-    border-left: 1px solid var(--rei-border);
-    border-right: 1px solid var(--rei-border);
+  .rei-chat-container {
+    padding: 0 var(--rei-space-24);
+  }
+
+  .rei-chat-msg {
+    max-width: 85%;
+  }
+
+  .rei-chat-msg--user {
+    max-width: 65%;
+  }
+
+  .rei-header {
+    grid-column: 1 / -1;
   }
 
   .rei-input-shell {
-    max-width: 720px;
-    margin: 0 auto;
+    grid-column: 1;
+  }
+
+  .rei-session-footer {
+    grid-column: 1;
   }
 }
 
 @media (min-width: 1024px) {
+  .rei-chat-msg {
+    max-width: 75%;
+  }
+}
+
+@media (min-width: 1200px) {
   .rei-shell {
-    max-width: 860px;
+    grid-template-columns: 1fr 360px;
   }
 }
 
@@ -1346,4 +1411,139 @@ code, pre, .rei-code {
 .rei-context-toggle:hover {
   color: var(--rei-accent);
   border-color: var(--rei-accent);
+}
+
+/* ─── Instrument rail (side panel on wide screens) ─── */
+.rei-instrument-rail {
+  display: none;
+  flex-direction: column;
+  gap: var(--rei-space-16);
+  padding: var(--rei-space-16);
+  background: var(--rei-surface);
+  border-left: 1px solid var(--rei-border);
+  overflow-y: auto;
+  font-size: 11px;
+  color: var(--rei-text-muted);
+}
+
+.rei-instrument-rail__section {
+  padding-bottom: var(--rei-space-12);
+  border-bottom: 1px solid var(--rei-border);
+}
+
+.rei-instrument-rail__section:last-child {
+  border-bottom: none;
+}
+
+.rei-instrument-rail__label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rei-text-muted);
+  margin-bottom: var(--rei-space-8);
+}
+
+.rei-instrument-rail__value {
+  font-size: 11px;
+  color: var(--rei-text);
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.rei-instrument-rail__value--accent {
+  color: var(--rei-accent);
+}
+
+.rei-instrument-rail__value--success {
+  color: var(--rei-success);
+}
+
+.rei-instrument-rail__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 2px 0;
+}
+
+/* ─── Monospace data typography ─── */
+.rei-router-badge,
+.rei-router-panel,
+.rei-chat-card__router,
+.rei-chat-card__router *,
+.rei-budget-row,
+.rei-budget-row *,
+.rei-session-footer,
+.rei-session-footer * {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, monospace;
+}
+
+.rei-chat-card__sender,
+.rei-chat-card__body,
+.rei-section-label {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ─── Log-entry message styling ─── */
+.rei-chat-card {
+  border-radius: var(--rei-radius);
+  overflow: hidden;
+  background: transparent;
+  border: none;
+}
+
+.rei-chat-card--rei {
+  background: transparent;
+  border: none;
+  border-left: 1px solid rgba(240,199,94,0.15);
+  border-top: 1px solid var(--rei-border);
+  border-right: 1px solid var(--rei-border);
+  border-bottom: 1px solid var(--rei-border);
+  border-radius: 0 2px 2px 0;
+}
+
+.rei-chat-card--user {
+  background: transparent;
+  border: 1px solid rgba(240,199,94,0.06);
+  border-radius: 2px 0 0 2px;
+}
+
+.rei-chat-card__body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--rei-text-secondary);
+}
+
+.rei-chat-card__body--rei {
+  background: transparent;
+}
+
+.rei-chat-card__body--user {
+  background: transparent;
+}
+
+@media (max-width: 719px) {
+  .rei-instrument-rail {
+    display: none !important;
+  }
+}
+
+.rei-main-content {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.rei-instrument-rail {
+  grid-row: 2 / 4;
+  grid-column: 2;
+}
+
+.rei-session-footer {
+  grid-row: 3;
+  grid-column: 1;
+}
+
+.rei-input-shell {
+  grid-row: 4;
+  grid-column: 1;
 }
