@@ -69,12 +69,12 @@ export default function ChatMessage({
           {isRei && (
             <>
               <span className="rei-chat-card__avatar rei-chat-card__avatar--rei">R</span>
-              <span>REI &bull; {msg.timestamp}</span>
+              <span>{" "}REI &bull; {msg.timestamp}</span>
             </>
           )}
           {isUser && (
             <>
-              <span>{msg.timestamp} &bull; You</span>
+              <span>{msg.timestamp} &bull; You{" "}</span>
               <span className="rei-chat-card__avatar rei-chat-card__avatar--user">Y</span>
             </>
           )}
