@@ -343,7 +343,6 @@ code, pre, .rei-code {
 .rei-chat-card__sender {
   display: flex;
   align-items: center;
-  gap: 6px;
   padding: 10px var(--rei-space-16) 0;
   font-size: 11px;
   line-height: 1;
@@ -365,6 +364,12 @@ code, pre, .rei-code {
   font-weight: 700;
   line-height: 1;
   flex-shrink: 0;
+  margin-right: 6px;
+}
+
+.rei-chat-card__sender--user .rei-chat-card__avatar {
+  margin-right: 0;
+  margin-left: 6px;
 }
 
 .rei-chat-card__avatar--rei {
