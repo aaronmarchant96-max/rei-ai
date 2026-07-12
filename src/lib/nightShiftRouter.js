@@ -1,5 +1,6 @@
 import fingerprintCatalog from "../../data/fingerprints.json" with { type: "json" };
 import { resolveDeterministic } from "./deterministicEngine.js";
+import { shouldEscalateToRemote } from "./cardoGuard.js";
 
 const ROUTER_CATALOG = Array.isArray(fingerprintCatalog) ? fingerprintCatalog : [];
 const STORAGE_KEY = "night-shift-user-fingerprint";
@@ -504,6 +505,21 @@ export function buildRouterDecision({
   decision.premiumCost = (estimatedInputTokens + (decision.maxTokens || 0)) / 1000 * premiumCostPer1k;
   decision.estimatedCost = (estimatedInputTokens + (decision.maxTokens || 0)) / 1000 * selectedCostPer1k;
   decision.pathway = decision.pathway || "medium";
+
+  const escalation = shouldEscalateToRemote({
+    confidence: decision.routingConfidence || 0,
+    pathway: decision.pathway,
+    estimatedCost: decision.estimatedCost || 0,
+    premiumCost: decision.premiumCost || 0,
+    qualityGate: decision.qualityGate || "",
+  });
+
+  if (escalation.escalate && !decision.deterministicLayer) {
+    const escalatedPathway = decision.pathway === "cheap" ? "medium" : "premium";
+    decision.pathway = escalatedPathway;
+    decision.escalated = true;
+    decision.escalationReason = escalation.reason;
+  }
 
   persistRouteHistory(decision.id);
   return decision;
