@@ -8,8 +8,10 @@
 const BANNED_OPENERS = [
   /^(here'?s\s+the\s+hinge[\s:,]*)\s*/i,
   /^(the\s+key\s+thing\s+is[\s:,]*)\s*/i,
+  /^(the\s+key\s+issue\s+is[\s:,]*)\s*/i,
   /^(the\s+hinge\s+is[\s:,]*)\s*/i,
   /^(the\s+core\s+(idea|point|issue)\s+is[\s:,]*)\s*/i,
+  /^(the\s+unsolved\s+nature\s+of[\s:,]*)\s*/i,
   /^(structured\s+reasoning[\s:,]*)\s*/i,
   /^(hinge[\s:,]*)\s*/i,
 ];
@@ -17,9 +19,14 @@ const BANNED_OPENERS = [
 export function deRoboticize(text) {
   if (!text) return text;
   let out = text.trim();
+
   for (const re of BANNED_OPENERS) {
     out = out.replace(re, "").trim();
   }
+
+  out = out.replace(/\s*\(Source:\s*[^)]+\)/g, "").trim();
+  out = out.replace(/\s*\(source:\s*[^)]+\)/g, "").trim();
+
   if (out && out.length > 0) {
     out = out[0].toUpperCase() + out.slice(1);
   }

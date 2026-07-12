@@ -359,7 +359,7 @@ export function buildRouterDecision({
     .join(" ");
   const text = normalizeText(combinedInput);
   const domainName = String(domain || "assistant").toLowerCase();
-  const catalogRoute = getCatalogRouteMatch(text);
+  const catalogRoute = getCatalogRouteMatch(input);
   const complexityTier = getComplexityTier(text);
   const highStructureSignals = getHighStructureSignals(text);
   const storedPreference = getStoredPreferenceForContext(text, domainName);

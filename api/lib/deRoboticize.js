@@ -8,8 +8,10 @@
 const BANNED_OPENERS = [
   /^(here'?s\s+the\s+hinge[\s:,]*)\s*/i,
   /^(the\s+key\s+thing\s+is[\s:,]*)\s*/i,
+  /^(the\s+key\s+issue\s+is[\s:,]*)\s*/i,
   /^(the\s+hinge\s+is[\s:,]*)\s*/i,
   /^(the\s+core\s+(idea|point|issue)\s+is[\s:,]*)\s*/i,
+  /^(the\s+unsolved\s+nature\s+of[\s:,]*)\s*/i,
   /^(structured\s+reasoning[\s:,]*)\s*/i,
   /^(hinge[\s:,]*)\s*/i,
 ];
