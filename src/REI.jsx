@@ -11,6 +11,7 @@ import PhilosophyModal from "./components/PhilosophyModal.jsx";
 import SessionSummary from "./components/SessionSummary.jsx";
 import IngestPanel, { MAX_RECORD_CHARS, SOURCE_TYPES } from "./components/IngestPanel.jsx";
 import ChatMessage from "./components/ChatMessage.jsx";
+import ContextPanel from "./components/ContextPanel.jsx";
 import { parseEvidenceTiers } from "./components/EvidenceCard.jsx";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
 import "./rei.css";
@@ -270,6 +271,7 @@ export default function REI() {
   };
 
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
+  const [isContextOpen, setIsContextOpen] = useState(false);
 
   const [selectedDomain, setSelectedDomain] = useState("assistant");
   const [rawRecordText, setRawRecordText] = useState("");
@@ -295,6 +297,14 @@ export default function REI() {
   const { domainHint, updateDomainHint, dismissDomainHint, switchDomain } = useDomainHint(selectedDomain);
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
+
+  let lastReiMessage = null;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i]?.sender === "rei" && !messages[i]?.isSystemNotice && !messages[i]?.fallback) {
+      lastReiMessage = messages[i];
+      break;
+    }
+  }
 
   // Prevent a pasted record from leaking into a different domain
   useEffect(() => {
@@ -671,6 +681,19 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
         </div>
       
       {isPhilosophyOpen && <PhilosophyModal onClose={() => setIsPhilosophyOpen(false)} />}
+      <button
+        className="rei-context-toggle"
+        onClick={() => setIsContextOpen((v) => !v)}
+        aria-label="Toggle context panel"
+        aria-expanded={isContextOpen}
+      >
+        Context
+      </button>
+      <ContextPanel
+        message={lastReiMessage}
+        isOpen={isContextOpen}
+        onClose={() => setIsContextOpen(false)}
+      />
     </div>
   );
 }
