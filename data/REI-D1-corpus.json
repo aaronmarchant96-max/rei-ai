@@ -1,0 +1,45 @@
+{
+  "_schema_version": "1.0.0",
+  "_description": "REI-D1 Static Reference Corpus — 30 frozen arXiv papers for scientific literature evaluation. Immutable artifact for reproducible benchmarking.",
+  "_domain": "scientific-literature",
+  "_snapshot_date": "2026-08-01",
+  "_snapshot_source": "arXiv API v2 — categories cs.AI, cs.CL, physics, q-bio",
+  "_selection_method": "Programmatic filter (200 candidates) → manual curation (30 selected) across 3 complexity gates",
+
+  "complexity_gates": {
+    "citation_dense": {
+      "description": "30+ references, cross-disciplinary citations",
+      "count": 10
+    },
+    "quantitative_claims": {
+      "description": "Explicit numerical results, tables, statistical tests, p-values",
+      "count": 10
+    },
+    "long_reasoning_chains": {
+      "description": "Conclusion depends on 5+ sequential logical steps",
+      "count": 10
+    }
+  },
+
+  "domain_breakdown": {
+    "biomedical": { "count": 10, "description": "q-bio papers, GPQA biology overlap, Alberta Innovates alignment" },
+    "cs_ai": { "count": 10, "description": "cs.AI/cs.CL papers, routing and architecture evaluation" },
+    "physics": { "count": 10, "description": "physics papers, GPQA physics overlap, high-uncertainty reasoning" }
+  },
+
+  "evaluation_conditions": {
+    "C4_naive": "Full context per turn, no HCM, no CARDO GUARD — baseline token count and cost",
+    "C1_full_rei": "Cached prefix + sliding window + deterministic Layer 0 — token savings vs C4",
+    "C3_guard": "C1 + CARDO GUARD active — hallucination catch rate, false positive rate",
+    "synthesis": "C1 + HCM hierarchical compression — ROUGE/BERTScore on Related Work generation"
+  },
+
+  "metrics": {
+    "token_efficiency": "Token count delta (C1 vs C4), cost savings percentage, cache hit rate",
+    "guard_accuracy": "Hallucination catch rate, false positive rate, precision/recall (C3 vs C4)",
+    "synthesis_quality": "ROUGE-L, BERTScore, human evaluation on extracted Related Work section",
+    "routing_accuracy": "Pathway selection correctness, escalation rate, confidence score distribution"
+  },
+
+  "corpus": []
+}
