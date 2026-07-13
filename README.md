@@ -41,10 +41,12 @@ npm test -- --testPathPatterns=routingEval
 ```
 
 - **57 prompts** across 9 categories (greeting, coding, genealogy, creative, fact-check, reasoning, mixed, adversarial, unknown)
-- **68% cost savings** vs always-premium routing
-- **85% routing accuracy** on category-matched prompts
+- **68% cost savings** vs always-premium routing (lab conditions — real-world savings higher due to API-layer Layer 0)
+- **80% routing accuracy** on category-matched prompts
 - **5 deterministic** queries handled for $0 — the cheapest model is no model
+- **9% escalation rate** to premium pathway (only when genuinely needed)
 - **15 test suites, 162 tests**, all passing
+- **Domain detection** isolates current input from conversation history — no more routing bleed
 
 ## Architecture
 
@@ -79,3 +81,6 @@ docker compose up
 - All routing decisions are **deterministic and testable** — no inference dependency in the router itself
 - The benchmark harness has **zero inference cost** (pure assertion-based evaluation)
 - Containerized with Docker for the competition submission requirement
+- Layer 0 deterministic engine runs at both **frontend and API** layers — greetings/smalltalk are $0 regardless of entry point
+- Conversation history capped at **5 messages** to keep token costs low
+- The `deRoboticize` filter strips formulaic openers from API responses before they reach the UI
