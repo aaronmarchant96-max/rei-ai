@@ -271,9 +271,26 @@ export default function REI() {
     }, 100);
   };
 
+  const handleFeedback = (msg, direction) => {
+    if (direction === "down" && msg.routerDecision && msg.routerDecision.pathway !== "premium") {
+      if (overridesUsed >= MAX_ESCALATIONS) return;
+      setOverridesUsed((c) => c + 1);
+
+      try {
+        const existing = JSON.parse(window.localStorage.getItem("night-shift-user-fingerprint") || "[]");
+        existing.push("structured-reasoning");
+        window.localStorage.setItem("night-shift-user-fingerprint", JSON.stringify(existing.slice(-10)));
+      } catch {
+        // silently ignore localStorage failures
+      }
+    }
+  };
+
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
   const [isContextOpen, setIsContextOpen] = useState(false);
   const [transparencyMode, setTransparencyMode] = useState(false);
+  const [overridesUsed, setOverridesUsed] = useState(0);
+  const MAX_ESCALATIONS = 5;
 
   const [selectedDomain, setSelectedDomain] = useState("assistant");
   const [rawRecordText, setRawRecordText] = useState("");
@@ -611,6 +628,7 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
                 selectedDomain={selectedDomain}
                 onCopy={copyText}
                 onRetry={retryMessage}
+                onFeedback={handleFeedback}
                 expandedByDefault={transparencyMode}
               />
             ))}

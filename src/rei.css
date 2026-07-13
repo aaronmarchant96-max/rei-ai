@@ -1567,3 +1567,9 @@ body,
   border-color: var(--rei-accent);
   color: var(--rei-accent);
 }
+
+.rei-chat-card__actions .rei-feedback-btn--active {
+  border-color: var(--rei-accent);
+  color: var(--rei-accent);
+  background: var(--rei-accent-dim);
+}

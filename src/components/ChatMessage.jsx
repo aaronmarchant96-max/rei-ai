@@ -54,6 +54,7 @@ export default function ChatMessage({
   selectedDomain,
   onCopy,
   onRetry,
+  onFeedback,
   expandedByDefault,
 }) {
   const isRei = msg.sender === "rei";
@@ -111,6 +112,20 @@ export default function ChatMessage({
             aria-label="Copy"
             title="Copy"
           >📋</button>
+          {isRei && onFeedback && !msg.fallback && (
+            <>
+              <button
+                onClick={() => onFeedback(msg, "up")}
+                aria-label="Helpful"
+                title="Helpful"
+              >👍</button>
+              <button
+                onClick={() => onFeedback(msg, "down")}
+                aria-label="Not helpful"
+                title="Not helpful"
+              >👎</button>
+            </>
+          )}
           {msg.fallback && (
             <button
               onClick={() => onRetry(index)}

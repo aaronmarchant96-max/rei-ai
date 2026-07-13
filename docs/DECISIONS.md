@@ -184,3 +184,21 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 *Last updated: July 12, 2026*  
 *Next: add decisions as they're made. Don't let 6 months pass.*
+
+---
+
+## 11. Client-Side Escalation via User Feedback
+
+**Date:** July 13, 2026  
+**Problem:** Users need a way to signal when routing quality is poor. A single misroute shouldn't need a developer to fix — the system should learn from user signals.
+
+**Alternatives considered:**
+- A. Server-side feedback endpoint — robust but requires backend infrastructure, data store, rate limiting. Too much for a hackathon
+- B. Automatic quality scoring — complex, unreliable for a demo
+- C. Wire existing `storedPreference` mechanism to a 👍/👎 UI — zero new backend, zero API changes, already exists in `nightShiftRouter.js:155-190`
+
+**Choice:** C — thumbs UI + localStorage write. When a user 👎s a non-premium response, the current route ID is appended to `night-shift-user-fingerprint` in localStorage. On the next query, `getStoredRoutePreference()` reads this array and elevates matching queries to a higher-confidence pathway.
+
+**Trade-off:** Client-side storage means a user can reset escalations by clearing localStorage or reloading. The escalation cap (5/session) prevents budget drain but isn't a security guarantee. For production, a server-side `/api/feedback` endpoint with proper rate limiting and authentication is the correct fix.
+
+**Code:** `src/REI.jsx:handleFeedback()`, `src/components/ChatMessage.jsx:115-123`
