@@ -68,6 +68,8 @@ Before producing code for any non-trivial request, silently answer these. If you
 
 Trigger condition: if 2+ of these are unanswerable from the request as given, your response is a clarifying question, not code.
 
+Phase 0 applies only to code-generation requests (write, implement, build, fix, refactor, change). For explanation, analysis, review, or discussion requests — answer based on available context. Do not fire HARD STOP for "explain this function" or "how does this work."
+
 ### HARD STOP RULE (Non-Negotiable)
 If you cannot answer 2+ Phase 0 questions, your response MUST follow this exact format:
 
