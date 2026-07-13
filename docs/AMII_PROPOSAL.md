@@ -1,15 +1,14 @@
-# REI: AMII-Ready Research Proposal
+# REI: An AI That Respects Your Budget as Much as Your Time
 
-**For:** Alberta Machine Intelligence Institute (AMII)  
+**AMII Grant Proposal**  
 **Project:** REI — Transparent Token-Efficient Reasoning Engine  
-**Duration:** 6 months  
-**Request:** $5,000 CAD  
+**Duration:** 6 months · **Request:** $5,000 CAD
 
 ---
 
 ## Executive Summary
 
-REI is a transparent, token-efficient reasoning engine built and tested in Alberta. It makes AI reasoning auditable by exposing the hinge point, evidence tiers, and what-would-change-the-conclusion in every response. A cost-aware routing layer (Night Shift) selects the cheapest model that meets a confidence threshold, reducing inference costs 68% below always-premium baselines. All routing decisions are deterministic and testable — zero inference dependency in the router itself.
+REI is an AI that respects your budget as much as your time. It makes reasoning auditable by exposing the hinge point, evidence tiers, and what-would-change-the-conclusion in every response. A cost-aware routing layer (Night Shift) selects the cheapest model that meets a confidence threshold, reducing inference costs 68% below always-premium baselines. All routing decisions are deterministic and testable — zero inference dependency in the router itself.
 
 The system has processed 441 million tokens across 1,194 API calls at a total cost of $3.83, demonstrating production-scale efficiency. A 57-prompt benchmark suite across 9 categories confirms 80% routing accuracy with 162 passing tests and zero inference cost in the evaluation harness.
 

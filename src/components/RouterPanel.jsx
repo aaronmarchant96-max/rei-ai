@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-export default function RouterPanel({ routerDecision, model }) {
-  const [expanded, setExpanded] = useState(false);
+export default function RouterPanel({ routerDecision, model, defaultExpanded }) {
+  const [expanded, setExpanded] = useState(defaultExpanded || false);
   if (!routerDecision) return null;
 
   const savings = (routerDecision.premiumCost || 0) - (routerDecision.estimatedCost || 0);
@@ -53,6 +53,17 @@ export default function RouterPanel({ routerDecision, model }) {
           {routerDecision.rationale && (
             <div className="rei-router-panel__why">
               <span className="rei-router-panel__label">Why:</span> {routerDecision.rationale}
+            </div>
+          )}
+          {routerDecision.routingSignals && (
+            <div className="rei-router-panel__item">
+              <span className="rei-router-panel__label">Signals:</span>{" "}
+              {routerDecision.matchedPattern
+                ? `Pattern: ${routerDecision.matchedPattern}`
+                : routerDecision.routingSignals.matchedTerms?.length > 0
+                  ? `Matched: ${routerDecision.routingSignals.matchedTerms.join(", ")}`
+                  : "No specific terms matched"}
+              {" · "}Complexity: {routerDecision.routingSignals.complexityTier || "n/a"}
             </div>
           )}
           {routerDecision.alternativeRoutes && routerDecision.alternativeRoutes.length > 0 && (

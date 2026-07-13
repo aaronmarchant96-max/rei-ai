@@ -273,6 +273,7 @@ export default function REI() {
 
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
   const [isContextOpen, setIsContextOpen] = useState(false);
+  const [transparencyMode, setTransparencyMode] = useState(false);
 
   const [selectedDomain, setSelectedDomain] = useState("assistant");
   const [rawRecordText, setRawRecordText] = useState("");
@@ -510,6 +511,7 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
             </div>
             <h1 className="rei-logo-title">REI</h1>
             <span className="rei-header__build-tag">v2.0 · Night Shift Router</span>
+            <span className="rei-header__tagline">Budget-respecting reasoning.</span>
           </div>
 
           <div className="rei-domain-tabs">
@@ -541,6 +543,14 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
               title="Clear"
             >
               ✕
+            </button>
+            <button
+              type="button"
+              onClick={() => setTransparencyMode((v) => !v)}
+              className={`rei-action-btn ${transparencyMode ? "rei-action-btn--transparent" : ""}`}
+              title="Glass box mode"
+            >
+              🔍
             </button>
           </div>
         </header>
@@ -601,6 +611,7 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
                 selectedDomain={selectedDomain}
                 onCopy={copyText}
                 onRetry={retryMessage}
+                expandedByDefault={transparencyMode}
               />
             ))}
 

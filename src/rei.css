@@ -1552,3 +1552,18 @@ body,
   margin-right: 0;
   margin-left: 6px;
 }
+
+.rei-header__tagline {
+  font-family: 'IBM Plex Sans', ui-sans-serif, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--rei-text-muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.rei-action-btn--transparent {
+  background: var(--rei-accent-dim);
+  border-color: var(--rei-accent);
+  color: var(--rei-accent);
+}

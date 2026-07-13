@@ -54,6 +54,7 @@ export default function ChatMessage({
   selectedDomain,
   onCopy,
   onRetry,
+  expandedByDefault,
 }) {
   const isRei = msg.sender === "rei";
   const isUser = msg.sender === "user";
@@ -120,7 +121,7 @@ export default function ChatMessage({
         </div>
       </div>
 
-      {isRei && <RouterPanel routerDecision={msg.routerDecision} model={msg.model} />}
+      {isRei && <RouterPanel routerDecision={msg.routerDecision} model={msg.model} defaultExpanded={expandedByDefault} />}
     </div>
   );
 }

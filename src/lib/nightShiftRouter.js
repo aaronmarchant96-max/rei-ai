@@ -373,7 +373,6 @@ export function buildRouterDecision({
     decision = buildDecision("structured-reasoning");
   } else if (deterministicResult) {
     decision = buildDecision("simple-greeting", {
-      rationale: "Greeting or smalltalk detected; routed through Layer 0 deterministic engine. No API call required.",
       costPer1kInput: 0,
       costPer1kOutput: 0,
       maxTokens: 0,
@@ -382,6 +381,8 @@ export function buildRouterDecision({
       confidence: { local: 1.0, cheap: 1.0, premium: 1.0 },
       deterministicLayer: true,
       deterministicResponse: deterministicResult.response,
+      matchedPattern: deterministicResult.pattern,
+      rationale: `Pattern matched: '${deterministicResult.pattern}' → deterministic response ($0, zero tokens).`,
       routingSignals: {
         complexityTier: "low",
         matchedTerms: [],

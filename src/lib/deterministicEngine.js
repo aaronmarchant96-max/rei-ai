@@ -10,31 +10,36 @@
  */
 
 const PATTERNS = [
-  // ─── Greetings ─────────────────────────────────────────
   {
+    name: "greeting",
     pattern: /^(hi|hello|hey|yo|hiya|sup|howdy|heya|hola)[\s!,.]*$/i,
     response: "Hey. Say what you want to sort out, and I'll help pull it apart cleanly.",
   },
   {
+    name: "time-of-day greeting",
     pattern: /^good\s+(morning|afternoon|evening)[\s!,.]*$/i,
     response: "Good {0}. What are you thinking through?",
   },
   // ─── Smalltalk ─────────────────────────────────────────
   {
+    name: "how are you",
     pattern: /^(how\s+are\s+(you|things|it\s+going)|how('s|s)\s+(it\s+going|everything|life)|what('s|s)\s+up)[\s!,.]*$/i,
     response: "Doing what I do best — sorting through what's real. What's on your mind?",
   },
   {
+    name: "thanks",
     pattern: /^(thanks|thank\s+you|thx|ty|appreciate\s+(it|that|you))[\s!,.]*$/i,
     response: "Of course. What's next?",
   },
   // ─── Empty / filler ────────────────────────────────────
   {
+    name: "filler",
     pattern: /^(ok|okay|k+|right|yeah|yep|nope|sure|alright|fine|got\s+it|gotcha|hmm+|uh|um)[\s!,.]*$/i,
     response: "Ready when you are.",
   },
   // ─── Unknown / test input ──────────────────────────────
   {
+    name: "test/ping",
     pattern: /^(test|testing|ping|pong)[\s!,.]*$/i,
     response: "Pong. What's the real question?",
   },
@@ -48,6 +53,7 @@ export function resolveDeterministic(input) {
     const match = clean.match(entry.pattern);
     if (match) {
       return {
+        pattern: entry.name,
         matched: true,
         response: entry.response.replace(/\{(\d+)\}/g, (_, i) => match[parseInt(i) + 1] || ""),
         confidence: 1.0,

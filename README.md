@@ -1,6 +1,6 @@
 # Night Shift Router
 
-**The cheapest model that still meets the confidence bar.**
+**An AI that respects your budget as much as your time.**
 
 A cost-aware LLM routing engine built for the AMD Developer Hackathon: ACT II (Track 1 — Hybrid Token-Efficient Routing Agent). Selects the least expensive reasoning pathway capable of meeting a measurable confidence threshold.
 
