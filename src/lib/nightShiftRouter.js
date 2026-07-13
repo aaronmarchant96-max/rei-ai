@@ -228,16 +228,16 @@ function isSimpleGreeting(text) {
   return /^(hi|hello|hey|yo|hiya|sup|howdy|heya|hola)(\s+there)?[\s!,.]*$|^(good\s+(morning|afternoon|evening)|how\s+are\s+(you|things|it\s+going)|how('s|s)\s+(it\s+going|everything|life)|what('s|s)\s+up|thanks|thank\s+you|thx|ty|ok|okay|k+|yeah|yep|nope|sure|right|alright|fine|test|ping|appreciate\s+(it|that|you))[\s!,.]*$/i.test(text.trim());
 }
 
-function isLikelyCodingRequest(text) {
-  return /\b(implement|build|debug|fix|refactor|function|component|module|api|jest|vite|react|node|typescript|javascript|python|test|patch|class|service|hook|route)\b/i.test(text);
+function isLikelyCodingRequest(input) {
+  return /\b(implement|build|debug|fix|refactor|function|component|module|api|jest|vite|react|node|typescript|javascript|python|test|patch|class|service|hook|route)\b/i.test(input);
 }
 
-function isLikelyGenealogyRequest(text) {
-  return /\b(ancestor|descendant|birth|death|marriage|census|familysearch|find a grave|pedigree|genealogy|lineage|same-name|disambiguat|archive|parish|baptism|burial)\b/i.test(text);
+function isLikelyGenealogyRequest(input) {
+  return /\b(ancestor|descendant|birth|death|marriage|census|familysearch|find a grave|pedigree|genealogy|lineage|same-name|disambiguat|archive|parish|baptism|burial)\b/i.test(input);
 }
 
-function isLikelyStoryRequest(text) {
-  return /\b(story|plot|character|scene|narrative|outline|dialogue|arc|worldbuilding|conflict|hero|villain)\b/i.test(text);
+function isLikelyStoryRequest(input) {
+  return /\b(story|plot|character|scene|narrative|outline|dialogue|arc|worldbuilding|conflict|hero|villain)\b/i.test(input);
 }
 
 function isAdversarialRequest(text) {
@@ -422,7 +422,7 @@ export function buildRouterDecision({
         storedPreference,
       },
     });
-  } else if (domainName === "genealogy" || catalogRoute?.entry?.id === "genealogy-deep-dive" || isLikelyGenealogyRequest(text)) {
+  } else if (domainName === "genealogy" || catalogRoute?.entry?.id === "genealogy-deep-dive" || isLikelyGenealogyRequest(input)) {
     decision = buildDecision("genealogy-deep-dive", {
       rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
       routingSignals: {
@@ -432,7 +432,7 @@ export function buildRouterDecision({
         storedPreference,
       },
     });
-  } else if (domainName === "coding" || catalogRoute?.entry?.id === "coding-hinge" || isLikelyCodingRequest(text)) {
+  } else if (domainName === "coding" || catalogRoute?.entry?.id === "coding-hinge" || isLikelyCodingRequest(input)) {
     decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",
       routingSignals: {
@@ -442,7 +442,7 @@ export function buildRouterDecision({
         storedPreference,
       },
     });
-  } else if (domainName === "story" || catalogRoute?.entry?.id === "story-architect" || isLikelyStoryRequest(text)) {
+  } else if (domainName === "story" || catalogRoute?.entry?.id === "story-architect" || isLikelyStoryRequest(input)) {
     decision = buildDecision("story-architect", {
       rationale: "Story or narrative language detected; route through the storytelling blueprint path.",
       routingSignals: {
