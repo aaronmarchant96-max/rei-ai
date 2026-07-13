@@ -495,7 +495,9 @@ export function buildRouterDecision({
   const catalogConfidence = (catalogMatchId && catalogMatchId === decision.id)
     ? Math.min(catalogRoute.score || 0, 1.0)
     : 0;
-  decision.routingConfidence = decision.deterministicLayer ? 1.0 : catalogConfidence;
+  decision.routingConfidence = decision.deterministicLayer ? 1.0
+    : catalogConfidence > 0 ? catalogConfidence
+    : decision.confidence?.[decision.pathway || "medium"] || 0.5;
 
   const premiumEntry = ROUTER_CATALOG.find((e) => e.id === "adversarial-validation");
   const premiumCostPer1k = premiumEntry
