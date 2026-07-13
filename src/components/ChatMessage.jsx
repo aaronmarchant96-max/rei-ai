@@ -66,6 +66,7 @@ export default function ChatMessage({
     >
       <div className={`rei-chat-card ${isUser ? "rei-chat-card--user" : "rei-chat-card--rei"}`}>
         <div className={`rei-chat-card__sender ${isUser ? "rei-chat-card__sender--user" : ""}`}>
+          <span className="rei-chat-card__exchange">[{index + 1}]</span>
           {isRei && (
             <>
               <span className="rei-chat-card__avatar rei-chat-card__avatar--rei">R</span>

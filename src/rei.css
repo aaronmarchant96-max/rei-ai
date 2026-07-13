@@ -1,17 +1,17 @@
 /* ─── Research Lab Theme — tokens ─── */
 :root {
-  --rei-bg: #09090b;
-  --rei-surface: #111114;
-  --rei-surface-raised: #1a1a1f;
+  --rei-bg: #0b0d10;
+  --rei-surface: #0f1115;
+  --rei-surface-raised: #16181d;
   --rei-border: rgba(255,255,255,0.06);
   --rei-text: #fafafa;
   --rei-text-secondary: #a1a1aa;
   --rei-text-muted: #71717a;
   --rei-accent: #f0c75e;
-  --rei-accent-dim: rgba(240,199,94,0.10);
-  --rei-accent-glow: rgba(240,199,94,0.20);
+  --rei-accent-dim: rgba(240,199,94,0.08);
   --rei-success: #4ade80;
   --rei-danger: #f87171;
+  --rei-spectral: linear-gradient(90deg, #ef4444, #f0c75e, #22d3ee);
   --rei-radius: 2px;
   --rei-space-8: 8px;
   --rei-space-12: 12px;
@@ -150,9 +150,18 @@ code, pre, .rei-code {
   height: 48px;
   min-height: 48px;
   background: var(--rei-surface);
-  border-bottom: 1px solid var(--rei-border);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  border-bottom: 2px solid transparent;
+  border-image: var(--rei-spectral) 1;
   z-index: 20;
+}
+
+.rei-header__build-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--rei-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .rei-header__brand {
@@ -171,18 +180,6 @@ code, pre, .rei-code {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.rei-logo-title {
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: -0.01em;
-  color: var(--rei-text);
-  margin: 0;
-}
-
-.rei-logo-sub {
-  display: none;
 }
 
 /* ─── Domain pills ─── */
@@ -1403,8 +1400,9 @@ code, pre, .rei-code {
 .rei-instrument-rail__label {
   font-size: 9px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  text-transform: none;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
   color: var(--rei-text-muted);
   margin-bottom: var(--rei-space-8);
 }
@@ -1445,8 +1443,29 @@ code, pre, .rei-code {
 
 .rei-chat-card__sender,
 .rei-chat-card__body,
-.rei-section-label {
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+.rei-section-label,
+body,
+.rei-shell {
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+.rei-logo-title {
+  font-family: 'Fraunces', 'IBM Plex Sans', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--rei-text);
+  margin: 0;
+}
+
+.rei-instrument-rail__label {
+  font-family: 'Fraunces', 'IBM Plex Sans', serif;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: none;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  color: var(--rei-text-muted);
+  margin-bottom: var(--rei-space-8);
 }
 
 /* ─── Log-entry message styling ─── */
@@ -1519,4 +1538,17 @@ code, pre, .rei-code {
   .rei-instrument-rail {
     display: none;
   }
+}
+
+.rei-chat-card__exchange {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--rei-text-muted);
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.rei-chat-card__sender--user .rei-chat-card__exchange {
+  margin-right: 0;
+  margin-left: 6px;
 }

@@ -506,9 +506,10 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
       <header className="rei-header">
           <div className="rei-header__brand">
             <div className="rei-logo-mark">
-              <HingeMark size={20} animated={true} />
+              <HingeMark size={20} animated={false} />
             </div>
             <h1 className="rei-logo-title">REI</h1>
+            <span className="rei-header__build-tag">v2.0 · Night Shift Router</span>
           </div>
 
           <div className="rei-domain-tabs">
