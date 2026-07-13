@@ -22,7 +22,7 @@ jobs:
           cache: npm
 
       - name: Install
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Validate seed schema
         run: npm run seeds:validate

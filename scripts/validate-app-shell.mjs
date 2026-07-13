@@ -10,11 +10,14 @@ const appShellPath = path.join(repoRoot, "src", "AppShell.jsx");
 const expectedStrings = [
   "PromptHound Labs",
   "Structured outputs for messy input.",
-  "Bring the hard question. We’ll find the hinge.",
-  "CARDO REI loop: build the slice, test what holds, keep the limits visible.",
 ];
 
 const expectedTabs = [
+  {
+    id: "tools",
+    label: "Tools",
+    subtitle: "Pick the slice you need.",
+  },
   {
     id: "furnace",
     label: "Debate Furnace",
@@ -34,6 +37,16 @@ const expectedTabs = [
     id: "cardo-guard",
     label: "CARDO GUARD",
     subtitle: "AI scores get checked against cost.",
+  },
+  {
+    id: "rei",
+    label: "REI.ai",
+    subtitle: "Platform reasoning layer.",
+  },
+  {
+    id: "tracepoint",
+    label: "Tracepoint",
+    subtitle: "Industrial signals stay evidence-first.",
   },
 ];
 
