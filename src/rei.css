@@ -1099,14 +1099,29 @@ code, pre, .rei-code {
 @media (max-width: 640px) {
   .rei-shell {
     display: flex;
-    grid-template-columns: none;
-    grid-template-rows: none;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
   }
 
   .rei-header {
     padding: 0 var(--rei-space-8);
     height: 44px;
     min-height: 44px;
+    flex-shrink: 0;
+  }
+
+  .rei-main-content {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .rei-session-footer {
+    flex-shrink: 0;
+  }
+
+  .rei-input-shell {
+    flex-shrink: 0;
   }
 
   .rei-logo-title {
