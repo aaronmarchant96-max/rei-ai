@@ -37,7 +37,7 @@ The next time the user sends a query that matches domain-specific signals for th
 
 ### Step C: Automated Benchmark Expansion (Future)
 
-For production deployment beyond the hackathon:
+For production deployment:
 
 1. **Cluster & Extract:** Run TF-IDF or vector cosine similarity on downvoted prompts stored in a feedback datastore to identify misrouted keyword patterns.
 2. **Benchmark Insertion:** Append offending prompts to `routingEval.test.js` under a new `qualityRegressions` category with guard assertions.
@@ -50,7 +50,7 @@ For production deployment beyond the hackathon:
 
 ### Adversarial/Subjective Downvoting (Noise)
 
-Users may downvote correct answers they disagree with. The current implementation uses raw user signal — acceptable for a hackathon. For production, add a secondary verification step: run the prompt through a lightweight LLM evaluator in the background to confirm the base model's output had logical/syntactic errors before triggering escalation.
+Users may downvote correct answers they disagree with. The current implementation uses raw user signal — acceptable for an MVP. For production, add a secondary verification step: run the prompt through a lightweight LLM evaluator in the background to confirm the base model's output had logical/syntactic errors before triggering escalation.
 
 ### The "Hotel California" Problem
 

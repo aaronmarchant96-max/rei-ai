@@ -193,7 +193,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 **Problem:** Users need a way to signal when routing quality is poor. A single misroute shouldn't need a developer to fix — the system should learn from user signals.
 
 **Alternatives considered:**
-- A. Server-side feedback endpoint — robust but requires backend infrastructure, data store, rate limiting. Too much for a hackathon
+- A. Server-side feedback endpoint — robust but requires backend infrastructure, data store, rate limiting. Over-engineered for MVP
 - B. Automatic quality scoring — complex, unreliable for a demo
 - C. Wire existing `storedPreference` mechanism to a 👍/👎 UI — zero new backend, zero API changes, already exists in `nightShiftRouter.js:155-190`
 
