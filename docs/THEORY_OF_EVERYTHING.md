@@ -1,7 +1,19 @@
-# CARDO REI: An Information-Theoretic Framework for Cost-Aware, Multi-Domain Reasoning
+# CARDO REI: An Information-Theoretic Architecture for Cost-Aware Reasoning
 
-**The Theory of Epistemic Solvency**  
-**Michio Kaku framing — the physicist's approach to AI reasoning.**
+**Toward an Information Theory of Practical AI Reasoning**  
+**Physics-inspired design principles applied to deterministic, cost-aware LLM routing.**
+
+---
+
+## Claim Stratification
+
+This paper makes claims at three levels. All are argued, but not all are proven to the same standard:
+
+| Claim | Level | Status |
+|-------|-------|--------|
+| **A:** The REI routing pipeline works as described — deterministic, cost-aware, multi-domain, auditably tested | Engineering | **Proven** — 162 tests, 57-prompt benchmark, gate assertions, reproducible CLI |
+| **B:** This architecture is a good design for cost-aware reasoning systems — the combination of deterministic routing + explicit hinge detection + cost-weighted governance + human boundary conditions is superior to alternative designs | Design | **Argued** — supported by the evidence but not proven across alternative architectures |
+| **C:** The principles underlying REI (complexity reduction, decision boundary detection, cost-weighted action) generalize beyond this specific implementation to reasoning more broadly | Theory | **Hypothesized** — see Testable Hypotheses (Section 9) |
 
 ---
 
@@ -11,11 +23,11 @@
 
 ---
 
-## 1. Kaku's Method — Applied to Reasoning
+## 1. Physics-Inspired Design Principles
 
-Michio Kaku reduces physics to five steps. Every problem, from particle collision to galaxy formation, follows the same method:
+Five design principles drawn from the methodology physicists use to solve complex problems. Every principle maps to a specific implementation in REI:
 
-| Step | Kaku's Physics Method | Applied to AI Reasoning |
+| Step | Physics Principle | REI Implementation |
 |------|----------------------|------------------------|
 | **1. Reduce** | Strip a problem to its fundamentals until one governing principle remains | CARDO REI 8-stage pipeline — every problem decomposes into the same fundamental stages |
 | **2. Find the equation** | Express the principle mathematically | `Miss Loss > Waste → ACT` — the entire decision reduces to one inequality |
@@ -23,35 +35,33 @@ Michio Kaku reduces physics to five steps. Every problem, from particle collisio
 | **4. Test** | Verify experimentally | 162 assertion-gated tests. Build fails if savings ≤ 0. `npm test` |
 | **5. Falsify** | Define what would prove the theory wrong | If routing accuracy degrades, the benchmark fails. If costs exceed premium, the gate assertion blocks deployment. CI catches regression. |
 
-In physics, we don't build separate theories for water boiling in a kettle and water boiling in a nuclear reactor. It's the same phase transition. The same equation. The same threshold. When we find the governing principle — the one equation that explains every variation — we stop building new models and start predicting new outcomes.
+In physics, we don't build separate theories for water boiling in a kettle and water boiling in a nuclear reactor. It's the same phase transition. The same equation. The same threshold. When we find the governing principle — the one equation that explains every variation — we stop building new models and start predicting new outcomes. This is the approach REI adapts to reasoning.
 
 REI applies this principle to reasoning: **every complex problem reduces to a hinge point** — the exact boundary condition where the answer flips. Find that phase transition, compute the cost of crossing it, and you don't need a thousand domain-specific models. You need one governing equation.
 
-This is Epistemic Solvency: information entropy reduction under action constraints.
-
 ---
 
-## 2. Formal Definition: Epistemic Solvency
+## 2. Formal Definition: The Routing Model
 
-Kaku's method demands equations, not metaphors. Here is the formal definition:
+The design principles demand a formal specification, not metaphors. Here is the definition of the routing pipeline:
 
 ```
 Let T be a reasoning task.
-Let H(T) = words×2 + questionMarks×8 + uncertaintyHits×10  [complexity score, nightShiftRouter.js:247-255]
+Let R(T) = words×2 + questionMarks×8 + uncertaintyHits×10  [Routing Complexity Index, nightShiftRouter.js:247-255]
 Let P ∈ {deterministic, base, standard, premium}           [selected pathway]
 Let τ be the hinge threshold — the exact boundary          [phase transition point]
          where the answer flips
 Let C(P, T) be the estimated cost of routing T through P   [cost estimation, nightShiftRouter.js:506]
 
 
-Epistemic Solvency holds for T iff:
+A routing decision is correct for T when:
 
   C(P_actual, T) < C(P_premium, T)    (1) Cost Constraint
   AND accuracy(T) > threshold         (2) Quality Constraint
   AND P is deterministic AND reproducible  (3) Reproducibility Constraint
 
 
-The system is solvent when it:
+The pipeline operates correctly when it:
   (a) Routes queries to a pathway no more expensive than needed
   (b) Maintains quality above a measurable threshold
   (c) Produces identical output for identical input
@@ -60,34 +70,34 @@ The system is solvent when it:
 
 ### Derivations
 
-**Entropy Score Derivation (H):**
+**Complexity Score Derivation (R):**
 
 ```
-Why words ×2?     — Baseline lexical complexity weight derived from empirical
-                    calibration against the 57-prompt benchmark. Each word adds
-                    ~2 units of processing complexity, consistent across all
-                    9 domains (genealogy, coding, debate, telemetry, creative).
-                    Validated in routingEval.test.js.
+R(T) = words×2 + questionMarks×8 + uncertaintyHits×10  [Routing Complexity Index]
 
-Why questionMarks ×8? — Questions signal branching. Each question mark indicates
-                         the user is at a decision point. Branching multiplies
-                         uncertainty at 4× the word weight because a question
-                         mark changes the semantic structure of the prompt,
-                         not just its lexical density.
+Lexical weight coefficient (×2):
+- Empirically calibrated baseline from the 57-prompt benchmark.
+- Each word adds ~2 units of processing complexity, consistent across
+  all 9 domains (genealogy, coding, debate, telemetry, creative).
+- Validated in routingEval.test.js.
 
-Why uncertaintyHits ×10? — Explicit uncertainty terms ("not sure", "unclear",
-                            "unknown", "missing", "uncertain", "doubt",
-                            "uncertainty") are the strongest entropy signal.
-                            When the user states their own uncertainty, the
-                            routing system must assume higher complexity.
-                            Weighted at 5× the word baseline because
-                            uncertainty language carries disproportionate
-                            cognitive load.
+Branching factor (×8, 4× lexical weight):
+- Questions signal branching. Each question mark indicates the user is
+  at a decision point. Branching multiplies uncertainty at 4× the
+  lexical baseline because a question mark changes the semantic
+  structure of the prompt, not just its lexical density.
+
+Explicit uncertainty signal (×10, 5× lexical weight):
+- Terms: "not sure", "unclear", "unknown", "missing", "uncertain",
+  "doubt", "uncertainty". When the user states their own uncertainty,
+  the routing system must assume higher complexity. Weighted at 5× the
+  lexical baseline because uncertainty language carries disproportionate
+  cognitive load.
 
 Tier mapping:
-  H(T) < 20  → low    (deterministic or base tier adequate)
-  20 ≤ H(T) < 40 → medium (standard tier recommended)
-  H(T) ≥ 40 → high   (consider premium tier, evaluate escalation)
+  R(T) < 20  → low    (deterministic or base tier adequate)
+  20 ≤ R(T) < 40 → medium (standard tier recommended)
+  R(T) ≥ 40 → high   (consider premium tier, evaluate escalation)
 ```
 
 **Cost Constraint Derivation:**
@@ -124,11 +134,11 @@ Breakeven: the exact cost at which the decision flips
 
 ## 3. The Governing Equation (CARDO GUARD)
 
-In Kaku's physics, every action has an energy cost. You don't fire a rocket without computing the fuel budget. You don't route a query to gpt-4o without computing the financial budget.
+A core design principle: every action has an associated cost. You don't fire a rocket without computing the fuel budget. You don't route a query to gpt-4o without computing the financial budget.
 
-The governing equation is universal. It governs every decision in REI — whether routing a user query to gpt-4o, evaluating evidence for a genealogy claim, or deciding whether to shut down a failing compressor in Tracepoint. The domain changes. The equation doesn't.
+The governing equation is universal within the system. It governs every decision — whether routing a user query to gpt-4o, evaluating evidence for a genealogy claim, or deciding whether to shut down a failing compressor in Tracepoint. The domain changes. The equation doesn't.
 
-```js
+```
 Expected Waste    = Cost to Act   × False Alarm Rate
 Expected Loss     = Cost of Miss  × (1 - False Alarm Rate)
 
@@ -136,51 +146,53 @@ Verdict = ACT     if Expected Loss > Expected Waste
 Verdict = DO NOT ACT if Expected Waste > Expected Loss
 ```
 
+*This is an application of expected utility theory with cost-weighted parameters. The contribution is not the equation — it is the adaptive parameterization: false alarm rates derived from routing confidence scores, cost weights calibrated against provider pricing, and the equation deployed at a specific decision boundary in a multi-tier routing pipeline.*
+
 The breakeven point — the exact cost at which the decision flips — is computed by `calculateBreakevenMissCost()` (`cardoGuard.js:85-91`). This is the thermodynamic equilibrium point of the system.
 
 The `shouldEscalateToRemote()` cost-governor extends this to model routing: when confidence drops below a pathway-specific threshold, the system escalates to a higher-capability model, updating the model identifier, cost estimates, and token budget.
 
 ---
 
-## 4. Information Thermodynamics
+## 4. The Information-Flow Model
 
-In the physics of information, every reasoning act is a thermodynamic process. Raw data enters at high entropy, passes through filters, hits a phase transition (the hinge), and emerges as a low-entropy decision. Each stage has a measurable cost.
+In this model, information passes through a series of processing stages. Raw input enters at high complexity, passes through filters, hits a decision boundary (the hinge), and emerges as a low-complexity routing decision. Each stage has a measurable cost.
 
 ```
-[ RAW DATA / HIGH ENTROPY ]
+[ RAW INPUT / HIGH COMPLEXITY ]
              ↓
       1. Collect (Mass)
              ↓
 2. Analyze & Distinguish (Filters)
    Separates Signal from Inference
              ↓
-3. Find the Hinge (Singularity)
-   The exact phase transition threshold
+3. Find the Hinge (Decision Boundary)
+   The exact threshold where the answer changes
              ↓
 4. CARDO GUARD Gate
-   Thermodynamic Cost-Risk Balance
+   Cost-Risk Balance Evaluation
              ↓
-[ ACTION / LOW-ENTROPY DECISION ]
+[ ROUTING DECISION / LOW COMPLEXITY ]
 ```
 
-### Physical Mappings
+### System Mappings
 
-Each concept maps to a specific, verifiable code path:
+Each design concept maps to a specific, verifiable code path:
 
-| Physical Concept | REI Component | Verification |
-|-----------------|---------------|-------------|
-| **Entropy (disorder)** | `getComplexityTier()` — `words×2 + questionMarks×8 + uncertaintyHits×10` | `nightShiftRouter.js:247-255`. 57-prompt benchmark validates tier assignment |
-| **Phase Transition (hinge)** | `buildRouterDecision()` — the decision tree branches at deterministic → base → standard → premium. One binary choice at each boundary | `nightShiftRouter.js:349-525`. Deterministic, reproducible |
-| **Energy States (evidence)** | 🟢 Primary Source = high-energy, low-entropy. 🟡 Family Memory = low-energy, high-entropy (subject to decay). Four-tier quantized energy ladder | `EvidenceCard.jsx`. 10 parser tests |
-| **Conservation Laws** | 162 Jest tests. Information cannot be "created from nothing" (hallucination is a conservation violation) | `routingEval.test.js`. Build fails if assertions fail |
+| Design Concept | REI Component | Verification |
+|----------------|---------------|-------------|
+| **Routing Complexity** | `getComplexityTier()` — `R = words×2 + questionMarks×8 + uncertaintyHits×10` | `nightShiftRouter.js:247-255`. 57-prompt benchmark validates tier assignment |
+| **Decision Boundary (hinge)** | `buildRouterDecision()` — the decision tree branches at deterministic → base → standard → premium. One binary choice at each boundary | `nightShiftRouter.js:349-525`. Deterministic, reproducible |
+| **Confidence Levels (evidence)** | 🟢 Primary Source = high-confidence, low-complexity. 🟡 Family Memory = low-confidence, high-complexity (subject to decay). Four-tier confidence ladder | `EvidenceCard.jsx`. 10 parser tests |
+| **System Invariants** | 162 Jest tests. Information that enters the output must have entered the input through validated channels. Hallucination is an invariant violation | `routingEval.test.js`. Build fails if assertions fail |
 | **Signal-to-Noise Ratio** | `isLikelyGenealogyRequest(input)` — current input only. History is noise. Signal is the user's immediate intent | `nightShiftRouter.js:426`. Fixed routing bleed |
-| **Thermodynamic Equilibrium** | CARDO GUARD: the equilibrium point where `Action Waste = Miss Loss` — the breakeven hinge where the decision flips | `cardoGuard.js:85-91` |
+| **Decision Equilibrium** | CARDO GUARD: the equilibrium point where `Action Waste = Miss Loss` — the breakeven hinge where the decision flips | `cardoGuard.js:85-91` |
 
 ### Solutions Come From Reduction
 
-Kaku's most famous insight: the solution is already in the problem. You don't add complexity to find it — you strip away what's hiding it.
+The insight drawn from physics: the solution is already in the problem. You don't add complexity to find it — you strip away what's hiding it.
 
-| Kaku Principle | REI Application |
+| Reduction Principle | REI Application |
 |---------------|----------------|
 | "Don't add complexity. Strip it away." | The 8-stage CARDO REI pipeline decomposes every problem into the same fundamental steps |
 | "The answer is already there. Remove what's hiding it." | The hinge already exists in the problem. REI doesn't generate it — it isolates it |
@@ -211,7 +223,7 @@ The theory's strength is that every claim can be verified by tracing a single qu
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                ENTROPY COMPUTATION                            │
+│              COMPLEXITY COMPUTATION                             │
 │  H = 13×2 + 0×8 + 0×10 = 26                                │
 │  Tier: medium (≥20, <40)                                     │
 │  Code: nightShiftRouter.js:247-255                           │
@@ -286,7 +298,7 @@ resolveDeterministic("what should I consider...") → null
 → Code: nightShiftRouter.js:370, deterministicEngine.js:43-61
 ```
 
-### Step 2 — Entropy Computation
+### Step 2 — Complexity Computation
 
 ```
 getComplexityTier("what should I consider before quitting my job to start a company")
@@ -404,7 +416,7 @@ Cost:        $0.000558
 Premium:     $0.005050
 Savings:     89%
 Escalated:   no
-Solvent:     yes — constraints (1), (2), and (3) all satisfied
+Correct:     yes — constraints (1), (2), and (3) all satisfied
 ```
 
 ---
@@ -456,7 +468,7 @@ All numbers independently verifiable at the provider dashboard.
 
 ## 6. Empirical Verification
 
-A law of physics is only as good as its experimental verification. REI's verification is deterministic and reproducible — no model calls, no embeddings, no non-determinism. Identical input produces identical output every run. This is what makes it physics rather than statistics.
+A law of physics is only as good as its experimental verification. REI's verification is deterministic and reproducible — no model calls, no embeddings, no non-determinism. Identical input produces identical output every run. This is what makes it engineering rather than speculation.
 
 | Measurement | Result | Method |
 |------------|--------|--------|
@@ -526,19 +538,19 @@ A theory that doesn't acknowledge its boundaries isn't a theory — it's a belie
 
 ---
 
-## 9. Novel Predictions
+## 9. Testable Hypotheses
 
-A scientific theory must make testable, falsifiable predictions about phenomena not yet measured. Each prediction is independently verifiable.
+These hypotheses are about the routing system's behavior, not about reasoning in general. Each is falsifiable through the existing benchmark harness and feedback collection infrastructure.
 
-**Prediction 1 (Feedback Pattern Detection):** User prompts receiving ≥3 downvotes within a 24-hour window will show significantly lower routing confidence scores than prompts with no downvotes, controlling for prompt complexity (entropy score) and domain. If routing confidence is uncorrelated with user satisfaction, the Epistemic Solvency model is incomplete.
+**Hypothesis 1 (Feedback Pattern Detection):** User prompts receiving ≥3 downvotes within a 24-hour window will show significantly lower routing confidence scores than prompts with no downvotes, controlling for prompt complexity (complexity score) and domain. If routing confidence is uncorrelated with user satisfaction, the routing model is incomplete.
 
-**Prediction 2 (Canary Probing):** When a model receives a major version update (e.g., llama-3.1-8b → llama-3.2-8b), previously-escalated patterns routed to the base tier as a canary probe will receive ≥50% fewer user escalations than before the update. If model improvements don't reduce escalation rates, model selection isn't the primary driver of routing quality.
+**Hypothesis 2 (Canary Probing):** When a model receives a major version update (e.g., llama-3.1-8b → llama-3.2-8b), previously-escalated patterns routed to the base tier as a canary probe will receive ≥50% fewer user escalations than before the update. If model improvements don't reduce escalation rates, model selection isn't the primary driver of routing quality.
 
-**Prediction 3 (Entropy-Routing Correlation):** Prompts with uncertaintyHits ≥ 2 will have lower routing confidence scores than prompts with uncertaintyHits = 0, even after controlling for word count and questionMarks. If uncertainty language doesn't predict routing difficulty, the entropy score is misweighted.
+**Hypothesis 3 (Complexity-Routing Correlation):** Prompts with uncertaintyHits ≥ 2 will have lower routing confidence scores than prompts with uncertaintyHits = 0, even after controlling for word count and questionMarks. If uncertainty language doesn't predict routing difficulty, the complexity score is misweighted.
 
-**Prediction 4 (Lexical Density-Routing Accuracy):** Cross-domain routing accuracy will be higher for domains with more specific lexical fingerprints (genealogy: 30 match terms, 17 negative terms, including record, will, code) than for domains with broader fingerprints (assistant: 24 match terms, 6 negative terms). If specificity doesn't improve accuracy, the fingerprint catalog approach is underperforming.
+**Hypothesis 4 (Lexical Density-Routing Accuracy):** Cross-domain routing accuracy will be higher for domains with more specific lexical fingerprints (genealogy: 30 match terms, 17 negative terms, including record, will, code) than for domains with broader fingerprints (assistant: 24 match terms, 6 negative terms). If specificity doesn't improve accuracy, the fingerprint catalog approach is underperforming.
 
-**Prediction 5 (Cost-Constraint Adherence):** Under the $20/month budget constraint, the system will favor deterministic and base-tier routing over standard and premium routing as monthly spend approaches the limit, even for queries that would normally qualify for higher tiers. If the system does not adapt routing behavior to budget pressure, the cost-governance model is incomplete.
+**Hypothesis 5 (Cost-Constraint Adherence):** Under the $20/month budget constraint, the system will favor deterministic and base-tier routing over standard and premium routing as monthly spend approaches the limit, even for queries that would normally qualify for higher tiers. If the system does not adapt routing behavior to budget pressure, the cost-governance model is incomplete.
 
 ---
 
@@ -550,7 +562,7 @@ A scientific theory must make testable, falsifiable predictions about phenomena 
 | RAG systems | No — retrieval + generation glued together | No | Partial | No | No |
 | Mixture of Experts (MoE) | Yes — gating network | Yes — softmax over experts | Yes | Yes | No — architecture-specific |
 | DSPy | Partial — prompt optimization | No — optimizer, not a theory | Yes | Partial | Yes |
-| **CARDO REI** | **Yes — Epistemic Solvency** | **Yes — `Miss Loss > Waste → ACT`** | **Yes — 162 tests** | **Yes — build gate** | **Yes — 5 domains** |
+| **CARDO REI** | **Yes — A routing model with a cost-weighted hinge** | **Yes — `Miss Loss > Waste → ACT`** | **Yes — 162 tests** | **Yes — build gate** | **Yes — 5 domains** |
 
 ---
 
@@ -576,18 +588,18 @@ See [`docs/FEEDBACK_ARCHITECTURE.md`](./FEEDBACK_ARCHITECTURE.md) for the full f
 
 ---
 
-## 13. The Kaku Checklist (Answered)
+## 13. The Design Principles Checklist (Answered)
 
 | This theory... | REI's answer |
 |---------------|-------------|
-| Has a simple governing principle? | **Epistemic Solvency** — every decision reduces to a cost-weighted hinge |
+| Has a simple governing principle? | **A routing model with a cost-weighted hinge** — every decision reduces to a cost-weighted hinge |
 | Can be written as an equation? | `Expected Miss Loss > Expected Action Waste → ACT` |
 | Is experimentally testable? | 162 tests, 57 prompts, zero inference. `npm test` |
 | Is falsifiable? | Build fails if savings ≤ 0. Routing accuracy gate. CI blocks regression |
 | Unifies multiple phenomena? | Same architecture governs genealogy, coding, debate, telemetry, creativity |
 | Can be explained to a non-expert? | *"Find the hinge. Compare the cost of acting to the cost of doing nothing. Pick the cheaper one."* |
-| Makes novel predictions? | 5 testable predictions (Section 9) — feedback, canary probing, entropy-routing, lexical density, cost-constraint |
-| Has experimental evidence? | 601M development tokens for $6.51. 68% lab savings. 80% accuracy. 162 passing tests |
+| Makes testable hypotheses? | 5 testable hypotheses (Section 9) — feedback, canary probing, entropy-routing, lexical density, cost-constraint |
+| Has verifiable evidence? | 601M development tokens for $6.51. 68% lab savings. 80% accuracy. 162 passing tests |
 
 ---
 
