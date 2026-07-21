@@ -369,6 +369,18 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
         ? `Depth: ${paragraphs} para, ${sourceCitations} sources — may be shallow`
         : null;
 
+      if (response.rateLimited) {
+        return {
+          success: true,
+          result: cleanResult,
+          model: response.model,
+          routerDecision: response.routerDecision || routerDecision,
+          usage: null,
+          rateLimited: true,
+          timestamp: new Date().toISOString(),
+        };
+      }
+
       if (depthWarning && response.model !== "gpt-4o" && routerDecision?.pathway !== "premium") {
         logger.info("depth_escalation", {
           originalModel: response.model,
@@ -395,16 +407,18 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
             });
           }
 
-          return {
-            success: true,
-            result: deRoboticize(premiumResponse.content),
-            model: premiumResponse.model,
-            routerDecision: premiumDecision,
-            usage: premiumResponse.usage || null,
-            depthEscalated: true,
-            depthEscalationReason: depthWarning,
-            timestamp: new Date().toISOString(),
-          };
+          if (!premiumResponse.rateLimited && premiumResponse.model === "gpt-4o") {
+            return {
+              success: true,
+              result: deRoboticize(premiumResponse.content),
+              model: premiumResponse.model,
+              routerDecision: premiumDecision,
+              usage: premiumResponse.usage || null,
+              depthEscalated: true,
+              depthEscalationReason: depthWarning,
+              timestamp: new Date().toISOString(),
+            };
+          }
         } catch (e) {
           logger.warn("depth_escalation_failed", { error: e.message });
         }

@@ -7,8 +7,9 @@ export default function InstrumentRail({
   modelBreakdown,
   formatCost,
 }) {
-  const savingsPercent = sessionCost > 0
-    ? Math.round((savingsVsPremium / (sessionCost + savingsVsPremium)) * 100)
+  const totalPremiumCost = sessionCost + savingsVsPremium;
+  const savingsPercent = totalPremiumCost > 0
+    ? Math.round((savingsVsPremium / totalPremiumCost) * 100)
     : 0;
 
   return (
