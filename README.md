@@ -1,8 +1,19 @@
 # REI.ai
 
-**Budget-respecting reasoning.** An adaptive LLM platform that routes every query to the cheapest inference pathway capable of meeting a measurable confidence threshold — so you get precise answers without burning money on oversized models.
+**Budget-respecting reasoning.**
 
-## What it does
+## Who this is for
+
+You want an AI reasoning partner but don't want to burn $20/month on a subscription that runs GPT-4 for every query — including "hello." REI is for developers writing code, researchers evaluating evidence, genealogists cross-referencing records, and writers building narrative structure — anyone who wants precise answers without paying premium-model prices for simple questions.
+
+## What you can do that you can't today
+
+- **Get reasoning for pennies.** Every query routes to the cheapest adequate model. Greetings cost $0. Coding problems get a 70B model at ~$0.0014/1K tokens. Only adversarial validation hits GPT-4.
+- **See why the router chose that model.** Every response includes a transparent routing decision — confidence score, cost estimate, savings vs always-premium, and alternative routes considered.
+- **Never pay for "hello."** The Layer 0 deterministic engine handles greetings, smalltalk, and FAQ patterns with zero API calls. The cheapest model is no model.
+- **Track your session budget.** Per-message cost badges, a 5K token budget gauge, and a session summary panel show exactly what you spent and saved.
+
+## How it works
 
 ```
 Incoming query → classify complexity + domain →
@@ -39,6 +50,11 @@ npm test -- --testPathPatterns=routingEval
 - **9% escalation rate** to premium (only when genuinely needed)
 - **178 tests, 16 suites**, all passing
 
+Blind test set (held-out prompts never used in development):
+```bash
+npm test -- --testPathPatterns=routingEvalBlind
+```
+
 ## Architecture
 
 ```
@@ -60,6 +76,7 @@ Full decision flow: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 | `src/lib/costHelpers.js` | Unified cost model — ceiling-based estimates with split usage tracking |
 | `src/hooks/useSessionTracker.js` | Cumulative savings tracker — sessions, costs, escalations |
 | `src/__eval__/routingEval.test.js` | 57-prompt benchmark harness with accuracy/savings gates |
+| `src/__eval__/routingEvalBlind.test.js` | 24-prompt blind test set — held-out, never used in development |
 | `data/fingerprints.json` | Routing catalog with confidence thresholds per pathway |
 
 ## Run with Docker
