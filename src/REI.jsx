@@ -573,7 +573,8 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
                 {dom.id === "assistant" ? "Generalist" :
                  dom.id === "coding" ? "Coding" :
                  dom.id === "genealogy" ? "Research" :
-                 "Stories"}
+                 dom.id === "story" ? "Stories" :
+                 "Red Team"}
               </button>
             ))}
             <button
