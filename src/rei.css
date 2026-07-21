@@ -1727,7 +1727,290 @@ body,
 
 .rei-router-panel__detail {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--rei-text-muted);
-  margin-top: 1px;
+  margin-top: 4px;
+}
+
+/* ─── Red Team Report ─── */
+.rei-redteam-container {
+  margin: 16px 0;
+  padding: 0 16px;
+}
+
+.rei-redteam-report {
+  background: var(--rei-surface-raised);
+  border: 1px solid var(--rei-border);
+  border-radius: var(--rei-radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.rei-redteam-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.rei-redteam-verdict {
+  padding: 4px 12px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-left: 3px solid;
+}
+
+.rei-redteam-score-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--rei-surface);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rei-redteam-score-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.rei-redteam-score-value {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: var(--rei-text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.rei-redteam-dimensions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.rei-redteam-dimension-pill {
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.rei-redteam-dimension-pill.slate {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.rei-redteam-dimension-pill.amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.rei-redteam-dimension-pill.red {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.rei-redteam-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rei-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.rei-redteam-finding {
+  border-left: 3px solid var(--rei-accent);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: var(--rei-surface);
+  border-radius: 0 var(--rei-radius) var(--rei-radius) 0;
+}
+
+.rei-redteam-finding.border-blue-400 { border-left-color: #60a5fa; }
+.rei-redteam-finding.border-yellow-400 { border-left-color: #fbbf24; }
+.rei-redteam-finding.border-orange-400 { border-left-color: #fb923c; }
+.rei-redteam-finding.border-red-400 { border-left-color: #f87171; }
+
+.rei-redteam-finding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.rei-redteam-finding-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rei-text);
+}
+
+.rei-redteam-severity-badge {
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rei-redteam-severity-badge.severity-low {
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+}
+
+.rei-redteam-severity-badge.severity-medium {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.rei-redteam-severity-badge.severity-high {
+  background: rgba(251, 146, 60, 0.15);
+  color: #fb923c;
+}
+
+.rei-redteam-severity-badge.severity-critical {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.rei-redteam-finding-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--rei-text-muted);
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.rei-redteam-evidence {
+  margin: 8px 0;
+  padding: 8px 12px;
+  background: var(--rei-bg);
+  border-radius: 2px;
+}
+
+.rei-redteam-evidence-label {
+  display: block;
+  font-size: 10px;
+  color: var(--rei-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.rei-redteam-evidence code {
+  font-size: 12px;
+  color: var(--rei-accent);
+}
+
+.rei-redteam-impact {
+  font-size: 13px;
+  color: var(--rei-text-secondary);
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.rei-redteam-fix {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(74, 222, 128, 0.05);
+  border-left: 2px solid var(--rei-success);
+  border-radius: 0 2px 2px 0;
+}
+
+.rei-redteam-fix-label {
+  display: block;
+  font-size: 10px;
+  color: var(--rei-success);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.rei-redteam-fix ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.rei-redteam-fix li {
+  font-size: 12px;
+  color: var(--rei-text-secondary);
+  margin: 2px 0;
+  line-height: 1.4;
+}
+
+.rei-redteam-trace {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rei-border);
+}
+
+.rei-redteam-trace-entry {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--rei-text-muted);
+  font-family: 'JetBrains Mono', monospace;
+  margin: 4px 0;
+}
+
+.rei-redteam-trace-dim {
+  font-weight: 600;
+  min-width: 24px;
+}
+
+.rei-redteam-trace-dim:first-child { color: #94a3b8; }
+.rei-redteam-trace-dim:nth-child(2) { color: #f59e0b; }
+
+.rei-redteam-cost {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rei-border);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--rei-text-secondary);
+}
+
+.rei-redteam-cost-value {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--rei-accent);
+}
+
+/* Router Badge dimension chip */
+.rei-router-badge__dimension {
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  margin-left: 4px;
+}
+
+.rei-router-badge__dimension--d1 {
+  background: rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.rei-router-badge__dimension--d2 {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.rei-router-badge__dimension--d3 {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
 }

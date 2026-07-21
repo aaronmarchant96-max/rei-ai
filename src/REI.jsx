@@ -13,6 +13,7 @@ import IngestPanel, { MAX_RECORD_CHARS, SOURCE_TYPES } from "./components/Ingest
 import ChatMessage from "./components/ChatMessage.jsx";
 import ContextPanel from "./components/ContextPanel.jsx";
 import InstrumentRail from "./components/InstrumentRail.jsx";
+import RedTeamReport from "./components/RedTeamReport.jsx";
 import { parseEvidenceTiers } from "./components/EvidenceCard.jsx";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
 import "./rei.css";
@@ -49,6 +50,14 @@ const DOMAIN_PROFILES = [
     description: "Narrative architecture generating story blueprints.",
     rules: ["Establish blueprint structure", "Identify character driver hinges", "Avoid cliché tropes"],
     exemplar: "Expanding historical inspiration seeds into multi-part character outlines."
+  },
+  {
+    id: "red-team",
+    label: "Red Team",
+    badge: "Active",
+    description: "Adversarial testing and prompt vulnerability scanning.",
+    rules: ["Surface pattern scan", "Semantic meaning-drift analysis", "Structured findings with severity and fix suggestions"],
+    exemplar: "Scan this prompt for jailbreak vulnerabilities."
   }
 ];
 
@@ -491,19 +500,26 @@ export default function REI() {
         ? parseEvidenceTiers(data.result)
         : [];
 
+      const redTeamReport = selectedDomain === "red-team" && data.result
+        ? data.result
+        : null;
+
       setMessages((prev) => [
         ...prev,
         userMsg,
         {
           id: nextMessageId(),
           sender: "rei",
-          text: data.result,
+          text: selectedDomain === "red-team"
+            ? `Red Team scan complete. Verdict: ${data.result?.verdict || "unknown"}`
+            : data.result,
           timestamp: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
           usage,
           model: responseModel,
           cost: msgCost,
           routerDecision: data.routerDecision || routerDecision,
           evidence: evidence.length > 0 ? evidence : undefined,
+          redTeamReport,
         }
       ]);
     } catch (error) {
@@ -632,7 +648,16 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
 
         {/* Chat Interface Container */}
         <div className="rei-chat-container">
-          
+
+          {/* Red Team Report — shown for red-team domain */}
+          {selectedDomain === "red-team" && messages.length > 0 && (
+            <div className="rei-redteam-container">
+              {messages.filter(m => m.sender === "rei" && m.redTeamReport).map((msg, idx) => (
+                <RedTeamReport key={msg.id || idx} report={msg.redTeamReport} />
+              ))}
+            </div>
+          )}
+
           {/* Chat History Area */}
           <div className="rei-chat-history" role="log" aria-live="polite" aria-label="Chat messages">
             {messages.map((msg, index) => (
