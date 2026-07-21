@@ -122,7 +122,7 @@
 // Defined in REI.jsx, consumed by domain banner + domain pills.
 
 /**
- * @typedef {"assistant"|"coding"|"genealogy"|"story"} DomainId
+ * @typedef {"assistant"|"coding"|"genealogy"|"story"|"red-team"} DomainId
  */
 
 /**
@@ -133,6 +133,39 @@
  * @property {string} description
  * @property {string[]} rules
  * @property {string} exemplar
+ */
+
+// ─── Red Team ─────────────────────────────────────────────────
+// Produced by scanRedTeamInput() and handleRedTeamRequest().
+
+/**
+ * @typedef {"low"|"medium"|"high"|"critical"} RedTeamSeverity
+ */
+
+/**
+ * @typedef {"clean"|"suspicious"|"high-risk"|"critical"} RedTeamVerdict
+ */
+
+/**
+ * @typedef {Object} RedTeamFinding
+ * @property {string} finding - Human-readable label for the detected pattern
+ * @property {RedTeamSeverity} severity - Severity level
+ * @property {"D1"|"D2"|"D3"} dimension - Which dimension detected this
+ * @property {string} category - Category key from redTeamTaxonomy
+ * @property {string[]} evidence - Matched keywords or phrases
+ * @property {string} impact - Description of potential impact
+ * @property {string[]} suggestedFix - Suggested mitigations
+ * @property {number} confidence - Confidence score 0-1
+ */
+
+/**
+ * @typedef {Object} RedTeamReport
+ * @property {RedTeamVerdict} verdict - Overall verdict
+ * @property {number} score - Risk score 0-100
+ * @property {("D1"|"D2"|"D3")[]} dimensionsTriggered - Which dimensions were triggered
+ * @property {RedTeamFinding[]} findings - Detailed findings
+ * @property {Object} routingTrace - Routing decision trace
+ * @property {number} cost - Estimated cost in USD
  */
 
 // ─── Cost helpers ─────────────────────────────────────────────

@@ -400,9 +400,19 @@ export function buildRouterDecision({
         storedPreference,
       },
     });
+  } else if (domainName === "red-team") {
+    decision = buildDecision("red-team-surface", {
+      rationale: "Red Team mode selected; routing through surface scan pipeline.",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: [],
+        highStructureSignals,
+        storedPreference,
+      },
+    });
   } else if (requiresAdversarial || isAdversarialRequest(input)) {
-    decision = buildDecision("adversarial-validation", {
-      rationale: "Adversarial or red-team request detected; use the premium validation path.",
+    decision = buildDecision("red-team-surface", {
+      rationale: "Adversarial or red-team request detected; use the surface scan path.",
       routingSignals: {
         complexityTier,
         matchedTerms: ["adversarial"],
@@ -459,7 +469,7 @@ export function buildRouterDecision({
       qualityGate: "Hinge + Facts + Move + challenge test",
       maxTokens: 600,
       temperature: 0.2,
-      fallbackPriority: "adversarial-validation",
+      fallbackPriority: "red-team-semantic",
       routingSignals: {
         complexityTier,
         matchedTerms: catalogRoute?.entry?.matchTerms || [],

@@ -44,12 +44,12 @@ describe("nightShiftRouter", () => {
    expect(decision.enforce).toBe("EVIDENCE_TIERS");
   });
 
-  it("routes adversarial prompts to the premium validation path", () => {
+  it("routes adversarial prompts to the red team surface scan path", () => {
     const decision = buildRouterDecision({ input: "Red-team this claim and prove it wrong", domain: "assistant" });
 
-    expect(decision.id).toBe("adversarial-validation");
-    expect(decision.model).toBe("gpt-4o");
-    expect(resolveRoutingModel(decision)).toBe("gpt-4o");
+    expect(decision.id).toBe("red-team-surface");
+    expect(decision.model).toBe("llama-3.1-8b-instant");
+    expect(resolveRoutingModel(decision)).toBe("llama-3.1-8b-instant");
   });
 
   it("routes high-structure uncertainty prompts through a stricter reasoning gate", () => {
@@ -103,7 +103,7 @@ describe("nightShiftRouter", () => {
 
     it("detects adversarial request via requiresAdversarial flag", () => {
       const decision = buildRouterDecision({ input: "tell me a story", domain: "assistant", requiresAdversarial: true });
-      expect(decision.id).toBe("adversarial-validation");
+      expect(decision.id).toBe("red-team-surface");
     });
 
     it("does not match substrings in getHighStructureSignals", () => {
