@@ -14,28 +14,14 @@ export default function InstrumentRail({
 
   return (
     <aside className="rei-instrument-rail" aria-label="Session instrumentation">
-      <div className="rei-instrument-rail__section">
-        <div className="rei-instrument-rail__label">Session</div>
-        <div className="rei-instrument-rail__row">
-          <span>Tokens</span>
-          <span className="rei-instrument-rail__value">
-            {sessionTokens.toLocaleString()}
-          </span>
-        </div>
-        <div className="rei-instrument-rail__row">
-          <span>Messages</span>
-          <span className="rei-instrument-rail__value">{sessionMessages}</span>
-        </div>
-        <div className="rei-instrument-rail__row">
-          <span>Est. Cost</span>
-          <span className="rei-instrument-rail__value">
-            {sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
-          </span>
+      <div className="rei-instrument-rail__section rei-instrument-rail__section--hero">
+        <div className="rei-instrument-rail__hero-label">Efficiency</div>
+        <div className="rei-instrument-rail__hero-value">
+          {savingsPercent}%
         </div>
       </div>
 
       <div className="rei-instrument-rail__section">
-        <div className="rei-instrument-rail__label">Savings vs Premium</div>
         <div className="rei-instrument-rail__row">
           <span>Saved</span>
           <span className="rei-instrument-rail__value rei-instrument-rail__value--success">
@@ -43,9 +29,9 @@ export default function InstrumentRail({
           </span>
         </div>
         <div className="rei-instrument-rail__row">
-          <span>Efficiency</span>
-          <span className="rei-instrument-rail__value rei-instrument-rail__value--success">
-            {savingsPercent}%
+          <span>Cost</span>
+          <span className="rei-instrument-rail__value">
+            {sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
           </span>
         </div>
         {escalationCount > 0 && (
@@ -59,7 +45,20 @@ export default function InstrumentRail({
       </div>
 
       <div className="rei-instrument-rail__section">
-        <div className="rei-instrument-rail__label">Model Breakdown</div>
+        <div className="rei-instrument-rail__row">
+          <span>Tokens</span>
+          <span className="rei-instrument-rail__value">
+            {sessionTokens.toLocaleString()}
+          </span>
+        </div>
+        <div className="rei-instrument-rail__row">
+          <span>Messages</span>
+          <span className="rei-instrument-rail__value">{sessionMessages}</span>
+        </div>
+      </div>
+
+      <div className="rei-instrument-rail__section">
+        <div className="rei-instrument-rail__label">Models</div>
         {Object.entries(modelBreakdown).map(([model, tokens]) => (
           <div key={model} className="rei-instrument-rail__row">
             <span title={model}>
@@ -72,8 +71,7 @@ export default function InstrumentRail({
         ))}
       </div>
 
-      <div className="rei-instrument-rail__section">
-        <div className="rei-instrument-rail__label">REI.ai</div>
+      <div className="rei-instrument-rail__section rei-instrument-rail__section--muted">
         <div className="rei-instrument-rail__row">
           <span>Build</span>
           <span className="rei-instrument-rail__value">v2.0</span>

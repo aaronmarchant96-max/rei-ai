@@ -15,31 +15,55 @@ export default function SessionSummary({
 }) {
   if (sessionMessages === 0) return null;
 
-  const savingsPercent = sessionCost > 0
-    ? Math.round((savingsVsPremium / (sessionCost + savingsVsPremium)) * 100)
+  const totalPremiumCost = sessionCost + savingsVsPremium;
+  const savingsPercent = totalPremiumCost > 0
+    ? Math.round((savingsVsPremium / totalPremiumCost) * 100)
     : 0;
 
   return (
     <div className="rei-session-footer">
       <div className="rei-session-footer__summary">
-        <span>&#x1F4CA; <strong>{sessionTokens.toLocaleString()}</strong> tokens &middot; <strong>{sessionMessages}</strong> msgs</span>
-        <span className="rei-session-footer__cost">{sessionCost < 0.0001 ? "< $0.0001" : `~$${sessionCost.toFixed(4)}`}</span>
-        {savingsVsPremium > 0 && (
-          <span className="rei-session-footer__savings">
-            Saved ${savingsVsPremium.toFixed(4)} ({savingsPercent}%)
+        <div className="rei-session-footer__stats">
+          <span className="rei-session-footer__stat">
+            <span className="rei-session-footer__stat-value">{sessionTokens.toLocaleString()}</span>
+            <span className="rei-session-footer__stat-label">tok</span>
           </span>
+          <span className="rei-session-footer__stat-sep" aria-hidden="true" />
+          <span className="rei-session-footer__stat">
+            <span className="rei-session-footer__stat-value">{sessionMessages}</span>
+            <span className="rei-session-footer__stat-label">msgs</span>
+          </span>
+          <span className="rei-session-footer__stat-sep" aria-hidden="true" />
+          <span className="rei-session-footer__stat">
+            <span className="rei-session-footer__stat-value">
+              {sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
+            </span>
+            <span className="rei-session-footer__stat-label">cost</span>
+          </span>
+        </div>
+
+        {savingsVsPremium > 0 && (
+          <div className="rei-session-footer__savings">
+            <span className="rei-session-footer__savings-label">SAVED</span>
+            <span className="rei-session-footer__savings-hero">
+              <span className="rei-session-footer__savings-pct">{savingsPercent}%</span>
+              <span className="rei-session-footer__savings-amt">${savingsVsPremium.toFixed(4)}</span>
+            </span>
+          </div>
         )}
+
         {escalationCount > 0 && (
           <span className="rei-session-footer__escalations">
-            &#x26A1; Escalated {escalationCount}x
+            Escalated {escalationCount}x
           </span>
         )}
+
         <button
           type="button"
           className="rei-session-footer__toggle"
           onClick={() => setShowSessionSummary((prev) => !prev)}
         >
-          {showSessionSummary ? "\u25B2 Hide" : "\u25BC Details"} &middot; Export
+          {showSessionSummary ? "Hide" : "Details"}
         </button>
       </div>
       {showSessionSummary && (
@@ -83,7 +107,7 @@ export default function SessionSummary({
                 URL.revokeObjectURL(url);
               }}
             >
-              &#x1F4E5; Download .md
+              Export .md
             </button>
             <button
               type="button"

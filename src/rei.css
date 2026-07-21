@@ -333,15 +333,15 @@ code, pre, .rei-code {
 .rei-chat-container {
   display: flex;
   flex-direction: column;
-  gap: var(--rei-space-12);
-  padding: 0 var(--rei-space-16);
+  gap: var(--rei-space-16);
+  padding: var(--rei-space-12) var(--rei-space-16);
 }
 
 .rei-chat-history {
   display: flex;
   flex-direction: column;
-  gap: var(--rei-space-12);
-  padding-bottom: var(--rei-space-8);
+  gap: var(--rei-space-16);
+  padding-bottom: var(--rei-space-16);
 }
 
 .rei-chat-msg {
@@ -487,21 +487,26 @@ code, pre, .rei-code {
 
 /* ─── Router badge / panel ─── */
 .rei-router-badge {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(214,176,76,0.15);
-  background: rgba(214,176,76,0.06);
-  color: #94a3b8;
-  font-size: 10px;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(214,176,76,0.2);
+  background: rgba(214,176,76,0.08);
+  color: #a1a1aa;
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 .rei-router-badge__icon {
-  font-size: 11px;
+  font-size: 13px;
+  line-height: 1;
+}
+.rei-router-badge__label {
+  color: #cbd5e1;
 }
 .rei-router-badge__model {
   color: #fbbf24;
@@ -510,10 +515,18 @@ code, pre, .rei-code {
 .rei-router-badge__cost {
   font-size: 10px;
   color: #94a3b8;
-  margin-left: 6px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: rgba(148,163,184,0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(148,163,184,0.12);
+}
+.rei-router-badge__savings {
+  font-size: 10px;
+  color: #4ade80;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(74,222,128,0.12);
+  margin-left: 2px;
 }
 .rei-router-panel {
   margin-top: 8px;
@@ -979,7 +992,7 @@ code, pre, .rei-code {
 
 /* ─── Session footer ─── */
 .rei-session-footer {
-  padding: 8px 16px;
+  padding: 12px 20px;
   border-top: 1px solid rgba(255,255,255,0.06);
   display: flex;
   align-items: center;
@@ -992,17 +1005,81 @@ code, pre, .rei-code {
 }
 .rei-session-footer__summary {
   display: flex;
-  gap: 12px;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
+}
+.rei-session-footer__stats {
+  display: flex;
+  gap: 6px;
   align-items: center;
 }
-.rei-session-footer__cost {
+.rei-session-footer__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.rei-session-footer__stat-value {
+  font-weight: 600;
   color: var(--rei-text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+.rei-session-footer__stat-label {
+  font-size: 9px;
+  color: var(--rei-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.rei-session-footer__stat-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255,255,255,0.08);
+  margin: 0 4px;
 }
 .rei-session-footer__savings {
-  color: var(--rei-success);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 16px;
+  border-radius: 8px;
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.15);
+  margin-left: auto;
+}
+.rei-session-footer__savings-label {
+  font-size: 7px;
+  font-weight: 700;
+  color: #4ade80;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.rei-session-footer__savings-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.rei-session-footer__savings-pct {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4ade80;
+  line-height: 1;
+  font-family: 'JetBrains Mono', monospace;
+}
+.rei-session-footer__savings-amt {
+  font-size: 11px;
+  font-weight: 500;
+  color: #22c55e;
+  font-family: 'JetBrains Mono', monospace;
 }
 .rei-session-footer__escalations {
   color: #fbbf24;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(251,191,36,0.08);
 }
 .rei-session-footer__toggle {
   background: none;
@@ -1412,6 +1489,37 @@ code, pre, .rei-code {
 
 .rei-instrument-rail__section:last-child {
   border-bottom: none;
+}
+
+.rei-instrument-rail__section--hero {
+  text-align: center;
+  padding-bottom: var(--rei-space-16);
+}
+
+.rei-instrument-rail__section--muted {
+  padding-top: var(--rei-space-8);
+}
+
+.rei-instrument-rail__section--muted .rei-instrument-rail__row {
+  opacity: 0.5;
+}
+
+.rei-instrument-rail__hero-label {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--rei-text-muted);
+  margin-bottom: 4px;
+}
+
+.rei-instrument-rail__hero-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #4ade80;
+  line-height: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .rei-instrument-rail__label {
