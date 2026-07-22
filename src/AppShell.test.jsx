@@ -102,4 +102,15 @@ describe("AppShell", () => {
     expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("REI.ai");
     expect(document.title).toBe("PromptHound Labs | REI.ai");
   });
+
+  it("loads the landing page storefront from the #landing hash", async () => {
+    window.history.replaceState({}, "", "/#landing");
+
+    render(<AppShell />);
+    await waitForLazySettle();
+
+    expect(screen.getByText(/An Information-Theoretic Routing & Reasoning Engine/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Try the Demo/i })).toBeInTheDocument();
+    expect(document.title).toBe("PromptHound Labs | CARDO REI");
+  });
 });

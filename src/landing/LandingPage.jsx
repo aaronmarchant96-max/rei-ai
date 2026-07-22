@@ -4,7 +4,7 @@ import { LandingStats } from "./LandingStats";
 import { LandingHowItWorks } from "./LandingHowItWorks";
 import { LandingCTA } from "./LandingCTA";
 
-export function LandingPage({ onTryDemo }) {
+export default function LandingPage({ onTryDemo }) {
   return (
     <div className="bg-zinc-950 min-h-screen text-white font-sans selection:bg-amber-500/30 selection:text-amber-200">
       <LandingHero onTryDemo={onTryDemo} />
