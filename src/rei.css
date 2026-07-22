@@ -1,4 +1,4 @@
-/* ─── Research Lab Theme — tokens ─── */
+
 :root {
   --rei-bg: #0b0d10;
   --rei-surface: #0f1115;
@@ -1764,6 +1764,16 @@ body,
 }
 
 .rei-redteam-report {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  border: 1px solid var(--rei-border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  padding: var(--rei-space-16);
+  margin: var(--rei-space-24) auto;
+  max-width: 960px;
+  animation: fadeIn 0.5s ease-out;
+}
   background: var(--rei-surface-raised);
   border: 1px solid var(--rei-border);
   border-radius: var(--rei-radius);
@@ -2038,4 +2048,44 @@ body,
   background: rgba(239, 68, 68, 0.2);
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* ─── Red Team Report UI Enhancements ─── */
+.rei-redteam-report {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  border: 1px solid var(--rei-border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  padding: var(--rei-space-16);
+  margin: var(--rei-space-24) auto;
+  max-width: 960px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.rei-redteam-verdict {
+  background: var(--rei-spectral);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.rei-show-more {
+  background: linear-gradient(90deg, var(--rei-accent), var(--rei-success));
+  color: var(--rei-text);
+  border: none;
+  border-radius: 6px;
+  padding: var(--rei-space-8) var(--rei-space-12);
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.rei-show-more:hover {
+  transform: scale(1.04);
+  opacity: 0.9;
+}
+
+.rei-redteam-finding {
+  animation: fadeIn 0.3s ease forwards;
 }
