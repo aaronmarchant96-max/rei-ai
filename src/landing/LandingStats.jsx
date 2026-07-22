@@ -6,7 +6,7 @@ export function LandingStats() {
     {
       metric: "90%",
       title: "Real-World Cost Savings",
-      desc: "Compared to always routing to premium models. Our Layer 0 deterministic engine captures greetings and smalltalk at $0, reducing production cost significantly below laboratory benchmarks.",
+      desc: "Cost saving vs premium‑only routing by handling greetings at $0.",
     },
     {
       metric: "162",

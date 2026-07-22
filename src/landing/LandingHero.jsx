@@ -13,12 +13,12 @@ export function LandingHero({ onTryDemo }) {
 
         {/* Heading */}
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight max-w-4xl leading-tight md:leading-none mb-6">
-          CARDO REI: <span className="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">An Information-Theoretic Routing & Reasoning Engine</span>
+          REI.ai: <span className="bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">The AI that routes itself. Pay for reasoning, not greetings.</span>
         </h1>
 
         {/* Subheading */}
         <p className="text-lg md:text-xl text-zinc-400 max-w-3xl leading-relaxed mb-10">
-          Deconstruct reasoning under uncertainty. Deflect simple greetings to $0 paths. Route coding to 70B models at $0.0014/1K tokens. Escalate to premium models only when the utility justification is proven.
+          A lightweight routing layer that saves you money by sending only the hard queries to premium models.
         </p>
 
         {/* CTA Buttons */}

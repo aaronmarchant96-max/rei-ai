@@ -39,9 +39,7 @@ export function LandingHowItWorks() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight mb-4">How the Routing Pipeline Works</h2>
-          <p className="text-zinc-400">
-            A unified routing architecture governing five domains with zero domain-specific code. Every escalation decision is explicit, auditable, and reproducible — eliminating quality-bleed (cheap model under-delivers) and cost-bleed (premium model used unnecessarily).
-          </p>
+          <p className="text-zinc-400">Three decisions, in order, every time.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {steps.map((step, i) => (

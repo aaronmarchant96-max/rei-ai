@@ -124,7 +124,7 @@ export default function AppShell() {
         : tool === "storm-replay"
           ? "PromptHound Labs | Storm Replay"
         : tool === "cardo-guard"
-            ? "PromptHound Labs | CARDO GUARD"
+            ? "PromptHound Labs | REI.ai Guard"
             : tool === "rei"
             ? "PromptHound Labs | REI.ai"
               : tool === "tracepoint"

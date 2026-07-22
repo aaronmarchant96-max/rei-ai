@@ -23,6 +23,15 @@ export default function SessionSummary({
   return (
     <div className="rei-session-footer">
       <div className="rei-session-footer__summary">
+        {savingsVsPremium > 0 && (
+          <div className="rei-session-footer__savings">
+            <span className="rei-session-footer__savings-label">SAVED</span>
+            <span className="rei-session-footer__savings-hero">
+              <span className="rei-session-footer__savings-pct">{savingsPercent}%</span>
+              <span className="rei-session-footer__savings-amt">${savingsVsPremium.toFixed(4)}</span>
+            </span>
+          </div>
+        )}
         <div className="rei-session-footer__stats">
           <span className="rei-session-footer__stat">
             <span className="rei-session-footer__stat-value">{sessionTokens.toLocaleString()}</span>
@@ -42,15 +51,7 @@ export default function SessionSummary({
           </span>
         </div>
 
-        {savingsVsPremium > 0 && (
-          <div className="rei-session-footer__savings">
-            <span className="rei-session-footer__savings-label">SAVED</span>
-            <span className="rei-session-footer__savings-hero">
-              <span className="rei-session-footer__savings-pct">{savingsPercent}%</span>
-              <span className="rei-session-footer__savings-amt">${savingsVsPremium.toFixed(4)}</span>
-            </span>
-          </div>
-        )}
+
 
         {escalationCount > 0 && (
           <span className="rei-session-footer__escalations">
