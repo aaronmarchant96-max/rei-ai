@@ -1774,12 +1774,7 @@ body,
   max-width: 960px;
   animation: fadeIn 0.5s ease-out;
 }
-  background: var(--rei-surface-raised);
-  border: 1px solid var(--rei-border);
-  border-radius: var(--rei-radius);
-  padding: 20px;
-  margin-bottom: 16px;
-}
+
 
 .rei-redteam-header {
   display: flex;
