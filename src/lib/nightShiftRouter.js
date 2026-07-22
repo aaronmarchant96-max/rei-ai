@@ -345,6 +345,24 @@ export function getFingerprintCatalog() {
  *    - Complexity-tiered responses
  *    - Minimal necessary force
  */
+/**
+ * buildRouterDecision — Core routing engine. Determines the optimal model and pathway for a given input.
+ * 
+ * Uses CARDO REI methodology: Complexity scoring, catalog matching, and cost-aware decision making.
+ * 
+ * @param {Object} options - Routing options
+ * @param {string} options.input - User input to route
+ * @param {string} options.domain - Domain context (default: "assistant")
+ * @param {Array} options.history - Previous conversation messages
+ * @param {string} options.attachedRecord - Additional context record
+ * @param {boolean} options.requiresAdversarial - Force adversarial routing
+ * @param {boolean} options.thrifty - Force cheapest model
+ * @returns {Object} Routing decision with model, pathway, costs, and rationale
+ * 
+ * @example
+ *   buildRouterDecision({ input: "Write a Python function", domain: "coding" })
+ *   // → { id: "coding-hinge", model: "llama-3.3-70b-versatile", pathway: "medium", ... }
+ */
 export function buildRouterDecision({
   input = "",
   domain = "assistant",

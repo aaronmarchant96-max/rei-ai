@@ -189,11 +189,35 @@ function buildPromptWithContext(prompt, domainLabel, domainRules, recordBlock) {
   return `Domain: ${label}\nRules: ${rules}${record}\n\nUser Query: ${userQuery}`;
 }
 
+/**
+ * selectGroqModel — Routes input to the appropriate LLM based on fingerprint analysis.
+ * 
+ * @param {string} prompt - User input to analyze
+ * @param {Object} routerDecision - (Optional) Pre-computed routing decision
+ * @returns {string} Model name (e.g., "gpt-4o", "llama-3.3-70b-versatile")
+ * 
+ * @example
+ *   selectGroqModel("write a function")  // → "llama-3.3-70b-versatile" (fast)
+ *   selectGroqModel("explain my bug", {model: "gpt-4o"})  // → "gpt-4o" (premium)
+ */
 function selectGroqModel(prompt = "", routerDecision = null) {
   const decision = routerDecision || buildRouterDecision({ input: prompt });
   return resolveRoutingModel(decision) || DEFAULT_MODEL || "llama-3.3-70b-versatile";
 }
 
+/**
+ * callGroqDirectly — Calls the Groq API (or OpenAI for premium routes) with the given prompt.
+ * 
+ * @param {string} prompt - The user's input/query
+ * @param {string} systemPrompt - System message to prepend (defaults to REI_SYSTEM_PROMPT)
+ * @param {Array} history - Previous conversation messages
+ * @param {Object} routerDecision - (Optional) Pre-computed routing decision for model selection
+ * @returns {Promise<Object>} Response containing content, model used, and usage stats
+ * 
+ * @example
+ *   await callGroqDirectly("What is the capital of France?")
+ *   // → { content: "The capital of France is Paris.", model: "llama-3.3-70b-versatile", usage: {...} }
+ */
 async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerDecision = null) {
   const isPremiumRoute = routerDecision?.model === "gpt-4o" || routerDecision?.id === "adversarial-validation";
   const isGptMode =
@@ -446,6 +470,25 @@ async function handleRedTeamRequest({ input, history = [], routerDecision = null
   };
 }
 
+/**
+ * handleCfaiRequest — Main request handler for CFai API. Routes through CLI or direct API calls.
+ * 
+ * @param {string} command - Command to execute (e.g., "chat", "eval", "route")
+ * @param {Array} args - Command arguments
+ * @param {string} input - User input/prompt
+ * @param {string} systemPrompt - System message override
+ * @param {Array} history - Conversation history
+ * @param {Object} routerDecision - (Optional) Pre-computed routing decision
+ * @param {string} domain - Domain context (e.g., "assistant", "genealogy", "coding")
+ * @param {string} domainLabel - Label for the domain
+ * @param {Array} domainRules - Domain-specific rules
+ * @param {string} recordBlock - Additional context block
+ * @returns {Promise<Object>} Response with result, model, usage, and metadata
+ * 
+ * @example
+ *   await handleCfaiRequest("chat", [], "Write a Python function", "", [])
+ *   // → { success: true, result: "Here's a Python function:", model: "llama-3.3-70b-versatile", ... }
+ */
 async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null, domain = "", domainLabel = "", domainRules = [], recordBlock = "") {
   const resolvedPrompt = resolveSystemPrompt(systemPrompt, domain, domainLabel, domainRules);
   const payload = input || (args.length > 0 ? args.join(" ") : "help");

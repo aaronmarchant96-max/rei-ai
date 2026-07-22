@@ -1,6 +1,8 @@
 # REI_VIBE_MASTER_INDEX.md — Template Structure
 **Purpose:** Single source of truth for all REI.AI, CARDO REI, Vibe handoff, battle arena contexts, and Night Shift / REI Fingerprint Router system. Prevents redundant token spend across sessions.
 
+> **START HERE:** See `CLI_ENTRY.md` instead (optimized for speed). Use this file for deep reference only.
+
 > **💡 USE THIS FIRST:** Before reading any individual file or starting any session, check this index. If the info is here, reference it instead of re-reading source files.
 
 ---
