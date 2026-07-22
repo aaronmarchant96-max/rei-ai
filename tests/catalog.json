@@ -1,0 +1,181 @@
+{
+  "version": "1.0.0",
+  "description": "Test case catalog for debate-furnace. Use this instead of reading full test files.",
+  "tokenImpact": "High - prevents 1000+ tokens/session by avoiding test file reads",
+  "catalogs": {
+    "nightShiftRouter": [
+      {
+        "id": "simple_greeting",
+        "category": "routing",
+        "input": "hello",
+        "expectedRoute": "simple-greeting",
+        "expectedPathway": "cheap",
+        "description": "Greetings should route to cheap fast model",
+        "testFile": "src/lib/nightShiftRouter.test.js"
+      },
+      {
+        "id": "time_of_day_greeting",
+        "category": "routing",
+        "input": "good morning",
+        "expectedRoute": "simple-greeting",
+        "expectedPathway": "cheap",
+        "description": "Time-based greetings route to cheap model"
+      },
+      {
+        "id": "coding_request",
+        "category": "routing",
+        "input": "implement a react hook for form validation",
+        "expectedRoute": "coding-hinge",
+        "expectedPathway": "medium",
+        "description": "Coding requests route to medium with HARD STOP verification"
+      },
+      {
+        "id": "genealogy_request",
+        "category": "routing",
+        "input": "find my great-grandfather's census record",
+        "expectedRoute": "genealogy-deep-dive",
+        "expectedPathway": "medium",
+        "description": "Genealogy requests route to evidence-tiered reasoning"
+      },
+      {
+        "id": "story_request",
+        "category": "routing",
+        "input": "write a story about a detective in 1920s Shanghai",
+        "expectedRoute": "story-architect",
+        "expectedPathway": "medium",
+        "description": "Creative writing routes to story architect"
+      },
+      {
+        "id": "adversarial_request",
+        "category": "routing",
+        "input": "red team this business plan and find the fatal flaw",
+        "expectedRoute": "red-team-surface",
+        "expectedPathway": "cheap",
+        "description": "Adversarial requests route to red team surface scan"
+      },
+      {
+        "id": "high_structure_request",
+        "category": "routing",
+        "input": "what would change my mind about universal basic income",
+        "expectedRoute": "structured-reasoning",
+        "expectedPathway": "medium",
+        "description": "High-structure uncertainty routes to stricter reasoning gate"
+      },
+      {
+        "id": "empty_input",
+        "category": "edge_case",
+        "input": "",
+        "expectedRoute": "structured-reasoning",
+        "expectedPathway": "medium",
+        "description": "Empty input falls back to default reasoning"
+      },
+      {
+        "id": "deterministic_greeting",
+        "category": "deterministic",
+        "input": "hi",
+        "expectedPathway": "deterministic",
+        "expectedCost": 0,
+        "description": "Simple greetings trigger $0 deterministic responses"
+      }
+    ],
+    "cardoGuard": [
+      {
+        "id": "escalate_low_confidence_cheap",
+        "category": "escalation",
+        "confidence": 0.4,
+        "pathway": "cheap",
+        "expectedEscalate": true,
+        "reason": "Confidence below 0.5 threshold for cheap pathway"
+      },
+      {
+        "id": "escalate_low_confidence_medium",
+        "category": "escalation",
+        "confidence": 0.25,
+        "pathway": "medium",
+        "expectedEscalate": true,
+        "reason": "Confidence below 0.3 threshold for medium pathway"
+      },
+      {
+        "id": "no_escalate_high_confidence",
+        "category": "escalation",
+        "confidence": 0.8,
+        "pathway": "medium",
+        "expectedEscalate": false,
+        "reason": "Confidence meets pathway quality threshold"
+      },
+      {
+        "id": "no_escalate_premium",
+        "category": "escalation",
+        "pathway": "premium",
+        "expectedEscalate": false,
+        "reason": "Already using premium pathway, no higher tier available"
+      },
+      {
+        "id": "no_escalate_deterministic",
+        "category": "escalation",
+        "pathway": "deterministic",
+        "expectedEscalate": false,
+        "reason": "Deterministic pathway has maximum confidence (1.0)"
+      }
+    ],
+    "deterministicEngine": [
+      {
+        "id": "greeting_pattern",
+        "category": "pattern_matching",
+        "input": "hi",
+        "expectedMatch": true,
+        "expectedResponse": "Hey. Say what you want to sort out, and I'll help pull it apart cleanly.",
+        "cost": 0
+      },
+      {
+        "id": "thanks_pattern",
+        "category": "pattern_matching",
+        "input": "thank you",
+        "expectedMatch": true,
+        "expectedResponse": "Of course. What's next?",
+        "cost": 0
+      },
+      {
+        "id": "test_pattern",
+        "category": "pattern_matching",
+        "input": "ping",
+        "expectedMatch": true,
+        "expectedResponse": "Pong. What's the real question?",
+        "cost": 0
+      },
+      {
+        "id": "no_match",
+        "category": "pattern_matching",
+        "input": "write a python function",
+        "expectedMatch": false,
+        "expectedResponse": null,
+        "cost": 0
+      }
+    ],
+    "routingEval": [
+      {
+        "id": "benchmark_57_prompts",
+        "category": "benchmark",
+        "promptCount": 57,
+        "expectedAccuracy": "80%",
+        "expectedSavings": ">0%",
+        "expectedDeterministicCount": ">0",
+        "description": "Main routing eval benchmark - must pass assertion gates"
+      },
+      {
+        "id": "blind_27_prompts",
+        "category": "benchmark",
+        "promptCount": 27,
+        "expectedAccuracy": ">40%",
+        "description": "Blind held-out test set for honesty"
+      }
+    ]
+  },
+  "howToUse": {
+    "query": "To find test cases, search this file: rg 'category: routing' tests/catalog.json",
+    "addNew": "Add new cases to the appropriate catalog section and update the test files",
+    "verify": "Run: npm test -- --testPathPatterns=catalog"
+  },
+  "lastUpdated": "2026-07-21",
+  "maintainer": "PromptHound Labs"
+}

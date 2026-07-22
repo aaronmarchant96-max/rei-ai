@@ -1,3 +1,9 @@
+/**
+ * CARDO GUARD - Cost decision engine for LLM routing
+ * 
+ * Implements thermodynamic trade-off analysis: Expected Miss Loss > Expected Action Waste
+ * Uses confidence bands to determine false alarm rates and make escalation decisions.
+ */
 export const CARDO_GUARD_SCENARIOS = [
   {
     id: "road-closure-reroute",
@@ -28,6 +34,11 @@ export const CARDO_GUARD_SCENARIOS = [
   },
 ];
 
+/**
+ * getScenarioById — Retrieves a CARDO GUARD scenario by its ID.
+ * @param {string} id - Scenario identifier
+ * @returns {Object} Matching scenario or the first scenario as default
+ */
 export function getScenarioById(id) {
   return CARDO_GUARD_SCENARIOS.find((scenario) => scenario.id === id) || CARDO_GUARD_SCENARIOS[0];
 }
@@ -191,6 +202,17 @@ export function buildCardoGuardWhyThisVerdict(review) {
  * @param {number} params.premiumCost - cost of premium pathway
  * @param {string} params.qualityGate - quality requirements
  * @returns {{ escalate: boolean, reason: string }}
+ */
+/**
+ * shouldEscalateToRemote — Determines if a request should escalate to a premium model.
+ * Uses CARDO GUARD logic: escalates if Expected Miss Loss > Expected Action Waste.
+ * @param {Object} options - Escalation options
+ * @param {number} options.confidence - Routing confidence (0-1)
+ * @param {string} options.pathway - Current pathway tier (deterministic/cheap/medium/premium)
+ * @param {number} options.estimatedCost - Cost of current pathway
+ * @param {number} options.premiumCost - Cost of premium pathway
+ * @param {string} options.qualityGate - Quality requirements
+ * @returns {Object} Escalation decision with reason
  */
 export function shouldEscalateToRemote({
   confidence = 0,

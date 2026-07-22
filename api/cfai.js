@@ -171,6 +171,14 @@ Dissect all queries regarding these lines against these verified facts. Do not a
   story: `You are REI.ai, a creative story architect using the CARDO REI narrative methodology. CARDO REI is Latin for finding the hinge of the story—the core turning point or character driver hinge (what each character actually wants and fears that pivots the arc). Dissect the narrative blueprint to isolate this hinge before expanding any outline. Speak with direct narrative clarity, avoid cliché tropes, and structure clear structural timelines.`,
 };
 
+/**
+ * resolveSystemPrompt — Resolves the system prompt for a given domain.
+ * @param {string} systemPrompt - Explicit system prompt override
+ * @param {string} domain - Domain identifier
+ * @param {string} domainLabel - Domain label
+ * @param {Array} domainRules - Domain-specific rules
+ * @returns {string} Resolved system prompt
+ */
 function resolveSystemPrompt(systemPrompt, domain, domainLabel, domainRules) {
   if (domain && DOMAIN_SYSTEM_PROMPTS[domain]) {
     return DOMAIN_SYSTEM_PROMPTS[domain];
@@ -181,6 +189,14 @@ function resolveSystemPrompt(systemPrompt, domain, domainLabel, domainRules) {
   return systemPrompt || REI_SYSTEM_PROMPT;
 }
 
+/**
+ * buildPromptWithContext — Constructs a context-aware prompt with domain info.
+ * @param {string} prompt - User query
+ * @param {string} domainLabel - Domain label
+ * @param {Array} domainRules - Domain-specific rules
+ * @param {string} recordBlock - Additional record context
+ * @returns {string} Formatted prompt with domain context
+ */
 function buildPromptWithContext(prompt, domainLabel, domainRules, recordBlock) {
   const label = domainLabel || "REI.ai";
   const rules = Array.isArray(domainRules) ? domainRules.join(", ") : "";
@@ -350,6 +366,14 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   };
 }
 
+/**
+ * handleRedTeamRequest — Processes red-team/adversarial inputs through the scanner pipeline.
+ * @param {Object} options - Request options
+ * @param {string} options.input - User input to scan
+ * @param {Array} options.history - Conversation history
+ * @param {Object} options.routerDecision - (Optional) Pre-computed routing decision
+ * @returns {Promise<Object>} Red team scan results with verdict and findings
+ */
 async function handleRedTeamRequest({ input, history = [], routerDecision = null }) {
   const d1Result = scanRedTeamInput(input);
 
@@ -649,9 +673,15 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
   }
 }
 
+/**
+ * handler — Vercel API route handler for CFai requests.
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ * @returns {void} Sends JSON response
+ */
 export default async function handler(req, res) {
   try {
-    // Set headers
+    // Set headers for JSON response
     res.setHeader("Content-Type", "application/json");
 
     if (req.method === "POST") {

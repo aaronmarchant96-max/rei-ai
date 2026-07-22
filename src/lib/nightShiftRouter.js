@@ -574,6 +574,11 @@ export function buildRouterDecision({
   return decision;
 }
 
+/**
+ * resolveRoutingModel — Extracts the model name from a routing decision.
+ * @param {Object} routerDecision - Routing decision object
+ * @returns {string} Model name (defaults to FALLBACK_MODEL)
+ */
 export function resolveRoutingModel(routerDecision) {
   if (!routerDecision?.model) {
     return FALLBACK_MODEL;
@@ -582,6 +587,11 @@ export function resolveRoutingModel(routerDecision) {
   return routerDecision.model;
 }
 
+/**
+ * getRouterSummary — Returns a concise summary of a routing decision.
+ * @param {Object} routerDecision - Routing decision object
+ * @returns {Object|null} Summary with key fields or null
+ */
 export function getRouterSummary(routerDecision) {
   if (!routerDecision) {
     return null;

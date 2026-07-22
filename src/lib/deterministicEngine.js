@@ -45,6 +45,11 @@ const PATTERNS = [
   },
 ];
 
+/**
+ * resolveDeterministic — Matches input against deterministic patterns for $0 responses.
+ * @param {string} input - User input to match
+ * @returns {Object|null} Deterministic response object or null if no match
+ */
 export function resolveDeterministic(input) {
   if (!input || !input.trim()) return null;
 
@@ -66,6 +71,10 @@ export function resolveDeterministic(input) {
   return null;
 }
 
+/**
+ * getDeterministicCatalog — Returns all deterministic patterns for inspection.
+ * @returns {Array} Array of pattern objects with regex and response strings
+ */
 export function getDeterministicCatalog() {
   return PATTERNS.map(({ pattern, response }) => ({
     pattern: pattern.toString(),
