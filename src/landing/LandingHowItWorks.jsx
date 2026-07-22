@@ -15,7 +15,7 @@ export function LandingHowItWorks() {
     {
       step: "02",
       title: "Evaluate (CARDO GUARD)",
-      desc: "Escalation to premium models is checked by our cost-weighted utility gate. It runs a thermodynamic inequality (`L > W`) to decide if expensive inference is mathematically justified.",
+      desc: "Escalation to premium models is controlled by the CARDO GUARD cost gate. It evaluates one explicit inequality — Miss Loss > Waste → ACT — to decide if expensive inference is justified. If it isn't, the query stays on the cheaper model.",
       icon: (
         <svg className="w-10 h-10 text-amber-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -40,7 +40,7 @@ export function LandingHowItWorks() {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight mb-4">How the Routing Pipeline Works</h2>
           <p className="text-zinc-400">
-            A unified reasoning architecture governing five domains with zero domain-specific code. By treating reasoning as a cost-weighted phase transition, we eliminate quality-bleed and cost-bleed.
+            A unified routing architecture governing five domains with zero domain-specific code. Every escalation decision is explicit, auditable, and reproducible — eliminating quality-bleed (cheap model under-delivers) and cost-bleed (premium model used unnecessarily).
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
