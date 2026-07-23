@@ -8,7 +8,7 @@
   --border: rgba(255, 255, 255, 0.08);
   --border-green: rgba(159, 179, 160, 0.14);
   --accent: #d6b04c;
-  --accent-strong: #f0c75e;
+  --accent-strong: var(--rei-accent);
   --accent-muted: rgba(214, 176, 76, 0.12);
   --support: #86a890;
   --text: #f4f4ec;
@@ -1909,7 +1909,7 @@ button {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #f0c75e;
+  color: var(--rei-accent);
 }
 
 .tracepoint__hero h1 {
@@ -2046,7 +2046,7 @@ button {
 }
 
 .tracepoint-chart {
-  --tracepoint-accent: #f0c75e;
+  --tracepoint-accent: var(--rei-accent);
   display: grid;
   gap: 10px;
   border-color: rgba(255, 255, 255, 0.05);
@@ -2056,7 +2056,7 @@ button {
 }
 
 .tracepoint-chart--amber {
-  --tracepoint-accent: #f0c75e;
+  --tracepoint-accent: var(--rei-accent);
 }
 
 .tracepoint-chart--red {
@@ -2172,7 +2172,7 @@ button {
 }
 
 .tracepoint-chart__point-group:hover .tracepoint-chart__point {
-  fill: #f0c75e;
+  fill: var(--rei-accent);
   stroke: rgba(255, 255, 255, 0.95);
 }
 
@@ -2365,7 +2365,7 @@ button {
 }
 
 .tracepoint-gauge__arc--amber {
-  stroke: #f0c75e;
+  stroke: var(--rei-accent);
 }
 
 .tracepoint-gauge__arc--muted {
@@ -2745,7 +2745,7 @@ button {
 }
 
 .tracepoint-ladder__step strong {
-  color: #f0c75e;
+  color: var(--rei-accent);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;

@@ -17,6 +17,7 @@ import RedTeamReport from "./components/RedTeamReport.jsx";
 import { parseEvidenceTiers } from "./components/EvidenceCard.jsx";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
 import "./rei.css";
+import logo from "./assets/logo.png";
 
 const DOMAIN_PROFILES = [
   {
@@ -554,9 +555,7 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
     <div className="rei-shell">
       <header className="rei-header">
           <div className="rei-header__brand">
-            <div className="rei-logo-mark">
-              <HingeMark size={20} animated={false} />
-            </div>
+<img src={logo} alt="REI logo" className="rei-logo-img" style={{width:20,height:20,borderRadius:6}} />
             <h1 className="rei-logo-title">REI</h1>
             <span className="rei-header__build-tag">v2.0 · Night Shift Router</span>
             <span className="rei-header__tagline">Budget-respecting reasoning.</span>

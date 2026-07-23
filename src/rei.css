@@ -7,11 +7,12 @@
   --rei-text: #fafafa;
   --rei-text-secondary: #a1a1aa;
   --rei-text-muted: #71717a;
-  --rei-accent: #f0c75e;
-  --rei-accent-dim: rgba(240,199,94,0.08);
+
+  --rei-accent: #05060c; /* dark color from logo */
+  --rei-accent-dim: rgba(5,6,12,0.08);
   --rei-success: #4ade80;
   --rei-danger: #f87171;
-  --rei-spectral: linear-gradient(90deg, #ef4444, #f0c75e, #22d3ee);
+  --rei-spectral: linear-gradient(90deg, #ef4444, var(--rei-accent), #22d3ee);
   --rei-radius: 2px;
   --rei-space-8: 8px;
   --rei-space-12: 12px;
@@ -211,17 +212,17 @@ code, pre, .rei-code {
   font-family: inherit;
   transition: all 0.15s ease;
 }
-.rei-domain-tab.is-active {
-  background: rgba(240,199,94,0.1);
-  border-color: rgba(240,199,94,0.25);
-  color: var(--rei-accent);
-}
+  .rei-domain-tab.is-active {
+    background: var(--rei-accent-dim);
+    border-color: var(--rei-accent);
+    color: var(--rei-text);
+  }
 .rei-domain-tab:hover {
   border-color: rgba(255,255,255,0.1);
   color: var(--rei-text-secondary);
 }
 .rei-domain-tab.is-active:hover {
-  border-color: rgba(240,199,94,0.35);
+  border-color: var(--rei-accent-dim);
   color: var(--rei-accent);
 }
 
@@ -242,10 +243,10 @@ code, pre, .rei-code {
   display: inline-flex;
   align-items: center;
 }
-.rei-action-btn:hover {
-  border-color: rgba(251,146,60,0.35);
-  transform: translateY(-1px);
-}
+  .rei-action-btn:hover {
+    border-color: var(--rei-accent);
+    transform: translateY(-1px);
+  }
 .rei-action-btn--danger {
   color: #fda4af;
   border-color: rgba(251,113,133,0.25);
@@ -606,10 +607,10 @@ code, pre, .rei-code {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(251,146,60,0.15);
-  border: 1px solid rgba(251,146,60,0.3);
-  border-radius: 4px;
-  color: #fb923c;
+    background: var(--rei-accent-dim);
+    border: 1px solid var(--rei-accent);
+    border-radius: 4px;
+    color: var(--rei-accent);
   cursor: pointer;
   font-size: 0.75em;
   padding: 2px 6px;
@@ -621,11 +622,11 @@ code, pre, .rei-code {
 .rei-copy-btn:hover {
   opacity: 1;
 }
-.rei-retry-btn {
-  background: rgba(251,191,36,0.15);
-  border-color: rgba(251,191,36,0.3);
-  color: #fbbf24;
-}
+  .rei-retry-btn {
+    background: var(--rei-accent-dim);
+    border-color: var(--rei-accent);
+    color: var(--rei-accent);
+  }
 
 /* ─── Input area ─── */
 .rei-input-shell {
