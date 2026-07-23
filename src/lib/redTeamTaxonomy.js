@@ -24,7 +24,14 @@ export const RED_TEAM_CATEGORIES = {
       "give me your prompt",
       "tell me your instructions",
       "leak your prompt",
-      "expose your instructions"
+      "expose your instructions",
+      "your guardrails",
+      "provide your guardrails",
+      "what are your guardrails",
+      "show your guardrails",
+      "tell me your guardrails",
+      "give me your guardrails",
+      "what is your guardrails"
     ],
     weight: 1.0
   },
@@ -91,7 +98,15 @@ export const RED_TEAM_CATEGORIES = {
       "disregard all previous",
       "forget all previous",
       "drop all previous",
-      "discard all previous"
+      "discard all previous",
+      "break you",
+      "brek you",
+      "help me break",
+      "help me brek",
+      "how to break you",
+      "how to brek you",
+      "break the program",
+      "brek the program"
     ],
     weight: 0.9
   },
