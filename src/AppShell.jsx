@@ -52,21 +52,20 @@ const TOP_LEVEL = [
 const isTest = typeof process !== "undefined" && process.env.NODE_ENV === "test";
 
 function getInitialTool() {
-  if (typeof window === "undefined") return isTest ? "rei" : "landing";
+  if (typeof window === "undefined") return "landing";
   const hash = window.location.hash;
   if (hash && hash !== "") {
     if (hash === "#story-forge") return "story-forge";
     if (hash === "#storm-replay") return "storm-replay";
     if (hash === "#cardo-guard") return "cardo-guard";
-    if (hash === "#rei" || hash === "#cfai") return "rei";
+    if (hash === "#rei" || hash === "#cfai" || hash === "#hinge-meter") return "rei";
     if (hash === "#tracepoint") return "tracepoint";
     if (hash === "#landing") return "landing";
-    if (hash === "#hinge-meter") return "rei"; // default unknown hashes to flagship
+    if (hash === "#tools") return "tools";
   }
-  // Treat /tools as the flagship entry point; explicit Tools tab still works.
   if (window.location.pathname === "/tools" || window.location.pathname === "/tools/")
-    return "rei";
-  return isTest ? "rei" : "landing";
+    return "tools";
+  return "landing";
 }
 
 function getToolPath(tool) {
