@@ -1,7 +1,6 @@
-# REI.ai — CARDO REI: An Information-Theoretic Routing & Reasoning Engine
+# REI.ai — CARDO REI: A Cost-Aware Routing & Reasoning Engine
 
-**Toward an Information Theory of Practical AI Reasoning**  
-*Physics-inspired design principles applied to deterministic, cost-aware LLM routing.*
+Deconstruct reasoning under uncertainty. Deflect simple greetings to $0 paths. Route coding to 70B models at $0.0014/1K tokens. Escalate to premium models only when the utility justification is proven.
 
 ---
 
