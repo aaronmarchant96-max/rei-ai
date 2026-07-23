@@ -532,14 +532,7 @@ export function buildRouterDecision({
     : catalogConfidence > 0 ? catalogConfidence
     : decision.confidence?.[pathwayConfKey] || 0.5;
 
-  const premiumEntry = ROUTER_CATALOG.reduce((max, entry) => {
-    const cost = (entry.costPer1kInput || 0) + (entry.costPer1kOutput || 0);
-    const maxCost = max ? (max.costPer1kInput || 0) + (max.costPer1kOutput || 0) : 0;
-    return cost > maxCost ? entry : max;
-  }, null) || ROUTER_CATALOG[0];
-  const premiumCostPer1k = premiumEntry
-    ? (premiumEntry.costPer1kInput + premiumEntry.costPer1kOutput)
-    : selectedCostPer1k;
+  const premiumCostPer1k = 0.0125; // gpt-4o baseline rate: $0.0025 input + $0.0100 output per 1k tokens
   decision.premiumCostPer1k = premiumCostPer1k;
   decision.premiumCost = (estimatedInputTokens + (decision.maxTokens || 0)) / 1000 * premiumCostPer1k;
   decision.estimatedCost = (estimatedInputTokens + (decision.maxTokens || 0)) / 1000 * selectedCostPer1k;
