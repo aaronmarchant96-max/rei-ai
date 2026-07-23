@@ -63,6 +63,13 @@ User Input (Red Team tab)
 | child_safety_violation | critical | Child safety related attempts |
 | self_harm_instructions | critical | Self-harm related attempts |
 | weapon_proliferation | critical | Weapon-related attempts |
+| roleplay_jailbreak | high | Roleplay-based safety evasion attempts |
+| translation_attack | medium | Evasion via non-English encoding/translation |
+| authority_impersonation | high | Impersonating developers or system administrators |
+| social_engineering | medium | Manipulation, gaslighting, or sympathy farming |
+| context_poisoning | high | Injection of malicious rules in chat history |
+| nested_instructions | medium | Hypothetical scenario or simulator evasion |
+| obfuscation_attempt | medium | Base64, Hex, URL, or Unicode encoding tricks |
 
 ## Confidence Propagation
 
