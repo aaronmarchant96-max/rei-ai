@@ -220,6 +220,7 @@ export function shouldEscalateToRemote({
   estimatedCost = 0,
   premiumCost = 0,
   qualityGate = "",
+  suspicionScore = 0,
 }) {
   if (pathway === "deterministic") {
     return {
@@ -235,19 +236,34 @@ export function shouldEscalateToRemote({
     };
   }
 
-  if (pathway === "cheap" && confidence < 0.5) {
+  // Force escalation if adversarial suspicion is very high (Phase 3.1 verification)
+  if (suspicionScore >= 0.65) {
     return {
       escalate: true,
-      reason: `Cheap pathway confidence (${(confidence * 100).toFixed(0)}%) below quality threshold. Escalate to medium or premium.`,
+      reason: `Adversarial suspicion score (${(suspicionScore * 100).toFixed(0)}%) is high. Escalating to remote premium model for security verification.`,
+      expectedQuality: 100,
+      expectedCost: premiumCost,
+    };
+  }
+
+  // Adjust routing thresholds dynamically based on moderate suspicion
+  const confidenceAdjustment = suspicionScore > 0.3 ? 0.2 : 0.0;
+  const cheapThreshold = 0.5 + confidenceAdjustment;
+  const mediumThreshold = 0.3 + confidenceAdjustment;
+
+  if (pathway === "cheap" && confidence < cheapThreshold) {
+    return {
+      escalate: true,
+      reason: `Cheap pathway confidence (${(confidence * 100).toFixed(0)}%) below quality threshold (${(cheapThreshold * 100).toFixed(0)}% adjusted for suspicion). Escalate to medium or premium.`,
       expectedQuality: confidence * 100,
       expectedCost: premiumCost,
     };
   }
 
-  if (pathway === "medium" && confidence < 0.3) {
+  if (pathway === "medium" && confidence < mediumThreshold) {
     return {
       escalate: true,
-      reason: `Medium pathway confidence (${(confidence * 100).toFixed(0)}%) below threshold. Consider premium pathway.`,
+      reason: `Medium pathway confidence (${(confidence * 100).toFixed(0)}%) below threshold (${(mediumThreshold * 100).toFixed(0)}% adjusted for suspicion). Consider premium pathway.`,
       expectedQuality: confidence * 100,
       expectedCost: premiumCost,
     };

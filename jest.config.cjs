@@ -12,6 +12,7 @@ module.exports = {
   verbose: true,
   moduleNameMapper: {
     "\\.css$": "identity-obj-proxy",
+    "\\.(png|jpg|jpeg|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   coverageThreshold: {

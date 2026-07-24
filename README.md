@@ -22,7 +22,7 @@ REI is built on five core design principles adapted from theoretical physics dec
 | **1. Reduce** | Strip a complex system down to its fundamental components. | **CARDO REI 8-Stage Pipeline:** Every task decomposes into the same structured phases (Collect, Analyze, Record, Distinguish, Organize, Review, Evaluate, Iterate). |
 | **2. Formulaic Gate** | Express the core dynamics mathematically. | **CARDO GUARD Equation:** All operational decisions reduce to a single cost-weighted utility inequality (`Miss Loss > Action Waste`). |
 | **3. Unify** | Prove the same governing equation holds across diverse domains. | **Multi-Domain Registry:** Genealogy, coding, debate, telemetry, and creative writing are routed and verified using the same core logic with zero domain-specific code. |
-| **4. Test** | Validate model constraints experimentally. | **Assertion-Gated Tests:** 162 automated Jest tests assert chronological, biological, and cost boundaries. The build fails if cost savings $\le 0$. |
+| **4. Test** | Validate model constraints experimentally. | **Assertion-Gated Tests:** 227 automated Jest tests across 18 test suites assert chronological, biological, and cost boundaries. The build fails if cost savings $\le 0$. |
 | **5. Falsify** | Define the criteria that would disprove the system's claims. | **Reproducible Benchmarks:** Zero-inference lexical routing can be run and audited by any third party with identical, deterministic results. |
 
 ---
@@ -99,7 +99,7 @@ npm test -- --testPathPatterns=routingEvalBlind
 ```bash
 npm test
 ```
-Runs all 162 regression tests confirming logical correctness, error boundary recovery, and budget safety.
+Runs all 227 regression tests across 18 test suites confirming logical correctness, error boundary recovery, and budget safety.
 
 ---
 
@@ -112,6 +112,7 @@ Runs all 162 regression tests confirming logical correctness, error boundary rec
 | [**`src/lib/cardoGuard.js`**](src/lib/cardoGuard.js) | Cost-governor — executes the `L > W` escalation inequality check. |
 | [**`src/lib/costHelpers.js`**](src/lib/costHelpers.js) | Unified cost tracker enforcing ceiling-based estimates. |
 | [**`src/__eval__/routingEval.test.js`**](src/__eval__/routingEval.test.js) | 57-prompt benchmark harness with assertion-gated cost/savings checks. |
+| [**`api/v1/chat/completions.js`**](api/v1/chat/completions.js) | OpenAI‑compatible chat completions proxy with REI headers. |
 | [**`data/fingerprints.json`**](data/fingerprints.json) | The static fingerprint catalog with domain keywords and thresholds. |
 
 ---

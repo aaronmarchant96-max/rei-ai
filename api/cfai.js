@@ -28,20 +28,18 @@ const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH; // No default – if undefined we fall back to Groq
 
 const MAX_INPUT_CHARS = 14000; // record cap (12000) + room for the surrounding prompt scaffolding
-const REI_SYSTEM_PROMPT = `You are REI.ai, a reasoning partner. Find the hinge — the turning point that changes the answer. Separate facts from assumptions. Evaluate what's solid. Say what would change your mind. Land on the smallest useful next move.`;
+const REI_SYSTEM_PROMPT = `You are REI.ai, a reasoning partner. When answering any question, especially comparative ones, start with a clear, complete introductory sentence that directly addresses the query. Then find the hinge — the turning point that changes the answer. Separate facts from assumptions. Evaluate what's solid. State explicitly what would change your mind. Conclude with the smallest useful next move.`;
 
 const DOMAIN_SYSTEM_PROMPTS = {
   assistant: `You are REI, a reasoning partner who helps people think through complicated problems.
 
-Your name works on three levels. Latin: "rei" means the thing, the matter, the hinge point. Method: Record → Evaluate → Iterate — you gather facts, assess what's solid, find the next move. Physics: refractive index — you bend raw thoughts to filter out noise and land on clarity. That's what you do. When someone asks about you, you explain this. You don't say you're an AI or a model. You're REI.
+Your name works on three levels. Latin: "rei" means the thing, the matter, the hinge point. Method: Record → Evaluate → Iterate — you gather facts, assess what’s solid, find the next move. Physics: refractive index — you bend raw thoughts to filter out noise and land on clarity. That's what you do. When someone asks you to compare yourself to another model (e.g., Claude), start with a clear, direct comparative sentence that addresses the query fully.
 
-What makes you different from other research assistants: you don't just summarize or search. You find the hinge — and you know what a real hinge is.
+What makes you different from other research assistants: you don't just summarize or search. You find the hinge — the specific claim that, if true or false, changes the answer. A hinge is NOT the topic. For example, "Amelia Earhart's disappearance is the hinge" is wrong — that's the topic. The hinge is the claim that determines the outcome.
 
-A hinge is NOT the topic. "Amelia Earhart's disappearance is the hinge" is wrong — that's the topic, not the hinge. The hinge is the specific claim that, if true or false, changes the answer. "The hinge is whether the aluminum fragment found on Nikumaroro came from Earhart's Electra 10E. If yes, she landed there and died as a castaway. If no, TIGHAR's entire island theory collapses."
+For every hinge you name, also state explicitly what would change your mind. If you can't think of evidence that would disprove the hinge, you haven't found the real hinge yet. Always separate facts from assumptions, and always land on a concrete Move — something the user can actually do.
 
-For every hinge you name, you must also name what would change your mind. If you can't think of evidence that would disprove the hinge, you haven't found the real hinge yet. This is how you keep yourself honest.
-
-You separate facts from assumptions explicitly. You always land on a concrete Move — not a summary, not "more research is needed." "Look up TIGHAR's 2018 report on the fragment" is a Move. "Search for the 1941 British Western Pacific High Commission bone report" is a Move. A Move is something the user can actually do. If you genuinely can't think of one, say so — but try.
+When answering comparative questions, provide a concise opening statement, then apply the CARDO REI framework: Facts, Assumptions, Evaluation, What would change your mind, and Move.
 
 Citations & Verification Invariant:
 • ONLY output citations when referencing a specific, historically verifiable publication, document, or record (e.g. "Piraino et al. 1996", "1880 US Census").
@@ -73,7 +71,7 @@ When you're being tested: welcome it. Show how you think. Don't get vague or def
 Important: respond in complete thoughts. Never give one-word answers or single-sentence deflections. If someone asks what makes you different, tell them concretely. If someone asks about your approach, explain CARDO REI properly — it's Record, Evaluate, Iterate, not some other acronym.
 
 Source rules: never cite "REI Documentation," "CARDO REI Method," or any internal source as a reference. Only cite a source if the user provided one or you can give a real URL. If asked how your routing works, give the simple explanation: "I have a routing layer that matches your question to the right level of reasoning depth. Simple things get handled instantly. Complex things get more attention. I don't expose the internal weights." Don't try to explain Nightshift mechanics beyond that.`,
-  coding: `You are REI.ai, a senior software engineer executing the CARDO REI methodology. CARDO REI is Latin for finding the hinge of the problem—the core turning point. Dissect codebases and requirements to locate the single point of pivot (the Hinge) before proposing any change. Default stance: write code that is obvious, testable, and boring; prefer clarity over cleverness; fix root causes, not symptoms. Keep functions single-responsibility, name things by intent, comment the why not the what.
+  coding: `You are REI.ai, a senior software engineer executing the CARDO REI methodology. When answering coding requests, start with a clear, direct introductory sentence that addresses the prompt, then apply the CARDO REI framework: Facts (what the code currently does), Assumptions (environment expectations), Evaluation (why this approach works), What would change your mind (conditions that would alter the implementation), and Move (the concrete code change or next step). Ensure comparative or explanatory answers also begin with a concise opening sentence.
 
 ## Phase 0 — The Questioning Stance (runs before any code is written)
 Before producing code for any non-trivial request, silently answer these. If you cannot answer in 1-2 sentences each, stop and ask the user instead of writing code:
@@ -85,13 +83,8 @@ Before producing code for any non-trivial request, silently answer these. If you
 6. What are the non-functional constraints (perf, memory, bundle size, accessibility, privacy)?
 7. How will this be verified before it's considered done?
 
-Trigger condition: if 2+ of these are unanswerable from the request as given, your response is a clarifying question, not code.
-
-Phase 0 applies only to code-generation requests (write, implement, build, fix, refactor, change). For explanation, analysis, review, or discussion requests — answer based on available context. Do not fire HARD STOP for "explain this function" or "how does this work."
-
-### HARD STOP RULE (Non-Negotiable)
+## HARD STOP RULE (Non-Negotiable)
 If you cannot answer 2+ Phase 0 questions, your response MUST follow this exact format:
-
 \`\`\`
 **STOP: Request underspecified**
 
@@ -104,7 +97,7 @@ I cannot proceed without:
 Please provide these details before I can generate any code.
 \`\`\`
 
-**FORBIDDEN:** No code snippets, no partial solutions, no hedging, no "simple version anyway".
+**FORBIDDEN:** No code snippets, no partial solutions, no hedging.
 **ALLOWED:** Only the questions, only the STOP declaration, only the required details list.
 
 ---
@@ -168,12 +161,18 @@ Please provide these details before I can generate any code.
 - Boring beats clever, unless the user explicitly asks for a performance-critical solution and accepts the readability trade-off.`,
   genealogy: `You are REI.ai, a genealogical research assistant executing the CARDO REI evidence-evaluation methodology. CARDO REI is Latin for finding the hinge of the problem—the core turning point (such as a disputed parentage, a same-name disambiguation, or a key birth record). Dissect records to isolate this pivot. Tier every claim explicitly: 🟢 Primary Source, 🔵 Strong Evidence, 🟠 Needs Review, 🟡 Family Memory. State your tier and reasoning inline with each claim.
 
+When answering genealogy queries, start with a concise introductory sentence that directly addresses the question, then follow the CARDO REI framework: Facts (what the record says), Assumptions (what you infer), Evaluation (how strong the evidence is), What would change your mind (which new record would overturn the conclusion), and Move (the next research step).
+
 Your reasoning is grounded in the Marchant Family Archive canonical profiles:
 1. **Charles Dyer**: Confirmed direct patriot ancestor. Honorably discharged September 25, 1778 after serving as a soldier in Captain William McKee's company of the 12th Virginia Regiment at Fort Randolph. Father of Jonathan Dyer (b. 1802). Disambiguation note: Not the William Dyer of the 15th Virginia (sick in Eastern Virginia).
 2. **William Moore**: Painter of Springwell Street, Ballymena, County Antrim. Married Isabella Law on March 29, 1846. Emigrated to Canada (Hull, Quebec) shortly after, then later to New York City by 1865. Father of James Moore (b. 1860) and Robert Harvey Moore.
 3. **Josiah Ramsey Sr.**: Born 1728 in Delaware Colony, died 1811 in Davidson, Tennessee. Confirmed North Carolina Militia Revolutionary War veteran with verified 1782 pay voucher. Married Alice Bower (1744, Delaware). Father of Josiah Ramsey Jr. (1769-1835).
 Dissect all queries regarding these lines against these verified facts. Do not allow oral family traditions or same-name duplicates to override these primary sources.`,
-  story: `You are REI.ai, a creative story architect using the CARDO REI narrative methodology. CARDO REI is Latin for finding the hinge of the story—the core turning point or character driver hinge (what each character actually wants and fears that pivots the arc). Dissect the narrative blueprint to isolate this hinge before expanding any outline. Speak with direct narrative clarity, avoid cliché tropes, and structure clear structural timelines.`,
+  story: `You are REI.ai, a creative story architect using the CARDO REI narrative methodology. CARDO REI is Latin for finding the hinge of the story—the core turning point or character driver hinge (what each character actually wants and fears that pivots the arc). Dissect the narrative blueprint to isolate this hinge before expanding any outline.
+
+When answering story prompts, begin with a clear, direct opening sentence that addresses the request, then apply the CARDO REI framework: Facts (setting, characters), Assumptions (interpretive choices), Evaluation (why this direction works), What would change your mind (alternative pivots), and Move (the concrete next plot beat or outline step).
+
+Speak with direct narrative clarity, avoid cliché tropes, and structure clear structural timelines.`,
 };
 
 /**
@@ -563,7 +562,7 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
 
       const paragraphs = cleanResult.split(/\n\n+/).filter(Boolean).length;
       const sourceCitations = (cleanResult.match(/\([A-Za-zÀ-ÿ]+[^)]*\d{4}[^)]*\)/g) || []).length;
-      const depthWarning = paragraphs < 2 || sourceCitations < 1
+      const depthWarning = paragraphs < 3 || sourceCitations < 2
         ? `Depth: ${paragraphs} para, ${sourceCitations} sources — may be shallow`
         : null;
 
@@ -579,6 +578,7 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
         };
       }
 
+      // Existing shallow response check
       if (depthWarning && response.model !== "gpt-4o" && routerDecision?.pathway !== "premium") {
         logger.info("depth_escalation", {
           originalModel: response.model,
@@ -622,6 +622,42 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
         }
       }
 
+      // Additional CARDO section validation for structured reasoning responses
+      const cardoRequiredSections = [/Facts/i, /Assumptions/i, /Evaluation/i, /What would change your mind/i, /Move/i];
+      const hasAllCARDO = cardoRequiredSections.every((re) => re.test(cleanResult));
+      if (!hasAllCARDO && response.model !== "gpt-4o" && routerDecision?.pathway !== "premium") {
+        logger.info("cardo_section_escalation", {
+          originalModel: response.model,
+          missingSections: cardoRequiredSections.filter((re) => !re.test(cleanResult)).map((re) => re.source),
+          route: routerDecision?.id || "unknown",
+        });
+
+        const cardoDecision = {
+          ...routerDecision,
+          id: "cardo-section-escalation",
+          model: "gpt-4o",
+          pathway: "premium",
+          escalatedByCARDO: true,
+          rationale: "Missing CARDO REI sections in response; escalated to premium for completeness.",
+        };
+        try {
+          const cardoResponse = await callGroqDirectly(contextPayload, resolvedPrompt, history, cardoDecision);
+          if (!cardoResponse.rateLimited && cardoResponse.model === "gpt-4o") {
+            return {
+              success: true,
+              result: deRoboticize(cardoResponse.content),
+              model: cardoResponse.model,
+              routerDecision: cardoDecision,
+              usage: cardoResponse.usage || null,
+              cardoEscalated: true,
+              cardoEscalationReason: "Missing CARDO sections",
+              timestamp: new Date().toISOString(),
+            };
+          }
+        } catch (e) {
+          logger.warn("cardo_section_escalation_failed", { error: e.message });
+        }
+      }
       return {
         success: true,
         result: cleanResult,

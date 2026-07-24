@@ -11,7 +11,7 @@ This paper makes claims at three levels. All are argued, but not all are proven 
 
 | Claim | Level | Status |
 |-------|-------|--------|
-| **A:** The REI routing pipeline works as described — deterministic, cost-aware, multi-domain, auditably tested | Engineering | **Proven** — 162 tests, 57-prompt benchmark, gate assertions, reproducible CLI |
+| **A:** The REI routing pipeline works as described — deterministic, cost-aware, multi-domain, auditably tested | Engineering | **Proven** — 227 tests across 18 test suites, 57-prompt benchmark, gate assertions, reproducible CLI |
 | **B:** This architecture is a good design for cost-aware reasoning systems — the combination of deterministic routing + explicit hinge detection + cost-weighted governance + human boundary conditions is superior to alternative designs | Design | **Argued** — supported by the evidence but not proven across alternative architectures |
 | **C:** The principles underlying REI (complexity reduction, decision boundary detection, cost-weighted action) generalize beyond this specific implementation to reasoning more broadly | Theory | **Hypothesized** — see Testable Hypotheses (Section 9) |
 
@@ -455,7 +455,7 @@ Result: 57/57 passing, 78% savings, 80% accuracy, 5 deterministic queries at $0.
 npm test
 ```
 
-Result: 162 tests, 15 suites, all passing.
+Result: 227 tests across 18 test suites, 15 suites, all passing.
 
 ### 4. Verify Production Numbers
 
@@ -481,7 +481,7 @@ A design claim is only as good as its verification. REI's verification is determ
 | Cost savings | 68% vs always-premium | 57-prompt benchmark |
 | Deterministic ($0) queries | 5 of 57 (9%) | Layer 0 engine |
 | Escalation rate | 5 of 57 (9%) | CARDO GUARD cost-governor |
-| Test coverage | 162 tests, 15 suites | Jest |
+| Test coverage | 227 tests across 18 test suites, 15 suites | Jest |
 | Build gate | Fails if savings ≤ 0 | `routingEval.test.js:227` |
 | Laboratory cost | $0.129 for 57 prompts | `routingEval` benchmark output |
 | Development cost | $6.51 for 601M tokens | DeepSeek API dashboard |

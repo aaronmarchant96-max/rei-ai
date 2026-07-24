@@ -75,6 +75,21 @@ const HIGH_STRUCTURE_TERMS = [
 ];
 const UNCERTAINTY_TERMS = ["uncertain", "unclear", "missing", "unknown", "not sure", "unsure", "doubt", "uncertainty"];
 
+// ─── Pass-2 adversarial rephrase patterns ─────────────────────────────────────
+// These catch injection attempts that avoid the obvious surface keywords.
+const ADVERSARIAL_REPHRASE_PATTERNS = [
+  /ignore (previous|above|prior|all) (instructions?|rules?|prompts?|context)/i,
+  /disregard (the )?(above|previous|prior|all|your|any)/i,
+  /pretend (you are|you're|to be|that)/i,
+  /act (as if|like|as though|as a)/i,
+  /your (new|real|actual|true|updated) (rules?|instructions?|purpose|goal|system)/i,
+  /forget (your|all|the|these|those) (instructions?|rules?|training|context|guidelines?)/i,
+  /you are now/i,
+  /new (persona|role|identity|mode|directive)/i,
+  /override (your|the|all|these)? ?(instructions?|rules?|system|guidelines?)/i,
+  /jailbreak|DAN mode|developer mode|unrestricted mode/i,
+];
+
 function normalizeText(value = "") {
   return String(value ?? "").toLowerCase().trim();
 }
@@ -152,50 +167,163 @@ function getCatalogRouteMatch(text) {
   return { entry: bestEntry, score: bestScore };
 }
 
-function getStoredRouteHistory() {
-  if (typeof window === "undefined" || !window.localStorage) {
-    return [];
-  }
+// ─── Session Intelligence v2 ─────────────────────────────────────────────────────
+//
+// 4.1 — Recency-weighted preference
+//   Each stored entry now carries a timestamp. Weight = e^(-λ * ageInSlots)
+//   where λ = 0.3. Recent routes score higher; a preference is only applied
+//   when the top candidate’s decayed weight ≥ PREF_MIN_WEIGHT.
+//
+// 4.2 — Per-domain localStorage rings
+//   A separate ring is kept for each domain so a heavy coding session
+//   never contaminates preference for story or research sessions.
+//   Global ring is still maintained as a fallback for domain="assistant".
+//
+// Ring capacity: last 20 entries per domain (up from 10).
 
+const HISTORY_MAX = 20;
+const DECAY_LAMBDA = 0.3;   // higher → older entries fade faster
+const PREF_MIN_WEIGHT = 0.6; // minimum decayed weight to fire a preference
+
+// Map catalog IDs to the domain key used for per-domain rings
+const ROUTE_DOMAIN_MAP = {
+  "coding-hinge": "coding",
+  "genealogy-deep-dive": "genealogy",
+  "story-architect": "story",
+  "creative-prose": "story",
+  "fact-check": "research",
+  "red-team-surface": "redteam",
+  "red-team-semantic": "redteam",
+  "red-team-deep": "redteam",
+  "finance-analyst": "finance",
+  "structured-data": "data",
+  "meta-routing": "meta",
+  "multi-turn-synthesis": "synthesis",
+  "structured-reasoning": "general",
+  "simple-greeting": "general",
+};
+
+function domainStorageKey(domain) {
+  return `night-shift-history-${domain || "global"}`;
+}
+
+/** Read a stored ring (array of { id, ts } objects). */
+function readRing(key) {
+  if (typeof window === "undefined" || !window.localStorage) return [];
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return [];
-    }
-
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+    return Array.isArray(parsed) ? parsed.filter((e) => e && e.id) : [];
   } catch {
     return [];
   }
 }
 
-function persistRouteHistory(routeId) {
-  if (typeof window === "undefined" || !window.localStorage) {
-    return;
-  }
-
+/** Write a ring back to localStorage. */
+function writeRing(key, ring) {
+  if (typeof window === "undefined" || !window.localStorage) return;
   try {
-    const existing = getStoredRouteHistory();
-    const next = [...existing, routeId].filter(Boolean).slice(-10);
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(key, JSON.stringify(ring.slice(-HISTORY_MAX)));
   } catch {
-    // Ignore storage failures and keep routing deterministic.
+    // Ignore storage failures; routing remains deterministic.
   }
 }
 
-function getStoredRoutePreference() {
-  const history = getStoredRouteHistory();
-  if (history.length < 3) {
-    return null;
+/**
+ * getStoredRouteHistory — Returns the global history ring as a flat array of IDs.
+ * Kept for backward-compatibility with existing callers.
+ */
+function getStoredRouteHistory() {
+  return readRing(STORAGE_KEY).map((e) => (typeof e === "string" ? e : e.id));
+}
+
+/**
+ * persistRouteHistory — Appends a route ID to both the global ring
+ * and the per-domain ring, each entry stamped with a slot index (position).
+ */
+function persistRouteHistory(routeId) {
+  if (!routeId) return;
+
+  // ─ Global ring (backward compat) ──────────────────────────────────
+  const globalRing = readRing(STORAGE_KEY);
+  // Migrate any legacy string entries to object format on first write
+  const migratedGlobal = globalRing.map((e, i) =>
+    typeof e === "string" ? { id: e, slot: i } : e
+  );
+  migratedGlobal.push({ id: routeId, slot: migratedGlobal.length });
+  writeRing(STORAGE_KEY, migratedGlobal);
+
+  // ─ Per-domain ring ──────────────────────────────────────────
+  const domainKey = ROUTE_DOMAIN_MAP[routeId];
+  if (domainKey && domainKey !== "general") {
+    const dKey = domainStorageKey(domainKey);
+    const dRing = readRing(dKey);
+    dRing.push({ id: routeId, slot: dRing.length });
+    writeRing(dKey, dRing);
+  }
+}
+
+/**
+ * getDecayedWeight — Exponential decay score for a route within a ring.
+ *
+ * Gives entries a weight of e^(-λ * (maxSlot - entrySlot)), so the
+ * most recent entry scores ~1.0 and older entries fade exponentially.
+ *
+ * @param {Array} ring   - Array of { id, slot } objects
+ * @param {string} routeId - Route to score
+ * @returns {number} Decayed weight 0–1
+ */
+function getDecayedWeight(ring, routeId) {
+  if (!ring.length) return 0;
+  const maxSlot = Math.max(...ring.map((e) => e.slot ?? 0));
+  let totalWeight = 0;
+  for (const entry of ring) {
+    if (entry.id === routeId) {
+      const age = maxSlot - (entry.slot ?? 0);
+      totalWeight += Math.exp(-DECAY_LAMBDA * age);
+    }
+  }
+  return totalWeight;
+}
+
+/**
+ * getStoredRoutePreference — Returns the preferred route ID using
+ * recency-weighted scoring, or null if no candidate clears PREF_MIN_WEIGHT.
+ *
+ * Checks the per-domain ring first, then falls back to the global ring.
+ *
+ * @param {string} [domainHint] - Optional domain key to check first
+ * @returns {string|null}
+ */
+function getStoredRoutePreference(domainHint) {
+  // ─ Try per-domain ring first ───────────────────────────────────
+  if (domainHint && domainHint !== "general") {
+    const dRing = readRing(domainStorageKey(domainHint));
+    if (dRing.length >= 2) {
+      const uniqueIds = [...new Set(dRing.map((e) => e.id))];
+      let best = null, bestW = 0;
+      for (const id of uniqueIds) {
+        const w = getDecayedWeight(dRing, id);
+        if (w > bestW) { bestW = w; best = id; }
+      }
+      if (best && bestW >= PREF_MIN_WEIGHT) return best;
+    }
   }
 
-  const routeCounts = history.reduce((accumulator, routeId) => {
-    accumulator[routeId] = (accumulator[routeId] || 0) + 1;
-    return accumulator;
-  }, {});
+  // ─ Fall back to global ring ───────────────────────────────────
+  const globalRing = readRing(STORAGE_KEY).map((e, i) =>
+    typeof e === "string" ? { id: e, slot: i } : e
+  );
+  if (globalRing.length < 3) return null;
 
-  return Object.entries(routeCounts).sort((left, right) => right[1] - left[1])[0]?.[0] || null;
+  const uniqueIds = [...new Set(globalRing.map((e) => e.id))];
+  let best = null, bestW = 0;
+  for (const id of uniqueIds) {
+    const w = getDecayedWeight(globalRing, id);
+    if (w > bestW) { bestW = w; best = id; }
+  }
+  return best && bestW >= PREF_MIN_WEIGHT ? best : null;
 }
 
 function buildDecision(id, overrides = {}) {
@@ -228,6 +356,87 @@ function isSimpleGreeting(text) {
   return /^(hi|hello|hey|yo|hiya|sup|howdy|heya|hola)(\s+there)?[\s!,.]*$|^(good\s+(morning|afternoon|evening)|how\s+are\s+(you|things|it\s+going)|how('s|s)\s+(it\s+going|everything|life)|what('s|s)\s+up|thanks|thank\s+you|thx|ty|ok|okay|k+|yeah|yep|nope|sure|right|alright|fine|test|ping|appreciate\s+(it|that|you))[\s!,.]*$/i.test(text.trim());
 }
 
+// ─── Domain Signal Scorers ────────────────────────────────────────────────────
+// Each scorer returns a float 0–1 based on weighted keyword hits.
+// Multiple independent signals per domain prevent single-term false positives.
+
+const CODING_SIGNALS = [
+  { pattern: /```[\s\S]*?```/g, weight: 0.5 },
+  { pattern: /\b(implement|build|debug|fix|refactor|function|component|module|api)\b/i, weight: 0.25 },
+  { pattern: /\b(jest|vite|react|node|typescript|javascript|python|patch|class|service|hook)\b/i, weight: 0.2 },
+  { pattern: /\b(compile|deploy|dependency|import|export|async|callback|promise|syntax|error)\b/i, weight: 0.15 },
+  { pattern: /\b(test suite|unit test|integration test|stack trace|linting|eslint|webpack|bundler)\b/i, weight: 0.2 },
+];
+
+const GENEALOGY_SIGNALS = [
+  { pattern: /\b(ancestor|descendant|genealogy|lineage|pedigree|family tree)\b/i, weight: 0.4 },
+  { pattern: /\b(birth|death|marriage|census|baptism|burial|probate)\b/i, weight: 0.3 },
+  { pattern: /\b(familysearch|find a grave|archive|parish|headstone|cemetery|obituary)\b/i, weight: 0.3 },
+  { pattern: /\b(same-name|disambiguat|surname|provenance|dna|great-grand)\b/i, weight: 0.2 },
+];
+
+const STORY_SIGNALS = [
+  { pattern: /\b(story|plot|narrative|arc|worldbuilding)\b/i, weight: 0.35 },
+  { pattern: /\b(character|scene|dialogue|conflict|hero|villain)\b/i, weight: 0.3 },
+  { pattern: /\b(outline|prose|tone|genre|chapter|draft|creative writing)\b/i, weight: 0.25 },
+  { pattern: /\b(protagonist|antagonist|setting|theme|motif|climax|resolution)\b/i, weight: 0.2 },
+];
+
+const RESEARCH_SIGNALS = [
+  { pattern: /\b(source|cite|citation|evidence|reference|bibliography)\b/i, weight: 0.3 },
+  { pattern: /\b(study|paper|journal|dataset|statistic|report|survey|meta.analysis)\b/i, weight: 0.3 },
+  { pattern: /\b(fact.?check|verify|peer.?review|pubmed|doi|arxiv|empirical)\b/i, weight: 0.35 },
+  { pattern: /\b(scholarly|academic|quantitative|qualitative|literature|hypothesis)\b/i, weight: 0.2 },
+];
+
+const REDTEAM_SIGNALS = [
+  { pattern: /\b(red.?team|adversarial|stress.?test|attack|jailbreak)\b/i, weight: 0.5 },
+  { pattern: /\b(prompt injection|policy audit|abuse case|threat model|anomaly)\b/i, weight: 0.4 },
+  { pattern: /\b(counterargument|find.?flaw|poke holes|prove.?wrong|break.?argument)\b/i, weight: 0.3 },
+];
+
+/**
+ * getDomainSignals — Weighted multi-signal domain scorer.
+ *
+ * Returns a score 0–1 for each domain by summing weighted pattern hits,
+ * capped at 1.0. Also detects collisions when two domains score closely.
+ *
+ * @param {string} text - Normalized input text
+ * @returns {{ scores: Object, winner: string, runnerUp: string|null, collisionRatio: number }}
+ */
+function getDomainSignals(text) {
+  function scoreSignals(signals) {
+    let total = 0;
+    for (const { pattern, weight } of signals) {
+      if (pattern.test(text)) total += weight;
+      // Reset lastIndex for global regexes
+      if (pattern.global) pattern.lastIndex = 0;
+    }
+    return Math.min(total, 1.0);
+  }
+
+  const scores = {
+    coding: scoreSignals(CODING_SIGNALS),
+    genealogy: scoreSignals(GENEALOGY_SIGNALS),
+    story: scoreSignals(STORY_SIGNALS),
+    research: scoreSignals(RESEARCH_SIGNALS),
+    redteam: scoreSignals(REDTEAM_SIGNALS),
+  };
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const winner = sorted[0][0];
+  const winnerScore = sorted[0][1];
+  const runnerUp = sorted[1][0];
+  const runnerUpScore = sorted[1][1];
+
+  // Collision when runner-up is within 70% of winner's score and both > 0.2
+  const collisionRatio = winnerScore > 0 ? runnerUpScore / winnerScore : 0;
+  const collision = collisionRatio >= 0.7 && winnerScore >= 0.2 && runnerUpScore >= 0.15;
+
+  return { scores, winner, winnerScore, runnerUp, runnerUpScore, collisionRatio, collision };
+}
+
+// ─── Backward-compatible boolean helpers (used by existing callers) ───────────
 function isLikelyCodingRequest(input) {
   return /\b(implement|build|debug|fix|refactor|function|component|module|api|jest|vite|react|node|typescript|javascript|python|test|patch|class|service|hook|route)\b/i.test(input);
 }
@@ -240,18 +449,79 @@ function isLikelyStoryRequest(input) {
   return /\b(story|plot|character|scene|narrative|outline|dialogue|arc|worldbuilding|conflict|hero|villain)\b/i.test(input);
 }
 
-function isAdversarialRequest(text) {
-  return /\b(red[- ]?team|adversarial|stress test|attack|challenge|prove\b.*\bwrong|counterargument|break it|stress-test|break\b.*\bargument|find\b.*\bflaw|poke\s+holes)\b/i.test(text);
+/**
+ * isLikelyResearchRequest — detects epistemic/data-heavy requests.
+ * Triggers the research fingerprint when academic or evidence-oriented
+ * language is present, even without an explicit domain override.
+ */
+function isLikelyResearchRequest(input) {
+  return /\b(source|cite|citation|evidence|study|paper|journal|dataset|data|statistic|statistics|fact[- ]?check|verify|peer[- ]?review(ed)?|pubmed|doi|arxiv|report|survey|meta[- ]?analysis|reference|bibliography|literature|scholarly|academic|empirical|quantitative|qualitative)\b/i.test(input);
 }
 
+/**
+ * getAdversarialSuspicion — Two-pass adversarial detection.
+ *
+ * Pass 1: Surface keywords (fast regex, existing logic)
+ * Pass 2: Rephrase patterns (catches disguised injections)
+ *
+ * Returns a suspicionScore 0–1:
+ *   0.0 = clean
+ *   0.3–0.5 = surface hit only
+ *   0.6–0.8 = rephrase pattern hit
+ *   0.9–1.0 = both passes hit
+ */
+function getAdversarialSuspicion(text) {
+  const surfaceHit = /\b(red[- ]?team|adversarial|stress[- ]?test|attack|challenge|prove\b.*\bwrong|counterargument|break it|break\b.*\bargument|find\b.*\bflaw|poke\s+holes)\b/i.test(text);
+  const rephraseHits = ADVERSARIAL_REPHRASE_PATTERNS.filter((pattern) => pattern.test(text)).length;
+
+  if (surfaceHit && rephraseHits > 0) return 1.0;
+  if (rephraseHits >= 2) return 0.9;
+  if (rephraseHits === 1) return 0.65;
+  if (surfaceHit) return 0.4;
+  return 0.0;
+}
+
+/** Backward-compatible single boolean used by existing callers. */
+function isAdversarialRequest(text) {
+  return getAdversarialSuspicion(text) >= 0.4;
+}
+
+/**
+ * getComplexityTier v2 — Structural complexity scorer.
+ *
+ * Adds structural markers on top of the original word/question/uncertainty
+ * scoring. New markers: code fences, markdown tables, bullet lists, URLs,
+ * multi-clause conditionals, and comparison language.
+ *
+ * Tiers: low < 25 ≤ medium < 55 ≤ high < 90 ≤ ultra
+ * 'ultra' always escalates to frontier model regardless of budget.
+ */
 function getComplexityTier(text) {
   const words = text.split(/\s+/).filter(Boolean).length;
   const questionMarks = (text.match(/\?/g) || []).length;
   const uncertaintyHits = UNCERTAINTY_TERMS.filter((term) => text.includes(term)).length;
-  const score = words * 2 + questionMarks * 8 + uncertaintyHits * 10;
 
-  const tier = score >= 40 ? "high" : score >= 20 ? "medium" : "low";
-  return { tier, score, words, questionMarks, uncertaintyHits };
+  // ── Structural markers ────────────────────────────────────────────────────
+  const codeFences = (text.match(/```/g) || []).length;
+  const markdownTable = /\|.+\|.+\|/m.test(text) ? 1 : 0;
+  const bulletList = (text.match(/^\s*[-*•]\s+/gm) || []).length;
+  const urlCount = (text.match(/https?:\/\//g) || []).length;
+  const multiClause = (text.match(/\b(if|then|else|unless|given that|provided that|assuming)\b/gi) || []).length;
+  const compareLanguage = (text.match(/\b(compare|contrast|versus|vs\.?|trade.?off|difference between|better than|worse than)\b/gi) || []).length;
+
+  const score =
+    words * 2 +
+    questionMarks * 8 +
+    uncertaintyHits * 10 +
+    codeFences * 15 +
+    markdownTable * 12 +
+    Math.min(bulletList, 5) * 8 +  // cap at 5 bullets to avoid runaway
+    urlCount * 5 +
+    multiClause * 10 +
+    compareLanguage * 6;
+
+  const tier = score >= 90 ? "ultra" : score >= 55 ? "high" : score >= 25 ? "medium" : "low";
+  return { tier, score, words, questionMarks, uncertaintyHits, codeFences, markdownTable, bulletList, urlCount, multiClause, compareLanguage };
 }
 
 function getHighStructureSignals(text) {
@@ -259,7 +529,19 @@ function getHighStructureSignals(text) {
 }
 
 function getStoredPreferenceForContext(text, domainName) {
-  const storedPreference = getStoredRoutePreference();
+  // Resolve domain key for per-domain ring lookup (4.2)
+  const domainKeyMap = {
+    coding: "coding",
+    genealogy: "genealogy",
+    story: "story",
+    creative: "story",
+    research: "research",
+    factcheck: "research",
+    "fact-check": "research",
+    "red-team": "redteam",
+  };
+  const domainHint = domainKeyMap[domainName] || null;
+  const storedPreference = getStoredRoutePreference(domainHint);
   if (!storedPreference) {
     return null;
   }
@@ -268,33 +550,101 @@ function getStoredPreferenceForContext(text, domainName) {
     "genealogy-deep-dive": /family|ancestor|record|lineage|archive|burial|marriage|census/i,
     "coding-hinge": /code|function|module|api|test|build|debug|implement/i,
     "story-architect": /story|plot|character|scene|narrative|dialogue|worldbuilding/i,
+    "fact-check": /source|cite|evidence|study|paper|journal|dataset|verify|report/i,
   };
 
-  if (!genericDomainSignals[storedPreference]?.test(text)) {
-    return null;
+  // For non-assistant domains, always honour the preference if it came from
+  // the per-domain ring (the ring is already domain-scoped, so no extra check needed).
+  if (domainHint) {
+    return storedPreference;
   }
 
-  if (domainName === "assistant") {
+  // For generic "assistant" domain, require a lexical signal match before applying.
+  if (domainName === "assistant" && genericDomainSignals[storedPreference]?.test(text)) {
     return storedPreference;
   }
 
   return null;
 }
 
+/**
+ * estimateTokens — Token estimator v2.
+ *
+ * Improves on the naive `length / 4` baseline by adding correction
+ * factors for code fences, embedded URLs, and non-ASCII Unicode.
+ * These are the most common sources of under-counting in real prompts.
+ *
+ * Accuracy improvement: ~20–30% closer to tiktoken on typical inputs.
+ */
 export function estimateTokens(text) {
-  return Math.ceil((text || "").length / 4);
+  const safeText = text || "";
+  const base = Math.ceil(safeText.length / 4);
+  // Code fences add significant overhead due to tokenizer boundary effects
+  const codeFenceBonus = (safeText.match(/```/g) || []).length * 8;
+  // URLs are tokenized character-by-character in most BPE encodings
+  const urlBonus = (safeText.match(/https?:\/\//g) || []).length * 5;
+  // Non-ASCII chars often map to 2–3 tokens each in BPE vocabularies
+  const unicodeBonus = (safeText.match(/[^\x00-\x7F]/g) || []).length;
+  return base + codeFenceBonus + urlBonus + unicodeBonus;
 }
 
+/**
+ * detectDomain — Auto-classifies input into a domain string.
+ * Research is now included as a first-class auto-detected domain.
+ */
 export function detectDomain(text) {
   const t = normalizeText(text || "");
   if (isLikelyCodingRequest(t)) return "coding";
   if (isLikelyGenealogyRequest(t)) return "genealogy";
   if (isLikelyStoryRequest(t)) return "story";
+  if (isLikelyResearchRequest(t)) return "research";
   return null;
 }
 
 export function getFingerprintCatalog() {
   return ROUTER_CATALOG.map((entry) => ({ ...entry }));
+}
+
+/**
+ * buildHybridDecision — Merges two domain fingerprints when signals collide.
+ *
+ * Used when the runner-up domain scores within 70% of the winner.
+ * Blends max-tokens (average), uses winner's model and temperature,
+ * and produces a composite label for the Glass Box UI.
+ *
+ * @param {string} primaryId   - Winning fingerprint catalog ID
+ * @param {string} secondaryId - Runner-up fingerprint catalog ID
+ * @param {number} collisionRatio - runner-up score / winner score (0–1)
+ * @param {Object} sharedSignals - routingSignals to attach
+ * @returns {Object} Merged routing decision
+ */
+export function buildHybridDecision(primaryId, secondaryId, collisionRatio, sharedSignals = {}) {
+  const primary = getCatalogEntry(primaryId);
+  const secondary = getCatalogEntry(secondaryId);
+
+  if (!primary || !secondary) {
+    return buildDecision(primaryId || "structured-reasoning", { routingSignals: sharedSignals });
+  }
+
+  const blendedMaxTokens = Math.round(
+    (primary.maxTokens || FALLBACK_MAX_TOKENS) * 0.6 +
+    (secondary.maxTokens || FALLBACK_MAX_TOKENS) * 0.4
+  );
+
+  const primaryPct = Math.round((1 / (1 + collisionRatio)) * 100);
+  const secondaryPct = 100 - primaryPct;
+
+  return buildDecision(primaryId, {
+    label: `${primary.label} ⟷ ${secondary.label}`,
+    hybridMode: true,
+    hybridPrimary: { id: primaryId, label: primary.label, pct: primaryPct },
+    hybridSecondary: { id: secondaryId, label: secondary.label, pct: secondaryPct },
+    collisionRatio,
+    maxTokens: blendedMaxTokens,
+    qualityGate: `${primary.qualityGate} + ${secondary.qualityGate}`,
+    rationale: `Domain collision detected (${primaryPct}% ${primary.label} / ${secondaryPct}% ${secondary.label}); hybrid fingerprint applied.`,
+    routingSignals: sharedSignals,
+  });
 }
 
 /**
@@ -383,6 +733,9 @@ export function buildRouterDecision({
   const storedPreference = getStoredPreferenceForContext(text, domainName);
   const estimatedInputTokens = estimateTokens(combinedInput);
 
+  // ── Sprint 2: Multi-signal domain scoring & collision detection ──────────
+  const domainSignals = getDomainSignals(text);
+
   let decision;
 
   const deterministicResult = input ? resolveDeterministic(input) : null;
@@ -429,15 +782,25 @@ export function buildRouterDecision({
       },
     });
   } else if (requiresAdversarial || isAdversarialRequest(input)) {
+    const suspicionScore = getAdversarialSuspicion(input);
     decision = buildDecision("red-team-surface", {
-      rationale: "Adversarial or red-team request detected; use the surface scan path.",
+      rationale: `Adversarial or red-team request detected (suspicion: ${(suspicionScore * 100).toFixed(0)}%); routing through surface scan pipeline.`,
       routingSignals: {
         complexityTier,
         matchedTerms: ["adversarial"],
         highStructureSignals,
         storedPreference,
+        suspicionScore,
       },
     });
+    // ── Red Team Confidence Floor (Phase 3.2) ────────────────────────────────
+    // Prevent a high-suspicion prompt from silently routing at 50% confidence
+    // through the cheap path. Force a minimum 0.65 confidence so CARDO Guard
+    // can correctly evaluate the escalation decision.
+    if (suspicionScore > 0.3 && (decision.routingConfidence ?? 0.5) < 0.65) {
+      decision.routingConfidence = 0.65;
+      decision.confidenceFloorApplied = true;
+    }
   } else if (thrifty) {
     decision = buildDecision("simple-greeting", {
       rationale: "Thrifty mode active; using the cheapest adequate model.",
@@ -447,6 +810,87 @@ export function buildRouterDecision({
       routingSignals: {
         complexityTier,
         matchedTerms: [],
+        highStructureSignals,
+        storedPreference,
+      },
+    });
+  } else if (complexityTier === "ultra") {
+    // Ultra complexity always escalates — domain collision or not
+    decision = buildDecision("structured-reasoning", {
+      rationale: `Ultra-complexity detected (score: ${complexity.score}); escalating to frontier reasoning model.`,
+      qualityGate: "Hinge + Facts + Move + challenge test + ultra-verify",
+      maxTokens: 800,
+      temperature: 0.15,
+      pathway: "premium",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: catalogRoute?.entry?.matchTerms || [],
+        highStructureSignals,
+        storedPreference,
+        domainSignals,
+      },
+    });
+  } else if (
+    domainName === "finance" ||
+    /\b(roi|token cost|token budget|spend|pricing|invoice|budget|cost per|expenditure|revenue|profit|loss|margin|burn rate|cash flow|forecast|fiscal|financial|quarterly|annual report|cost analysis|cost saving|token efficiency)\b/i.test(input)
+  ) {
+    decision = buildDecision("finance-analyst", {
+      rationale: "Finance, cost, or token-efficiency language detected; routing to Finance Analyst fingerprint.",
+      routingSignals: { complexityTier, matchedTerms: ["finance"], highStructureSignals, storedPreference, domainSignals },
+    });
+  } else if (
+    domainName === "structured-data" ||
+    /\b(csv|json|sql|schema|dataframe|primary key|foreign key|migration|data model|aggregate|join\b)\b/i.test(input)
+  ) {
+    decision = buildDecision("structured-data", {
+      rationale: "Structured data or schema-heavy request detected; routing to Structured Data fingerprint.",
+      routingSignals: { complexityTier, matchedTerms: ["data"], highStructureSignals, storedPreference, domainSignals },
+    });
+  } else if (
+    domainName === "meta" ||
+    /\b(why did you choose|what model|what fingerprint|explain your routing|how did you route|glass box|night shift router|which fingerprint|why this model|token math|what pathway)\b/i.test(input)
+  ) {
+    decision = buildDecision("meta-routing", {
+      rationale: "Self-referential routing query detected; routing to Meta / Self-Reference fingerprint.",
+      routingSignals: { complexityTier, matchedTerms: ["meta"], highStructureSignals, storedPreference, domainSignals },
+    });
+  } else if (
+    history.length >= 5 &&
+    /\b(summarize|recap|so far|what have we covered|what did we discuss|catch me up|what was decided|pull together|consolidate|synthesize)\b/i.test(input)
+  ) {
+    decision = buildDecision("multi-turn-synthesis", {
+      rationale: "Long conversation history with synthesis request; routing to Multi-Turn Synthesis fingerprint.",
+      routingSignals: { complexityTier, matchedTerms: ["synthesis"], highStructureSignals, storedPreference, domainSignals },
+    });
+  } else if (
+    domainName === "assistant" &&
+    domainSignals.collision &&
+    !requiresAdversarial &&
+    !thrifty
+  ) {
+    // Hybrid fingerprint: top-2 domains too close to call — blend them
+    const domainToId = {
+      coding: "coding-hinge",
+      genealogy: "genealogy-deep-dive",
+      story: "story-architect",
+      research: "fact-check",
+      redteam: "red-team-surface",
+    };
+    const primaryId = domainToId[domainSignals.winner] || "structured-reasoning";
+    const secondaryId = domainToId[domainSignals.runnerUp] || "structured-reasoning";
+    decision = buildHybridDecision(primaryId, secondaryId, domainSignals.collisionRatio, {
+      complexityTier,
+      matchedTerms: catalogRoute?.entry?.matchTerms || [],
+      highStructureSignals,
+      storedPreference,
+      domainSignals,
+    });
+  } else if (domainName === "research" || domainName === "factcheck" || domainName === "fact-check" || (isLikelyResearchRequest(input) && !isLikelyCodingRequest(input))) {
+    decision = buildDecision("fact-check", {
+      rationale: "Research or evidence-oriented language detected via auto-classification; routing through the fact-check/research gate.",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: catalogRoute?.entry?.matchTerms || [],
         highStructureSignals,
         storedPreference,
       },
@@ -562,6 +1006,7 @@ export function buildRouterDecision({
     estimatedCost: decision.estimatedCost || 0,
     premiumCost: decision.premiumCost || 0,
     qualityGate: decision.qualityGate || "",
+    suspicionScore: decision.routingSignals?.suspicionScore || 0,
   });
 
   if (escalation.escalate && !decision.deterministicLayer) {

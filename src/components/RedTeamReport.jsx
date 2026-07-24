@@ -6,12 +6,13 @@ import Spinner from "./Spinner";
 // Color constants are now imported from shared theme file
 
 export default function RedTeamReport({ report, isLoading = false }) {
+  const [showAll, setShowAll] = useState(false);
+
   if (!report) return null;
 
   const { verdict, score, dimensionsTriggered, findings, routingTrace, cost } = report;
   if (verdict == null || score == null) return null;
-const colors = VERDICT_COLORS[verdict] || VERDICT_COLORS.clean;
-  const [showAll, setShowAll] = useState(false);
+  const colors = VERDICT_COLORS[verdict] || VERDICT_COLORS.clean;
 
   if (isLoading) {
   return (
