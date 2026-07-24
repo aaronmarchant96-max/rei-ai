@@ -25,32 +25,32 @@ REI demonstrates mastery over two completely different AI economic models:
 |---|------------|-----------|
 | **What it is** | Building REI itself — coding, debugging, architecture | Running REI for users — reasoning, routing, responses |
 | **Provider** | DeepSeek (via OpenCode CLI) | Groq (primary) + OpenAI (premium) |
-| **Model** | deepseek-v4-pro (~1,221 calls), deepseek-v4-flash (~276 calls) | llama-3.3-70b, llama-3.1-8b, gpt-4o |
-| **Tokens** | 601,255,780 | Varies — per-query cost estimated by benchmark |
-| **Cost** | $6.51 total | 78% below always-premium (verified by benchmark) |
+| **Model** | deepseek-v4-pro (1,534 calls | 728M tokens), deepseek-v4-flash (320 calls | 66M tokens) | llama-3.3-70b, llama-3.1-8b, gpt-4o |
+| **Tokens** | 795,310,356 | Varies — per-query cost estimated by benchmark |
+| **Cost** | $9.03 total | 78% below always-premium (verified by benchmark) |
 | **Strategy** | Prefix caching — the system prompt is a static `const`, DeepSeek caches it at the hardware level | Hardware arbitrage — cheap Groq LPU inference for most queries, OpenAI only for premium adversarial routes |
 | **Proof** | DeepSeek billing dashboard screenshot | `npm test -- --testPathPatterns=routingEval` |
 | **Pricing note** | DeepSeek introduced peak-valley pricing mid-July 2026 (2x during peak hours: 1:00–4:00 AM and 6:00–10:00 AM UTC). Future cost comparisons should account for this change. | — |
 
 ### The Cost to Build
 
-**601 million tokens** of code generation, debugging, architecture planning, and prompt engineering delivered by DeepSeek through OpenCode CLI for **$6.51 total**.
+**795 million tokens** of code generation, debugging, architecture planning, and prompt engineering delivered by DeepSeek through OpenCode CLI for **$9.03 total**.
 
 ```
-API requests: 1,497
-Tokens: 601,255,780
-Total cost: $6.51
-Cost per million: $0.0108
-Average cost/request: $0.0043
+API requests: 1,854
+Tokens: 795,310,356
+Total cost: $9.03
+Cost per million: $0.0113
+Average cost/request: $0.0048
 ```
 
-This is half a billion tokens of deep reasoning for the price of a cup of coffee. It proves that open-weights models combined with prefix caching have fundamentally changed the economics of AI development.
+Nearly 800 million tokens of deep reasoning for the price of two cups of coffee. It proves that open-weights models combined with prefix caching have fundamentally changed the economics of AI development.
 
 ### How It Runs
 
 REI's production architecture routes through Groq LPUs ($0.59/M input for llama-3.3-70b) with cost-aware pathway selection. The benchmark proves 78% savings vs always-premium (all gpt-4o). Layer 0 deterministic engine handles greetings at $0.
 
-**The two numbers a judge remembers:** $6.51 to build it. 78% cheaper to run it.
+**The two numbers a judge remembers:** $9.03 to build it. 78% cheaper to run it.
 | **buildRouterDecision** | Deterministic logic | Every routing decision is traceable, confidence-scored, cost-estimated | `src/lib/nightShiftRouter.js:349-525` |
 
 ---

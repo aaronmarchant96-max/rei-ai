@@ -7,7 +7,7 @@ REI.ai automatically minimizes your LLM API costs by intelligently routing every
 ---
 
 ## 📊 Telemetry Highlights (The Two Numbers)
-*   **$6.51 to build it:** 601 million tokens of deep reasoning and planning processed via DeepSeek & OpenCode CLI for the cost of a cup of coffee.
+*   **$9.03 to build it:** 795 million tokens of deep reasoning and planning processed via DeepSeek & OpenCode CLI for the cost of two cups of coffee.
 *   **78% cheaper to run it:** The routing suite deflects greetings and simple queries, saving 78% in API costs compared to an always-premium baseline.
 *   **Product Roadmap:** See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the Open-Core strategy, REI Router proxy API, and enterprise slice roadmap.
 
