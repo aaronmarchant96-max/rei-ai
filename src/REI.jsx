@@ -17,7 +17,7 @@ import RedTeamReport from "./components/RedTeamReport.jsx";
 import { parseEvidenceTiers } from "./components/EvidenceCard.jsx";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
 import "./rei.css";
-import logo from "./assets/logo.png";
+import logo from "./assets/logo_custom.png";
 
 const DOMAIN_PROFILES = [
   {
