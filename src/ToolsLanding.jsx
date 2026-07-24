@@ -206,43 +206,51 @@ export const TOOL_CARDS = [
 const S = {
   mono: { fontFamily: "'JetBrains Mono', monospace", fontSize: "0.85em" },
   eyebrow: {
-    fontSize: "0.72em", fontWeight: 700, color: "#38bdf8",
-    textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8,
+    fontSize: "0.72em", fontWeight: 700, color: "#f0c965",
+    textTransform: "uppercase", letterSpacing: "0.14em", marginBottom: 8,
   },
   label: {
-    fontSize: "0.7em", color: "#64748b", fontWeight: 700,
+    fontSize: "0.7em", color: "#94a3b8", fontWeight: 700,
     textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6,
   },
   row: { display: "flex", justifyContent: "space-between", padding: "5px 0", fontSize: "0.84em" },
   rowLabel: { color: "#94a3b8" },
-  accent: { color: "#38bdf8", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
+  accent: { color: "#f0c965", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
   green: { color: "#22c55e", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
-  gold: { color: "#facc15", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
+  gold: { color: "#f0c965", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" },
   red: { color: "#f87171", fontWeight: 700 },
   tab: (active) => ({
     padding: "6px 14px", borderRadius: 6, fontSize: "0.78em", fontWeight: 700,
-    background: active ? "#38bdf8" : "#1e293b", color: active ? "#0c1425" : "#cbd5e1",
-    border: "none", cursor: "pointer", transition: "all 0.2s",
+    background: active ? "linear-gradient(135deg, #f0c965 0%, #d6b04c 100%)" : "#131926",
+    color: active ? "#07090d" : "#cbd5e1",
+    border: active ? "1px solid #f0c965" : "1px solid #1e293b",
+    boxShadow: active ? "0 2px 10px rgba(240, 201, 101, 0.25)" : "none",
+    cursor: "pointer", transition: "all 0.2s",
   }),
   card: {
     background: "#0c1425", border: "1px solid #1e293b", borderRadius: 12, padding: "1.5rem",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
   },
   hingeBox: {
-    background: "#1a0a2e", border: "1px solid #7c3aed", borderRadius: 8,
+    background: "linear-gradient(135deg, rgba(240, 201, 101, 0.08) 0%, rgba(214, 176, 76, 0.03) 100%)",
+    border: "1px solid rgba(240, 201, 101, 0.4)", borderRadius: 8,
     padding: "12px 16px", marginTop: 12,
+    boxShadow: "0 4px 14px rgba(240, 201, 101, 0.12)",
   },
   hingeLabel: {
-    fontSize: "0.7em", color: "#a78bfa", fontWeight: 700,
+    fontSize: "0.7em", color: "#f0c965", fontWeight: 700,
     textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4,
   },
   barTrack: { height: 6, borderRadius: 3, background: "#1e293b", overflow: "hidden" },
   barFill: (pct) => ({
     height: "100%", borderRadius: 3, transition: "width 0.5s ease",
-    width: `${pct}%`, background: pct > 50 ? "#22c55e" : pct > 0 ? "#facc15" : "#f87171",
+    width: `${pct}%`, background: pct > 50 ? "#22c55e" : pct > 0 ? "#f0c965" : "#f87171",
   }),
   statBox: {
-    background: "#0f172a", border: "1px solid #1e293b", borderRadius: 10,
+    background: "linear-gradient(180deg, #0f172a 0%, #0a0f1d 100%)",
+    border: "1px solid rgba(240, 201, 101, 0.2)", borderRadius: 10,
     padding: "16px", textAlign: "center",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
   },
 };
 
@@ -324,7 +332,7 @@ export default function ToolsLanding({ onOpenTool }) {
           </div>
 
           <div className="relume-hero__actions">
-            <button type="button" className="relume-btn relume-btn--primary" onClick={() => onOpenTool("rei")}>
+            <button type="button" className="relume-btn relume-card__btn--gold" onClick={() => onOpenTool("rei")} style={{ padding: "12px 24px", fontSize: "0.95em" }}>
               <img src={logo} alt="REI Logo" className="relume-btn__icon" />
               Launch REI Platform &rarr;
             </button>
@@ -346,64 +354,70 @@ export default function ToolsLanding({ onOpenTool }) {
               The CARDO Framework
             </h2>
             <p style={{ color: "#94a3b8", fontSize: "0.9em", maxWidth: 640, margin: "8px auto 0", lineHeight: 1.6 }}>
-              Named after the Latin <span style={{ color: "#38bdf8", fontWeight: 600 }}>cardo</span> (<em>the load-bearing hinge on which everything pivots</em>). CARDO is a systematic cognitive framework designed to isolate the single pivot point in complex, noisy data.
+              Named after the Latin <span style={{ color: "#f0c965", fontWeight: 600 }}>cardo</span> (<em>the load-bearing hinge on which everything pivots</em>). CARDO is a systematic cognitive framework designed to isolate the single pivot point in complex, noisy data.
             </p>
           </div>
 
-          {/* ─── Visual Pipeline Flow Diagram ─── */}
+          {/* ─── Visual Pipeline Flow Diagram (Relume Gold Hinge Theme) ─── */}
           <div style={{
             background: "#080d1a",
-            border: "1px solid #1e293b",
+            border: "1px solid rgba(240, 201, 101, 0.25)",
             borderRadius: 12,
             padding: "1.2rem 1.5rem",
             marginBottom: "2rem",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.4), inset 0 0 15px rgba(240, 201, 101, 0.03)",
             overflowX: "auto"
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 680, gap: 8 }}>
               {/* Step 1: Prompt Input */}
               <div style={{ textAlign: "center", flex: "1" }}>
-                <div style={{ fontSize: "0.7em", color: "#64748b", fontWeight: 700, uppercase: "true", letterSpacing: "0.05em", marginBottom: 4 }}>START</div>
+                <div style={{ fontSize: "0.7em", color: "#64748b", fontWeight: 700, letterSpacing: "0.05em", marginBottom: 4 }}>START</div>
                 <div style={{ background: "#0f172a", border: "1px solid #334155", padding: "8px 12px", borderRadius: 6, color: "#e2e8f0", fontSize: "0.82em", fontWeight: 600 }}>
                   Prompt Input
                 </div>
               </div>
 
-              <span style={{ color: "#38bdf8", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+              <span style={{ color: "#f0c965", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
 
               {/* Step 2: C - Collect */}
               <div style={{ textAlign: "center", flex: "1" }}>
-                <div style={{ fontSize: "0.7em", color: "#38bdf8", fontWeight: 700, marginBottom: 4 }}>C &middot; 01</div>
-                <div style={{ background: "#091e3a", border: "1px solid #0284c7", padding: "8px 12px", borderRadius: 6, color: "#38bdf8", fontSize: "0.82em", fontWeight: 700 }}>
+                <div style={{ fontSize: "0.7em", color: "#f0c965", fontWeight: 700, marginBottom: 4 }}>C &middot; 01</div>
+                <div style={{ background: "#131926", border: "1px solid rgba(240, 201, 101, 0.3)", padding: "8px 12px", borderRadius: 6, color: "#f0c965", fontSize: "0.82em", fontWeight: 700 }}>
                   Collect
                 </div>
               </div>
 
-              <span style={{ color: "#38bdf8", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+              <span style={{ color: "#f0c965", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
 
               {/* Step 3: A - Analyze */}
               <div style={{ textAlign: "center", flex: "1" }}>
-                <div style={{ fontSize: "0.7em", color: "#38bdf8", fontWeight: 700, marginBottom: 4 }}>A &middot; 02</div>
-                <div style={{ background: "#091e3a", border: "1px solid #0284c7", padding: "8px 12px", borderRadius: 6, color: "#38bdf8", fontSize: "0.82em", fontWeight: 700 }}>
+                <div style={{ fontSize: "0.7em", color: "#f0c965", fontWeight: 700, marginBottom: 4 }}>A &middot; 02</div>
+                <div style={{ background: "#131926", border: "1px solid rgba(240, 201, 101, 0.3)", padding: "8px 12px", borderRadius: 6, color: "#f0c965", fontSize: "0.82em", fontWeight: 700 }}>
                   Analyze
                 </div>
               </div>
 
-              <span style={{ color: "#facc15", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+              <span style={{ color: "#f0c965", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
 
-              {/* Step 4: R - Record Hinge */}
-              <div style={{ textAlign: "center", flex: "1.2" }}>
-                <div style={{ fontSize: "0.7em", color: "#facc15", fontWeight: 700, marginBottom: 4 }}>R &middot; 03 (HINGE)</div>
-                <div style={{ background: "#2e1065", border: "1px solid #7c3aed", padding: "8px 12px", borderRadius: 6, color: "#c084fc", fontSize: "0.82em", fontWeight: 800 }}>
+              {/* Step 4: R - Record Hinge (GOLD HIGHLIGHT) */}
+              <div style={{ textAlign: "center", flex: "1.3" }}>
+                <div style={{ fontSize: "0.7em", color: "#f0c965", fontWeight: 800, letterSpacing: "0.05em", marginBottom: 4 }}>R &middot; 03 (THE HINGE)</div>
+                <div style={{
+                  background: "linear-gradient(135deg, rgba(240, 201, 101, 0.25) 0%, rgba(214, 176, 76, 0.12) 100%)",
+                  border: "1px solid #f0c965",
+                  boxShadow: "0 0 12px rgba(240, 201, 101, 0.3)",
+                  padding: "8px 12px", borderRadius: 6, color: "#ffffff", fontSize: "0.84em", fontWeight: 800
+                }}>
                   📌 Record Hinge
                 </div>
               </div>
 
-              <span style={{ color: "#38bdf8", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+              <span style={{ color: "#f0c965", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
 
               {/* Step 5: DO - Operate */}
               <div style={{ textAlign: "center", flex: "1" }}>
-                <div style={{ fontSize: "0.7em", color: "#38bdf8", fontWeight: 700, marginBottom: 4 }}>DO &middot; 04</div>
-                <div style={{ background: "#091e3a", border: "1px solid #0284c7", padding: "8px 12px", borderRadius: 6, color: "#38bdf8", fontSize: "0.82em", fontWeight: 700 }}>
+                <div style={{ fontSize: "0.7em", color: "#f0c965", fontWeight: 700, marginBottom: 4 }}>DO &middot; 04</div>
+                <div style={{ background: "#131926", border: "1px solid rgba(240, 201, 101, 0.3)", padding: "8px 12px", borderRadius: 6, color: "#f0c965", fontSize: "0.82em", fontWeight: 700 }}>
                   Operate
                 </div>
               </div>
@@ -427,10 +441,10 @@ export default function ToolsLanding({ onOpenTool }) {
               { s: "R", icon: "📌", t: "Record the Hinge", d: "Isolate the single load-bearing detail (the hinge) that dictates complexity and safety." },
               { s: "DO", icon: "🔄", t: "Operate & Decide", d: "Execute deterministic low-cost actions or route to specialized tiers with continuous audit logs." },
             ].map(({ s, icon, t, d }) => (
-              <div className="relume-spotlight-card" key={s} style={{ padding: "1.2rem 1.2rem", background: "#0c1425", border: "1px solid #1e293b" }}>
+              <div className="relume-spotlight-card" key={s} style={{ padding: "1.2rem 1.2rem", background: "#0c1425", border: "1px solid rgba(240, 201, 101, 0.2)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                   <span style={{ fontSize: "1.4em" }}>{icon}</span>
-                  <span style={{ fontSize: "1.1em", color: "#38bdf8", fontWeight: 800, fontFamily: "'JetBrains Mono', monospace" }}>{s}</span>
+                  <span style={{ fontSize: "1.1em", color: "#f0c965", fontWeight: 800, fontFamily: "'JetBrains Mono', monospace" }}>{s}</span>
                 </div>
                 <h3 style={{ fontSize: "1em", margin: "0 0 6px", color: "#e2e8f0" }}>{t}</h3>
                 <p style={{ fontSize: "0.82em", margin: 0, color: "#94a3b8", lineHeight: 1.5 }}>{d}</p>
@@ -438,8 +452,8 @@ export default function ToolsLanding({ onOpenTool }) {
             ))}
           </div>
 
-          <div style={{ background: "rgba(56, 189, 248, 0.04)", border: "1px solid rgba(56, 189, 248, 0.2)", borderRadius: 10, padding: "1rem 1.5rem", textAlign: "center", maxWidth: 760, margin: "0 auto" }}>
-            <span style={{ color: "#38bdf8", fontWeight: 700, fontSize: "0.82em", textTransform: "uppercase", letterSpacing: "0.08em" }}>Why Philosophy First?</span>
+          <div style={{ background: "rgba(240, 201, 101, 0.05)", border: "1px solid rgba(240, 201, 101, 0.3)", borderRadius: 10, padding: "1.2rem 1.5rem", textAlign: "center", maxWidth: 760, margin: "0 auto", boxShadow: "0 4px 16px rgba(240, 201, 101, 0.08)" }}>
+            <span style={{ color: "#f0c965", fontWeight: 700, fontSize: "0.82em", textTransform: "uppercase", letterSpacing: "0.1em" }}>Why Philosophy First?</span>
             <p style={{ color: "#cbd5e1", fontSize: "0.86em", margin: "6px 0 0", lineHeight: 1.6 }}>
               Most LLM routers are ad-hoc heuristics. REI.ai is built on an adversarial-tested reasoning architecture. The same <strong>CARDO hinge logic</strong> that cuts LLM API costs by 78% also powers our evidence verification, debate stress-testing, and meteorological signal analysis.
             </p>
