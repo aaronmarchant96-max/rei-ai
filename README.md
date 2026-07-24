@@ -31,17 +31,15 @@ REI is built on five core design principles adapted from theoretical physics dec
 
 Let $T$ be a reasoning task.  
 The system computes the **Complexity Index** $R(T)$:
-$$R(T) = (\text{Word Count} \times 2) + (\text{Question Marks} \times 8) + (\text{Uncertainty Keyword Hits} \times 10)$$
+$$R(T) = \text{Base Score} + (\text{Code Fences} \times 15) + (\text{Markdown Tables} \times 12) + (\text{Bullet List Length} \times 8) + (\text{URL Count} \times 5) + (\text{Multi-clause IF} \times 10) + (\text{Compare Verbs} \times 6)$$
 
-Where:
-*   **Lexical weight ($\times 2$):** Baseline processing density coefficient.
-*   **Branching weight ($\times 8$):** Questions signal decision points, multiplying uncertainty.
-*   **Uncertainty weight ($\times 10$):** Explicit uncertainty statements (e.g., *"not sure"*, *"unclear"*) carry heavy cognitive load.
+Where $\text{Base Score} = (\text{Word Count} \times 2) + (\text{Question Marks} \times 8) + (\text{Uncertainty Keyword Hits} \times 10)$.
 
 ### Complexity Tier Mapping:
-*   $R(T) < 20 \rightarrow$ **Low:** Routed to Deterministic ($0 cost) or Base/Cheap models.
-*   $20 \le R(T) < 40 \rightarrow$ **Medium:** Routed to Standard pathway (`llama-3.3-70b-versatile`).
-*   $R(T) \ge 40 \rightarrow$ **High:** Routed to Premium reasoning pathway (`gpt-4o`) via the CARDO GUARD gate.
+*   $R(T) < 25 \rightarrow$ **Low:** Routed to Deterministic ($0 cost) or Base/Cheap models.
+*   $25 \le R(T) < 55 \rightarrow$ **Medium:** Routed to Standard pathway (`llama-3.3-70b-versatile`).
+*   $55 \le R(T) < 90 \rightarrow$ **High:** Routed to Premium reasoning pathway (`gpt-4o`) via the CARDO GUARD gate.
+*   $R(T) \ge 90 \rightarrow$ **Ultra:** Automatically escalates directly to the frontier remote model (`openai/gpt-oss-120b`).
 
 ---
 
@@ -58,11 +56,13 @@ Escalation to premium models is treated as a thermodynamic utility trade-off und
 *   **The Decision Rule:**
     $$\text{Verdict} = \begin{cases} \text{ACT (Escalate to Premium)}, & \text{if } L > W \\ \text{DO NOT ACT (Use Base/Standard)}, & \text{if } L \le W \end{cases}$$
 
+*Note: The false alarm rate is dynamically adjusted on security alerts when adversarial suspicion is high ($> 0.3$), forcing escalation to protect systems.*
+
 ---
 
 ## 🌐 Unification Across Domains
 
-The same 8-stage CARDO REI pipeline + cost-weighted CARDO GUARD gate governs five domains with **zero domain-specific code**:
+The same 8-stage CARDO REI pipeline + cost-weighted CARDO GUARD gate governs specialized domains with **zero domain-specific code**:
 
 | Domain | Input Type | The Hinge (Phase Transition) | Evidence Tiers | Cost Risk |
 | :--- | :--- | :--- | :--- | :--- |
@@ -71,6 +71,10 @@ The same 8-stage CARDO REI pipeline + cost-weighted CARDO GUARD gate governs fiv
 | **Debate** | Arguments, claims, references | Burden of proof allocation | Source citation credibility | Cost of generating vs verifying |
 | **Industrial** | Telemetry, vibrations, thermal data | Anomaly exceeds safety threshold | Sensor reading $\rightarrow$ Feature $\rightarrow$ Score | Cost of shutdown vs missed failure |
 | **Creative** | Story prompts, character outlines, structures | Character motivation hinge (want/fear) | Coherence and genre alignment | Token budget on long generation |
+| **Finance** | Budgets, spend metrics, token efficiency | Hinge point of cost-minimization logic | Ledger check / Audit | Token price fluctuation vs value |
+| **Structured Data** | CSV, JSON, SQL database schemas | Tabular structural parity alignment | Schema compliance | Data parsing errors vs performance |
+| **Meta-Routing** | Inquiries about routing decisions | Rationalizing routing telemetry path | Transparency & validation | Inefficient self-reflective overhead |
+| **Multi-Turn** | Long-context conversation history | Core synthesis compression points | Dialogue history recap | Token inflation on long contexts |
 
 ---
 
@@ -99,7 +103,7 @@ npm test -- --testPathPatterns=routingEvalBlind
 ```bash
 npm test
 ```
-Runs all 227 regression tests across 18 test suites confirming logical correctness, error boundary recovery, and budget safety.
+Runs all 231 regression tests across 18 test suites confirming logical correctness, error boundary recovery, and budget safety.
 
 ---
 

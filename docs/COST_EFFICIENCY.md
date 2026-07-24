@@ -15,10 +15,10 @@ npm test -- --testPathPatterns=routingEval
 | Metric | Value |
 |--------|-------|
 | Total prompts evaluated | 57 |
-| Categories | 9 (greeting, coding, genealogy, creative, fact-check, reasoning, mixed, adversarial, unknown) |
+| Categories | 13 (greeting, coding, genealogy, creative, fact-check, reasoning, mixed, adversarial, finance, structured-data, meta, multi-turn, unknown) |
 | Routing accuracy | 80% (36 correct, 9 incorrect) |
 | Test suites | 18 |
-| Total tests | 227 |
+| Total tests | 231 |
 | All passing | Yes |
 
 ## 2. Pathway Cost Breakdown
