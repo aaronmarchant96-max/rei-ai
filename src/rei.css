@@ -1,6 +1,6 @@
 
 :root {
-  --rei-bg: #0b0d10;
+  --rei-bg: #ff80c0; /* bright pink for testing */
   --rei-surface: #0f1115;
   --rei-surface-raised: #16181d;
   --rei-border: rgba(255,255,255,0.06);
@@ -8,8 +8,8 @@
   --rei-text-secondary: #a1a1aa;
   --rei-text-muted: #a8a8b0;
 
-  --rei-accent: #e66b2b; /* softer accent color */
-  --rei-accent-dim: rgba(230,107,43,0.12);
+  --rei-accent: #dfdcd7; /* logo dominant color */
+  --rei-accent-dim: rgba(223,220,215,0.12);
   --rei-success: #4ade80;
   --rei-danger: #f87171;
   --rei-spectral: linear-gradient(90deg, #ef4444, var(--rei-accent), #22d3ee);
@@ -150,7 +150,7 @@ code, pre, .rei-code {
   padding: 0 var(--rei-space-16);
   height: 50px;
   min-height: 50px;
-  background: var(--rei-surface);
+  background: var(--rei-accent); /* accent background for visibility */
   border-bottom: 1px solid var(--rei-accent);
   z-index: 20;
 }
