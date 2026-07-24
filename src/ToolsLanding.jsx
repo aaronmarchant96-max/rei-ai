@@ -127,15 +127,15 @@ const CASE_STUDIES = [
     id: "storm-replay",
     icon: "⛈️",
     title: "Storm Replay",
-    subtitle: "Meteorological Signal Analysis",
-    cardo: "Collect Doppler & EWMA signals → Analyze environmental shear → Record atmospheric hinge → Synthesize report",
-    badge: "Signal Review",
+    subtitle: "Historical Radar Signal Review",
+    cardo: "Collect 24 GOES/NEXRAD frames → Analyze motion energy & reflectivity → Record velocity hinge → Prepare evidence packet",
+    badge: "Radar Signal Review",
     badgeColor: "#38bdf8",
     example: {
-      input: "June 14, 2025 — Central Alberta Supercell",
-      hinge: "Storm-relative helicity exceeded 350 m²/s² — the single indicator that separated this supercell from the 6 weaker cells that day.",
-      result: "CAPE 3,200 J/kg + 45kt shear were necessary conditions, but helicity was the sufficient one.",
-      preview: { label: "Severe Signal", value: "Helicity > 350 m²/s² (ELEVATED)", tag: "EWMA Drift Detected" }
+      input: "December 10–11, 2021 Tornado Outbreak Replay (Graves County 22:00–23:00 CST)",
+      hinge: "Motion score spiked to 0.0162 (max) between frames #016–#020 while intensity coupling diverged — isolating the exact 60-min vortex surge.",
+      result: "Evidence Packet: 24 frames analyzed; 5 frames flagged for human meteorological inspection in Graves County window.",
+      preview: { label: "Radar Signal", value: "Motion 0.0162 | Graves Co 22:00 CST", tag: "5 Frames Flagged" }
     },
   },
   {
