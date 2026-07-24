@@ -9,7 +9,7 @@ REI.ai automatically minimizes your LLM API costs by intelligently routing every
 ## 📊 Telemetry Highlights (The Two Numbers)
 *   **$6.51 to build it:** 601 million tokens of deep reasoning and planning processed via DeepSeek & OpenCode CLI for the cost of a cup of coffee.
 *   **78% cheaper to run it:** The routing suite deflects greetings and simple queries, saving 78% in API costs compared to an always-premium baseline.
-*   **Product Roadmap:** See [`docs/ROADMAP.md`](file:///home/potatoking/rei-ai/docs/ROADMAP.md) for the Open-Core strategy, REI Router proxy API, and enterprise slice roadmap.
+*   **Product Roadmap:** See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the Open-Core strategy, REI Router proxy API, and enterprise slice roadmap.
 
 ---
 
@@ -107,12 +107,12 @@ Runs all 162 regression tests confirming logical correctness, error boundary rec
 
 | File | Purpose |
 | :--- | :--- |
-| [**`src/lib/nightShiftRouter.js`**](file:///home/potatoking/debate-furnace/src/lib/nightShiftRouter.js) | Core routing engine — complexity scoring, catalog matching, and cost estimation. |
-| [**`src/lib/deterministicEngine.js`**](file:///home/potatoking/debate-furnace/src/lib/deterministicEngine.js) | Layer 0 — returns $0-cost instant answers for smalltalk and greetings. |
-| [**`src/lib/cardoGuard.js`**](file:///home/potatoking/debate-furnace/src/lib/cardoGuard.js) | Cost-governor — executes the `L > W` escalation inequality check. |
-| [**`src/lib/costHelpers.js`**](file:///home/potatoking/debate-furnace/src/lib/costHelpers.js) | Unified cost tracker enforcing ceiling-based estimates. |
-| [**`src/__eval__/routingEval.test.js`**](file:///home/potatoking/debate-furnace/src/__eval__/routingEval.test.js) | 57-prompt benchmark harness with assertion-gated cost/savings checks. |
-| [**`data/fingerprints.json`**](file:///home/potatoking/debate-furnace/data/fingerprints.json) | The static fingerprint catalog with domain keywords and thresholds. |
+| [**`src/lib/nightShiftRouter.js`**](src/lib/nightShiftRouter.js) | Core routing engine — complexity scoring, catalog matching, and cost estimation. |
+| [**`src/lib/deterministicEngine.js`**](src/lib/deterministicEngine.js) | Layer 0 — returns $0-cost instant answers for smalltalk and greetings. |
+| [**`src/lib/cardoGuard.js`**](src/lib/cardoGuard.js) | Cost-governor — executes the `L > W` escalation inequality check. |
+| [**`src/lib/costHelpers.js`**](src/lib/costHelpers.js) | Unified cost tracker enforcing ceiling-based estimates. |
+| [**`src/__eval__/routingEval.test.js`**](src/__eval__/routingEval.test.js) | 57-prompt benchmark harness with assertion-gated cost/savings checks. |
+| [**`data/fingerprints.json`**](data/fingerprints.json) | The static fingerprint catalog with domain keywords and thresholds. |
 
 ---
 

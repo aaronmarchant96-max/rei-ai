@@ -71,7 +71,7 @@ REI.ai solves this by placing a **zero-inference deterministic engine** and **co
 - [ ] Implement token budget ceiling controls (`max_cost_per_query`).
 
 ### Phase 4: Public Launch & Case Studies (Week 4)
-- [ ] Publish peer-grade benchmark study ([`docs/INFORMATION_THEORETIC_ARCHITECTURE.md`](file:///home/potatoking/rei-ai/docs/INFORMATION_THEORETIC_ARCHITECTURE.md)).
+- [ ] Publish peer-grade benchmark study ([`INFORMATION_THEORETIC_ARCHITECTURE.md`](INFORMATION_THEORETIC_ARCHITECTURE.md)).
 - [ ] Public launch on Hacker News, ProductHunt, and GitHub Trending.
 - [ ] Initiate development of **Legal Hinge Analyzer** enterprise slice.
 
