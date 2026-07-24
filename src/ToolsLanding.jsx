@@ -315,7 +315,7 @@ export default function ToolsLanding({ onOpenTool }) {
             <span className="relume-hero__title-accent">that also saves you 78% on LLM costs.</span>
           </h1>
 
-          <p className="relume-hero__subtitle" style={{ maxWidth: 620 }}>
+          <p className="relume-hero__subtitle" style={{ maxWidth: 620, marginTop: "1rem", marginBottom: "1.25rem" }}>
             REI.ai applies <strong>CARDO</strong> — Collect, Analyze, Record, Distinguish, Operate —
             to every prompt. It finds the <em>hinge point</em>, routes to the cheapest model that
             won&apos;t fumble the answer, and proves the methodology works across domains
