@@ -18,21 +18,31 @@ export default function RouterBadge({ routerDecision, usage }) {
     : null;
 
   return (
-    <div className="rei-router-badge" role="status" aria-label={`Routed via ${routerDecision.label} to ${routerDecision.model}`}>
-      <span className="rei-router-badge__icon">{isDeterministic ? "⚡" : "🌙"}</span>
-      <span className="rei-router-badge__label">{routerDecision.label}</span>
-      {dimensionLabel && (
-        <span className={`rei-router-badge__dimension rei-router-badge__dimension--${dimensionLabel.toLowerCase()}`}>
-          {dimensionLabel}
+    <div className="rei-router-badge-container">
+      <div className="rei-pipeline-trace">
+        <span className="rei-pipeline-step">Input Analysis</span>
+        <span className="rei-pipeline-arrow">&rarr;</span>
+        <span className="rei-pipeline-step">Night Shift Router</span>
+        <span className="rei-pipeline-arrow">&rarr;</span>
+        <span className="rei-pipeline-step rei-pipeline-step--active">{isDeterministic ? "Rule Engine" : "Guard Passed"}</span>
+      </div>
+
+      <div className="rei-router-badge" role="status" aria-label={`Routed via ${routerDecision.label} to ${routerDecision.model}`}>
+        <span className="rei-router-badge__icon">{isDeterministic ? "⚡" : "🌙"}</span>
+        <span className="rei-router-badge__label">{routerDecision.label}</span>
+        {dimensionLabel && (
+          <span className={`rei-router-badge__dimension rei-router-badge__dimension--${dimensionLabel.toLowerCase()}`}>
+            {dimensionLabel}
+          </span>
+        )}
+        <span className="rei-router-badge__model">{routerDecision.model}</span>
+        <span className="rei-router-badge__cost">
+          {isDeterministic ? "$0 · 0 tok" : getCostBadgeLabel(routerDecision.model, totalTokens, usage)}
         </span>
-      )}
-      <span className="rei-router-badge__model">{routerDecision.model}</span>
-      <span className="rei-router-badge__cost">
-        {isDeterministic ? "$0 · 0 tok" : getCostBadgeLabel(routerDecision.model, totalTokens, usage)}
-      </span>
-      {!isDeterministic && savingsPct > 0 && (
-        <span className="rei-router-badge__savings">−{savingsPct}%</span>
-      )}
+        {!isDeterministic && savingsPct > 0 && (
+          <span className="rei-router-badge__savings">−{savingsPct}% saved</span>
+        )}
+      </div>
     </div>
   );
 }

@@ -4,9 +4,9 @@
   --rei-surface-raised: #161c2b;
   --rei-border: rgba(255, 255, 255, 0.08);
   --rei-border-gold: rgba(214, 176, 76, 0.28);
-  --rei-text: #f8fafc;
-  --rei-text-secondary: #cbd5e1;
-  --rei-text-muted: #94a3b8;
+  --rei-text: #ffffff;
+  --rei-text-secondary: #e2e8f0;  /* Higher contrast for readability */
+  --rei-text-muted: #a0aec0;
 
   --rei-accent: #d6b04c;        /* Logo Gold */
   --rei-accent-glow: #f0c965;   /* Glowing Gold */
@@ -17,6 +17,8 @@
 
   --rei-success: #34d399;
   --rei-danger: #f87171;
+  --rei-cyan: #38bdf8;
+  --rei-purple: #c084fc;
   --rei-spectral: linear-gradient(90deg, #ef4444, var(--rei-accent), #38bdf8);
   --rei-radius: 8px;
   --rei-space-8: 8px;
@@ -34,14 +36,14 @@
   background: rgba(7, 9, 13, 0.6);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(214, 176, 76, 0.25);
+  background: rgba(214, 176, 76, 0.3);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(240, 201, 101, 0.5);
+  background: rgba(240, 201, 101, 0.6);
 }
 
-/* ─── Global Background & Atmosphere ─── */
+/* ─── Global Background & Physics Grid Atmosphere ─── */
 body {
   position: relative;
   background-color: var(--rei-bg);
@@ -51,13 +53,27 @@ body {
   padding: 0;
 }
 
+/* Cybernetic Physics/Grid Overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(rgba(214, 176, 76, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(214, 176, 76, 0.025) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: 0.8;
+}
+
 body::after {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.018;
+  opacity: 0.02;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0% 0% / 100px;
 }
 
@@ -103,13 +119,13 @@ code, pre, .rei-code {
 }
 
 @keyframes goldGlowPulse {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(214, 176, 76, 0.3)); }
-  50%      { filter: drop-shadow(0 0 16px rgba(240, 201, 101, 0.65)); }
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(214, 176, 76, 0.4)); }
+  50%      { filter: drop-shadow(0 0 18px rgba(240, 201, 101, 0.75)); }
 }
 
-@keyframes dotBounce {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-  40%           { transform: scale(1.2); opacity: 1; }
+@keyframes livePulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.4)); }
+  50%      { transform: scale(1.03); filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.8)); }
 }
 
 /* ─── Main Application Shell ─── */
@@ -122,6 +138,8 @@ code, pre, .rei-code {
   background: radial-gradient(ellipse at 50% -10%, #1a2032 0%, #0d1018 55%, #07090d 100%);
   max-width: 100%;
   gap: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 720px) {
@@ -171,7 +189,7 @@ code, pre, .rei-code {
   }
 }
 
-/* ─── Header Bar with Micro-Animations ─── */
+/* ─── Header Bar with Metallic Gold Touch ─── */
 .rei-header {
   display: flex;
   align-items: center;
@@ -213,12 +231,12 @@ code, pre, .rei-code {
   background: var(--rei-gold-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(214, 176, 76, 0.3));
+  filter: drop-shadow(0 0 10px rgba(214, 176, 76, 0.35));
   transition: filter 0.2s ease;
 }
 
 .rei-logo-title:hover {
-  filter: drop-shadow(0 0 16px rgba(240, 201, 101, 0.6));
+  filter: drop-shadow(0 0 18px rgba(240, 201, 101, 0.7));
 }
 
 .rei-header__build-tag {
@@ -238,7 +256,13 @@ code, pre, .rei-code {
 
 .rei-header__build-tag:hover {
   border-color: var(--rei-accent-glow);
-  box-shadow: 0 0 10px rgba(214, 176, 76, 0.3);
+  box-shadow: 0 0 12px rgba(214, 176, 76, 0.35);
+}
+
+.rei-header__tagline {
+  font-size: 11px;
+  color: var(--rei-text-muted);
+  font-style: italic;
 }
 
 /* ─── Domain Tabs & Micro-Animations ─── */
@@ -385,7 +409,7 @@ code, pre, .rei-code {
   max-width: 90%;
 }
 
-/* ─── Luxury Glassmorphic Cards & Micro-Hover ─── */
+/* ─── Luxury Glassmorphic Cards & High-Contrast Typography ─── */
 .rei-chat-card {
   border-radius: 12px;
   overflow: hidden;
@@ -397,7 +421,7 @@ code, pre, .rei-code {
 }
 
 .rei-chat-card--rei {
-  background: linear-gradient(135deg, rgba(18, 23, 36, 0.88) 0%, rgba(12, 15, 24, 0.92) 100%);
+  background: linear-gradient(135deg, rgba(18, 23, 36, 0.92) 0%, rgba(12, 15, 24, 0.95) 100%);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -411,7 +435,7 @@ code, pre, .rei-code {
 }
 
 .rei-chat-card--user {
-  background: linear-gradient(135deg, rgba(30, 38, 58, 0.88) 0%, rgba(20, 26, 40, 0.92) 100%);
+  background: linear-gradient(135deg, rgba(30, 38, 58, 0.92) 0%, rgba(20, 26, 40, 0.95) 100%);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--rei-border-gold);
@@ -468,8 +492,8 @@ code, pre, .rei-code {
 
 .rei-chat-card__body {
   padding: 16px 20px 18px;
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 14.5px;
+  line-height: 1.75;
   color: var(--rei-text-secondary);
   word-break: break-word;
 }
@@ -637,7 +661,7 @@ code, pre, .rei-code {
   transform: scale(0.96);
 }
 
-/* ─── Telemetry Sidebar (`.rei-instrument-rail`) ─── */
+/* ─── Telemetry Control Panel Inset Styling ─── */
 .rei-instrument-rail {
   display: flex;
   flex-direction: column;
@@ -653,16 +677,16 @@ code, pre, .rei-code {
 
 .rei-instrument-rail__section {
   padding: 18px;
-  background: linear-gradient(135deg, rgba(20, 25, 38, 0.7) 0%, rgba(13, 16, 25, 0.8) 100%);
+  background: linear-gradient(135deg, rgba(20, 25, 38, 0.75) 0%, rgba(13, 16, 25, 0.85) 100%);
   border: 1px solid rgba(214, 176, 76, 0.2);
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 0 rgba(240, 201, 101, 0.15), 0 6px 20px rgba(0, 0, 0, 0.4);
   transition: all 0.2s ease;
 }
 
 .rei-instrument-rail__section:hover {
-  border-color: rgba(214, 176, 76, 0.35);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(214, 176, 76, 0.08);
+  border-color: rgba(214, 176, 76, 0.4);
+  box-shadow: inset 0 1px 0 rgba(240, 201, 101, 0.3), 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 18px rgba(214, 176, 76, 0.1);
 }
 
 .rei-instrument-rail__hero-value {
@@ -670,7 +694,7 @@ code, pre, .rei-code {
   font-weight: 700;
   color: var(--rei-success);
   font-family: 'JetBrains Mono', monospace;
-  text-shadow: 0 0 14px rgba(52, 211, 153, 0.4);
+  animation: livePulse 3s ease-in-out infinite;
 }
 
 .rei-instrument-rail__label {
@@ -699,7 +723,42 @@ code, pre, .rei-code {
   border-bottom: none;
 }
 
-/* ─── Router Badge & Router Panel ─── */
+/* ─── Router Badge & Pipeline Trace Visualizer ─── */
+.rei-router-badge-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.rei-pipeline-trace {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--rei-text-muted);
+}
+
+.rei-pipeline-step {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rei-pipeline-step--active {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.35);
+  color: var(--rei-success);
+  font-weight: 600;
+}
+
+.rei-pipeline-arrow {
+  color: var(--rei-accent);
+  opacity: 0.7;
+}
+
 .rei-router-badge {
   display: inline-flex;
   align-items: center;
