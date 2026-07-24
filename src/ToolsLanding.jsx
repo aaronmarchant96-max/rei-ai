@@ -350,6 +350,76 @@ export default function ToolsLanding({ onOpenTool }) {
             </p>
           </div>
 
+          {/* ─── Visual Pipeline Flow Diagram ─── */}
+          <div style={{
+            background: "#080d1a",
+            border: "1px solid #1e293b",
+            borderRadius: 12,
+            padding: "1.2rem 1.5rem",
+            marginBottom: "2rem",
+            overflowX: "auto"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minWidth: 680, gap: 8 }}>
+              {/* Step 1: Prompt Input */}
+              <div style={{ textAlign: "center", flex: "1" }}>
+                <div style={{ fontSize: "0.7em", color: "#64748b", fontWeight: 700, uppercase: "true", letterSpacing: "0.05em", marginBottom: 4 }}>START</div>
+                <div style={{ background: "#0f172a", border: "1px solid #334155", padding: "8px 12px", borderRadius: 6, color: "#e2e8f0", fontSize: "0.82em", fontWeight: 600 }}>
+                  Prompt Input
+                </div>
+              </div>
+
+              <span style={{ color: "#38bdf8", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+
+              {/* Step 2: C - Collect */}
+              <div style={{ textAlign: "center", flex: "1" }}>
+                <div style={{ fontSize: "0.7em", color: "#38bdf8", fontWeight: 700, marginBottom: 4 }}>C &middot; 01</div>
+                <div style={{ background: "#091e3a", border: "1px solid #0284c7", padding: "8px 12px", borderRadius: 6, color: "#38bdf8", fontSize: "0.82em", fontWeight: 700 }}>
+                  Collect
+                </div>
+              </div>
+
+              <span style={{ color: "#38bdf8", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+
+              {/* Step 3: A - Analyze */}
+              <div style={{ textAlign: "center", flex: "1" }}>
+                <div style={{ fontSize: "0.7em", color: "#38bdf8", fontWeight: 700, marginBottom: 4 }}>A &middot; 02</div>
+                <div style={{ background: "#091e3a", border: "1px solid #0284c7", padding: "8px 12px", borderRadius: 6, color: "#38bdf8", fontSize: "0.82em", fontWeight: 700 }}>
+                  Analyze
+                </div>
+              </div>
+
+              <span style={{ color: "#facc15", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+
+              {/* Step 4: R - Record Hinge */}
+              <div style={{ textAlign: "center", flex: "1.2" }}>
+                <div style={{ fontSize: "0.7em", color: "#facc15", fontWeight: 700, marginBottom: 4 }}>R &middot; 03 (HINGE)</div>
+                <div style={{ background: "#2e1065", border: "1px solid #7c3aed", padding: "8px 12px", borderRadius: 6, color: "#c084fc", fontSize: "0.82em", fontWeight: 800 }}>
+                  📌 Record Hinge
+                </div>
+              </div>
+
+              <span style={{ color: "#38bdf8", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+
+              {/* Step 5: DO - Operate */}
+              <div style={{ textAlign: "center", flex: "1" }}>
+                <div style={{ fontSize: "0.7em", color: "#38bdf8", fontWeight: 700, marginBottom: 4 }}>DO &middot; 04</div>
+                <div style={{ background: "#091e3a", border: "1px solid #0284c7", padding: "8px 12px", borderRadius: 6, color: "#38bdf8", fontSize: "0.82em", fontWeight: 700 }}>
+                  Operate
+                </div>
+              </div>
+
+              <span style={{ color: "#22c55e", fontWeight: 800, fontSize: "1.1em" }}>➔</span>
+
+              {/* Step 6: Optimal Route */}
+              <div style={{ textAlign: "center", flex: "1" }}>
+                <div style={{ fontSize: "0.7em", color: "#22c55e", fontWeight: 700, marginBottom: 4 }}>OUTPUT</div>
+                <div style={{ background: "#052e16", border: "1px solid #16a34a", padding: "8px 12px", borderRadius: 6, color: "#4ade80", fontSize: "0.82em", fontWeight: 700 }}>
+                  Optimal Route
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="relume-spotlight-grid" style={{ marginBottom: "1.5rem" }}>
             {[
               { s: "C", icon: "📥", t: "Collect", d: "Gather raw inputs, context tokens, and domain evidence without pre-filtering bias." },
@@ -376,6 +446,7 @@ export default function ToolsLanding({ onOpenTool }) {
           </div>
         </div>
       </section>
+
 
 
       {/* ═══════════════════════════════════════════
