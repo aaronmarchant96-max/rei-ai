@@ -67,11 +67,12 @@ The lab spans 6 active repositories across AI engineering, evaluation, computer 
 
 ### 2026-08 (planned)
 
-| Status | Experiment | Category |
-|--------|-----------|----------|
-| □ | Context Compression | Cost, Architecture |
-| □ | CARDO GUARD Validation Study | Evaluation |
-| □ | Session Recovery Engine | UX, Architecture |
+| Status | Experiment | Category | Plan |
+|--------|-----------|----------| -----|
+| □ | **Night Shift v3: Hinge Classifier** — ML-based 3-axis routing (ECS/DAS/APS) with Kaku-tier model mapping | Architecture, ML, Cost | [NIGHT_SHIFT_V3_ML_PLAN.md](NIGHT_SHIFT_V3_ML_PLAN.md) |
+| □ | Context Compression | Cost, Architecture | — |
+| □ | CARDO GUARD Validation Study | Evaluation | — |
+| □ | Session Recovery Engine | UX, Architecture | — |
 
 ### 2026-09 (planned)
 
