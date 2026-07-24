@@ -97,15 +97,15 @@ const CASE_STUDIES = [
     id: "furnace",
     icon: "⚔️",
     title: "Debate Furnace",
-    subtitle: "Argument Stress-Testing",
-    cardo: "Collect claim → Analyze evidence quality → Record logical hinge → Pressure-test counter-arguments",
-    badge: "Counter-Argument Engine",
+    subtitle: "Argument Pressure Testing",
+    cardo: "Collect claim & starter question → Steel-man both sides → Record value-collision hinge → Run 3-round pressure test",
+    badge: "Adversarial Pressure Test",
     badgeColor: "#f87171",
     example: {
-      input: "\"AI will replace all software engineers within 5 years.\"",
-      hinge: "Assumes AI can handle ambiguous requirements and stakeholder negotiation — tasks requiring contextual judgment, not pattern matching.",
-      result: "Confidence: Low — claim relies on extrapolation with no precedent for full-role displacement at this speed.",
-      preview: { label: "Fallacy Flagged", value: "Survivorship Bias & Extrapolation", tag: "3 Counter-Args Generated" }
+      input: "\"Is free will an illusion?\" (Illusion vs Not Illusion, Ruthless heat)",
+      hinge: "Value Collision (High Clarity): Whether free will requires ultimate authorship, or whether reason-responsive agency is enough.",
+      result: "Verdict: Not Illusion performed better under pressure (2 rounds to 1). Core Tradeoff: Causal History vs Practical Agency.",
+      preview: { label: "Debate Hinge", value: "Ultimate Authorship vs Reason-Responsive Agency", tag: "3-Round Test Complete" }
     },
   },
   {
@@ -113,14 +113,14 @@ const CASE_STUDIES = [
     icon: "📜",
     title: "Story Forge",
     subtitle: "Archival Narrative Synthesis",
-    cardo: "Collect records → Analyze source discrepancies → Record narrative hinge → Outline character drivers",
-    badge: "Evidence Tiering",
+    cardo: "Pick curated seed → Shape blueprint format → Record narrative hinge → Remix genre & mutation",
+    badge: "Source Trail & Remix",
     badgeColor: "#a78bfa",
     example: {
-      input: "1923 Alberta Homestead Record — Marchant Family",
-      hinge: "Census 1921 lists 4 children. Homestead record lists 5 — a birth between 1921–1923 that vanishes from the 1926 census.",
-      result: "The missing fifth child becomes the story's load-bearing detail: who were they, and why do they disappear?",
-      preview: { label: "Source Evidence", value: "Primary: Land Title SE¼-12-42-4-W5", tag: "Discrepancy Isolated" }
+      input: "Seed: The Storyteller's Gambit (Frame Tale / Survival through Storytelling; Persianate / Arabic Tradition)",
+      hinge: "Can control of the story become a form of material survival? (Delay, curiosity, and emotional leverage as protection against power).",
+      result: "Blueprint Packet: 3-Act Movie / Fantasy / Speculative Mutation outline with source trail intact and distinct fictional boundary.",
+      preview: { label: "Story Seed", value: "The Storyteller's Gambit", tag: "3-Act Blueprint Ready" }
     },
   },
   {
