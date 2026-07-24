@@ -128,14 +128,14 @@ const CASE_STUDIES = [
     icon: "⛈️",
     title: "Storm Replay",
     subtitle: "Historical Radar Signal Review",
-    cardo: "Collect 24 GOES/NEXRAD frames → Analyze motion energy & reflectivity → Record velocity hinge → Prepare evidence packet",
+    cardo: "Collect 24 NEXRAD frames → Analyze motion energy (0.0000–0.0162) → Record velocity surge hinge → Export review packet",
     badge: "Radar Signal Review",
     badgeColor: "#38bdf8",
     example: {
-      input: "December 10–11, 2021 Tornado Outbreak Replay (Graves County 22:00–23:00 CST)",
-      hinge: "Motion score spiked to 0.0162 (max) between frames #016–#020 while intensity coupling diverged — isolating the exact 60-min vortex surge.",
-      result: "Evidence Packet: 24 frames analyzed; 5 frames flagged for human meteorological inspection in Graves County window.",
-      preview: { label: "Radar Signal", value: "Motion 0.0162 | Graves Co 22:00 CST", tag: "5 Frames Flagged" }
+      input: "December 10–11, 2021 Tornado Outbreak Replay (Graves County 22:00–23:00 CST window)",
+      hinge: "Motion energy score rose from 0.0067 to 0.0162 (max) across frames #016–#023, isolating the exact tornado activity window.",
+      result: "Calibration Pass: 24/24 radar frames reviewed; motion score peak 0.0162 (frame #022) flagged for human inspection.",
+      preview: { label: "Radar Signal", value: "Motion 0.0162 | Graves Co 22:00 CST", tag: "24 Frames Reviewed" }
     },
   },
   {
