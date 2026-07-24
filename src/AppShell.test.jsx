@@ -16,7 +16,7 @@ describe("AppShell", () => {
     render(<AppShell />);
     await waitForLazySettle();
 
-    expect(screen.getByRole("heading", { name: /Structured Reasoning/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Automatically reduce your LLM costs/i })).toBeInTheDocument();
     await waitFor(() => {
       expect(document.title).toBe("PromptHound Labs | Tools");
     });
@@ -39,7 +39,7 @@ describe("AppShell", () => {
       expect(document.title).toBe("PromptHound Labs | Tools");
     });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /Structured Reasoning/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /Automatically reduce your LLM costs/i })).toBeInTheDocument();
     });
   });
 
@@ -47,7 +47,7 @@ describe("AppShell", () => {
     render(<AppShell />);
     await waitForLazySettle();
 
-    expect(screen.getByRole("heading", { name: /Structured Reasoning/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Automatically reduce your LLM costs/i })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /Launch Story Forge/i }));
     await waitForLazySettle();
@@ -96,7 +96,7 @@ describe("AppShell", () => {
     render(<AppShell />);
     await waitForLazySettle();
 
-    expect(screen.getByRole("heading", { name: /Structured Reasoning/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Automatically reduce your LLM costs/i })).toBeInTheDocument();
     expect(document.title).toBe("PromptHound Labs | Tools");
   });
 });

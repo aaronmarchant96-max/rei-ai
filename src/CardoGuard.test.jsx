@@ -7,7 +7,7 @@ describe("CardoGuard", () => {
 
     expect(screen.getByText(/should we act on this ai risk score/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/rei\.ai guard/i, { selector: ".cardo-guard__tool-name" })
+      screen.getByText(/cardo guard/i, { selector: ".cardo-guard__tool-name" })
     ).toBeInTheDocument();
     expect(
       screen.getByText(/synthetic demo only/i, { selector: ".status-badge--cyan" })

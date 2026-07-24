@@ -102,16 +102,16 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="relume-hero__container">
           <div className="relume-badge">
             <span className="relume-badge__dot">●</span>
-            PROMPTHOUND LABS &middot; FLAGSHIP REASONING LAYER
+            PROMPTHOUND LABS &middot; COST-PERFORMANCE LLM ROUTER
           </div>
 
           <h1 className="relume-hero__title">
-            Structured Reasoning. <br />
-            <span className="relume-hero__title-accent">Budget-Respecting Intelligence.</span>
+            Automatically reduce your LLM costs. <br />
+            <span className="relume-hero__title-accent">Intelligence on demand. Zero wasted tokens.</span>
           </h1>
 
           <p className="relume-hero__subtitle">
-            REI.ai combines dual-engine <strong>CARDO REI methodology</strong> with the <strong>Night Shift Router</strong> to deliver senior-level reasoning, evidence tiering, and decision support at up to <strong>78% lower token cost</strong>.
+            REI.ai automatically minimizes your LLM API spend by intelligently routing every request to the lowest-cost option that meets your target quality—deflecting up to <strong>78% of inference costs</strong> before firing a single token.
           </p>
 
           <div className="relume-hero__actions">
@@ -121,7 +121,7 @@ export default function ToolsLanding({ onOpenTool }) {
               onClick={() => onOpenTool("rei")}
             >
               <img src={logo} alt="REI Logo" className="relume-btn__icon" />
-              Launch REI.ai Flagship Platform &rarr;
+              Launch REI Router Platform &rarr;
             </button>
             <a
               href="#modules"

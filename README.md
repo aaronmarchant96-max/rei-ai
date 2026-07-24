@@ -1,15 +1,15 @@
-# REI.ai — CARDO REI: A Cost-Aware Routing & Reasoning Engine
+# REI.ai — Cost-Performance Routing for Enterprise AI
 
-> **"The only router that thinks before it spends."**
+> **"The OpenAI-compatible router that thinks before it spends."**
 
-Deconstruct reasoning under uncertainty. Deflect simple greetings to $0 paths. Route coding to 70B models at $0.0014/1K tokens. Escalate to premium models only when the utility justification is proven.
+REI.ai automatically minimizes your LLM API costs by intelligently routing every request to the lowest-cost option that meets your target quality—deflecting up to 78% of inference spend before firing a single token.
 
 ---
 
 ## 📊 Telemetry Highlights (The Two Numbers)
 *   **$6.51 to build it:** 601 million tokens of deep reasoning and planning processed via DeepSeek & OpenCode CLI for the cost of a cup of coffee.
 *   **78% cheaper to run it:** The routing suite deflects greetings and simple queries, saving 78% in API costs compared to an always-premium baseline.
-*   **Product Roadmap:** See [`docs/ROADMAP.md`](file:///home/potatoking/rei-ai/docs/ROADMAP.md) for the Open-Core strategy & Proxy API launch plan.
+*   **Product Roadmap:** See [`docs/ROADMAP.md`](file:///home/potatoking/rei-ai/docs/ROADMAP.md) for the Open-Core strategy, REI Router proxy API, and enterprise slice roadmap.
 
 ---
 
