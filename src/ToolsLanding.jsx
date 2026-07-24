@@ -336,35 +336,47 @@ export default function ToolsLanding({ onOpenTool }) {
       </section>
 
       {/* ═══════════════════════════════════════════
-          CARDO METHOD — ~10% — Compact 4-step strip
+          CARDO METHODOLOGY — Professional & Strategic Framing
           ═══════════════════════════════════════════ */}
-      <section className="relume-section relume-section--highlight" style={{ padding: "2.5rem 0" }}>
+      <section className="relume-section relume-section--highlight" style={{ padding: "3rem 0" }}>
         <div className="relume-container">
-          <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-            <span style={S.eyebrow}>THE CARDO METHOD</span>
-            <h2 className="relume-section-title" style={{ fontSize: "1.4em", marginTop: 4 }}>
-              Four steps. Every domain. Every time.
+          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+            <span style={S.eyebrow}>PHILOSOPHY & METHODOLOGY</span>
+            <h2 className="relume-section-title" style={{ fontSize: "1.6em", marginTop: 4 }}>
+              The CARDO Framework
             </h2>
+            <p style={{ color: "#94a3b8", fontSize: "0.9em", maxWidth: 640, margin: "8px auto 0", lineHeight: 1.6 }}>
+              Named after the Latin <span style={{ color: "#38bdf8", fontWeight: 600 }}>cardo</span> (<em>the load-bearing hinge on which everything pivots</em>). CARDO is a systematic cognitive framework designed to isolate the single pivot point in complex, noisy data.
+            </p>
           </div>
-          <div className="relume-spotlight-grid">
+
+          <div className="relume-spotlight-grid" style={{ marginBottom: "1.5rem" }}>
             {[
-              { s: "01", icon: "📥", t: "Collect", d: "Gather raw evidence without filtering." },
-              { s: "02", icon: "🔬", t: "Analyze", d: "Separate facts from inferences." },
-              { s: "03", icon: "📌", t: "Find the Hinge", d: "The one detail that turns the conclusion." },
-              { s: "04", icon: "🔄", t: "Operate", d: "Assign confidence tiers. Iterate." },
+              { s: "C", icon: "📥", t: "Collect", d: "Gather raw inputs, context tokens, and domain evidence without pre-filtering bias." },
+              { s: "A", icon: "🔬", t: "Analyze & Distinguish", d: "Dissect inputs by separating hard facts from implicit assumptions and noisy prompts." },
+              { s: "R", icon: "📌", t: "Record the Hinge", d: "Isolate the single load-bearing detail (the hinge) that dictates complexity and safety." },
+              { s: "DO", icon: "🔄", t: "Operate & Decide", d: "Execute deterministic low-cost actions or route to specialized tiers with continuous audit logs." },
             ].map(({ s, icon, t, d }) => (
-              <div className="relume-spotlight-card" key={s} style={{ padding: "1rem 1.2rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                  <span style={{ fontSize: "1.2em" }}>{icon}</span>
-                  <span style={{ fontSize: "0.68em", color: "#64748b", fontWeight: 700 }}>{s}</span>
+              <div className="relume-spotlight-card" key={s} style={{ padding: "1.2rem 1.2rem", background: "#0c1425", border: "1px solid #1e293b" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <span style={{ fontSize: "1.4em" }}>{icon}</span>
+                  <span style={{ fontSize: "1.1em", color: "#38bdf8", fontWeight: 800, fontFamily: "'JetBrains Mono', monospace" }}>{s}</span>
                 </div>
-                <h3 style={{ fontSize: "0.95em", margin: "0 0 4px" }}>{t}</h3>
-                <p style={{ fontSize: "0.82em", margin: 0 }}>{d}</p>
+                <h3 style={{ fontSize: "1em", margin: "0 0 6px", color: "#e2e8f0" }}>{t}</h3>
+                <p style={{ fontSize: "0.82em", margin: 0, color: "#94a3b8", lineHeight: 1.5 }}>{d}</p>
               </div>
             ))}
           </div>
+
+          <div style={{ background: "rgba(56, 189, 248, 0.04)", border: "1px solid rgba(56, 189, 248, 0.2)", borderRadius: 10, padding: "1rem 1.5rem", textAlign: "center", maxWidth: 760, margin: "0 auto" }}>
+            <span style={{ color: "#38bdf8", fontWeight: 700, fontSize: "0.82em", textTransform: "uppercase", letterSpacing: "0.08em" }}>Why Philosophy First?</span>
+            <p style={{ color: "#cbd5e1", fontSize: "0.86em", margin: "6px 0 0", lineHeight: 1.6 }}>
+              Most LLM routers are ad-hoc heuristics. REI.ai is built on an adversarial-tested reasoning architecture. The same <strong>CARDO hinge logic</strong> that cuts LLM API costs by 78% also powers our evidence verification, debate stress-testing, and meteorological signal analysis.
+            </p>
+          </div>
         </div>
       </section>
+
 
       {/* ═══════════════════════════════════════════
           FLAGSHIP: REI.AI PLATFORM — ~50% — THE STAR
