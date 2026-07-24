@@ -78,6 +78,25 @@ export default function ToolsLanding({ onOpenTool }) {
 
   return (
     <div className="relume-page">
+      {/* ─── Relume Top Navbar ─── */}
+      <header className="relume-nav">
+        <div className="relume-nav__brand">
+          <img src={logo} alt="REI Logo" width="28" height="28" style={{ borderRadius: 6 }} />
+          <span className="relume-nav__title">PromptHound Labs</span>
+          <span className="relume-nav__badge">REI.ai Flagship</span>
+        </div>
+        <div className="relume-nav__actions">
+          <a href="#modules" className="relume-nav__link">Explore Slices</a>
+          <button
+            type="button"
+            className="relume-nav__btn"
+            onClick={() => onOpenTool("rei")}
+          >
+            Launch REI.ai &rarr;
+          </button>
+        </div>
+      </header>
+
       {/* ─── Hero Section ─── */}
       <section className="relume-hero">
         <div className="relume-hero__container">

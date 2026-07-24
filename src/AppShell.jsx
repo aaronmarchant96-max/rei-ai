@@ -201,31 +201,7 @@ export default function AppShell() {
         </>
       )}
 
-      {tool === "tools" ? (
-        <header className="shell-header shell-header--landing">
-          <div className="shell-brand">
-            <div className="shell-brand__title">PromptHound Labs</div>
-            <div className="shell-brand__sub">Structured outputs for messy input.</div>
-          </div>
-
-          {!mobile && (
-            <nav className="top-tabs hide-mobile" aria-label="Top-level tools">
-              {TOP_LEVEL.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={tool === item.id ? "top-tab is-active" : "top-tab touch-target"}
-                  onClick={() => setTool(item.id)}
-                  aria-pressed={tool === item.id}
-                >
-                  <span className="top-tab__label">{item.label}</span>
-                  <span className="top-tab__sub">{item.subtitle}</span>
-                </button>
-              ))}
-            </nav>
-          )}
-        </header>
-      ) : !mobile ? (
+      {tool !== "tools" && !mobile ? (
         <div className="shell-tool-bar" aria-label="Breadcrumb">
           <button
             type="button"

@@ -4217,16 +4217,79 @@ input:focus:not(:focus-visible) {
 /* ==========================================================================
    RELUME PRO LANDING PAGE STYLES
    ========================================================================== */
-.relume-page {
-  background: radial-gradient(ellipse at 50% -10%, #1c2338 0%, #0d1018 50%, #07090d 100%);
-  color: #f8fafc;
-  min-height: 100vh;
-  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow-x: hidden;
+.relume-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 60px;
+  background: rgba(11, 13, 19, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(214, 176, 76, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.relume-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.relume-nav__badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #f0c965;
+  background: rgba(214, 176, 76, 0.15);
+  border: 1px solid rgba(214, 176, 76, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.relume-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.relume-nav__link {
+  color: #cbd5e1;
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.relume-nav__link:hover {
+  color: #f0c965;
+}
+
+.relume-nav__btn {
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  background: linear-gradient(135deg, #f0c965 0%, #d6b04c 60%, #b58f33 100%) !important;
+  color: #07090d !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(214, 176, 76, 0.3) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.relume-nav__btn:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow: 0 6px 20px rgba(240, 201, 101, 0.45) !important;
 }
 
 .relume-hero {
-  padding: 64px 24px 80px;
+  padding: 48px 24px 80px;
   text-align: center;
   max-width: 1100px;
   margin: 0 auto;
