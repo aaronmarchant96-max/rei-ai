@@ -33,8 +33,8 @@ const TOP_LEVEL = [
   },
   {
     id: "cardo-guard",
-    label: "REI.ai Guard",
-    subtitle: "Escalation to premium models is controlled by the REI.ai Guard cost gate."
+    label: "CARDO Guard",
+    subtitle: "Escalation to premium models is controlled by the CARDO Guard cost gate."
   },
   {
     id: "rei",

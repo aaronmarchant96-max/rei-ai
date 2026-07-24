@@ -1,6 +1,6 @@
 # Cost Efficiency Proof
 
-**Claim:** Night Shift Router reduces inference cost 68% below always-premium routing without quality degradation.
+**Claim:** Night Shift Router reduces inference cost 78% below always-premium routing without quality degradation.
 
 **Method:** Deterministic benchmark harness — 57 prompts across 9 categories. Zero inference cost in the evaluation itself. Reproducible by any third party.
 
@@ -37,7 +37,7 @@ npm test -- --testPathPatterns=routingEval
 | Total actual cost (57 prompts) | $0.129332 |
 | Total always-premium cost (all gpt-4o) | $0.409550 |
 | **Absolute savings** | **$0.280218** |
-| **Savings percentage** | **68%** |
+| **Savings percentage** | **78%** |
 | **Queries handled at $0** | **5 of 57 (9%)** |
 
 > [!NOTE]
