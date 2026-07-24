@@ -148,7 +148,7 @@ export default function ToolsLanding({ onOpenTool }) {
               <div className="relume-showcase-sample">
                 <div className="relume-showcase-sample__tag">📌 HINGE POINT</div>
                 <div className="relume-showcase-sample__text">
-                  The primary bottleneck is not model intelligence—it is arbitrary routing to expensive frontier models when a 70B versatille model achieves identical precision at 1/10th the cost.
+                  The primary bottleneck is not model intelligence—it is arbitrary routing to expensive frontier models when a 70B versatile model achieves identical precision at 1/10th the cost.
                 </div>
 
                 <div className="relume-showcase-sample__grid">
@@ -186,18 +186,54 @@ export default function ToolsLanding({ onOpenTool }) {
             </div>
             <div className="relume-spotlight-card">
               <div className="relume-spotlight-card__icon">🌙</div>
-              <h3>Night Shift Router</h3>
+              <h3>Night Shift Router v2.0</h3>
               <p>Dynamic cost-aware routing that evaluates complexity before choosing the optimal model.</p>
             </div>
             <div className="relume-spotlight-card">
-              <div className="relume-spotlight-card__icon">🟢</div>
-              <h3>Rigorous Evidence Tiering</h3>
-              <p>Classifies evidence into Primary Sources, Strong Evidence, Family Memory, and Needs Review.</p>
+              <div className="relume-spotlight-card__icon">🔄</div>
+              <h3>Hybrid Routing Collision</h3>
+              <p>Combines domain signals dynamically (e.g. Coding ⟷ Stories) when a prompt covers multiple targets.</p>
             </div>
             <div className="relume-spotlight-card">
               <div className="relume-spotlight-card__icon">💰</div>
-              <h3>Telemetry &amp; Cost Guards</h3>
-              <p>Real-time token cost estimation, ceiling enforcement, and session savings tracking.</p>
+              <h3>Adversarial Suspicion Defect</h3>
+              <p>Security analysis routing injections directly to safety verification pipelines, preventing prompt hijacking.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── New Fingerprint Showcase Section ─── */}
+      <section className="relume-section relume-section--white">
+        <div className="relume-container">
+          <div className="relume-section-header">
+            <span className="relume-eyebrow">ROUTING SYSTEM CAPABILITIES</span>
+            <h2 className="relume-section-title">New Fingerprint Layout Slices</h2>
+            <p className="relume-section-desc">
+              Our routing catalog has been updated to dynamically recognize specialized prompt workloads.
+            </p>
+          </div>
+
+          <div className="relume-spotlight-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+            <div className="relume-spotlight-card" style={{ background: "#0f172a", border: "1px solid #334155" }}>
+              <div className="relume-spotlight-card__icon">💰</div>
+              <h3>Finance Analyst</h3>
+              <p style={{ color: "#94a3b8" }}>Triggered by budgets, invoices, expenditures, or token-savings metrics.</p>
+            </div>
+            <div className="relume-spotlight-card" style={{ background: "#0f172a", border: "1px solid #334155" }}>
+              <div className="relume-spotlight-card__icon">🗃️</div>
+              <h3>Structured Data</h3>
+              <p style={{ color: "#94a3b8" }}>Recognizes CSV structure, JSON schemas, SQL queries, and tabular datasets.</p>
+            </div>
+            <div className="relume-spotlight-card" style={{ background: "#0f172a", border: "1px solid #334155" }}>
+              <div className="relume-spotlight-card__icon">🔍</div>
+              <h3>Meta-Routing</h3>
+              <p style={{ color: "#94a3b8" }}>Handles self-referential queries regarding active models, rules, or routing logic.</p>
+            </div>
+            <div className="relume-spotlight-card" style={{ background: "#0f172a", border: "1px solid #334155" }}>
+              <div className="relume-spotlight-card__icon">🧵</div>
+              <h3>Multi-Turn Synthesis</h3>
+              <p style={{ color: "#94a3b8" }}>Engages high-context comprehension when dialogue history exceeds 5 turns.</p>
             </div>
           </div>
         </div>
