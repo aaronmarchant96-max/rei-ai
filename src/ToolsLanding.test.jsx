@@ -18,7 +18,7 @@ describe("ToolsLanding", () => {
     render(<ToolsLanding onOpenTool={onOpenTool} />);
 
     // Click the REI Router button
-    fireEvent.click(screen.getByRole("button", { name: /Launch REI Router Platform/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Launch REI Playground/i }));
     expect(onOpenTool).toHaveBeenCalledWith("rei");
 
     // Click the Tracepoint button
