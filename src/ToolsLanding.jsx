@@ -142,15 +142,15 @@ const CASE_STUDIES = [
     id: "cardo-guard",
     icon: "🛡️",
     title: "CARDO Guard",
-    subtitle: "Confidence & Cost Ceiling Gate",
-    cardo: "Collect model prompt → Analyze payload risk & cost-to-miss → Record safety hinge → Enforce gate verdict",
-    badge: "Cost Ceiling Gate",
+    subtitle: "AI Risk Decision Gate",
+    cardo: "Collect risk score → Analyze false alarm band → Record breakeven hinge → Enforce cost-weighted gate verdict",
+    badge: "Cost-Weighted Gate",
     badgeColor: "#f0c965",
     example: {
-      input: "High-volume customer API query ($12.50 vs $0.04 model options)",
-      hinge: "Cost-to-act ($0.04) vs Cost-to-miss ($1,500 compliance error). Confidence score 92% allows 70B local execution.",
-      result: "Verdict: Low-cost local model approved ($0.04 execution cost; $1,499.96 risk-weighted value saved).",
-      preview: { label: "Cost Gate", value: "Act: $0.04 | Miss: $1,500", tag: "Approved Local Tier" }
+      input: "Compressor Anomaly Risk (91% Confidence, $42,000 Cost to Act, $850,000 Cost of Miss)",
+      hinge: "Risk-adjusted miss loss ($722,500) exceeds expected action waste ($6,300). Breakeven miss cost is $7,412.",
+      result: "Verdict: ACT (Very Strong 114.7× margin; Action waste $6.3k vs Miss loss $722.5k).",
+      preview: { label: "Risk Gate", value: "Act $42k | Miss $850k ➔ ACT", tag: "114.7x Margin" }
     },
   },
   {
