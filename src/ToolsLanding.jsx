@@ -98,35 +98,74 @@ const CASE_STUDIES = [
     icon: "⚔️",
     title: "Debate Furnace",
     subtitle: "Argument Stress-Testing",
-    cardo: "Collect the claim → Analyze evidence quality → Find the logical hinge → Pressure-test with counter-arguments",
+    cardo: "Collect claim → Analyze evidence quality → Record logical hinge → Pressure-test counter-arguments",
+    badge: "Counter-Argument Engine",
+    badgeColor: "#f87171",
     example: {
       input: "\"AI will replace all software engineers within 5 years.\"",
       hinge: "Assumes AI can handle ambiguous requirements and stakeholder negotiation — tasks requiring contextual judgment, not pattern matching.",
       result: "Confidence: Low — claim relies on extrapolation with no precedent for full-role displacement at this speed.",
+      preview: { label: "Fallacy Flagged", value: "Survivorship Bias & Extrapolation", tag: "3 Counter-Args Generated" }
     },
   },
   {
     id: "story-forge",
     icon: "📜",
     title: "Story Forge",
-    subtitle: "Archival Narrative",
-    cardo: "Collect records → Analyze discrepancies → Find the narrative hinge → Build the story around it",
+    subtitle: "Archival Narrative Synthesis",
+    cardo: "Collect records → Analyze source discrepancies → Record narrative hinge → Outline character drivers",
+    badge: "Evidence Tiering",
+    badgeColor: "#a78bfa",
     example: {
       input: "1923 Alberta Homestead Record — Marchant Family",
       hinge: "Census 1921 lists 4 children. Homestead record lists 5 — a birth between 1921–1923 that vanishes from the 1926 census.",
       result: "The missing fifth child becomes the story's load-bearing detail: who were they, and why do they disappear?",
+      preview: { label: "Source Evidence", value: "Primary: Land Title SE¼-12-42-4-W5", tag: "Discrepancy Isolated" }
     },
   },
   {
     id: "storm-replay",
     icon: "⛈️",
     title: "Storm Replay",
-    subtitle: "Signal Analysis",
-    cardo: "Collect observations → Analyze atmospheric signals → Find the meteorological hinge → Explain the outcome",
+    subtitle: "Meteorological Signal Analysis",
+    cardo: "Collect Doppler & EWMA signals → Analyze environmental shear → Record atmospheric hinge → Synthesize report",
+    badge: "Signal Review",
+    badgeColor: "#38bdf8",
     example: {
       input: "June 14, 2025 — Central Alberta Supercell",
       hinge: "Storm-relative helicity exceeded 350 m²/s² — the single indicator that separated this supercell from the 6 weaker cells that day.",
       result: "CAPE 3,200 J/kg + 45kt shear were necessary conditions, but helicity was the sufficient one.",
+      preview: { label: "Severe Signal", value: "Helicity > 350 m²/s² (ELEVATED)", tag: "EWMA Drift Detected" }
+    },
+  },
+  {
+    id: "cardo-guard",
+    icon: "🛡️",
+    title: "CARDO Guard",
+    subtitle: "Confidence & Cost Ceiling Gate",
+    cardo: "Collect model prompt → Analyze payload risk & cost-to-miss → Record safety hinge → Enforce gate verdict",
+    badge: "Cost Ceiling Gate",
+    badgeColor: "#f0c965",
+    example: {
+      input: "High-volume customer API query ($12.50 vs $0.04 model options)",
+      hinge: "Cost-to-act ($0.04) vs Cost-to-miss ($1,500 compliance error). Confidence score 92% allows 70B local execution.",
+      result: "Verdict: Low-cost local model approved ($0.04 execution cost; $1,499.96 risk-weighted value saved).",
+      preview: { label: "Cost Gate", value: "Act: $0.04 | Miss: $1,500", tag: "Approved Local Tier" }
+    },
+  },
+  {
+    id: "tracepoint",
+    icon: "📡",
+    title: "Tracepoint",
+    subtitle: "Industrial Telemetry & Handover Review",
+    cardo: "Collect 7-day hourly sensor readings → Analyze EWMA drift → Record maintenance hinge → Export handover report",
+    badge: "Industrial Telemetry",
+    badgeColor: "#4ade80",
+    example: {
+      input: "Pump Station P-204 — Vibration RMS & Bearing Temp Drift",
+      hinge: "Vibration RMS exceeded asset baseline by 49.7% with 12 consecutive elevated readings; pressure/flow coupling diverged.",
+      result: "Decision Read: High signal / Expected loss ($163.9k) exceeds inspection cost ($91.9k). Review recommended.",
+      preview: { label: "Telemetry Drift", value: "P-204 Vibration +49.7% vs Baseline", tag: "Handover Packet Ready" }
     },
   },
 ];
@@ -595,9 +634,9 @@ export default function ToolsLanding({ onOpenTool }) {
             </div>
           </div>
 
-          {/* Fingerprint Grid */}
+          {/* Fingerprint / Category Grid */}
           <div style={{ marginTop: 24 }}>
-            <div style={{ ...S.eyebrow, textAlign: "center", marginBottom: 16 }}>15 PRE-BUILT ROUTING FINGERPRINTS</div>
+            <div style={{ ...S.eyebrow, textAlign: "center", marginBottom: 16 }}>15 PRE-BUILT ROUTING DOMAINS</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
               {FINGERPRINTS.map((fp) => (
                 <div key={fp.name} style={{
@@ -633,21 +672,21 @@ export default function ToolsLanding({ onOpenTool }) {
       </section>
 
       {/* ═══════════════════════════════════════════
-          CASE STUDIES — ~20% — Compact expandable proof
+          CASE STUDIES — ~20% — Unified 5-Domain Proof
           ═══════════════════════════════════════════ */}
-      <section id="case-studies" className="relume-section relume-section--highlight" style={{ padding: "2.5rem 0" }}>
+      <section id="case-studies" className="relume-section relume-section--highlight" style={{ padding: "3rem 0" }}>
         <div className="relume-container">
-          <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
             <span style={S.eyebrow}>CARDO APPLIED: DOMAIN CASE STUDIES</span>
-            <h2 className="relume-section-title" style={{ fontSize: "1.3em", marginTop: 4 }}>
-              Same framework. Three different hard problems.
+            <h2 className="relume-section-title" style={{ fontSize: "1.4em", marginTop: 4 }}>
+              Five specialized tools. One underlying framework.
             </h2>
-            <p className="relume-section-desc" style={{ fontSize: "0.88em" }}>
-              These aren&apos;t separate products — they&apos;re proof that the methodology generalizes.
+            <p className="relume-section-desc" style={{ fontSize: "0.88em", maxWidth: 620, margin: "6px auto 0" }}>
+              These aren&apos;t disconnected products — they are living proof that CARDO hinge reasoning generalizes across domains from adversarial debate to industrial telemetry.
             </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {CASE_STUDIES.map((cs, i) => {
               const isOpen = expandedCase === i;
               return (
@@ -656,99 +695,86 @@ export default function ToolsLanding({ onOpenTool }) {
                   style={{
                     ...S.card,
                     cursor: "pointer",
-                    transition: "border-color 0.2s",
-                    borderColor: isOpen ? "#38bdf8" : "#1e293b",
+                    transition: "all 0.2s ease",
+                    borderColor: isOpen ? "#f0c965" : "rgba(240, 201, 101, 0.25)",
+                    boxShadow: isOpen ? "0 4px 20px rgba(240, 201, 101, 0.15)" : "0 4px 12px rgba(0,0,0,0.2)",
                   }}
                 >
                   {/* Collapsed header — always visible */}
                   <div
                     onClick={() => setExpandedCase(isOpen ? null : i)}
-                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <span style={{ fontSize: "1.4em" }}>{cs.icon}</span>
+                      <span style={{ fontSize: "1.5em" }}>{cs.icon}</span>
                       <div>
-                        <div style={{ color: "#e2e8f0", fontWeight: 700, fontSize: "0.95em" }}>{cs.title}</div>
-                        <div style={{ color: "#64748b", fontSize: "0.78em" }}>{cs.subtitle} — {cs.cardo.split(" → ").length} CARDO steps applied</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ color: "#e2e8f0", fontWeight: 700, fontSize: "0.95em" }}>{cs.title}</span>
+                          {cs.badge && (
+                            <span style={{
+                              fontSize: "0.68em", padding: "2px 8px", borderRadius: 10,
+                              background: "rgba(240, 201, 101, 0.12)", color: cs.badgeColor || "#f0c965",
+                              border: `1px solid ${cs.badgeColor || "#f0c965"}40`, fontWeight: 700,
+                            }}>
+                              {cs.badge}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ color: "#94a3b8", fontSize: "0.78em", marginTop: 2 }}>
+                          {cs.subtitle} &middot; <span style={{ color: "#f0c965", fontWeight: 600 }}>4 CARDO steps applied</span>
+                        </div>
                       </div>
                     </div>
+
+                    {/* Inline UI Preview Chip */}
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {cs.example.preview && (
+                        <div style={{
+                          background: "#090d16", border: "1px solid #1e293b",
+                          padding: "4px 10px", borderRadius: 6, display: "flex", gap: 8, alignItems: "center"
+                        }}>
+                          <span style={{ fontSize: "0.7em", color: "#64748b", fontWeight: 700 }}>{cs.example.preview.label}:</span>
+                          <span style={{ fontSize: "0.75em", color: "#e2e8f0", fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>{cs.example.preview.value}</span>
+                        </div>
+                      )}
                       <button
                         type="button"
-                        className="relume-btn relume-btn--secondary"
-                        style={{ fontSize: "0.76em", padding: "5px 12px" }}
+                        className="relume-btn relume-card__btn--gold"
+                        style={{ fontSize: "0.76em", padding: "6px 14px" }}
                         onClick={(e) => { e.stopPropagation(); onOpenTool(cs.id); }}
                       >
-                        Launch &rarr;
+                        Launch {cs.title} &rarr;
                       </button>
-                      <span style={{ color: "#64748b", fontSize: "0.85em" }}>{isOpen ? "▲" : "▼"}</span>
+                      <span style={{ color: "#f0c965", fontSize: "0.85em" }}>{isOpen ? "▲" : "▼"}</span>
                     </div>
                   </div>
 
                   {/* Expanded body */}
                   {isOpen && (
                     <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid #1e293b" }}>
-                      <div style={{ ...S.label, marginBottom: 8, color: "#38bdf8" }}>
-                        CARDO Flow: {cs.cardo}
+                      <div style={{ fontSize: "0.75em", fontWeight: 700, color: "#f0c965", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
+                        CARDO Execution Flow: {cs.cardo}
                       </div>
 
                       <div style={{ background: "#090d16", padding: 12, borderRadius: 8, border: "1px solid #1e293b" }}>
-                        <div style={S.label}>Input</div>
-                        <div style={{ ...S.mono, color: "#fbbf24" }}>{cs.example.input}</div>
+                        <div style={S.label}>Domain Input</div>
+                        <div style={{ ...S.mono, color: "#f0c965" }}>{cs.example.input}</div>
                       </div>
 
                       <div style={S.hingeBox}>
-                        <div style={S.hingeLabel}>📌 Hinge Point</div>
+                        <div style={S.hingeLabel}>📌 Isolated Hinge Point</div>
                         <div style={{ color: "#e2e8f0", fontSize: "0.84em", lineHeight: 1.5 }}>{cs.example.hinge}</div>
                       </div>
 
                       <div style={{ ...S.row, marginTop: 12, borderTop: "1px dashed #334155", paddingTop: 8 }}>
-                        <span style={S.rowLabel}>CARDO Output</span>
-                        <span style={{ color: "#e2e8f0", fontSize: "0.84em", maxWidth: "65%", textAlign: "right" }}>{cs.example.result}</span>
+                        <span style={S.rowLabel}>CARDO Framework Output</span>
+                        <span style={{ color: "#e2e8f0", fontSize: "0.84em", maxWidth: "65%", textAlign: "right", fontWeight: 600 }}>{cs.example.result}</span>
                       </div>
                     </div>
                   )}
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════
-          GUARD + TRACEPOINT — ~10% — Compact utility strip
-          ═══════════════════════════════════════════ */}
-      <section className="relume-section" style={{ padding: "2rem 0" }}>
-        <div className="relume-container">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            {TOOL_CARDS.filter(t => t.id === "cardo-guard" || t.id === "tracepoint").map((tool) => (
-              <div key={tool.id} style={S.card}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <span style={{ fontSize: "1.3em" }}>{tool.icon}</span>
-                  <div>
-                    <div style={{ color: "#e2e8f0", fontWeight: 700, fontSize: "0.9em" }}>{tool.label}</div>
-                    <div style={{ color: "#64748b", fontSize: "0.72em" }}>{tool.category}</div>
-                  </div>
-                </div>
-                <p style={{ color: "#94a3b8", fontSize: "0.84em", margin: "0 0 12px", lineHeight: 1.5 }}>{tool.description}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 12 }}>
-                  {tool.features.map(f => (
-                    <span key={f} style={{
-                      background: "#1e293b", color: "#94a3b8", padding: "2px 8px",
-                      borderRadius: 4, fontSize: "0.7em", fontWeight: 600,
-                    }}>{f}</span>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="relume-btn relume-btn--secondary"
-                  style={{ fontSize: "0.82em", padding: "6px 14px", width: "100%" }}
-                  onClick={() => onOpenTool(tool.id)}
-                >
-                  Launch {tool.label} &rarr;
-                </button>
-              </div>
-            ))}
           </div>
         </div>
       </section>
