@@ -991,9 +991,69 @@ code, pre, .rei-code {
   transform: translateY(-50%) translateX(-2px) !important;
 }
 
-/* ─── Responsive Media Queries ─── */
+/* ─── Responsive Mobile Polish Media Queries ─── */
 @media (max-width: 719px) {
   .rei-instrument-rail {
     display: none;
   }
+
+  .rei-header {
+    padding: 0 12px;
+    gap: 8px;
+    height: 56px;
+    min-height: 56px;
+  }
+
+  .rei-logo-title {
+    font-size: 17px;
+  }
+
+  .rei-header__build-tag {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+
+  .rei-header__tagline {
+    display: none;
+  }
+
+  .rei-main-content {
+    padding: 12px 12px 120px;
+  }
+
+  .rei-chat-msg--user {
+    max-width: 94%;
+  }
+
+  .rei-chat-msg--rei {
+    max-width: 98%;
+  }
+
+  .rei-chat-card__body {
+    padding: 12px 14px 14px;
+    font-size: 13.5px;
+  }
+
+  .rei-input-shell {
+    padding: 12px 14px;
+  }
+
+  .rei-touch-button {
+    padding: 0 18px !important;
+    font-size: 13px !important;
+    min-height: 42px !important;
+  }
+
+  .rei-input-area {
+    min-height: 42px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+  }
+
+  .rei-context-toggle {
+    padding: 10px 5px !important;
+    font-size: 9.5px !important;
+    border-radius: 4px 0 0 4px !important;
+  }
 }
+
