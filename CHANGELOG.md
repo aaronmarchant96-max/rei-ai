@@ -24,7 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - **Un-Contaminated Blind Set V2 Built (`src/__eval__/routingEvalBlindV2.test.js`):**
   - Created a physical, 28-prompt zero-shot benchmark suite containing 100% un-mined, fresh prompts across all 7 categories.
   - *Measured V2 Zero-Shot Accuracy:* **53.6% (15/28 correct)** out-of-sample accuracy with **89.2% cost savings vs premium baseline**.
-  - Demonstrates empirical proof of test-set contamination on V1 (88.9% in-sample vs 53.6% true zero-shot generalization).
+  - *Architectural Assessment:* Plainly documented as the **current lexical feature extraction ceiling**. While cost savings remain high (89.2%), pure keyword/regex feature extraction does not generalize sufficiently across novel zero-shot domain queries (53.6% vs 80% target). Scheduled for local semantic embedding / ONNX classifier refactoring in v4.
 - **Test Harness Upgrade:** Expanded test suite from 283 to **312 automated tests across 21 test suites** (100% passing).
 
 ### 📊 Single Source of Truth Created

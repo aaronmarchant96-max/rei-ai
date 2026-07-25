@@ -1,11 +1,11 @@
 {
   "version": "2.0.2",
-  "lastUpdated": "2026-07-24T22:03:00Z",
+  "lastUpdated": "2026-07-24T23:03:00Z",
   "repository": {
     "name": "rei-ai",
-    "lifetimeCommits": 354,
-    "past7DaysCommits": 105,
-    "totalLinesOfCode": 32560,
+    "lifetimeCommits": 355,
+    "past7DaysCommits": 106,
+    "totalLinesOfCode": 32580,
     "activeSpanDays": 62
   },
   "tests": {
@@ -22,7 +22,8 @@
     "mlV1HoldoutAccuracyPct": 88.9,
     "mlV1HoldoutAccuracyMethod": "In-sample/tuned holdout accuracy across 27 prompts in routingEvalML.test.js",
     "mlV2ZeroShotAccuracyPct": 53.6,
-    "mlV2ZeroShotAccuracyMethod": "Un-contaminated zero-shot out-of-sample accuracy across 28 un-mined prompts in routingEvalBlindV2.test.js (15/28 correct)",
+    "mlV2ZeroShotAccuracyMethod": "Un-contaminated zero-shot out-of-sample accuracy across 28 un-mined prompts in routingEvalBlindV2.test.js (15/28 correct). Represents current lexical classifier ceiling.",
+    "mlV2ZeroShotStatus": "KNOWN CEILING (53.6% zero-shot accuracy demonstrates lexical feature extraction limits; ONNX local semantic embeddings planned for v4)",
     "mlV2HoldoutSavingsPct": 89.2,
     "mlV2HoldoutSavingsMethod": "Actual cost savings vs always-calling-GPT-4o baseline ($0.020763 vs $0.192813) on 28 un-mined prompts",
     "mlWeightArtifactSizeKB": 0.43,
