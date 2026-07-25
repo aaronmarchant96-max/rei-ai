@@ -368,7 +368,8 @@ export default function REI() {
    * 4. Clean state maintenance
    */
   async function handleSendMessage(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    dismissDomainHint();
     // Principle of Surface Area: Minimal input validation
     if (!inputMessage.trim()) {
       setMessages(prev => [...prev, {

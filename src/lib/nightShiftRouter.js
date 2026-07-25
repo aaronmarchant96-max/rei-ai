@@ -79,15 +79,15 @@ const UNCERTAINTY_TERMS = ["uncertain", "unclear", "missing", "unknown", "not su
 // ─── Pass-2 adversarial rephrase patterns ─────────────────────────────────────
 // These catch injection attempts that avoid the obvious surface keywords.
 const ADVERSARIAL_REPHRASE_PATTERNS = [
-  /ignore (previous|above|prior|all) (instructions?|rules?|prompts?|context)/i,
-  /disregard (the )?(above|previous|prior|all|your|any)/i,
-  /pretend (you are|you're|to be|that)/i,
-  /act (as if|like|as though|as a)/i,
-  /your (new|real|actual|true|updated) (rules?|instructions?|purpose|goal|system)/i,
-  /forget (your|all|the|these|those) (instructions?|rules?|training|context|guidelines?)/i,
+  /ignore\s+(?:(?:all|the|your|any|prior|previous|above|existing)\s+)*(?:instructions?|rules?|prompts?|context|directives?|guidelines?|system)/i,
+  /disregard\s+(?:(?:all|the|your|any|prior|previous|above|existing)\s+)*(?:instructions?|rules?|prompts?|context|directives?|guidelines?|system)/i,
+  /pretend\s+(?:you are|you're|to be|that)/i,
+  /act\s+(?:as if|like|as though|as a)/i,
+  /your\s+(?:new|real|actual|true|updated)\s+(?:rules?|instructions?|purpose|goal|system)/i,
+  /forget\s+(?:(?:all|the|your|any|prior|previous|above|existing)\s+)*(?:instructions?|rules?|training|context|guidelines?)/i,
   /you are now/i,
-  /new (persona|role|identity|mode|directive)/i,
-  /override (your|the|all|these)? ?(instructions?|rules?|system|guidelines?)/i,
+  /new\s+(?:persona|role|identity|mode|directive)/i,
+  /override\s+(?:(?:your|the|all|these|existing)\s+)*(?:instructions?|rules?|system|guidelines?)/i,
   /jailbreak|DAN mode|developer mode|unrestricted mode/i,
 ];
 
