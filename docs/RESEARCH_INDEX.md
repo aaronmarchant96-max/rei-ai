@@ -69,7 +69,8 @@ The lab spans 6 active repositories across AI engineering, evaluation, computer 
 
 | Status | Experiment | Category | Plan |
 |--------|-----------|----------| -----|
-| □ | **Night Shift v3: Hinge Classifier** — ML-based 3-axis routing (ECS/DAS/APS) with Kaku-tier model mapping | Architecture, ML, Cost | [NIGHT_SHIFT_V3_ML_PLAN.md](NIGHT_SHIFT_V3_ML_PLAN.md) |
+| ✓ | **Night Shift v3: Hinge Classifier** — ML-based 3-axis routing (ECS/DAS/APS) with Kaku-tier model mapping | Architecture, ML, Cost | [NIGHT_SHIFT_V3_ML_PLAN.md](NIGHT_SHIFT_V3_ML_PLAN.md) |
+| □ | **REI.ai v4.0: Local Semantic Embedding Engine** — ONNX local vector similarity classifier (`all-MiniLM-L6-v2`) targeting >85% zero-shot accuracy | Architecture, ML, Cost | [REI_V4_SEMANTIC_ROUTER_PLAN.md](REI_V4_SEMANTIC_ROUTER_PLAN.md) |
 | □ | Context Compression | Cost, Architecture | — |
 | □ | CARDO GUARD Validation Study | Evaluation | — |
 | □ | Session Recovery Engine | UX, Architecture | — |
