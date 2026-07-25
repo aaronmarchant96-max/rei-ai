@@ -76,7 +76,19 @@ REI.ai solves this by placing a **zero-inference deterministic engine** and **co
 
 ---
 
+## 🧠 Next Generation Architecture (v4.0 Roadmap)
+
+### Local ONNX / Semantic Embedding Classifier (Zero-Shot Upgrade)
+- **Problem Statement:** Current lexical/keyword feature extraction (`Night Shift v3`) achieves **53.6% zero-shot accuracy** on un-mined prompts (`routingEvalBlindV2.test.js`), representing a hard lexical ceiling for pure regex matching.
+- **Architectural Milestone (v4.0):** Integrate local, zero-dependency ONNX embeddings (`@xenova/transformers` with `all-MiniLM-L6-v2` or `bge-small-en-v1.5`) directly into the local JS runtime.
+- **Zero-Latency Invariant:** Execute local vector similarity scoring in <25ms in WebAssembly/Node environments without external API calls.
+- **Target Accuracy:** Elevate true zero-shot out-of-sample holdout accuracy from **53.6%** to **> 85.0%**.
+
+---
+
 ## 📊 Target Benchmarks (Empirically Verified)
-- **Cost Reduction Baseline**: **Verified 78% reduction** vs. always-premium baseline.
-- **Zero-Inference Deflection**: > 80% correct routing via zero-inference lexical fingerprints ($0.00 compute).
-- **Test Suite Integrity**: Maintain 100% pass rate across all 18 regression suites (227 unit tests).
+- **Cost Reduction Baseline**: **Verified 78% reduction** vs. always-premium baseline across general catalog queries.
+- **V1 In-Sample Holdout Accuracy**: **88.9%** across 27 tuned prompts (`routingEvalML.test.js`).
+- **V2 Zero-Shot Holdout Accuracy**: **53.6%** across 28 un-mined prompts (`routingEvalBlindV2.test.js` — *Known Lexical Ceiling*).
+- **v4.0 Zero-Shot Embedding Target**: **> 85.0%** target via local ONNX semantic vector classifier.
+- **Test Suite Integrity**: Maintain 100% pass rate across all **312 automated unit and integration tests across 21 test suites**. Current canonical stats are tracked in [`data/telemetry.json`](../data/telemetry.json).
