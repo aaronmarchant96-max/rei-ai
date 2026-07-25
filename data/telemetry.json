@@ -1,28 +1,30 @@
 {
-  "version": "2.0.1",
-  "lastUpdated": "2026-07-24T21:58:00Z",
+  "version": "2.0.2",
+  "lastUpdated": "2026-07-24T22:03:00Z",
   "repository": {
     "name": "rei-ai",
-    "lifetimeCommits": 353,
-    "past7DaysCommits": 104,
-    "totalLinesOfCode": 32435,
+    "lifetimeCommits": 354,
+    "past7DaysCommits": 105,
+    "totalLinesOfCode": 32560,
     "activeSpanDays": 62
   },
   "tests": {
-    "passing": 283,
-    "total": 283,
-    "suites": 20,
+    "passing": 312,
+    "total": 312,
+    "suites": 21,
     "harness": "Jest v29.7.0",
     "command": "npm test",
     "status": "100% PASSING"
   },
   "benchmarks": {
     "catalogBaselineSavingsPct": 78.0,
-    "catalogBaselineMethod": "Average cost deflection across 15 general catalog domains vs GPT-4o frontier baseline (measured in routingEval.test.js)",
-    "mlHoldoutAccuracyPct": 88.9,
-    "mlHoldoutAccuracyMethod": "Strict category label matching (normalizeLabel(decision.label) === expectedCategory) across 27 prompts in frozen blind holdout set (measured in routingEvalML.test.js)",
-    "mlHoldoutSavingsPct": 89.6,
-    "mlHoldoutSavingsMethod": "Actual cost savings vs always-calling-GPT-4o baseline ($0.018539 vs $0.178938) on 27 blind prompts",
+    "catalogBaselineMethod": "Average cost deflection across 15 general catalog domains vs GPT-4o (measured in routingEval.test.js)",
+    "mlV1HoldoutAccuracyPct": 88.9,
+    "mlV1HoldoutAccuracyMethod": "In-sample/tuned holdout accuracy across 27 prompts in routingEvalML.test.js",
+    "mlV2ZeroShotAccuracyPct": 53.6,
+    "mlV2ZeroShotAccuracyMethod": "Un-contaminated zero-shot out-of-sample accuracy across 28 un-mined prompts in routingEvalBlindV2.test.js (15/28 correct)",
+    "mlV2HoldoutSavingsPct": 89.2,
+    "mlV2HoldoutSavingsMethod": "Actual cost savings vs always-calling-GPT-4o baseline ($0.020763 vs $0.192813) on 28 un-mined prompts",
     "mlWeightArtifactSizeKB": 0.43,
     "mlInferenceLatencyMs": 18
   },
