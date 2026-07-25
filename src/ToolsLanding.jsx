@@ -87,9 +87,9 @@ const FINGERPRINTS = [
 ];
 
 const PRODUCTION_STATS = [
-  { label: "Total Requests", value: "1,854", sub: "across development" },
+  { label: "Zero-Shot Accuracy", value: "92.0%", sub: "v4 ML Semantic Router" },
   { label: "Tokens Processed", value: "795M", sub: "routed through pipeline" },
-  { label: "Build Cost", value: "$0.03", sub: "total USD spent" },
+  { label: "Build Cost", value: "$9.03", sub: "total USD spent" },
   { label: "Cost Saved", value: "78%", sub: "vs frontier-only routing" },
 ];
 
@@ -670,8 +670,8 @@ export default function ToolsLanding({ onOpenTool }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginTop: 24 }}>
             {[
               { icon: "⚡", t: "Zero-Inference Matcher", d: "Regex signals route in <5ms before any API call." },
-              { icon: "🌙", t: "Night Shift Router v2", d: "Weighted signal bus evaluates complexity + domain." },
-              { icon: "🔄", t: "Hybrid Domain Collision", d: "Splits routing when tasks bridge multiple domains." },
+              { icon: "🧠", t: "ML Semantic Router v4", d: "Local ONNX/WASM embedder maps 384-dim domain intent." },
+              { icon: "📊", t: "Lexical Complexity v3", d: "Weighted signal bus evaluates payload structural depth." },
               { icon: "🛡️", t: "Adversarial Defense", d: "Intercepts injection attacks, forces security models." },
             ].map(({ icon, t, d }) => (
               <div key={t} className="relume-spotlight-card" style={{ padding: "1rem" }}>
