@@ -77,7 +77,7 @@ export default function InstrumentRail({
         </div>
         <div className="rei-instrument-rail__row">
           <span>Router</span>
-          <span className="rei-instrument-rail__value">Night Shift</span>
+          <span className="rei-instrument-rail__value">v4 Semantic</span>
         </div>
         <div className="rei-instrument-rail__row">
           <span>Gateway</span>

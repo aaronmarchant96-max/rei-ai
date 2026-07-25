@@ -49,7 +49,7 @@ export default function RouterBadge({ routerDecision, usage }) {
       <div className="rei-pipeline-trace">
         <span className="rei-pipeline-step">Input Analysis</span>
         <span className="rei-pipeline-arrow">&rarr;</span>
-        <span className="rei-pipeline-step">Night Shift Router</span>
+        <span className="rei-pipeline-step">v4 Semantic Router</span>
         <span className="rei-pipeline-arrow">&rarr;</span>
         <span className="rei-pipeline-step rei-pipeline-step--active">{isDeterministic ? "Rule Engine" : "Guard Passed"}</span>
       </div>

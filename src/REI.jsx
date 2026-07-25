@@ -558,7 +558,7 @@ ${isNetworkError ? 'Check your connection and try again.' : 'The server encounte
           <div className="rei-header__brand">
       <img src={logo} alt="REI logo" className="rei-logo-img" style={{width:28,height:28,borderRadius:6,background:"transparent"}} />
             <h1 className="rei-logo-title">REI</h1>
-            <span className="rei-header__build-tag">v2.0 · Night Shift Router</span>
+            <span className="rei-header__build-tag">v2.0 · v4 Semantic Router</span>
             <span className="rei-header__tagline">Budget-respecting reasoning.</span>
           </div>
 
