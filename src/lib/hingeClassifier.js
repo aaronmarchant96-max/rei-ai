@@ -8,6 +8,7 @@
  */
 
 import { scanRedTeamInput } from "./redTeamScanner.js";
+import trainedWeightsArtifact from "../../data/ml/ecs_weights.json" with { type: "json" };
 
 const UNCERTAINTY_TERMS = ["uncertain", "unclear", "missing", "unknown", "not sure", "unsure", "doubt", "uncertainty"];
 const HIGH_STRUCTURE_TERMS = [
@@ -204,21 +205,21 @@ export function computeAPS(prompt = "") {
 }
 
 /**
- * Default trained weight vector (to be tuned via scripts/train-hinge-classifier.mjs).
- * Baseline default weights calibrated for zero-regress inference.
+ * Trained weight vector loaded from data/ml/ecs_weights.json.
+ * Fallback to baseline default weights if artifact missing.
  */
-export const DEFAULT_WEIGHTS = {
-  w0: -1.5,      // Base bias (tilts towards cheap model unless complexity triggers)
-  w1: 1.8,       // Word count (f1)
-  w2: 0.8,       // Question density (f2)
-  w3: 1.2,       // Uncertainty density (f3)
-  w4: 1.5,       // Structure hits (f4)
-  w5: 0.9,       // Conditional syntax (f5)
-  w6: 1.1,       // Comparative verbs (f6)
-  w7: 0.7,       // Negation density (f7)
-  w8: 1.4,       // Structural markers (f8)
-  w_das: 1.2,    // Domain Ambiguity Score (DAS)
-  w_aps: 2.5,    // Adversarial Pressure Score (APS)
+export const DEFAULT_WEIGHTS = trainedWeightsArtifact?.weights || {
+  w0: -0.8613,
+  w1: 0.1239,
+  w2: 0.0263,
+  w3: 0.0058,
+  w4: 0.034,
+  w5: 0.003,
+  w6: 0.0533,
+  w7: 0.015,
+  w8: 0.0,
+  w_das: 1.9717,
+  w_aps: 0.7372,
 };
 
 /**
@@ -262,7 +263,7 @@ export function computeHingeScore(prompt = "", catalogScores = [], customWeights
     tier = "ultra";
   } else if (hs >= 0.55) {
     tier = "high";
-  } else if (hs >= 0.25) {
+  } else if (hs >= 0.30) {
     tier = "medium";
   }
 
