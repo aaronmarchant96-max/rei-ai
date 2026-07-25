@@ -350,8 +350,9 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
         content = "[REI.AI NOTICE] Empty response received; defaulting to placeholder message.";
       }
 
-      if (isGptMode && !process.env.OPENAI_API_KEY) {
-        content = `[REI.AI ROUTING WARNING: OPENAI_API_KEY not found in Vercel. Falling back to Open-Source Router: ${selectedModel}]\n\n${content}`;
+      if (isGptMode && !process.env.OPENAI_API_KEY && routerDecision) {
+        routerDecision.fallbackReason = "OPENAI_KEY_NOT_CONFIGURED";
+        routerDecision.fallbackNotice = `Frontier route executed via Open-Source Router (${selectedModel}).`;
       }
 
       return { content, model: selectedModel, routerDecision, usage: data.usage ? normalizeUsage(data.usage) : null };
