@@ -27,7 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Discovered that the offline centroid generator (`scripts/generate-domain-centroids.mjs`) had itself been using `generateSyntheticEmbedding()` to generate the centroid matrix, meaning real semantic vectors had 0% cosine similarity to the hash noise centroids.
   - Rewrote the centroid generator to use real `embedText()` and regenerated the matrix natively in Node ESM.
   - Wrote a standalone native Node ESM benchmark (`scripts/run-v4-benchmark.mjs`) that bypasses Jest's CJS module transforms, allowing `@xenova/transformers` to load properly with `fallback: false` for all 50 prompts.
-  - **Result:** The v4 semantic router achieved **94.0% true accuracy** (47/50 correct) on the un-contaminated Blind Set V2. Status updated from UNVERIFIED to VERIFIED.
+  - **Correction (2026-07-25):** The initial 94.0% run contained contamination: the centroid generation script shared multiple identical prompt strings with the Blind Set V2.
+  - Rewrote the centroid generator's training exemplars completely and added a strict programmatic `Set` check to ensure 0% string overlap with the blind set, then regenerated the matrix.
+  - **True Result:** With strictly 0% overlap, the v4 semantic router achieved **92.0% true accuracy** (46/50 correct) on the un-contaminated Blind Set V2. Status updated from UNVERIFIED to VERIFIED.
   - **Receipt:** Committed `data/ml/v4_benchmark_run_log.txt` as a permanent physical artifact of the full 50-prompt evaluation with real ONNX embeddings, environment trace, and per-prompt cosine similarities.
 
 ---

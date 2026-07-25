@@ -23,7 +23,7 @@
     "mlV1HoldoutAccuracyMethod": "In-sample/tuned holdout accuracy across 27 prompts in routingEvalML.test.js — WARNING: in-sample, not zero-shot",
     "mlV2ZeroShotAccuracyPct": 53.6,
     "mlV2ZeroShotAccuracyMethod": "v3 lexical feature baseline zero-shot out-of-sample accuracy across un-mined prompts in routingEvalBlindV2.test.js",
-    "v4SemanticZeroShotAccuracyPct": 94.0,
+    "v4SemanticZeroShotAccuracyPct": 92.0,
     "v4SemanticZeroShotAccuracyStatus": "VERIFIED — measured on 50-prompt Blind Set V2 using native Node ESM execution to bypass Jest CJS transforms, proving real ONNX semantic similarity via all-MiniLM-L6-v2.",
     "v4SemanticTargetZeroShotAccuracyPct": 85.0,
     "v4SemanticTargetMethod": "ONNX all-MiniLM-L6-v2 384-dim dense vector cosine similarity vs 15-domain k-means (k=3) sub-centroids with calibrated Softmax (tau=0.50) and OOD gating (theta_ood=0.25). Target enforced when test detects fallback=false.",
