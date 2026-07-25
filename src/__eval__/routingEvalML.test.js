@@ -88,13 +88,15 @@ describe("Routing Eval ML — Night Shift v3 Holdout Suite", () => {
           const actualCategory = normalizeLabel(decision.label);
           if (actualCategory === category) {
             correctClassifications++;
+          } else {
+            console.log(`      [MISMATCH] Category: "${category}" vs Route: "${actualCategory}" | Prompt: "${prompt}"`);
           }
         });
       }
     });
   }
 
-  test("Falsifiable Pass Condition: True category holdout accuracy >= 65% and cost savings >= 78%", () => {
+  test("Falsifiable Pass Condition: True category holdout accuracy >= 80% and cost savings >= 78%", () => {
     const accuracy = (correctClassifications / totalPrompts) * 100;
     const savingsPct = totalPremiumCost > 0
       ? ((totalPremiumCost - totalCost) / totalPremiumCost) * 100
@@ -106,7 +108,7 @@ describe("Routing Eval ML — Night Shift v3 Holdout Suite", () => {
     console.log(`   - Cost Savings vs Premium: ${savingsPct.toFixed(1)}%`);
     console.log(`   - Total Cost: $${totalCost.toFixed(6)} vs Premium: $${totalPremiumCost.toFixed(6)}`);
 
-    expect(accuracy).toBeGreaterThanOrEqual(65.0);
+    expect(accuracy).toBeGreaterThanOrEqual(80.0);
     expect(savingsPct).toBeGreaterThanOrEqual(78.0);
   });
 

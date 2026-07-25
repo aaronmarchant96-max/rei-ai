@@ -22,6 +22,12 @@
       "hiya",
       "sup",
       "howdy",
+      "partner",
+      "morning",
+      "everyone",
+      "howdy partner",
+      "morning everyone",
+      "yo yo yo",
       "heya",
       "hola",
       "how are you",
@@ -47,7 +53,7 @@
     "fallbackChain": [
       "structured-reasoning"
     ],
-    "matchThreshold": 0.5,
+    "matchThreshold": 0.2,
     "contextWindow": 8192,
     "confidence": {
       "local": 0.95,
@@ -166,7 +172,13 @@
       "export",
       "async",
       "callback",
-      "promise"
+      "promise",
+      "query",
+      "postgresql",
+      "sql",
+      "index",
+      "database",
+      "optimize"
     ],
     "negativeMatchTerms": [
       "story",
@@ -235,7 +247,13 @@
       "headstone",
       "cemetery",
       "obituary",
-      "dna"
+      "dna",
+      "ship manifest",
+      "ellis island",
+      "parish marriage register",
+      "civil birth registration",
+      "marriage register",
+      "maternal line"
     ],
     "negativeMatchTerms": [
       "code",
@@ -505,6 +523,7 @@
       "citation",
       "prove",
       "verify",
+      "verify the claim",
       "reference",
       "evidence",
       "fact-check",
@@ -512,6 +531,8 @@
       "is it true",
       "is this accurate",
       "can you confirm",
+      "confirm whether",
+      "confirm if",
       "double-check",
       "validate",
       "authentic",
@@ -525,7 +546,12 @@
       "hello",
       "hi",
       "translate",
-      "poem"
+      "poem",
+      "census",
+      "manifest",
+      "parish",
+      "marriage register",
+      "genealogy"
     ],
     "temperature": 0.2,
     "fallbackPriority": "structured-reasoning",
@@ -570,7 +596,13 @@
       "rewording",
       "express",
       "tell me a",
-      "make up a"
+      "make up a",
+      "monologue",
+      "redemption arc",
+      "magic system",
+      "thriller",
+      "opening scene",
+      "outline"
     ],
     "negativeMatchTerms": [
       "code",

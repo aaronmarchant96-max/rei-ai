@@ -354,7 +354,7 @@ function buildDecision(id, overrides = {}) {
 }
 
 function isSimpleGreeting(text) {
-  return /^(hi|hello|hey|yo|hiya|sup|howdy|heya|hola)(\s+there)?[\s!,.]*$|^(good\s+(morning|afternoon|evening)|how\s+are\s+(you|things|it\s+going)|how('s|s)\s+(it\s+going|everything|life)|what('s|s)\s+up|thanks|thank\s+you|thx|ty|ok|okay|k+|yeah|yep|nope|sure|right|alright|fine|test|ping|appreciate\s+(it|that|you))[\s!,.]*$/i.test(text.trim());
+  return /^(hi|hello|hey|yo|hiya|sup|howdy|heya|hola|morning)(\s+(there|everyone|partner|all|friend|folks|yo\s+yo))?[\s!,.]*$|^(good\s+(morning|afternoon|evening)|how\s+are\s+(you|things|it\s+going)|how('s|s)\s+(it\s+going|everything|life)|what('s|s)\s+up|thanks|thank\s+you|thx|ty|ok|okay|k+|yeah|yep|nope|sure|right|alright|fine|test|ping|appreciate\s+(it|that|you))[\s!,.]*$/i.test(text.trim());
 }
 
 // ─── Domain Signal Scorers ────────────────────────────────────────────────────
