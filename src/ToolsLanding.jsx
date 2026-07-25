@@ -317,6 +317,32 @@ export default function ToolsLanding({ onOpenTool }) {
 
   return (
     <div className="relume-page">
+      <style>{`
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+          100% { transform: translateY(0px); }
+        }
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 0 0 rgba(240, 201, 101, 0.4); }
+          70% { box-shadow: 0 0 0 12px rgba(240, 201, 101, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(240, 201, 101, 0); }
+        }
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
+        .btn-pulse:hover {
+          animation: pulseGlow 1.5s infinite;
+        }
+        .hover-lift {
+          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease !important;
+        }
+        .hover-lift:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 16px rgba(240, 201, 101, 0.1);
+          border-color: rgba(240, 201, 101, 0.4) !important;
+        }
+      `}</style>
 
       {/* ─── Navbar ─── */}
       <header className="relume-nav">
@@ -406,8 +432,8 @@ export default function ToolsLanding({ onOpenTool }) {
           </div>
 
           <div className="relume-hero__actions">
-            <button type="button" className="relume-btn relume-card__btn--gold" onClick={() => onOpenTool("rei")} style={{ padding: "12px 24px", fontSize: "0.95em" }}>
-              <img src={logo} alt="REI Logo" className="relume-btn__icon" />
+            <button type="button" className="relume-btn relume-card__btn--gold btn-pulse" onClick={() => onOpenTool("rei")} style={{ padding: "12px 24px", fontSize: "0.95em" }}>
+              <img src={logo} alt="REI Logo" className="relume-btn__icon animate-float" />
               Launch REI Platform &rarr;
             </button>
             <a href="#platform" className="relume-btn relume-btn--secondary">
@@ -655,7 +681,7 @@ export default function ToolsLanding({ onOpenTool }) {
             <div style={{ ...S.eyebrow, textAlign: "center", marginBottom: 16 }}>15 PRE-BUILT ROUTING DOMAINS</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
               {FINGERPRINTS.map((fp) => (
-                <div key={fp.name} style={{
+                <div key={fp.name} className="hover-lift" style={{
                   background: "#0f172a", border: "1px solid #1e293b", borderRadius: 8,
                   padding: "10px 14px", display: "flex", alignItems: "center", gap: 10,
                 }}>
@@ -677,7 +703,7 @@ export default function ToolsLanding({ onOpenTool }) {
               { icon: "📊", t: "Lexical Complexity v3", d: "Weighted signal bus evaluates payload structural depth." },
               { icon: "🛡️", t: "Adversarial Defense", d: "Intercepts injection attacks, forces security models." },
             ].map(({ icon, t, d }) => (
-              <div key={t} className="relume-spotlight-card" style={{ padding: "1rem" }}>
+              <div key={t} className="relume-spotlight-card hover-lift" style={{ padding: "1rem" }}>
                 <div style={{ fontSize: "1.2em", marginBottom: 6 }}>{icon}</div>
                 <h3 style={{ fontSize: "0.88em", margin: "0 0 4px" }}>{t}</h3>
                 <p style={{ fontSize: "0.78em", margin: 0 }}>{d}</p>
@@ -708,6 +734,7 @@ export default function ToolsLanding({ onOpenTool }) {
               return (
                 <div
                   key={cs.id}
+                  className="hover-lift"
                   style={{
                     ...S.card,
                     cursor: "pointer",
