@@ -10,7 +10,7 @@ const domainCentroids = _cjsRequire("../../data/ml/domain_centroids.json");
 
 // Calibrated temperature (tau) and OOD threshold (theta_ood)
 export const CALIBRATED_TAU = 0.50;
-export const CALIBRATED_THETA_OOD = 0.25;
+export const CALIBRATED_THETA_OOD = 0.07;
 
 /**
  * Computes semantic cosine similarity, Softmax probabilities, DAS entropy,

@@ -1,4 +1,5 @@
 import { computeSemanticHingeScore } from "../src/lib/semanticHingeClassifier.js";
+import { buildRouterDecision } from "../src/lib/nightShiftRouter.js";
 import { BLIND_HELDOUT_DATASET_V2_50 } from "../src/__eval__/blindDatasetV2.js";
 
 function normalizeLabel(label) {
@@ -35,13 +36,14 @@ async function runBenchmark() {
   for (const [category, prompts] of Object.entries(BLIND_HELDOUT_DATASET_V2_50)) {
     for (const prompt of prompts) {
       total++;
-      const res = await computeSemanticHingeScore(prompt);
+      const semanticVote = await computeSemanticHingeScore(prompt);
+      const decision = buildRouterDecision({ input: prompt, semanticVote });
       
-      if (res.fallback) {
+      if (semanticVote.fallback) {
         fallbackCount++;
       }
 
-      const actualCategory = normalizeLabel(res.topDomain);
+      const actualCategory = normalizeLabel(decision.id);
       const isCorrect = actualCategory === category;
       if (isCorrect) {
         correct++;
@@ -50,7 +52,7 @@ async function runBenchmark() {
       console.log(`[${total.toString().padStart(2, '0')}/50] ${isCorrect ? '✅ PASS' : '❌ FAIL'}`);
       console.log(`   Prompt:   "${prompt}"`);
       console.log(`   Expected: ${category}`);
-      console.log(`   Actual:   ${res.topDomain} (Sim: ${res.topSimilarity.toFixed(4)})`);
+      console.log(`   Actual:   ${decision.id} (Winner: ${semanticVote.topDomain}, Sim: ${semanticVote.topSimilarity.toFixed(4)})`);
     }
     console.log(""); // Spacing between categories
   }

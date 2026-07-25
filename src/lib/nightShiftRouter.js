@@ -721,6 +721,7 @@ export function buildRouterDecision({
   attachedRecord = "",
   requiresAdversarial = false,
   thrifty = false,
+  semanticVote = null,
 } = {}) {
   const combinedInput = [input, attachedRecord, history?.map((message) => message?.content || "").join(" ")]
     .filter(Boolean)
@@ -740,6 +741,29 @@ export function buildRouterDecision({
   let decision;
 
   const deterministicResult = input ? resolveDeterministic(input) : null;
+
+  const semanticDomainToCatalogId = {
+    "simple-greeting": "simple-greeting",
+    "coding-hinge": "coding-hinge",
+    "genealogy-deep-dive": "genealogy-deep-dive",
+    "creative-prose": "creative-prose",
+    "fact-check": "fact-check",
+    "structured-reasoning": "structured-reasoning",
+    "red-team-surface": "red-team-surface",
+    "math-solver": "structured-reasoning",
+    "legal-hinge": "structured-reasoning",
+    "telemetry-ops": "coding-hinge",
+    "archival-research": "genealogy-deep-dive",
+    "story-architect": "story-architect",
+    "debate-furnace": "structured-reasoning",
+    "evidence-evaluation": "fact-check",
+    "adversarial-validation": "red-team-surface"
+  };
+
+  const useSemanticRoute = semanticVote &&
+    !semanticVote.fallback &&
+    !semanticVote.isOOD &&
+    (semanticVote.topSimilarity >= 0.20);
 
   if (!text) {
     decision = buildDecision("structured-reasoning");
@@ -829,6 +853,18 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
         domainSignals,
+      },
+    });
+  } else if (useSemanticRoute) {
+    const semanticRouteId = semanticDomainToCatalogId[semanticVote.topDomain] || "structured-reasoning";
+    decision = buildDecision(semanticRouteId, {
+      rationale: `Routed via v4 Semantic Classifier (topDomain: ${semanticVote.topDomain}, similarity: ${semanticVote.topSimilarity.toFixed(4)}).`,
+      routingSignals: {
+        complexityTier,
+        matchedTerms: [],
+        highStructureSignals,
+        storedPreference,
+        semanticVote,
       },
     });
   } else if (
