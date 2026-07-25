@@ -116,7 +116,14 @@ export async function embedText(text) {
       coldStartMs: isCold ? coldStartDurationMs : 0,
     };
   } catch (err) {
-    // Deterministic synthetic fallback when ONNX binary loading is unavailable in test runner
+    // LOUD WARNING: synthetic fallback produces hash-based noise vectors, not
+    // real semantic embeddings. Any accuracy measurement using these results
+    // is meaningless. This path exists only so the pipeline doesn't crash
+    // in environments where ONNX/WASM cannot load (e.g., some CI runners).
+    console.warn(
+      `[semanticEmbedder] ⚠️  ONNX model unavailable — using synthetic hash fallback. ` +
+      `Reason: ${err.message}. Downstream accuracy numbers are NOT real semantic measurements.`
+    );
     const vector = generateSyntheticEmbedding(normalized);
     const latencyMs = Date.now() - startTime;
 

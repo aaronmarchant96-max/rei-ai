@@ -100,5 +100,10 @@ export async function computeSemanticHingeScore(text, options = {}) {
     probabilities,
     latencyMs: embedRes.latencyMs,
     coldStartMs: embedRes.coldStartMs,
+    // CRITICAL: propagate fallback state so consumers know whether real ONNX
+    // embeddings or synthetic hash vectors were used. A result with
+    // fallback: true has NOT been semantically classified.
+    fallback: embedRes.fallback || false,
+    fallbackError: embedRes.error || null,
   };
 }

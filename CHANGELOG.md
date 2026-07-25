@@ -9,11 +9,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [4.0.0] - 2026-07-24
 
 ### 🧠 Local Semantic Embedding Engine Built
-- **Local ONNX Harness (`src/lib/semanticEmbedder.js`):** Integrated `@xenova/transformers` running `all-MiniLM-L6-v2` locally in WebAssembly/ONNX runtime. Computes 384-dimensional dense vectors in **<25ms (warm)** with in-memory caching and IndexedDB support.
+- **Local ONNX Harness (`src/lib/semanticEmbedder.js`):** Integrated `@xenova/transformers` running `all-MiniLM-L6-v2` locally in WebAssembly/ONNX runtime. Computes 384-dimensional dense vectors with in-memory caching and IndexedDB support.
 - **k-Means Sub-Centroid Matrix (`data/ml/domain_centroids.json`):** Generated $15 \times 3 = 45$ sub-centroids ($k=3$) across all 15 fingerprint domains (`scripts/generate-domain-centroids.mjs`) to represent multimodal domain registers.
 - **Calibrated Vector Engine (`src/lib/semanticHingeClassifier.js`):** Implemented Softmax entropy scoring with calibrated temperature $\tau = 0.50$, normalized Domain Ambiguity ($\text{DAS}$), and Out-Of-Distribution gating ($\theta_{\text{ood}} = 0.25$).
 - **Expanded Zero-Shot Evaluation Harness (`src/__eval__/routingEvalBlindV2.test.js`):** Expanded un-contaminated benchmark suite to **50 prompts** with 95% Wilson Score confidence intervals.
 - **Pre-Registration Safeguard Verified:** Enforced strict rule that centroid exemplars are finalized prior to running V2 test evaluations, with zero post-hoc exemplar modifications.
+
+### ⚠️ Critical Correction: Synthetic Fallback Invalidation (2026-07-25)
+- **Finding:** All v4.0 benchmark runs executed under synthetic hash fallback (`generateSyntheticEmbedding()`), not real ONNX embeddings. When `@xenova/transformers` fails to download `all-MiniLM-L6-v2` weights from `huggingface.co`, `embedText()` silently catches the error and returns `Math.sin(hash + i*0.1)` noise vectors with a buried `fallback: true` field that nothing in the test checked.
+- **Impact:** The 26.0% accuracy number previously reported measured hash-noise classification against hash-noise centroids — it has no relationship to real semantic similarity. The "v4.0 fully deployed" claim was structurally honest (the pipeline runs end-to-end) but functionally unvalidated (no real embeddings were ever tested). Previously claimed latency numbers (22ms warm, 1718ms cold-start) were also measured under fallback.
+- **Correction applied:**
+  1. `semanticHingeClassifier.js` now propagates `fallback` and `fallbackError` fields to all consumers.
+  2. `semanticEmbedder.js` now logs `console.warn` on every fallback invocation instead of silently returning fake vectors.
+  3. `routingEvalBlindV2.test.js` now detects which embedder ran, prints it as the first line of output, and enforces ≥85% accuracy only when `fallback=false`. In fallback mode, it passes structurally but makes zero accuracy claims.
+  4. `data/telemetry.json` v4 accuracy and latency fields set to `null` with explicit notes explaining the invalidation.
+- **v4 semantic accuracy status:** **UNVERIFIED.** No valid measurement exists until the benchmark runs with `fallback=false` for all 50 prompts.
 
 ---
 
