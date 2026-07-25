@@ -90,6 +90,19 @@ npm test -- --testPathPattern=nightShift
 
 ---
 
+## 🧠 Critical Architecture Mistakes (Lessons from v4)
+
+During the development of the v4 Semantic Router, three major architectural evaluation mistakes occurred that temporarily invalidated our accuracy claims. Documenting them here prevents recurrence:
+
+1. **The Synthetic Fallback Illusion:** `@xenova/transformers` silently caught network/module loading errors and fell back to generating hash-noise vectors (`Math.sin()` logic). Tests passed with 100% "green" accuracy because they were comparing hash noise to hash noise.
+   * **Fix:** Added strict `fallback: false` enforcement in tests and explicit telemetry logging.
+2. **Jest CJS Module Boundary Blockers:** Jest's Babel transform couldn't handle `import.meta.url` natively, which the WASM embedder required, forcing the synthetic fallback. 
+   * **Fix:** Bypassed Jest completely for the true evaluation by writing a standalone native Node ESM benchmark (`scripts/run-v4-benchmark.mjs`).
+3. **Blind Set Contamination:** 8+ strings in the "un-contaminated" 50-prompt blind holdout set were identical to exemplars used to train the domain sub-centroids (`scripts/generate-domain-centroids.mjs`), leading to artificially perfect cosine similarities (1.0000) and an inflated 94.0% accuracy claim.
+   * **Fix:** Exported the blind dataset, enforced a programmatic `Set` intersection check that throws an error on >0% overlap, and rewrote all 90 training exemplars to ensure true zero-shot evaluation (which yielded the true 92.0% accuracy).
+
+---
+
 ## 🎯 Quick Recovery Commands
 
 ```bash

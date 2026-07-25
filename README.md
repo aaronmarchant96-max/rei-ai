@@ -7,9 +7,10 @@ REI.ai automatically minimizes your LLM API costs by intelligently routing every
 ---
 
 ## 📊 Telemetry Highlights (The Two Numbers)
+*   **92.0% Zero-Shot ML Accuracy:** The v4 Semantic Router (running `all-MiniLM-L6-v2` locally via ONNX/WASM) achieves 92.0% strict zero-shot classification accuracy across 15 domains.
 *   **$9.03 to build it:** 795 million tokens of deep reasoning and planning processed via DeepSeek & OpenCode CLI for the cost of two cups of coffee.
 *   **78% cheaper to run it:** The routing suite deflects greetings and simple queries, saving 78% in API costs compared to an always-premium baseline.
-*   **Product Roadmap:** See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the Open-Core strategy, REI Router proxy API, and enterprise slice roadmap.
+*   **Product Roadmap:** See [`docs/REI_V4_SEMANTIC_ROUTER_PLAN.md`](docs/REI_V4_SEMANTIC_ROUTER_PLAN.md) for the current ML transition details and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the Open-Core strategy.
 
 ---
 
@@ -29,8 +30,13 @@ REI is built on five core design principles adapted from theoretical physics dec
 
 ## 📐 Formal Definition: The Routing Model
 
-Let $T$ be a reasoning task.  
-The system computes the **Complexity Index** $R(T)$:
+REI operates on a dual-layered pipeline: a lightweight **v4 ML Semantic Router** running locally via ONNX/WASM (`all-MiniLM-L6-v2`), followed by the **v3 Lexical Complexity Index**.
+
+### 1. Semantic Domain Router (v4)
+Every prompt is embedded into a 384-dimensional dense vector and compared against a pre-computed $k=3$ centroid matrix covering 15 specialized domains using cosine similarity and a calibrated Softmax temperature ($\tau=0.50$). It enforces an Out-Of-Distribution (OOD) gate to capture novel prompts.
+
+### 2. Lexical Complexity Index $R(T)$ (v3)
+Let $T$ be a reasoning task. The system computes the **Complexity Index** $R(T)$:
 $$R(T) = \text{Base Score} + (\text{Code Fences} \times 15) + (\text{Markdown Tables} \times 12) + (\text{Bullet List Length} \times 8) + (\text{URL Count} \times 5) + (\text{Multi-clause IF} \times 10) + (\text{Compare Verbs} \times 6)$$
 
 Where $\text{Base Score} = (\text{Word Count} \times 2) + (\text{Question Marks} \times 8) + (\text{Uncertainty Keyword Hits} \times 10)$.
