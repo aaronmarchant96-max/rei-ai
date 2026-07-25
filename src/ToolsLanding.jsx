@@ -317,32 +317,6 @@ export default function ToolsLanding({ onOpenTool }) {
 
   return (
     <div className="relume-page">
-      <style>{`
-        @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-          100% { transform: translateY(0px); }
-        }
-        @keyframes pulseGlow {
-          0% { box-shadow: 0 0 0 0 rgba(240, 201, 101, 0.4); }
-          70% { box-shadow: 0 0 0 12px rgba(240, 201, 101, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(240, 201, 101, 0); }
-        }
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-        .btn-pulse:hover {
-          animation: pulseGlow 1.5s infinite;
-        }
-        .hover-lift {
-          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease !important;
-        }
-        .hover-lift:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 16px rgba(240, 201, 101, 0.1);
-          border-color: rgba(240, 201, 101, 0.4) !important;
-        }
-      `}</style>
 
       {/* ─── Navbar ─── */}
       <header className="relume-nav">
