@@ -7,6 +7,9 @@ module.exports = {
   moduleFileExtensions: ["js", "jsx", "json"],
   testMatch: ["<rootDir>/src/**/*.test.[jt]s?(x)", "<rootDir>/api/**/*.test.[jt]s?(x)"],
   clearMocks: true,
+  transformIgnorePatterns: [
+    "node_modules/(?!(@xenova/transformers)/)",
+  ],
   bail: true,
   testTimeout: 10000,
   verbose: true,
