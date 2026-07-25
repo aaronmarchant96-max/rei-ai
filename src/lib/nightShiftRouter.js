@@ -1,6 +1,7 @@
 import fingerprintCatalog from "../../data/fingerprints.json" with { type: "json" };
 import { resolveDeterministic } from "./deterministicEngine.js";
 import { shouldEscalateToRemote } from "./cardoGuard.js";
+import { computeHingeScore } from "./hingeClassifier.js";
 
 const ROUTER_CATALOG = Array.isArray(fingerprintCatalog) ? fingerprintCatalog : [];
 const STORAGE_KEY = "night-shift-user-fingerprint";
@@ -983,9 +984,37 @@ export function buildRouterDecision({
   const pathwayConfKey = decision.pathway === "deterministic" ? "local"
     : decision.pathway === "premium" ? "premium"
     : "cheap";
-  decision.routingConfidence = decision.deterministicLayer ? 1.0
-    : catalogConfidence > 0 ? catalogConfidence
-    : decision.confidence?.[pathwayConfKey] || 0.5;
+  const defaultPathwayConfidence = catalogConfidence > 0
+    ? catalogConfidence
+    : (decision.confidence?.[pathwayConfKey] || 0.5);
+
+  // Layer 1.5: Unified Hinge Classifier (Night Shift v3 ML Layer)
+  const catalogScores = ROUTER_CATALOG.map((entry) => {
+    return (catalogMatchId === entry.id) ? (catalogRoute?.score || 0.8) : 0.0;
+  });
+
+  let hingeResult = null;
+  try {
+    hingeResult = computeHingeScore(input, catalogScores);
+  } catch (e) {
+    hingeResult = null; // Solvency: Liber principle fallback
+  }
+
+  if (hingeResult && typeof hingeResult.cheapRouteConfidence === "number") {
+    let finalConfidence = decision.deterministicLayer ? 1.0 : hingeResult.cheapRouteConfidence;
+    if (defaultPathwayConfidence > 0) {
+      finalConfidence = Math.max(defaultPathwayConfidence, finalConfidence);
+    }
+    if (decision.confidenceFloorApplied && finalConfidence < 0.65) {
+      finalConfidence = 0.65;
+    }
+    decision.routingConfidence = finalConfidence;
+    decision.hingeScore = hingeResult.hs;
+    decision.hingeVector = hingeResult.hingeVector;
+    decision.hingeTier = hingeResult.tier;
+  } else {
+    decision.routingConfidence = decision.deterministicLayer ? 1.0 : defaultPathwayConfidence;
+  }
 
   const premiumEntry = ROUTER_CATALOG.reduce((max, entry) => {
     const cost = (entry.costPer1kInput || 0) + (entry.costPer1kOutput || 0);
