@@ -1,0 +1,35 @@
+{
+  "version": "2.0.1",
+  "lastUpdated": "2026-07-24T21:58:00Z",
+  "repository": {
+    "name": "rei-ai",
+    "lifetimeCommits": 353,
+    "past7DaysCommits": 104,
+    "totalLinesOfCode": 32435,
+    "activeSpanDays": 62
+  },
+  "tests": {
+    "passing": 283,
+    "total": 283,
+    "suites": 20,
+    "harness": "Jest v29.7.0",
+    "command": "npm test",
+    "status": "100% PASSING"
+  },
+  "benchmarks": {
+    "catalogBaselineSavingsPct": 78.0,
+    "catalogBaselineMethod": "Average cost deflection across 15 general catalog domains vs GPT-4o frontier baseline (measured in routingEval.test.js)",
+    "mlHoldoutAccuracyPct": 88.9,
+    "mlHoldoutAccuracyMethod": "Strict category label matching (normalizeLabel(decision.label) === expectedCategory) across 27 prompts in frozen blind holdout set (measured in routingEvalML.test.js)",
+    "mlHoldoutSavingsPct": 89.6,
+    "mlHoldoutSavingsMethod": "Actual cost savings vs always-calling-GPT-4o baseline ($0.018539 vs $0.178938) on 27 blind prompts",
+    "mlWeightArtifactSizeKB": 0.43,
+    "mlInferenceLatencyMs": 18
+  },
+  "buildTelemetry": {
+    "buildCostUSD": 9.03,
+    "buildTokensProcessed": 795000000,
+    "buildApiRequests": 1854,
+    "modelProvider": "DeepSeek-V3 / OpenCode AI Agent"
+  }
+}
