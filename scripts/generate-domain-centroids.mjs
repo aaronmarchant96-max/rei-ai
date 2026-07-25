@@ -19,10 +19,10 @@ const DOMAIN_EXEMPLARS = {
   "coding-hinge": [
     "profile memory allocation spikes during V8 garbage collection",
     "write a custom ESLint rule for enforcing strict null checks",
-    "implement a throttle function for infinite scroll in React",
-    "configure Webpack code splitting for dynamic imports",
-    "refactor monolith into event-driven microservices architecture",
-    "optimize MongoDB aggregation pipeline with covering indexes"
+    "trace memory growth in long-lived WebSocket connection",
+    "find retain cycle in event listener registration",
+    "implement exponential backoff with jitter for reconnect",
+    "write a resilient WebSocket client with reconnect queue"
   ],
   "genealogy-deep-dive": [
     "locate naturalization papers for Italian immigrants in 1910s New York",
@@ -34,9 +34,9 @@ const DOMAIN_EXEMPLARS = {
   ],
   "creative-prose": [
     "write a poetic description of a rusted mech sinking in a swamp",
-    "create a character dossier for an exiled royal guard",
+    "outline a hard-SF story about resource extraction on gas giants",
     "describe a tense standoff on a derelict space station",
-    "outline a cyberpunk thriller about memory smugglers in Neo-Tokyo",
+    "design a planetary engineering plot set on Venus",
     "draft a noir monologue for a disgraced journalist in 1920s Chicago",
     "design a magic system where spells consume the caster's memories"
   ],
@@ -50,9 +50,9 @@ const DOMAIN_EXEMPLARS = {
   ],
   "structured-reasoning": [
     "assess the long-term viability of modern monetary theory in high inflation environments",
-    "evaluate the strongest case for and against a four-day work week",
+    "analyze second-order effects of a land value tax",
     "what missing data would flip my conclusion about urban density and housing costs?",
-    "analyze the incentive structures of private vs public prison systems",
+    "steelman the Georgist case against deadweight loss of property taxes",
     "deconstruct the arguments against nuclear power expansion",
     "compare the societal impacts of zero-sum vs positive-sum economic frameworks"
   ],
