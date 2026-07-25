@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { generateSyntheticEmbedding, cosineSimilarity } from "../src/lib/semanticEmbedder.js";
+import { embedText, cosineSimilarity } from "../src/lib/semanticEmbedder.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -186,7 +186,14 @@ async function main() {
   const matrix = {};
 
   for (const [domain, prompts] of Object.entries(DOMAIN_EXEMPLARS)) {
-    const vectors = prompts.map(p => generateSyntheticEmbedding(p));
+    const vectors = [];
+    for (const p of prompts) {
+      const res = await embedText(p);
+      if (res.fallback) {
+        throw new Error("Failed to load ONNX embedder for centroid generation!");
+      }
+      vectors.push(res.vector);
+    }
     const subCentroids = kMeansClustering(vectors, 3);
     matrix[domain] = subCentroids;
     console.log(`   ✓ Domain "${domain}": computed ${subCentroids.length} sub-centroids (384-dim)`);

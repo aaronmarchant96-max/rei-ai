@@ -1,5 +1,12 @@
-import domainCentroids from "../../data/ml/domain_centroids.json";
+import { createRequire } from "module";
 import { embedText, cosineSimilarity } from "./semanticEmbedder.js";
+
+// Load domain centroids using createRequire, which works in:
+// - Raw Node ESM (createRequire is available in the 'module' builtin)
+// - Jest CJS transform (Babel transforms this to a regular require)
+// - Vite bundler (resolves JSON imports at build time)
+const _cjsRequire = createRequire(import.meta.url);
+const domainCentroids = _cjsRequire("../../data/ml/domain_centroids.json");
 
 // Calibrated temperature (tau) and OOD threshold (theta_ood)
 export const CALIBRATED_TAU = 0.50;

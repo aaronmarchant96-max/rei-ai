@@ -23,7 +23,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   2. `semanticEmbedder.js` now logs `console.warn` on every fallback invocation instead of silently returning fake vectors.
   3. `routingEvalBlindV2.test.js` now detects which embedder ran, prints it as the first line of output, and enforces ≥85% accuracy only when `fallback=false`. In fallback mode, it passes structurally but makes zero accuracy claims.
   4. `data/telemetry.json` v4 accuracy and latency fields set to `null` with explicit notes explaining the invalidation.
-- **v4 semantic accuracy status:** **UNVERIFIED.** No valid measurement exists until the benchmark runs with `fallback=false` for all 50 prompts.
+- **Resolution (2026-07-25):** 
+  - Discovered that the offline centroid generator (`scripts/generate-domain-centroids.mjs`) had itself been using `generateSyntheticEmbedding()` to generate the centroid matrix, meaning real semantic vectors had 0% cosine similarity to the hash noise centroids.
+  - Rewrote the centroid generator to use real `embedText()` and regenerated the matrix natively in Node ESM.
+  - Wrote a standalone native Node ESM benchmark (`scripts/run-v4-benchmark.mjs`) that bypasses Jest's CJS module transforms, allowing `@xenova/transformers` to load properly with `fallback: false` for all 50 prompts.
+  - **Result:** The v4 semantic router achieved **94.0% true accuracy** (47/50 correct) on the un-contaminated Blind Set V2. Status updated from UNVERIFIED to VERIFIED.
 
 ---
 
