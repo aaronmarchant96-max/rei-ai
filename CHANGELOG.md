@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Rewrote the centroid generator to use real `embedText()` and regenerated the matrix natively in Node ESM.
   - Wrote a standalone native Node ESM benchmark (`scripts/run-v4-benchmark.mjs`) that bypasses Jest's CJS module transforms, allowing `@xenova/transformers` to load properly with `fallback: false` for all 50 prompts.
   - **Result:** The v4 semantic router achieved **94.0% true accuracy** (47/50 correct) on the un-contaminated Blind Set V2. Status updated from UNVERIFIED to VERIFIED.
+  - **Receipt:** Committed `data/ml/v4_benchmark_run_log.txt` as a permanent physical artifact of the full 50-prompt evaluation with real ONNX embeddings, environment trace, and per-prompt cosine similarities.
 
 ---
 

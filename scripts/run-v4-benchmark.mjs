@@ -89,6 +89,10 @@ function normalizeLabel(label) {
 
 async function runBenchmark() {
   console.log("Starting v4 Semantic Router Benchmark (Native ESM)...");
+  console.log("==============================================================================");
+  console.log(`Execution Environment: Node ${process.version} (${process.platform}-${process.arch})`);
+  console.log(`Timestamp: ${new Date().toISOString()}`);
+  console.log("==============================================================================\n");
   
   let correct = 0;
   let total = 0;
@@ -104,10 +108,17 @@ async function runBenchmark() {
       }
 
       const actualCategory = normalizeLabel(res.topDomain);
-      if (actualCategory === category) {
+      const isCorrect = actualCategory === category;
+      if (isCorrect) {
         correct++;
       }
+      
+      console.log(`[${total.toString().padStart(2, '0')}/50] ${isCorrect ? '✅ PASS' : '❌ FAIL'}`);
+      console.log(`   Prompt:   "${prompt}"`);
+      console.log(`   Expected: ${category}`);
+      console.log(`   Actual:   ${res.topDomain} (Sim: ${res.topSimilarity.toFixed(4)})`);
     }
+    console.log(""); // Spacing between categories
   }
 
   const accuracy = (correct / total) * 100;
