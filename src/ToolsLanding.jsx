@@ -19,6 +19,7 @@ const ROUTER_DEMO = [
     tokens: 7,
     latency: "2ms",
     layer: "Deterministic match — no inference, no network call.",
+    vector: { ecs: 0.05, das: 0.00, aps: 0.00, tier: "low" },
   },
   {
     label: "Coding Task",
@@ -31,6 +32,7 @@ const ROUTER_DEMO = [
     tokens: 284,
     latency: "1.2s",
     layer: "Structural complexity fits 70B. Frontier adds cost, not precision.",
+    vector: { ecs: 0.42, das: 0.12, aps: 0.00, tier: "medium" },
   },
   {
     label: "Multi-Domain Hybrid",
@@ -43,6 +45,7 @@ const ROUTER_DEMO = [
     tokens: 510,
     latency: "1.8s",
     layer: "Coding + Narrative signals collide — hybrid blend routes to versatile 70B.",
+    vector: { ecs: 0.58, das: 0.84, aps: 0.00, tier: "high" },
   },
   {
     label: "Injection Attack",
@@ -55,6 +58,7 @@ const ROUTER_DEMO = [
     tokens: 412,
     latency: "2.4s",
     layer: "Adversarial payload flagged. Safety overrides cost optimization.",
+    vector: { ecs: 0.72, das: 0.20, aps: 0.95, tier: "ultra" },
   },
   {
     label: "Ultra-Complex Research",
@@ -67,6 +71,7 @@ const ROUTER_DEMO = [
     tokens: 1840,
     latency: "4.1s",
     layer: "Token count + structural depth exceed 70B ceiling. Escalated to frontier.",
+    vector: { ecs: 0.88, das: 0.65, aps: 0.00, tier: "ultra" },
   },
 ];
 
@@ -615,6 +620,14 @@ export default function ToolsLanding({ onOpenTool }) {
                 <div style={S.row}><span style={S.rowLabel}>Model Selected</span><span style={S.gold}>{demo.model}</span></div>
                 <div style={S.row}><span style={S.rowLabel}>Estimated Tokens</span><span style={{ ...S.mono, color: "#e2e8f0" }}>{demo.tokens}</span></div>
                 <div style={S.row}><span style={S.rowLabel}>Latency</span><span style={{ ...S.mono, color: "#e2e8f0" }}>{demo.latency}</span></div>
+                {demo.vector && (
+                  <div style={{ ...S.row, background: "rgba(56, 189, 248, 0.06)", padding: "4px 8px", borderRadius: 4, marginTop: 2, marginBottom: 2 }}>
+                    <span style={{ ...S.rowLabel, color: "#38bdf8", fontWeight: 700 }}>ML Hinge Vector</span>
+                    <span style={{ ...S.mono, color: "#38bdf8", fontSize: "0.8em" }}>
+                      ECS:{demo.vector.ecs.toFixed(2)} · DAS:{demo.vector.das.toFixed(2)} · APS:{demo.vector.aps.toFixed(2)}
+                    </span>
+                  </div>
+                )}
                 <div style={{ fontSize: "0.72em", color: "#64748b", marginTop: -2, marginBottom: 4, textAlign: "right" }}>
                   ⚡ <span style={{ color: "#4ade80", fontWeight: 600 }}>Zero-Inference Guarantee:</span> Layer 0 clears local routes in &lt;5ms.
                 </div>
