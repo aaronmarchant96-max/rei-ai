@@ -322,8 +322,7 @@ export default function ToolsLanding({ onOpenTool }) {
       <header className="relume-nav">
         <div className="relume-nav__brand">
           <img src={logo} alt="REI Logo" width="28" height="28" style={{ borderRadius: 6 }} />
-          <span className="relume-nav__title">PromptHound Labs</span>
-          <span className="relume-nav__badge">REI.ai</span>
+          <span className="relume-nav__title">REI.ai by PromptHound Labs</span>
         </div>
         <div className="relume-nav__actions">
           <a href="#platform" className="relume-nav__link">Platform</a>
@@ -797,7 +796,7 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="relume-container relume-footer__inner">
           <div className="relume-footer__brand">
             <img src={logo} alt="REI Logo" width="20" height="20" />
-            <span>PromptHound Labs &middot; REI.ai</span>
+            <span>REI.ai by PromptHound Labs</span>
             <span className="relume-footer__build">v2.0 &middot; 231 tests passing</span>
           </div>
           <div className="relume-footer__links">
