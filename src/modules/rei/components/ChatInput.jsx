@@ -1,46 +1,83 @@
-export default function ChatInput({ inputMessage, setInputMessage, selectedDomain, onSend, inputRef, mobile, generalistPrompts, assistantPromptIndex, setAssistantPromptIndex }) {
+export default function ChatInput({
+  inputMessage,
+  setInputMessage,
+  selectedDomain,
+  onSend,
+  inputRef,
+  mobile,
+  generalistPrompts,
+  assistantPromptIndex,
+  setAssistantPromptIndex
+}) {
+  const quickPrompts = [
+    { label: "💡 Sort out a problem", text: "Help me sort this out" },
+    { label: "⚡ Find the hinge", text: "What is the real hinge?" },
+    { label: "❓ Check assumptions", text: "Separate facts from assumptions" },
+    { label: "⚖️ What changes it?", text: "What would change my mind?" },
+  ];
+
   return (
-    <div className="rei-input-shell fixed bottom-0 safe-bottom" style={{ maxWidth: mobile ? undefined : "1400px" }}>
-      <form className="rei-input-form" onSubmit={onSend}>
+    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40 }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         {selectedDomain === "assistant" && (
-          <div className="rei-input-row" style={{ flexWrap: "wrap", justifyContent: mobile ? "stretch" : "center" }}>
-            {generalistPrompts.map((prompt, index) => (
+          <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px" }}>
+            {quickPrompts.map((item) => (
               <button
-                key={prompt}
+                key={item.label}
                 type="button"
-                onClick={() => {
-                  setInputMessage(prompt);
-                  setAssistantPromptIndex(index);
-                }}
                 className="rei-quick-prompt"
-                style={{ flex: mobile ? "1 1 30%" : "1 1 auto", minWidth: mobile ? "100px" : "180px" }}
+                onClick={() => setInputMessage(item.text)}
               >
-                {prompt}
+                {item.label}
               </button>
             ))}
           </div>
         )}
-        <div className="rei-input-row">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder={selectedDomain === "assistant" ? "What are you thinking through?" : "Type proof context or statements to evaluate..."}
-            className="rei-input-area"
-            style={{ flex: 1, padding: mobile ? "14px 16px" : "12px 16px", minHeight: "48px" }}
-          />
-          <button
-            type="submit"
-            className="rei-touch-button touch-target"
-            style={{ padding: mobile ? "14px 28px" : "12px 24px", minHeight: "48px", height: "48px", background: "#f0c965", color: "#07090d", fontWeight: 700 }}
-            onMouseOver={(e) => e.currentTarget.style.background = "#d6b04c"}
-            onMouseOut={(e) => e.currentTarget.style.background = "#f0c965"}
-          >
-            Send
-          </button>
-        </div>
-      </form>
+
+        <form
+          className="rei-input-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSend();
+          }}
+        >
+          <div className="rei-input-row">
+            <textarea
+              ref={inputRef}
+              className="rei-input-area"
+              rows={mobile ? 2 : 2}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  onSend();
+                }
+              }}
+              placeholder={
+                selectedDomain === "coding"
+                  ? "Describe the feature or bug — REI will find the architectural hinge and write verification-first code."
+                  : selectedDomain === "red-team"
+                    ? "Paste your prompt or system policy — REI will run red-team taxonomy stress testing."
+                    : "What are you trying to think through?"
+              }
+            />
+            <button
+              type="submit"
+              className="rei-touch-button"
+              disabled={!inputMessage.trim()}
+              style={{ opacity: inputMessage.trim() ? 1 : 0.6 }}
+            >
+              Send ➔
+            </button>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "#94a3b8", marginTop: "4px" }}>
+            <span>⚡ <strong>Night Shift v3:</strong> Cost-aware LLM auto-routing active (&lt;5ms)</span>
+            <span style={{ opacity: 0.8 }}>Shift + Enter for new line</span>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

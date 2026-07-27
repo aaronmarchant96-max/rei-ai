@@ -8,65 +8,138 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
       onAnimationEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
       {msg.sender === "user" && msg.attachedRecord && (
-        <div style={{ fontSize: "10.5px", color: "#f0c965", marginBottom: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
-          📋 Record attached — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
+        <div style={{ fontSize: "11px", color: "#f0c965", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
+          📋 Attached Record — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
         </div>
       )}
+
       {msg.sender === "rei" && msg.rawJson?.routerDecision && (
-        <div className="rei-router-badge">
-          <span style={{ fontSize: "11px" }}>🌙</span>
+        <div className="rei-router-badge" style={{ marginBottom: "6px" }}>
+          <span style={{ fontSize: "11px" }}>⚡</span>
           <span>{msg.rawJson.routerDecision.label}</span>
-          <span style={{ color: "#f0c965", fontWeight: 600 }}>
+          <span style={{ color: "#f0c965", fontWeight: 700 }}>
             {msg.rawJson.routerDecision.model}
           </span>
         </div>
       )}
+
       <div
         className={`rei-chat-bubble ${msg.sender === "user" ? "rei-chat-bubble--user" : "rei-chat-bubble--rei"}`}
-        style={{ padding: "10px 60px 10px 14px" }}
+        style={{ padding: "16px 20px" }}
       >
         {selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback ? (
           (() => {
             const sections = parseAssistantStyleReply(msg.text);
-            const sectionOrder = [
-              { key: "Hinge", label: "Hinge" },
-              { key: "Facts", label: "Facts" },
-              { key: "Assumptions", label: "Assumptions" },
-              { key: "Evaluation", label: "Evaluation" },
-              { key: "ChangeMind", label: "What would change my mind" },
-              { key: "Move", label: "Move" },
-            ];
-            const visibleSections = sectionOrder.filter(({ key }) => sections[key] && sections[key].trim());
-            return sections.intro || visibleSections.length > 0 ? (
-              <div style={{ display: "grid", gap: "10px" }}>
-                {sections.intro && <div>{sections.intro}</div>}
-                {visibleSections.map(({ key, label }) => (
-                  <div key={key}>
-                    <div style={{ color: "#f0c965", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>{label}</div>
-                    <div>{sections[key]}</div>
+            const hasHinge = sections.Hinge && sections.Hinge.trim();
+            const hasFacts = sections.Facts && sections.Facts.trim();
+            const hasAssumptions = sections.Assumptions && sections.Assumptions.trim();
+            const hasEval = sections.Evaluation && sections.Evaluation.trim();
+            const hasChange = sections.ChangeMind && sections.ChangeMind.trim();
+            const hasMove = sections.Move && sections.Move.trim();
+
+            const isStructured = hasHinge || hasFacts || hasAssumptions || hasEval || hasChange || hasMove;
+
+            if (!isStructured) {
+              return <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>;
+            }
+
+            return (
+              <div style={{ display: "grid", gap: "16px" }}>
+                {sections.intro && <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{sections.intro}</div>}
+
+                {/* 📌 1. THE HINGE FOCUS CONTAINER */}
+                {hasHinge && (
+                  <div
+                    style={{
+                      background: "rgba(240, 201, 101, 0.1)",
+                      borderLeft: "4px solid #f0c965",
+                      borderRadius: "0 10px 10px 0",
+                      padding: "12px 16px",
+                      boxShadow: "0 4px 14px rgba(240, 201, 101, 0.08)",
+                    }}
+                  >
+                    <div style={{ color: "#f0c965", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 800, marginBottom: "4px" }}>
+                      📌 THE HINGE (Core Pivot Point)
+                    </div>
+                    <div style={{ color: "#f8fafc", fontSize: "14.5px", fontWeight: 600, lineHeight: "1.5" }}>
+                      {sections.Hinge}
+                    </div>
                   </div>
-                ))}
+                )}
+
+                {/* 🔬 2. COMPARATIVE GRID: FACTS vs ASSUMPTIONS */}
+                {(hasFacts || hasAssumptions) && (
+                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: "12px" }}>
+                    {hasFacts && (
+                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(240, 201, 101, 0.15)", borderRadius: "10px", padding: "12px" }}>
+                        <div style={{ color: "#38bdf8", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                          🔬 FACTS (Known Reality)
+                        </div>
+                        <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.5" }}>{sections.Facts}</div>
+                      </div>
+                    )}
+                    {hasAssumptions && (
+                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(251, 146, 60, 0.15)", borderRadius: "10px", padding: "12px" }}>
+                        <div style={{ color: "#fb923c", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                          ❓ ASSUMPTIONS (Uncertainty)
+                        </div>
+                        <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.5" }}>{sections.Assumptions}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ⚖️ 3. EVALUATION & CHANGE MIND */}
+                {hasEval && (
+                  <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px" }}>
+                    <div style={{ color: "#f0c965", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                      ⚖️ EVALUATION &amp; RISK
+                    </div>
+                    <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.5" }}>{sections.Evaluation}</div>
+                  </div>
+                )}
+
+                {hasChange && (
+                  <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px" }}>
+                    <div style={{ color: "#a855f7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                      🔄 WHAT WOULD CHANGE MY MIND
+                    </div>
+                    <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.5" }}>{sections.ChangeMind}</div>
+                  </div>
+                )}
+
+                {/* 🚀 4. NEXT MOVE */}
+                {hasMove && (
+                  <div style={{ background: "rgba(240, 201, 101, 0.06)", border: "1px solid rgba(240, 201, 101, 0.2)", borderRadius: "10px", padding: "12px" }}>
+                    <div style={{ color: "#4ade80", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                      🚀 NEXT MOVE
+                    </div>
+                    <div style={{ fontSize: "14px", color: "#f8fafc", fontWeight: 600, lineHeight: "1.5" }}>{sections.Move}</div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div>{msg.text}</div>
             );
           })()
         ) : (
-          msg.text
+          <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>
         )}
 
+        {/* Collapsible Telemetry Dropdown */}
         {msg.rawJson && (
-          <div className="rei-router-panel">
-            <div className="rei-router-panel__title">Night Shift routing</div>
-            <div className="rei-router-panel__grid">
+          <details style={{ marginTop: "14px", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "8px" }}>
+            <summary style={{ fontSize: "11.5px", color: "#94a3b8", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
+              🔍 View Night Shift Routing Telemetry ({msg.rawJson.routerDecision?.model || "auto"})
+            </summary>
+            <div className="rei-router-panel__grid" style={{ marginTop: "8px" }}>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Route:</span> {msg.rawJson.routerDecision?.label || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Model:</span> {msg.rawJson.routerDecision?.model || msg.rawJson.model || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Max tokens:</span> {msg.rawJson.routerDecision?.maxTokens || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Quality gate:</span> {msg.rawJson.routerDecision?.qualityGate || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Enforcement:</span> {msg.rawJson.routerDecision?.enforce || "none"}</div>
             </div>
-          </div>
+          </details>
         )}
+
         <button
           onClick={() => onCopy(msg.text)}
           className="rei-copy-btn touch-target"
@@ -79,8 +152,9 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
           Copy
         </button>
       </div>
+
       <span className="rei-chat-meta">
-        {msg.sender === "user" ? "You" : "REI.ai"} • {msg.timestamp}
+        {msg.sender === "user" ? "You" : "REI.ai Cognitive Engine"} • {msg.timestamp}
       </span>
     </div>
   );
