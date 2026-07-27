@@ -62,22 +62,19 @@ function getInitialTool() {
     if (hash === "#story-forge") return "story-forge";
     if (hash === "#storm-replay") return "storm-replay";
     if (hash === "#cardo-guard") return "cardo-guard";
-    if (hash === "#rei" || hash === "#cfai") return "rei";
     if (hash === "#tracepoint") return "tracepoint";
-    if (hash === "#hinge-meter") return "rei";
-    if (hash === "#tools") return "tools";
   }
   return "tools";
 }
 
 function getToolPath(tool) {
-  if (tool === "tools") return "/tools";
+  if (tool === "tools") return "/";
   if (tool === "story-forge") return "/#story-forge";
   if (tool === "storm-replay") return "/#storm-replay";
   if (tool === "cardo-guard") return "/#cardo-guard";
   if (tool === "rei") return "/#rei";
   if (tool === "tracepoint") return "/#tracepoint";
-  return "/#rei";
+  return "/";
 }
 
 function getToolLabel(tool) {
