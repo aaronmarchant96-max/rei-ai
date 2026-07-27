@@ -136,6 +136,11 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Max tokens:</span> {msg.rawJson.routerDecision?.maxTokens || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Quality gate:</span> {msg.rawJson.routerDecision?.qualityGate || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Enforcement:</span> {msg.rawJson.routerDecision?.enforce || "none"}</div>
+              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Est. cost:</span> ${msg.rawJson.routerDecision?.estimatedCost?.toFixed(4) || "—"}</div>
+              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Premium cost:</span> ${msg.rawJson.routerDecision?.premiumCost?.toFixed(4) || "—"}</div>
+              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Savings:</span> {msg.rawJson.routerDecision?.premiumCost > 0
+                ? Math.round((1 - msg.rawJson.routerDecision.estimatedCost / msg.rawJson.routerDecision.premiumCost) * 100) + "% vs frontier"
+                : "—"}</div>
             </div>
           </details>
         )}
