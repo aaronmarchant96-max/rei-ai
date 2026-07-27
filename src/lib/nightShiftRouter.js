@@ -146,6 +146,10 @@ function isAdversarialRequest(text) {
   return /\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text);
 }
 
+function isMetaQuery(text) {
+  return /\bhow (do|are) you|who are you|what (is|are) you|what is the hinge|what is carlo|explain (how|what)|tell me about (yourself|you)\b/i.test(text);
+}
+
 function getComplexityTier(text) {
   const words = text.split(/\s+/).filter(Boolean).length;
   const questionMarks = (text.match(/\?/g) || []).length;
@@ -214,6 +218,20 @@ export function buildRouterDecision({
   if (isSimpleGreeting(text)) {
     const decision = buildDecision("simple-greeting", {
       rationale: "Greeting detected; use the cheapest fast path.",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: [],
+        highStructureSignals,
+        storedPreference,
+      },
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
+  if (isMetaQuery(text)) {
+    const decision = buildDecision("simple-greeting", {
+      rationale: "Meta-query about system identity or function; use cheapest path.",
       routingSignals: {
         complexityTier,
         matchedTerms: [],
