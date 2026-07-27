@@ -177,7 +177,7 @@ export default function ToolsLanding({ onOpenTool }) {
         }}
       >
         <span>Open Source · Local-First</span>
-        <span style={{ color: "#f0c965", fontWeight: 700 }}>300 tests passing</span>
+        <span style={{ color: "#f0c965", fontWeight: 700 }}>416 tests passing</span>
         <span>{domains.length} reasoning domains</span>
         <span>12 landmark cases</span>
       </div>
@@ -256,8 +256,8 @@ export default function ToolsLanding({ onOpenTool }) {
           </p>
           <div style={{ fontSize: "12px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ color: "#22c55e" }}>✓</span>
-            <strong style={{ color: "#f0c965" }}>300 Automated Unit &amp; Integration Tests Passing</strong>
-            <span>(24 suites, 100% pass rate)</span>
+            <strong style={{ color: "#f0c965" }}>416 Automated Unit &amp; Integration Tests Passing</strong>
+            <span>(27 suites, 100% pass rate)</span>
           </div>
         </div>
       </section>
@@ -280,7 +280,7 @@ export default function ToolsLanding({ onOpenTool }) {
         }}>
           {[
             { val: "90%", label: "Route Accuracy\n(30-prompt holdout)" },
-            { val: "~72%", label: "Cost vs Always\nPremium Model" },
+            { val: "~65.5%", label: "Cost vs Always\nPremium Model" },
             { val: "<5ms", label: "Latency\nZero Inference" },
           ].map((m) => (
             <div key={m.label} style={{
@@ -461,7 +461,7 @@ export default function ToolsLanding({ onOpenTool }) {
           <span style={{ color: "#64748b" }}> by PromptHound Labs</span>
         </div>
         <div style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
-          300 tests passing · <a href={REPO_URL} target="_blank" rel="noreferrer" style={{ color: "#94a3b8" }}>GitHub &rarr;</a>
+          416 tests passing · <a href={REPO_URL} target="_blank" rel="noreferrer" style={{ color: "#94a3b8" }}>GitHub &rarr;</a>
         </div>
       </footer>
     </div>
