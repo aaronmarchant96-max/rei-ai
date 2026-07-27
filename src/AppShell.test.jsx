@@ -28,9 +28,7 @@ describe("AppShell", () => {
     await waitFor(() => {
       expect(document.title).toBe("PromptHound Labs | Tools");
     });
-    await waitFor(() => {
-      expect(screen.getByText(/the cardo framework/i)).toBeInTheDocument();
-    });
+    await screen.findByText(/the cardo framework/i, {}, { timeout: 5000 });
   });
 
   it("opens a tool from the Tools landing page", async () => {
