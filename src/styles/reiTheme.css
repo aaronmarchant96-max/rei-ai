@@ -350,23 +350,25 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(240, 201, 101, 0.12) !important;
-  border: 1px solid rgba(240, 201, 101, 0.3) !important;
-  border-radius: 6px;
-  color: #f0c965 !important;
+  background: rgba(15, 20, 32, 0.55);
+  border: 1px solid rgba(240, 201, 101, 0.15);
+  border-radius: 8px;
+  color: #94A3B8;
   cursor: pointer;
   font-size: 10px;
   font-weight: 600;
   padding: 3px 8px;
-  opacity: 0.85;
+  opacity: 0.6;
   transition: all 0.2s ease;
   line-height: 1;
+  backdrop-filter: blur(4px);
 }
 
 .rei-copy-btn:hover {
   opacity: 1;
-  background: rgba(240, 201, 101, 0.25) !important;
-  box-shadow: 0 0 12px rgba(240, 201, 101, 0.3);
+  color: #f0c965;
+  border-color: rgba(240, 201, 101, 0.3);
+  box-shadow: 0 0 15px rgba(240, 201, 101, 0.08);
 }
 
 /* Input Shell */
