@@ -140,7 +140,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Est. cost:</span> ${msg.rawJson.routerDecision?.estimatedCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Premium cost:</span> ${msg.rawJson.routerDecision?.premiumCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Savings:</span> {msg.rawJson.routerDecision?.premiumCost > 0
-                ? Math.round((1 - msg.rawJson.routerDecision.estimatedCost / msg.rawJson.routerDecision.premiumCost) * 100) + "% vs frontier"
+                ? Math.round((1 - msg.rawJson.routerDecision.estimatedCost / msg.rawJson.routerDecision.premiumCost) * 100) + "% vs gpt-4o"
                 : "—"}</div>
             </div>
           </details>

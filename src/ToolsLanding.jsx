@@ -348,7 +348,7 @@ export default function ToolsLanding({ onOpenTool }) {
                 <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", fontSize: "12px", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "6px", marginTop: "4px" }}>
                   <span style={{ color: "#64748b" }}>Cost</span>
                   <span style={{ color: "#22c55e", fontWeight: 700, textAlign: "right" }}>
-                    ${reiCost.toFixed(4)} vs ${premiumCost.toFixed(4)} frontier · Save {savingsPct}%
+                    ${reiCost.toFixed(4)} vs ${premiumCost.toFixed(4)} gpt-4o · Save {savingsPct}%
                   </span>
                 </div>
               </div>
