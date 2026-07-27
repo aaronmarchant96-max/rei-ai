@@ -18,8 +18,8 @@ describe("Prompt Eval — domain system messages", () => {
 
   test("assistant system message is initialized", () => {
     const msg = buildDomainSystemMessage("assistant", DOMAIN_PROFILES[0]);
-    expect(msg).toMatch(/^System initialized/);
-    expect(msg).toContain("Hey. Say what you want");
+    expect(msg).toMatch(/^Hey! I'm REI/);
+    expect(msg).toContain("CARDO framework");
   });
 
   test("coding system message mentions domain", () => {
