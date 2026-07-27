@@ -13,7 +13,7 @@ We prioritize verifiable, empirical benchmarks over generalized claims:
 
 *   **90% Route Accuracy:** Verified on our fresh, 30-prompt blind holdout set for the v3 keyword router (evolving from a 67% baseline to 90% post-tuning).
 *   **v4 Semantic Router (Research):** Currently at **70% accuracy** running local 384-dimensional dense vector embeddings (`all-MiniLM-L6-v2` via ONNX/WASM in browser/Node).
-*   **399 Automated Tests:** 27 test suites running 399 regression tests assert chronological, logical, and safety boundaries with 0 regressions.
+*   **200+ Tests:** 29 test suites with 100% pass rate — router decisions, classifier math, adversarial scanning, chat rendering, domain registry, and blind-holdout methodology.
 *   **12 Landmark Legal Cases:** Our legal reasoning domain is grounded in a 12-case verified index to prevent hallucination.
 
 ---
@@ -38,7 +38,7 @@ REI's routing pipeline runs in less than 5ms locally and consists of:
 Regex-based scanner that intercepts simple greetings, metadata inquiries, and smalltalk, returning instant local responses at $0 cost.
 
 ### 2. Night Shift Router (v3 Keyword Engine)
-High-speed keyword-based router that parses input structural properties, mapping prompts to domain profiles and executing the `isLikelyLegalRequest()` and coding branches.
+High-speed keyword-based router that parses input structural properties, mapping prompts to domain profiles via the domain registry and keyword matchers.
 
 ### 3. Local ONNX Embeddings (v4 Research Engine)
 Processes inputs through a 384-dimensional semantic embedding pipeline (`@xenova/transformers` running the `all-MiniLM-L6-v2` model) to determine cosine similarity against domain centroids.

@@ -257,7 +257,7 @@ export default function ToolsLanding({ onOpenTool }) {
           <div style={{ fontSize: "12px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ color: "#22c55e" }}>✓</span>
             <strong style={{ color: "#f0c965" }}>200+ Automated Unit &amp; Integration Tests Passing</strong>
-            <span>(27 suites, 100% pass rate)</span>
+            <span>(29 suites, 100% pass rate)</span>
           </div>
         </div>
       </section>
