@@ -11,9 +11,9 @@ export default function IngestPanel({ selectedDomain, rawRecordText, setRawRecor
         type="button"
         onClick={() => setShowIngest((v) => !v)}
         style={{
-          background: "rgba(251,146,60,0.08)",
-          border: "1px solid rgba(251,146,60,0.25)",
-          color: "#fdba74",
+          background: "rgba(240, 201, 101, 0.08)",
+          border: "1px solid rgba(240, 201, 101, 0.25)",
+          color: "#f0c965",
           borderRadius: "8px",
           padding: "8px 12px",
           fontSize: "12.5px",
@@ -38,12 +38,12 @@ export default function IngestPanel({ selectedDomain, rawRecordText, setRawRecor
                   padding: "5px 10px",
                   borderRadius: "6px",
                   border: recordSourceType === s.id
-                    ? "1px solid #f97316"
+                    ? "1px solid #f0c965"
                     : "1px solid rgba(255,255,255,0.1)",
                   background: recordSourceType === s.id
-                    ? "rgba(249,115,22,0.18)"
+                    ? "rgba(240, 201, 101, 0.18)"
                     : "rgba(255,255,255,0.02)",
-                  color: recordSourceType === s.id ? "#fed7aa" : "#94a3b8",
+                  color: recordSourceType === s.id ? "#f0c965" : "#94a3b8",
                   cursor: "pointer",
                 }}
               >
@@ -62,7 +62,7 @@ export default function IngestPanel({ selectedDomain, rawRecordText, setRawRecor
               background: "rgba(0,0,0,0.25)",
               border: overLimit
                 ? "1px solid #ef4444"
-                : "1px solid rgba(251,146,60,0.2)",
+                : "1px solid rgba(240, 201, 101, 0.2)",
               borderRadius: "8px",
               color: "#E2E8F0",
               fontSize: "12.5px",
