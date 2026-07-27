@@ -44,7 +44,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
             }
 
             return (
-              <div style={{ display: "grid", gap: "16px" }}>
+              <div style={{ display: "grid", gap: "16px", paddingRight: "36px" }}>
                 {sections.intro && <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{sections.intro}</div>}
 
                 {/* 📌 1. THE HINGE FOCUS CONTAINER */}
