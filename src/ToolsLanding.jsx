@@ -10,42 +10,42 @@ function ToolIcon({ id, size = 24 }) {
     case "furnace":
       return (
         <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <path d="M14 4 L21 12 L18 12 L18 24 L10 24 L10 12 L7 12 Z" fill="#1a0d08"/>
-          <path d="M11 4 Q14 0 17 4" fill="#1a0d08"/>
+          <path d="M14 4 L21 12 L18 12 L18 24 L10 24 L10 12 L7 12 Z" fill="#f0c965"/>
+          <path d="M11 4 Q14 0 17 4" fill="#f0c965"/>
         </svg>
       );
     case "story-forge":
       return (
         <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <path d="M6 22 L18 4 L22 10 L10 24 Z" fill="#1a0d08"/>
-          <circle cx="18" cy="6" r="3" fill="#1a0d08"/>
+          <path d="M6 22 L18 4 L22 10 L10 24 Z" fill="#f0c965"/>
+          <circle cx="18" cy="6" r="3" fill="#f0c965"/>
         </svg>
       );
     case "storm-replay":
       return (
         <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <circle cx="14" cy="14" r="10" stroke="#1a0d08" strokeWidth="2.5"/>
-          <circle cx="14" cy="14" r="5" stroke="#1a0d08" strokeWidth="2"/>
-          <line x1="14" y1="14" x2="14" y2="4" stroke="#1a0d08" strokeWidth="2.5" strokeLinecap="round"/>
+          <circle cx="14" cy="14" r="10" stroke="#f0c965" strokeWidth="2.5"/>
+          <circle cx="14" cy="14" r="5" stroke="#f0c965" strokeWidth="2"/>
+          <line x1="14" y1="14" x2="14" y2="4" stroke="#f0c965" strokeWidth="2.5" strokeLinecap="round"/>
         </svg>
       );
     case "cardo-guard":
       return (
         <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <line x1="6" y1="10" x2="22" y2="10" stroke="#1a0d08" strokeWidth="2.5" strokeLinecap="round"/>
-          <line x1="12" y1="10" x2="12" y2="22" stroke="#1a0d08" strokeWidth="2" strokeLinecap="round"/>
-          <circle cx="8" cy="20" r="3" fill="#1a0d08"/>
-          <circle cx="20" cy="20" r="3" fill="#1a0d08"/>
+          <line x1="6" y1="10" x2="22" y2="10" stroke="#f0c965" strokeWidth="2.5" strokeLinecap="round"/>
+          <line x1="12" y1="10" x2="12" y2="22" stroke="#f0c965" strokeWidth="2" strokeLinecap="round"/>
+          <circle cx="8" cy="20" r="3" fill="#f0c965"/>
+          <circle cx="20" cy="20" r="3" fill="#f0c965"/>
         </svg>
       );
     case "tracepoint":
       return (
         <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <line x1="2" y1="14" x2="16" y2="14" stroke="#1a0d08" strokeWidth="2.5" strokeLinecap="round"/>
-          <line x1="18" y1="4" x2="18" y2="14" stroke="#1a0d08" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="20" y1="20" x2="12" y2="20" stroke="#1a0d08" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="22" y1="10" x2="22" y2="18" stroke="#1a0d08" strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="24" y1="24" x2="24" y2="20" stroke="#1a0d08" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="2" y1="14" x2="16" y2="14" stroke="#f0c965" strokeWidth="2.5" strokeLinecap="round"/>
+          <line x1="18" y1="4" x2="18" y2="14" stroke="#f0c965" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="20" y1="20" x2="12" y2="20" stroke="#f0c965" strokeWidth="2" strokeLinecap="round"/>
+          <line x1="22" y1="10" x2="22" y2="18" stroke="#f0c965" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="24" y1="24" x2="24" y2="20" stroke="#f0c965" strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
       );
     default:
@@ -131,14 +131,15 @@ export default function ToolsLanding({ onOpenTool }) {
       >
         <div style={{
           width: "56px", height: "56px", borderRadius: "14px",
-          background: "linear-gradient(135deg, #f97316, #fbbf24)",
+          background: "rgba(240, 201, 101, 0.1)",
+          border: "1px solid rgba(240, 201, 101, 0.35)",
           display: "flex", alignItems: "center", justifyContent: "center",
           margin: "0 auto 16px",
-          boxShadow: "0 0 32px rgba(249,115,22,0.35)",
+          boxShadow: "0 0 32px rgba(240,201,101,0.25)",
         }}>
           <HingeMark size={30} animated={false} />
         </div>
-        <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase", color: "#fb923c", marginBottom: "8px" }}>
+        <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
           REI.ai by PromptHound Labs
         </div>
         <h1 style={{ fontSize: "28px", lineHeight: 1.3, margin: "0 0 12px", fontWeight: 800 }}>
@@ -152,14 +153,11 @@ export default function ToolsLanding({ onOpenTool }) {
         <button
           type="button"
           onClick={() => onOpenTool({ tool: "rei" })}
+          className="relume-card__btn--gold hover-lift"
           style={{
             padding: "12px 28px", borderRadius: "10px",
-            background: "#f97316", color: "#fff", border: "none",
             fontWeight: 700, fontSize: "14px", cursor: "pointer",
-            transition: "background 0.2s ease",
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "#fb923c"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "#f97316"}
         >
           Launch REI.ai &rarr;
         </button>
@@ -179,7 +177,7 @@ export default function ToolsLanding({ onOpenTool }) {
         }}
       >
         <span>Open Source · Local-First</span>
-        <span style={{ color: "#fdba74", fontWeight: 700 }}>300 tests passing</span>
+        <span style={{ color: "#f0c965", fontWeight: 700 }}>300 tests passing</span>
         <span>{domains.length} reasoning domains</span>
         <span>12 landmark cases</span>
       </div>
@@ -187,12 +185,12 @@ export default function ToolsLanding({ onOpenTool }) {
       {/* ── 3. CARDO Framework ── */}
       <section className="landing-section" style={{ marginBottom: "48px" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#fb923c", marginBottom: "8px" }}>
+          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
             Philosophy &amp; Methodology
           </div>
           <h2 style={{ fontSize: "22px", margin: "0 0 8px" }}>The CARDO Framework</h2>
           <p style={{ color: "#94a3b8", fontSize: "13px", maxWidth: "560px", margin: "0 auto" }}>
-            Named after the Latin <em style={{ color: "#fdba74" }}>cardo</em> (the load-bearing hinge on which everything pivots).
+            Named after the Latin <em style={{ color: "#f0c965" }}>cardo</em> (the load-bearing hinge on which everything pivots).
             A systematic cognitive framework designed to isolate the single pivot point in complex, noisy data.
           </p>
         </div>
@@ -209,7 +207,7 @@ export default function ToolsLanding({ onOpenTool }) {
             item.isLabel ? (
               <div key={i} style={{
                 padding: "10px 16px", borderRadius: "10px",
-                border: "1px dashed rgba(251,146,60,0.2)", color: "#94a3b8",
+                border: "1px dashed rgba(240,201,101,0.25)", color: "#94a3b8",
                 fontSize: "11px", display: "flex", alignItems: "center",
                 fontWeight: 600, letterSpacing: "0.05em",
               }}>
@@ -224,15 +222,15 @@ export default function ToolsLanding({ onOpenTool }) {
                   flex: "1 1 180px", minWidth: "140px",
                   padding: "14px", borderRadius: "12px",
                   background: expandedCardo === item.id
-                    ? "rgba(249,115,22,0.15)" : "rgba(255,255,255,0.03)",
+                    ? "rgba(240,201,101,0.15)" : "rgba(255,255,255,0.03)",
                   border: item.isHinge
-                    ? "1px solid rgba(249,115,22,0.35)"
+                    ? "1px solid rgba(240,201,101,0.35)"
                     : "1px solid rgba(255,255,255,0.08)",
                   color: "#e2e8f0", cursor: "pointer",
                   textAlign: "left", transition: "all 0.2s ease",
                 }}
               >
-                <div style={{ fontSize: "10px", color: "#fb923c", fontWeight: 700, marginBottom: "4px" }}>
+                <div style={{ fontSize: "10px", color: "#f0c965", fontWeight: 700, marginBottom: "4px" }}>
                   {item.tag} · {item.num}
                 </div>
                 <div style={{ fontWeight: 700, fontSize: "13px", marginBottom: expandedCardo === item.id ? "8px" : "0" }}>
@@ -250,7 +248,7 @@ export default function ToolsLanding({ onOpenTool }) {
 
         {/* Why Philosophy */}
         <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.06)" }}>
-          <h3 style={{ fontSize: "15px", margin: "0 0 8px", color: "#fdba74" }}>Why Philosophy First?</h3>
+          <h3 style={{ fontSize: "15px", margin: "0 0 8px", color: "#f0c965" }}>Why Philosophy First?</h3>
           <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: 1.6, margin: "0 0 12px" }}>
             Most LLM routers are ad-hoc heuristics. REI.ai is built on an adversarial-tested reasoning architecture.
             The same CARDO hinge logic that substantially reduces LLM API costs also powers our evidence verification,
@@ -258,7 +256,7 @@ export default function ToolsLanding({ onOpenTool }) {
           </p>
           <div style={{ fontSize: "12px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ color: "#22c55e" }}>✓</span>
-            <strong style={{ color: "#fdba74" }}>300 Automated Unit &amp; Integration Tests Passing</strong>
+            <strong style={{ color: "#f0c965" }}>300 Automated Unit &amp; Integration Tests Passing</strong>
             <span>(24 suites, 100% pass rate)</span>
           </div>
         </div>
@@ -267,7 +265,7 @@ export default function ToolsLanding({ onOpenTool }) {
       {/* ── 4. Live Router Demo ── */}
       <section className="landing-section" style={{ marginBottom: "48px" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#fb923c", marginBottom: "8px" }}>
+          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
             The Flagship
           </div>
           <h2 style={{ fontSize: "22px", margin: "0 0 8px" }}>REI.ai — Cost-Aware LLM Router</h2>
@@ -365,7 +363,7 @@ export default function ToolsLanding({ onOpenTool }) {
       {/* ── 5. Case Studies ── */}
       <section className="landing-section" style={{ marginBottom: "48px" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#fb923c", marginBottom: "8px" }}>
+          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
             CARDO Applied
           </div>
           <h2 style={{ fontSize: "22px", margin: "0 0 8px" }}>Domain Case Studies</h2>
@@ -395,7 +393,8 @@ export default function ToolsLanding({ onOpenTool }) {
               >
                 <div style={{
                   width: "36px", height: "36px", borderRadius: "9px",
-                  background: "linear-gradient(135deg, #f97316, #fbbf24)",
+                  background: "rgba(240, 201, 101, 0.1)",
+                  border: "1px solid rgba(240, 201, 101, 0.3)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0,
                 }}>
@@ -411,8 +410,8 @@ export default function ToolsLanding({ onOpenTool }) {
                 onClick={() => onOpenTool({ tool: cs.toolId })}
                 style={{
                   padding: "6px 14px", borderRadius: "8px",
-                  background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.25)",
-                  color: "#fdba74", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                  background: "rgba(240,201,101,0.12)", border: "1px solid rgba(240,201,101,0.25)",
+                  color: "#f0c965", fontSize: "12px", fontWeight: 600, cursor: "pointer",
                   flexShrink: 0,
                 }}
               >
@@ -423,10 +422,10 @@ export default function ToolsLanding({ onOpenTool }) {
                 <div style={{ marginTop: "12px", paddingLeft: "48px" }}>
                   <div style={{
                     padding: "10px 14px", borderRadius: "8px",
-                    background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.15)",
-                    fontSize: "12px", color: "#fed7aa",
+                    background: "rgba(240,201,101,0.08)", border: "1px solid rgba(240,201,101,0.15)",
+                    fontSize: "12px", color: "#f0c965",
                   }}>
-                    <strong style={{ color: "#fb923c" }}>
+                    <strong style={{ color: "#f0c965" }}>
                       {cs.toolId === "furnace" ? "Debate Hinge" : cs.toolId === "story-forge" ? "Story Seed" : cs.toolId === "storm-replay" ? "Radar Signal" : cs.toolId === "cardo-guard" ? "Risk Gate" : "Telemetry Drift"}:
                     </strong>{" "}
                     {cs.hinge}
@@ -443,14 +442,15 @@ export default function ToolsLanding({ onOpenTool }) {
         className="landing-section"
         style={{
           textAlign: "center", padding: "32px 0",
-          borderTop: "1px solid rgba(251,146,60,0.1)",
+          borderTop: "1px solid rgba(240,201,101,0.15)",
           opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(8px)",
           transition: "all 0.4s ease-out 0.4s",
         }}
       >
         <div style={{
           width: "32px", height: "32px", borderRadius: "9px",
-          background: "linear-gradient(135deg, #f97316, #fbbf24)",
+          background: "rgba(240, 201, 101, 0.1)",
+          border: "1px solid rgba(240, 201, 101, 0.3)",
           display: "flex", alignItems: "center", justifyContent: "center",
           margin: "0 auto 8px",
         }}>

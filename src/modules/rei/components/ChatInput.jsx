@@ -33,9 +33,9 @@ export default function ChatInput({ inputMessage, setInputMessage, selectedDomai
           <button
             type="submit"
             className="rei-touch-button touch-target"
-            style={{ padding: mobile ? "14px 28px" : "12px 24px", minHeight: "48px", height: "48px" }}
-            onMouseOver={(e) => e.currentTarget.style.background = "#fb923c"}
-            onMouseOut={(e) => e.currentTarget.style.background = "#f97316"}
+            style={{ padding: mobile ? "14px 28px" : "12px 24px", minHeight: "48px", height: "48px", background: "#f0c965", color: "#07090d", fontWeight: 700 }}
+            onMouseOver={(e) => e.currentTarget.style.background = "#d6b04c"}
+            onMouseOut={(e) => e.currentTarget.style.background = "#f0c965"}
           >
             Send
           </button>

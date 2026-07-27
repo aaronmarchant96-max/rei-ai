@@ -8,18 +8,18 @@ export default function HingeMark({ size = 36, animated = false }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Pivot pin */}
-      <circle cx="18" cy="18" r="2.2" fill="#1a0d08" />
+      <circle cx="18" cy="18" r="2.2" fill="#ffffff" />
 
       {/* Fixed arm */}
       <path
         d="M18 18 L18 6"
-        stroke="#1a0d08"
+        stroke="#f0c965"
         strokeWidth="3"
         strokeLinecap="round"
       />
       <path
         d="M18 6 L26 6"
-        stroke="#1a0d08"
+        stroke="#f0c965"
         strokeWidth="3"
         strokeLinecap="round"
       />
@@ -37,13 +37,13 @@ export default function HingeMark({ size = 36, animated = false }) {
       >
         <path
           d="M18 18 L18 30"
-          stroke="#1a0d08"
+          stroke="#f0c965"
           strokeWidth="3"
           strokeLinecap="round"
         />
         <path
           d="M18 30 L26 30"
-          stroke="#1a0d08"
+          stroke="#f0c965"
           strokeWidth="3"
           strokeLinecap="round"
         />

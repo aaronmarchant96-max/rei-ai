@@ -8,7 +8,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
       onAnimationEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
       {msg.sender === "user" && msg.attachedRecord && (
-        <div style={{ fontSize: "10.5px", color: "#fdba74", marginBottom: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
+        <div style={{ fontSize: "10.5px", color: "#f0c965", marginBottom: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
           📋 Record attached — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
         </div>
       )}
@@ -16,7 +16,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
         <div className="rei-router-badge">
           <span style={{ fontSize: "11px" }}>🌙</span>
           <span>{msg.rawJson.routerDecision.label}</span>
-          <span style={{ color: "#fbbf24", fontWeight: 600 }}>
+          <span style={{ color: "#f0c965", fontWeight: 600 }}>
             {msg.rawJson.routerDecision.model}
           </span>
         </div>
@@ -42,7 +42,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
                 {sections.intro && <div>{sections.intro}</div>}
                 {visibleSections.map(({ key, label }) => (
                   <div key={key}>
-                    <div style={{ color: "#fb923c", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>{label}</div>
+                    <div style={{ color: "#f0c965", fontSize: "0.85em", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "4px" }}>{label}</div>
                     <div>{sections[key]}</div>
                   </div>
                 ))}
