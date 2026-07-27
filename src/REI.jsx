@@ -13,6 +13,7 @@ import DomainBanner from "./modules/rei/components/DomainBanner.jsx";
 import ChatHistory from "./modules/rei/components/ChatHistory.jsx";
 import ChatInput from "./modules/rei/components/ChatInput.jsx";
 import PhilosophyModal from "./modules/rei/components/PhilosophyModal.jsx";
+import WelcomePanel from "./modules/rei/components/WelcomePanel.jsx";
 import ReiContext from "./modules/rei/ReiContext.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
@@ -416,6 +417,17 @@ Limitations:
           >
               (?) Philosophy
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedDomain("legal");
+              setInputMessage("What is the hinge in Donoghue v Stevenson?");
+            }}
+            className="rei-action-btn"
+            style={{ color: "#f0c965", borderColor: "rgba(240, 201, 101, 0.25)" }}
+          >
+              ⚖️ Try a Case
+          </button>
         </div>
       </header>
 
@@ -434,6 +446,13 @@ Limitations:
           maxRecordChars={MAX_RECORD_CHARS}
           sourceTypes={SOURCE_TYPES}
         />
+
+        {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
+          <WelcomePanel onStart={(prompt) => {
+            setInputMessage(prompt);
+            handleSendMessage({ preventDefault: () => {} });
+          }} />
+        )}
 
         <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} />
       </main>
