@@ -1,14 +1,8 @@
-export default function ChatInput({
-  inputMessage,
-  setInputMessage,
-  selectedDomain,
-  onSend,
-  inputRef,
-  mobile,
-  generalistPrompts,
-  assistantPromptIndex,
-  setAssistantPromptIndex
-}) {
+import { useRei } from "../ReiContext.js";
+
+export default function ChatInput() {
+  const { inputMessage, setInputMessage, selectedDomain, handleSendMessage, inputRef, mobile, generalistPrompts, assistantPromptIndex, setAssistantPromptIndex } = useRei();
+
   const quickPrompts = [
     { label: "💡 Sort out a problem", text: "Help me sort this out" },
     { label: "⚡ Find the hinge", text: "What is the real hinge?" },
@@ -38,7 +32,7 @@ export default function ChatInput({
           className="rei-input-form"
           onSubmit={(e) => {
             e.preventDefault();
-            onSend();
+            handleSendMessage();
           }}
         >
           <div className="rei-input-row">
@@ -51,30 +45,26 @@ export default function ChatInput({
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  onSend();
+                  handleSendMessage();
                 }
               }}
               placeholder={
                 selectedDomain === "coding"
                   ? "Describe the feature or bug — REI will find the architectural hinge and write verification-first code."
                   : selectedDomain === "red-team"
-                    ? "Paste your prompt or system policy — REI will run red-team taxonomy stress testing."
-                    : "What are you trying to think through?"
+                    ? "Type your adversarial prompt or vulnerability scenario..."
+                    : selectedDomain === "genealogy"
+                      ? "Type your genealogy question or family history puzzle..."
+                      : selectedDomain === "story"
+                        ? "Describe the story seed, character, or arc you want to build..."
+                        : selectedDomain === "legal"
+                          ? "Enter a case name, citation, or legal question..."
+                          : "What are you trying to think through?"
               }
             />
-            <button
-              type="submit"
-              className="rei-touch-button"
-              disabled={!inputMessage.trim()}
-              style={{ opacity: inputMessage.trim() ? 1 : 0.6 }}
-            >
+            <button type="submit" className="rei-touch-button touch-target">
               Send ➔
             </button>
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "11px", color: "#94a3b8", marginTop: "4px" }}>
-            <span>⚡ <strong>Night Shift v3:</strong> Cost-aware LLM auto-routing active (&lt;5ms)</span>
-            <span style={{ opacity: 0.8 }}>Shift + Enter for new line</span>
           </div>
         </form>
       </div>

@@ -13,6 +13,7 @@ import DomainBanner from "./modules/rei/components/DomainBanner.jsx";
 import ChatHistory from "./modules/rei/components/ChatHistory.jsx";
 import ChatInput from "./modules/rei/components/ChatInput.jsx";
 import PhilosophyModal from "./modules/rei/components/PhilosophyModal.jsx";
+import ReiContext from "./modules/rei/ReiContext.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
 
@@ -353,6 +354,11 @@ Limitations:
   }
 
   return (
+    <ReiContext.Provider value={{
+      inputMessage, setInputMessage, selectedDomain, setSelectedDomain,
+      handleSendMessage, inputRef, mobile, generalistPrompts: GENERALIST_PROMPTS,
+      assistantPromptIndex, setAssistantPromptIndex,
+    }}>
     <div
       className="mobile-container safe-area rei-shell"
       style={{
@@ -432,19 +438,10 @@ Limitations:
         <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} />
       </main>
 
-      <ChatInput
-        inputMessage={inputMessage}
-        setInputMessage={setInputMessage}
-        selectedDomain={selectedDomain}
-        onSend={handleSendMessage}
-        inputRef={inputRef}
-        mobile={mobile}
-        generalistPrompts={GENERALIST_PROMPTS}
-        assistantPromptIndex={assistantPromptIndex}
-        setAssistantPromptIndex={setAssistantPromptIndex}
-      />
+      <ChatInput />
       
       <PhilosophyModal isOpen={isPhilosophyOpen} onClose={() => setIsPhilosophyOpen(false)} />
     </div>
+    </ReiContext.Provider>
   );
 }
