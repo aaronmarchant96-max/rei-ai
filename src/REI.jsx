@@ -217,7 +217,7 @@ export default function REI({ initialPrompt } = {}) {
   };
 
   async function handleSendMessage(e) {
-    e.preventDefault();
+    e?.preventDefault?.();
     if (!inputMessage.trim()) return;
 
     const ingestedRecord = rawRecordText.trim();
