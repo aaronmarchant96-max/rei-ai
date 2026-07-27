@@ -21,22 +21,22 @@
   50% { transform: rotate(-18deg); }
 }
 
-/* Theme styles override */
+/* Theme styles override - Metallic Gold & Cyberpunk Dark */
 .rei-dashboard-wrapper {
-  background: #0a0505 !important;
+  background: #07090e !important;
 }
 .rei-custom-container {
-  background: radial-gradient(circle at 30% 15%, #4a1d0f 0%, #1a0d08 45%, #08050a 100%) !important;
+  background: radial-gradient(circle at 30% 15%, #161c28 0%, #0c1017 45%, #07090e 100%) !important;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(251,146,60,0.15) !important;
+  border: 1px solid rgba(240, 201, 101, 0.2) !important;
   border-radius: 16px !important;
 }
 .rei-custom-container::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(251,146,60,0.1), transparent 55%);
+  background: linear-gradient(135deg, rgba(240, 201, 101, 0.08), transparent 55%);
   pointer-events: none;
 }
 .rei-custom-container::after {
@@ -46,18 +46,18 @@
   right: -20%;
   width: 60%;
   height: 60%;
-  background: radial-gradient(circle, rgba(249,115,22,0.18), transparent 70%);
+  background: radial-gradient(circle, rgba(240, 201, 101, 0.12), transparent 70%);
   pointer-events: none;
 }
 .rei-logo-mark {
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #f97316, #fbbf24);
+  background: linear-gradient(135deg, #f0c965, #d6b04c);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 24px rgba(249,115,22,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  box-shadow: 0 0 24px rgba(240, 201, 101, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
   flex-shrink: 0;
   position: relative;
 }
@@ -66,27 +66,27 @@
   position: absolute;
   inset: -2px;
   border-radius: 16px;
-  border: 1px solid rgba(251,191,36,0.5);
+  border: 1px solid rgba(240, 201, 101, 0.5);
   animation: pulse-ring 2.4s ease-in-out infinite;
 }
 .rei-logo-title {
   font-weight: 800;
   font-size: 22px;
   letter-spacing: -0.01em;
-  background: linear-gradient(90deg, #fb923c, #fde047);
+  background: linear-gradient(90deg, #f0c965, #fde047);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 .rei-logo-sub {
   font-size: 12.5px;
-  color: #d6a98a;
+  color: #94a3b8;
   letter-spacing: 0.03em;
   margin-top: 2px;
 }
 .rei-custom-tab {
   padding: 9px 14px;
-  border-radius: 9px;
+  border-radius: 999px;
   font-size: 12.5px;
   font-weight: 600;
   border: 1px solid rgba(255,255,255,0.08);
@@ -100,22 +100,22 @@
   line-height: 1.3;
 }
 .rei-custom-tab:hover {
-  border-color: rgba(251,146,60,0.4);
-  color: #fdba74;
+  border-color: rgba(240, 201, 101, 0.4);
+  color: #f0c965;
   transform: translateY(-1px);
 }
 .rei-custom-tab-active {
-  background: linear-gradient(135deg, rgba(249,115,22,0.22), rgba(251,191,36,0.14)) !important;
-  border-color: #f97316 !important;
-  color: #fed7aa !important;
-  box-shadow: 0 0 18px rgba(249,115,22,0.15);
+  background: linear-gradient(135deg, rgba(240, 201, 101, 0.2), rgba(214, 176, 76, 0.12)) !important;
+  border-color: #f0c965 !important;
+  color: #f0c965 !important;
+  box-shadow: 0 0 18px rgba(240, 201, 101, 0.2);
 }
 .rei-custom-card {
   width: 100%;
   border-radius: 12px;
   padding: 16px 18px;
-  background: rgba(0,0,0,0.2);
-  border: 1px solid rgba(251,146,60,0.15);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(240, 201, 101, 0.18);
   position: relative;
   z-index: 1;
 }
@@ -126,9 +126,9 @@
   justify-content: space-between;
   gap: 12px;
   padding: 16px 16px 12px;
-  background: rgba(10, 5, 5, 0.9);
-  border-bottom: 1px solid rgba(251, 146, 60, 0.16);
-  backdrop-filter: blur(10px);
+  background: rgba(7, 9, 14, 0.92);
+  border-bottom: 1px solid rgba(240, 201, 101, 0.2);
+  backdrop-filter: blur(12px);
 }
 .rei-header__brand {
   display: flex;
@@ -146,7 +146,7 @@
 }
 .rei-domain-tab {
   padding: 8px 12px;
-  border-radius: 10px;
+  border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.08);
   background: rgba(255,255,255,0.02);
   color: #94a3b8;
@@ -159,17 +159,24 @@
   gap: 2px;
   text-align: left;
   min-height: 46px;
+  transition: all 0.2s ease;
+}
+.rei-domain-tab:hover {
+  border-color: rgba(240, 201, 101, 0.4);
+  color: #f0c965;
+  background: rgba(240, 201, 101, 0.08);
+  transform: translateY(-1px);
 }
 .rei-domain-tab.is-active {
-  background: linear-gradient(135deg, rgba(249,115,22,0.22), rgba(251,191,36,0.14));
-  border-color: #f97316;
-  color: #fed7aa;
-  box-shadow: 0 0 18px rgba(249,115,22,0.15);
+  background: linear-gradient(135deg, rgba(240, 201, 101, 0.22), rgba(214, 176, 76, 0.14));
+  border-color: #f0c965;
+  color: #f0c965;
+  box-shadow: 0 0 18px rgba(240, 201, 101, 0.2);
 }
 .rei-action-btn {
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
-  padding: 9px 12px;
+  border-radius: 999px;
+  padding: 9px 14px;
   font-size: 12px;
   font-weight: 700;
   color: #e2e8f0;
@@ -178,7 +185,8 @@
   transition: all 0.2s ease;
 }
 .rei-action-btn:hover {
-  border-color: rgba(251,146,60,0.35);
+  border-color: rgba(240, 201, 101, 0.4);
+  color: #f0c965;
   transform: translateY(-1px);
 }
 .rei-action-btn--danger {
@@ -186,21 +194,22 @@
   border-color: rgba(251,113,133,0.25);
 }
 .rei-action-btn--accent {
-  color: #fde68a;
-  border-color: rgba(251,191,36,0.25);
+  color: #f0c965;
+  border-color: rgba(240, 201, 101, 0.35);
+  background: rgba(240, 201, 101, 0.1);
 }
 .rei-domain-banner {
   background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(251,146,60,0.16);
+  border: 1px solid rgba(240, 201, 101, 0.2);
   border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
 }
 .rei-domain-banner__eyebrow {
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #fb923c;
+  color: #f0c965;
   margin-bottom: 8px;
   font-weight: 700;
 }
@@ -214,14 +223,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  color: #f5d7c4;
+  color: #e2e8f0;
   font-size: 13px;
 }
 .rei-domain-banner__meta--secondary {
-  color: #d6a98a;
+  color: #94a3b8;
 }
 .rei-domain-banner__label {
-  color: #fb923c;
+  color: #f0c965;
   font-weight: 700;
 }
 .rei-domain-banner__steps {
@@ -230,11 +239,11 @@
   gap: 8px;
 }
 .rei-domain-banner__step {
-  padding: 5px 8px;
+  padding: 5px 10px;
   border-radius: 999px;
-  background: rgba(251,146,60,0.11);
-  border: 1px solid rgba(251,146,60,0.18);
-  color: #fed7aa;
+  background: rgba(240, 201, 101, 0.1);
+  border: 1px solid rgba(240, 201, 101, 0.25);
+  color: #f0c965;
   font-size: 11px;
   font-weight: 600;
 }
@@ -245,7 +254,7 @@
   margin-top: 10px;
 }
 .rei-reasoning-loop__step {
-  border: 1px solid rgba(251,146,60,0.16);
+  border: 1px solid rgba(240, 201, 101, 0.18);
   border-radius: 10px;
   background: rgba(255,255,255,0.03);
   padding: 8px 10px;
@@ -254,14 +263,14 @@
   gap: 2px;
 }
 .rei-reasoning-loop__label {
-  color: #fb923c;
+  color: #f0c965;
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 .rei-reasoning-loop__detail {
-  color: #f5d7c4;
+  color: #cbd5e1;
   font-size: 12px;
   line-height: 1.35;
 }
@@ -306,9 +315,9 @@
   border: 1px solid rgba(255,255,255,0.1);
 }
 .rei-chat-bubble--rei {
-  background: rgba(251,146,60,0.08);
+  background: rgba(240, 201, 101, 0.06);
   color: #E2E8F0;
-  border: 1px solid rgba(251,146,60,0.18);
+  border: 1px solid rgba(240, 201, 101, 0.2);
 }
 .rei-chat-meta {
   font-size: 0.78em;
@@ -322,9 +331,9 @@
   gap: 6px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(251,146,60,0.24);
-  background: rgba(251,146,60,0.1);
-  color: #fed7aa;
+  border: 1px solid rgba(240, 201, 101, 0.3);
+  background: rgba(240, 201, 101, 0.1);
+  color: #f0c965;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -332,7 +341,7 @@
 }
 .rei-router-panel {
   margin-top: 12px;
-  border-top: 1px dashed rgba(251,146,60,0.18);
+  border-top: 1px dashed rgba(240, 201, 101, 0.2);
   padding-top: 8px;
 }
 .rei-router-panel__title {
@@ -353,17 +362,17 @@
   gap: 6px;
 }
 .rei-router-panel__label {
-  color: #fb923c;
+  color: #f0c965;
   font-weight: 700;
 }
 .rei-copy-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(251,146,60,0.15);
-  border: 1px solid rgba(251,146,60,0.3);
+  background: rgba(240, 201, 101, 0.12);
+  border: 1px solid rgba(240, 201, 101, 0.3);
   border-radius: 4px;
-  color: #fb923c;
+  color: #f0c965;
   cursor: pointer;
   font-size: 0.75em;
   padding: 2px 6px;
@@ -382,10 +391,11 @@
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  background: var(--surface);
-  border-top: 1px solid rgba(251,146,60,0.15);
+  background: rgba(7, 9, 14, 0.92);
+  border-top: 1px solid rgba(240, 201, 101, 0.2);
   padding: 16px;
   box-sizing: border-box;
+  backdrop-filter: blur(12px);
 }
 .rei-input-form {
   display: flex;
@@ -399,44 +409,47 @@
 }
 .rei-input-area {
   flex: 1;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.4);
   color: #E2E8F0;
-  border: 1px solid rgba(251,146,60,0.15);
-  border-radius: 6px;
+  border: 1px solid rgba(240, 201, 101, 0.2);
+  border-radius: 8px;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 15px;
   outline: none;
 }
 .rei-input-area:focus {
-  border-color: rgba(251,146,60,0.45);
-  box-shadow: 0 0 0 2px rgba(249,115,22,0.18);
+  border-color: #f0c965;
+  box-shadow: 0 0 0 2px rgba(240, 201, 101, 0.2);
 }
 .rei-touch-button {
-  background: #f97316;
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #f0c965, #d6b04c);
+  color: #07090d;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
   min-width: 48px;
   align-self: center;
-  font-size: 16px;
+  font-size: 15px;
 }
 .rei-quick-prompt {
   flex: 1 1 auto;
   min-width: 100px;
-  padding: 14px 18px;
+  padding: 10px 14px;
   white-space: normal;
   line-height: 1.3;
-  border-radius: 16px;
-  background: #3a2a1f;
-  color: #f5e5d7;
-  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 999px;
+  background: rgba(240, 201, 101, 0.08);
+  color: #f0c965;
+  border: 1px solid rgba(240, 201, 101, 0.2);
   cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
 }
 .rei-quick-prompt:hover {
-  border-color: rgba(251,146,60,0.35);
+  border-color: #f0c965;
+  background: rgba(240, 201, 101, 0.18);
   transform: translateY(-1px);
 }
 
@@ -447,31 +460,31 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 .rei-glass-modal {
-  background: rgba(20, 20, 20, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(251, 146, 60, 0.25);
-  border-radius: 12px;
+  background: rgba(12, 16, 26, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(240, 201, 101, 0.3);
+  border-radius: 16px;
   padding: 24px;
   max-width: 580px;
   width: 90%;
   color: #e2e8f0;
   font-family: inherit;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px rgba(240, 201, 101, 0.15);
 }
 .rei-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(251, 146, 60, 0.18);
+  border-bottom: 1px solid rgba(240, 201, 101, 0.2);
   padding-bottom: 12px;
   margin-bottom: 18px;
 }
@@ -479,7 +492,7 @@
   margin: 0;
   font-size: 18px;
   letter-spacing: 0.05em;
-  color: #fb923c;
+  color: #f0c965;
   font-weight: bold;
 }
 .rei-close-btn {
@@ -499,9 +512,9 @@
 }
 .rei-concept-layer h3 {
   font-size: 14px;
-  color: #fed7aa;
+  color: #f0c965;
   margin: 0 0 6px 0;
-  border-left: 3px solid #fb923c;
+  border-left: 3px solid #f0c965;
   padding-left: 8px;
   font-weight: bold;
 }
@@ -514,14 +527,14 @@
 }
 .rei-tagline {
   font-style: italic;
-  color: #fbd5c6;
+  color: #f0c965;
   opacity: 0.85;
   font-size: 11.5px;
   margin-top: 4px;
   padding-left: 11px;
 }
 
-/* ── Landing page animations ── */
+/* ── Landing page & site-wide ambient dark background ── */
 @keyframes ambient-shift {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
@@ -531,10 +544,10 @@
 body {
   background: linear-gradient(
     135deg,
-    #0d0604 0%,
-    #1a0d08 30%,
-    #0f0a14 60%,
-    #0d0604 100%
+    #07090e 0%,
+    #0c1017 30%,
+    #0f1422 60%,
+    #07090e 100%
   );
   background-size: 400% 400%;
   animation: ambient-shift 30s ease infinite;
