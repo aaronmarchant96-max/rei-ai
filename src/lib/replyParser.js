@@ -1,5 +1,5 @@
 export function parseAssistantStyleReply(text) {
-  if (text == null) text = "";
+  if (text == null) return { Hinge: "", Facts: "", Assumptions: "", Evaluation: "", ChangeMind: "", Move: "", intro: "" };
   const sections = { Hinge: "", Facts: "", Assumptions: "", Evaluation: "", ChangeMind: "", Move: "", intro: "" };
   const cleaned = text.replace(/\*\*/g, "").replace(/^\s*[-*]\s+/gm, "• ");
   const lines = cleaned.split("\n").map((line) => line.trim()).filter(Boolean);
@@ -23,11 +23,11 @@ export function parseAssistantStyleReply(text) {
       const key = keyMap[normalized] || null;
       const rest = inlineMatch[2].trim();
       if (key) {
+        sections[key] = sections[key] ? `${sections[key]} ${rest}` : rest;
         current = key;
         if (rest) {
-          sections[key] = sections[key] ? `${sections[key]} ${rest}` : rest;
+          continue;
         }
-        continue;
       }
     }
     if (current === "intro") {

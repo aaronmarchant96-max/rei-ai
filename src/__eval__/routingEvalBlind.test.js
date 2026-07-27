@@ -55,6 +55,12 @@ describe("Routing Eval — blind held-out set", () => {
 
   const pathwayCounts = { deterministic: 0, cheap: 0, medium: 0, premium: 0 };
 
+  function decisionPathway(decision) {
+    if (decision.model === "gpt-4o") return "premium";
+    if (decision.model === "llama-3.1-8b-instant") return "cheap";
+    return "medium";
+  }
+
   for (const [category, prompts] of Object.entries(BLIND_CATEGORIES)) {
     describe(category, () => {
       for (const prompt of prompts) {
@@ -66,7 +72,7 @@ describe("Routing Eval — blind held-out set", () => {
           totalCost += cost;
           totalPremiumCost += premiumCost;
 
-          const pathway = decision.pathway || "medium";
+          const pathway = decisionPathway(decision);
           pathwayCounts[pathway] = (pathwayCounts[pathway] || 0) + 1;
           if (pathway === "deterministic") deterministicCount++;
           if (pathway === "premium") escalationCount++;
@@ -98,7 +104,7 @@ describe("Routing Eval — blind held-out set", () => {
             route: actualLabel,
             pathway,
             model: decision.model,
-            confidence: decision.confidence,
+            hingeScore: decision.hingeScore,
             cost,
             premiumCost,
             savings: premiumCost - cost,
@@ -106,11 +112,11 @@ describe("Routing Eval — blind held-out set", () => {
 
           expect(decision).toHaveProperty("id");
           expect(decision).toHaveProperty("model");
-          expect(decision).toHaveProperty("confidence");
-          expect(decision).toHaveProperty("pathway");
+          expect(decision).toHaveProperty("hingeScore");
+          expect(decision).toHaveProperty("hingeVector");
+          expect(decision).toHaveProperty("hingeTier");
           expect(decision).toHaveProperty("estimatedCost");
           expect(decision).toHaveProperty("premiumCost");
-          expect(decision).toHaveProperty("confidence");
         });
       }
     });

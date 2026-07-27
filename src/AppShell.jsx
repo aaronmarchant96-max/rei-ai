@@ -1,14 +1,21 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useMobile, useSwipe } from "./useMobile.js";
-import { getFlag, setFlag } from "./lib/featureFlags.js";
 
-const ToolsLanding = lazy(() => import("./ToolsLanding.jsx"));
 const DebateFurnace = lazy(() => import("./DebateFurnace.jsx"));
 const CreativeEngine = lazy(() => import("./CreativeEngine.jsx"));
 const StormReplay = lazy(() => import("./StormReplay.jsx"));
 const CardoGuard = lazy(() => import("./CardoGuard.jsx"));
 const REI = lazy(() => import("./REI.jsx"));
 const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
+const ToolsLanding = lazy(() => import("./ToolsLanding.jsx"));
+
+function LoadingShell() {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+      <div style={{ color: "#fb923c", fontSize: "14px", fontWeight: 600 }}>Loading…</div>
+    </div>
+  );
+}
 
 const TOP_LEVEL = [
   {
@@ -33,8 +40,8 @@ const TOP_LEVEL = [
   },
   {
     id: "cardo-guard",
-    label: "CARDO Guard",
-    subtitle: "Escalation to premium models is controlled by the CARDO Guard cost gate."
+    label: "CARDO GUARD",
+    subtitle: "AI scores get checked against cost."
   },
   {
     id: "rei",
@@ -48,37 +55,38 @@ const TOP_LEVEL = [
   }
 ];
 
-const isTest = typeof process !== "undefined" && process.env.NODE_ENV === "test";
-
 function getInitialTool() {
-  if (typeof window === "undefined") return "tools";
+  if (typeof window === "undefined") return "rei";
   const hash = window.location.hash;
   if (hash && hash !== "") {
     if (hash === "#story-forge") return "story-forge";
     if (hash === "#storm-replay") return "storm-replay";
     if (hash === "#cardo-guard") return "cardo-guard";
-    if (hash === "#rei" || hash === "#cfai" || hash === "#hinge-meter") return "rei";
+    if (hash === "#rei" || hash === "#cfai") return "rei";
     if (hash === "#tracepoint") return "tracepoint";
-    if (hash === "#tools") return "tools";
+    if (hash === "#hinge-meter") return "rei"; // default unknown hashes to flagship
   }
-  return "tools";
+  // Treat /tools as the flagship entry point; explicit Tools tab still works.
+  if (window.location.pathname === "/tools" || window.location.pathname === "/tools/")
+    return "rei";
+  return "rei";
 }
 
 function getToolPath(tool) {
-  if (tool === "tools") return "/";
+  if (tool === "tools") return "/tools";
   if (tool === "story-forge") return "/#story-forge";
   if (tool === "storm-replay") return "/#storm-replay";
   if (tool === "cardo-guard") return "/#cardo-guard";
   if (tool === "rei") return "/#rei";
   if (tool === "tracepoint") return "/#tracepoint";
-  return "/";
+  return "/#rei";
 }
 
 function getToolLabel(tool) {
   if (tool === "tools") return "Tools";
   if (tool === "story-forge") return "Story Forge";
   if (tool === "storm-replay") return "Storm Replay";
-  if (tool === "cardo-guard") return "CARDO Guard";
+  if (tool === "cardo-guard") return "CARDO GUARD";
   if (tool === "rei" || tool === "cfai") return "REI.ai";
   if (tool === "tracepoint") return "Tracepoint";
   return "Debate Furnace";
@@ -87,6 +95,7 @@ function getToolLabel(tool) {
 export default function AppShell() {
   const [tool, setTool] = useState(getInitialTool);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [reiInitialPrompt, setReiInitialPrompt] = useState(null);
   const mobile = useMobile(45); // 45em = 720px
 
   // Swipe handlers for mobile drawer
@@ -111,24 +120,19 @@ export default function AppShell() {
       tool === "tools"
         ? "PromptHound Labs | Tools"
         : tool === "story-forge"
-        ? "PromptHound Labs | Story Forge"
-        : tool === "storm-replay"
-        ? "PromptHound Labs | Storm Replay"
-        : tool === "cardo-guard"
-        ? "PromptHound Labs | CARDO Guard"
-        : tool === "rei"
-        ? "PromptHound Labs | REI.ai"
-        : tool === "tracepoint"
-        ? "PromptHound Labs | Tracepoint"
-        : "PromptHound Labs | Debate Furnace";
+          ? "PromptHound Labs | Story Forge"
+          : tool === "storm-replay"
+            ? "PromptHound Labs | Storm Replay"
+            : tool === "cardo-guard"
+              ? "PromptHound Labs | CARDO GUARD"
+              : tool === "rei"
+                ? "PromptHound Labs | REI.ai"
+                : tool === "tracepoint"
+                  ? "PromptHound Labs | Tracepoint"
+                  : "PromptHound Labs | Debate Furnace";
   }, [tool]);
 
   const currentToolLabel = getToolLabel(tool);
-  const [experimentalLayout, setExperimentalLayout] = useState(() => getFlag("navigation-rail"));
-
-  useEffect(() => {
-    setFlag("navigation-rail", experimentalLayout);
-  }, [experimentalLayout]);
 
   return (
     <div className="app-shell" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
@@ -201,7 +205,31 @@ export default function AppShell() {
         </>
       )}
 
-      {tool !== "tools" && !mobile ? (
+      {tool === "tools" ? (
+        <header className="shell-header shell-header--landing">
+          <div className="shell-brand">
+            <div className="shell-brand__title">PromptHound Labs</div>
+            <div className="shell-brand__sub">Structured outputs for messy input.</div>
+          </div>
+
+          {!mobile && (
+            <nav className="top-tabs hide-mobile" aria-label="Top-level tools">
+              {TOP_LEVEL.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={tool === item.id ? "top-tab is-active" : "top-tab touch-target"}
+                  onClick={() => setTool(item.id)}
+                  aria-pressed={tool === item.id}
+                >
+                  <span className="top-tab__label">{item.label}</span>
+                  <span className="top-tab__sub">{item.subtitle}</span>
+                </button>
+              ))}
+            </nav>
+          )}
+        </header>
+      ) : !mobile ? (
         <div className="shell-tool-bar" aria-label="Breadcrumb">
           <button
             type="button"
@@ -212,47 +240,31 @@ export default function AppShell() {
           </button>
           <span className="shell-tool-bar__sep" aria-hidden="true">/</span>
           <span className="shell-tool-bar__current">{currentToolLabel}</span>
-          <span style={{ flex: 1 }} />
-          <button
-            type="button"
-            onClick={() => setExperimentalLayout((v) => !v)}
-            style={{
-              background: experimentalLayout ? "rgba(214,176,76,0.15)" : "transparent",
-              border: experimentalLayout ? "1px solid rgba(214,176,76,0.35)" : "1px solid transparent",
-              borderRadius: "4px",
-              color: experimentalLayout ? "#d6b04c" : "#697266",
-              cursor: "pointer",
-              fontSize: "10px",
-              padding: "2px 6px",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-            }}
-            title={experimentalLayout ? "Experimental layout active" : "Enable experimental layout"}
-          >
-            {experimentalLayout ? "🧪 Layout" : "🧪"}
-          </button>
         </div>
       ) : null}
 
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
-        <Suspense fallback={<div className="shell-loading" />}>
-          {tool === "tools" ? (
-            <ToolsLanding onOpenTool={setTool} />
-          ) : tool === "story-forge" ? (
-            <CreativeEngine />
-          ) : tool === "storm-replay" ? (
-            <StormReplay />
-          ) : tool === "cardo-guard" ? (
-            <CardoGuard />
-          ) : tool === "rei" ? (
-            <REI />
-          ) : tool === "tracepoint" ? (
-            <Tracepoint />
-          ) : tool === "cfai" ? (
-            <REI />
-          ) : (
-            <DebateFurnace />
-          )}
+        <Suspense fallback={<LoadingShell />}>
+        {tool === "tools" ? (
+          <ToolsLanding onOpenTool={({ tool: t, prompt }) => {
+            setReiInitialPrompt(prompt || null);
+            setTool(t);
+          }} />
+        ) : tool === "story-forge" ? (
+          <CreativeEngine />
+        ) : tool === "storm-replay" ? (
+          <StormReplay />
+        ) : tool === "cardo-guard" ? (
+          <CardoGuard />
+        ) : tool === "rei" ? (
+          <REI initialPrompt={reiInitialPrompt} />
+        ) : tool === "tracepoint" ? (
+          <Tracepoint />
+        ) : tool === "cfai" ? (
+          <REI initialPrompt={reiInitialPrompt} />
+        ) : (
+          <DebateFurnace />
+        )}
         </Suspense>
       </main>
     </div>

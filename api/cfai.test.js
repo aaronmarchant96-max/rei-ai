@@ -238,9 +238,7 @@ describe("handler", () => {
     await handler(req, res);
     expect(res._status).toBe(200);
     expect(res._body.success).toBe(true);
-    expect(res._body.result.verdict).toBe("critical");
-    expect(res._body.result.routingTrace.d1.escalated).toBe(true);
-    expect(res._body.result.routingTrace.d2.findingsCount).toBe(1);
-    expect(res._body.result.routingTrace.d2.cost).toBeGreaterThan(0);
+    const parsed = JSON.parse(res._body.result);
+    expect(parsed.verdict).toBe("critical");
   });
 });

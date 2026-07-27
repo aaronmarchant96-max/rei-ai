@@ -75,8 +75,8 @@ function buildFuel(seed, genre, mutation) {
     `Twist: ${mutationNotes[mutation]}`,
     remixFocus
       ? `Remix path: ${remixFocus}.`
-      : `Remix path: Keep the fiction distinct from the source event.`,
-    `Source trail: Keep the real event visible so the fiction feels grounded instead of generic.`,
+      : "Remix path: Keep the fiction distinct from the source event.",
+    "Source trail: Keep the real event visible so the fiction feels grounded instead of generic.",
   ];
 }
 
@@ -84,15 +84,15 @@ function makeCopyBlock(seed, genre, mutation) {
   const fuel = buildFuel(seed, genre.label, mutation);
   return [
     `# ${seed.title}`,
-    ``,
+    "",
     `**Genre mutation:** ${genre.label}`,
     `**Hinge:** ${seed.hinge}`,
     `**Story DNA:** ${seed.storyDNA.join(" · ")}`,
-    ``,
-    `## Story Fuel`,
+    "",
+    "## Story Fuel",
     ...fuel.map((line) => `- ${line}`),
-    ``,
-    `## Source Trail`,
+    "",
+    "## Source Trail",
     ...(seed.sourceTrail || []).map((source) => `- ${source.label}: ${source.url}`),
   ].join("\n");
 }

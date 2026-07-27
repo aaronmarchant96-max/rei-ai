@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Custom hook to detect mobile viewport
@@ -17,10 +17,10 @@ export function useMobile(breakpoint = 45) {
     checkMobile();
     
     // Add event listener
-    window.addEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
     
     // Cleanup
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, [breakpoint]);
 
   return isMobile;
@@ -38,10 +38,10 @@ export function useKeyboardVisible() {
     const handleBlur = () => setKeyboardVisible(false);
     
     // Listen for focus/blur events on all inputs
-    const inputs = document.querySelectorAll('input, textarea');
+    const inputs = document.querySelectorAll("input, textarea");
     inputs.forEach(input => {
-      input.addEventListener('focus', handleFocus);
-      input.addEventListener('blur', handleBlur);
+      input.addEventListener("focus", handleFocus);
+      input.addEventListener("blur", handleBlur);
     });
     
     // Handle window resize (keyboard visibility changes viewport height)
@@ -55,17 +55,17 @@ export function useKeyboardVisible() {
       }
     };
     
-    window.addEventListener('resize', handleResize);
-    window.visualViewport?.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    window.visualViewport?.addEventListener("resize", handleResize);
     
     // Cleanup
     return () => {
       inputs.forEach(input => {
-        input.removeEventListener('focus', handleFocus);
-        input.removeEventListener('blur', handleBlur);
+        input.removeEventListener("focus", handleFocus);
+        input.removeEventListener("blur", handleBlur);
       });
-      window.removeEventListener('resize', handleResize);
-      window.visualViewport?.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
+      window.visualViewport?.removeEventListener("resize", handleResize);
     };
   }, []);
 

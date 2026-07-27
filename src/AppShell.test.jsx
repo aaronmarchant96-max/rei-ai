@@ -1,10 +1,5 @@
-import { act } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import AppShell from "./AppShell.jsx";
-
-async function waitForLazySettle() {
-  await act(async () => {});
-}
 
 describe("AppShell", () => {
   beforeEach(() => {
@@ -12,91 +7,86 @@ describe("AppShell", () => {
     document.title = "";
   });
 
-  it("defaults to Tools landing and shows the brand header", async () => {
+  it("defaults to REI.ai and shows the breadcrumb", async () => {
     render(<AppShell />);
-    await waitForLazySettle();
 
-    expect(screen.getByRole("heading", { name: /A structured reasoning framework/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /PromptHound Labs/i })).toBeInTheDocument();
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("REI.ai");
     await waitFor(() => {
-      expect(document.title).toBe("PromptHound Labs | Tools");
+      expect(document.title).toBe("PromptHound Labs | REI.ai");
     });
   });
 
   it("navigates back to Tools landing from a tool", async () => {
-    window.history.replaceState({}, "", "/#storm-replay");
     render(<AppShell />);
-    await waitForLazySettle();
 
-    expect(screen.getByRole("button", { name: /PromptHound Labs/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /PromptHound Labs/i }));
-    await waitForLazySettle();
 
     await waitFor(() => {
-      expect(window.location.pathname).toBe("/");
-      expect(window.location.hash).toBe("");
+      expect(window.location.pathname).toBe("/tools");
     });
     await waitFor(() => {
       expect(document.title).toBe("PromptHound Labs | Tools");
     });
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: /A structured reasoning framework/i })).toBeInTheDocument();
+      expect(screen.getByText(/the cardo framework/i)).toBeInTheDocument();
     });
   });
 
   it("opens a tool from the Tools landing page", async () => {
     render(<AppShell />);
-    await waitForLazySettle();
 
-    expect(screen.getByRole("heading", { name: /A structured reasoning framework/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /PromptHound Labs/i }));
+    await waitFor(() => {
+      expect(window.location.pathname).toBe("/tools");
+    });
 
-    fireEvent.click(screen.getAllByRole("button", { name: /Launch Story Forge/i })[0]);
-    await waitForLazySettle();
+    await waitFor(() => {
+      const btns = screen.queryAllByRole("button", { name: /launch/i });
+      expect(btns.length).toBeGreaterThanOrEqual(5);
+    });
 
+    const launchBtns = screen.getAllByRole("button", { name: /launch/i });
+    fireEvent.click(launchBtns[2]); // 0=hero REI, 1=Debate Furnace, 2=Story Forge
     await waitFor(() => {
       expect(window.location.hash).toBe("#story-forge");
     });
-    await waitFor(() => {
-      expect(document.title).toBe("PromptHound Labs | Story Forge");
-    });
+    expect(document.title).toBe("PromptHound Labs | Story Forge");
   });
 
-  it("respects the initial hash on load", async () => {
+  it("respects the initial hash on load", () => {
     window.history.replaceState({}, "", "/#storm-replay");
 
     render(<AppShell />);
-    await waitForLazySettle();
 
     expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("Storm Replay");
     expect(document.title).toBe("PromptHound Labs | Storm Replay");
   });
 
-  it("loads CARDO Guard from the hash", async () => {
+  it("loads CARDO GUARD from the hash", () => {
     window.history.replaceState({}, "", "/#cardo-guard");
 
     render(<AppShell />);
-    await waitForLazySettle();
 
-    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("CARDO Guard");
-    expect(document.title).toBe("PromptHound Labs | CARDO Guard");
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("CARDO GUARD");
+    expect(document.title).toBe("PromptHound Labs | CARDO GUARD");
   });
 
-  it("loads Tracepoint from the hash", async () => {
+  it("loads Tracepoint from the hash", () => {
     window.history.replaceState({}, "", "/#tracepoint");
 
     render(<AppShell />);
-    await waitForLazySettle();
 
     expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("Tracepoint");
     expect(document.title).toBe("PromptHound Labs | Tracepoint");
   });
 
-  it("loads Tools from the /tools pathname", async () => {
+  it("loads REI.ai from the /tools pathname", () => {
     window.history.replaceState({}, "", "/tools");
 
     render(<AppShell />);
-    await waitForLazySettle();
 
-    expect(screen.getByRole("heading", { name: /A structured reasoning framework/i })).toBeInTheDocument();
-    expect(document.title).toBe("PromptHound Labs | Tools");
+    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("REI.ai");
+    expect(document.title).toBe("PromptHound Labs | REI.ai");
   });
 });

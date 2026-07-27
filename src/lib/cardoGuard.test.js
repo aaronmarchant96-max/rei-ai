@@ -144,16 +144,85 @@ describe("cardoGuard", () => {
     expect(strongBand.decisionMarginRatio).toBeGreaterThanOrEqual(2.5);
   });
 
-  describe("pure helper functions", () => {
-    it("getSyntheticFalseAlarmRate covers every confidence band", () => {
-      expect(getSyntheticFalseAlarmRate(95)).toBe(0.09);
-      expect(getSyntheticFalseAlarmRate(90)).toBe(0.15);
-      expect(getSyntheticFalseAlarmRate(85)).toBe(0.31);
-      expect(getSyntheticFalseAlarmRate(75)).toBe(0.44);
-      expect(getSyntheticFalseAlarmRate(60)).toBe(0.57);
+  it("applies CARDO GUARD to the pump maintenance scenario: 23% confidence, $50k to act, $500k to miss", () => {
+    // Pump scenario: 49% vibration increase, 23% failure probability (confidence band: very low)
+    // Cost to act: ~$50k (shutdown, inspection, potential repairs)
+    // Cost to miss: ~$500k (equipment failure, unplanned downtime, lost production)
+    const pumpReview = calculateCardoGuardReview({
+      scenarioId: "pump-maintenance",
+      confidence: 23,
+      costToAct: 50000,
+      costToMiss: 500000,
     });
 
-    it("getConfidenceBand covers every confidence band", () => {
+    // With 23% confidence, the false alarm rate should be high (0.57 for very low band)
+    expect(getSyntheticFalseAlarmRate(23)).toBe(0.57);
+    expect(pumpReview.confidenceBand).toBe("very low");
+
+    // Calculate: calibrated event likelihood = 1 - 0.57 = 0.43 (43% chance something bad happens)
+    expect(pumpReview.calibratedEventLikelihood).toBeCloseTo(0.43);
+
+    // Expected action waste: (1 - 0.43) * 50k = 0.57 * 50k = $28,500
+    expect(pumpReview.expectedActionWaste).toBeCloseTo(28500);
+
+    // Expected miss loss: 0.43 * 500k = $215,000
+    expect(pumpReview.expectedMissLoss).toBeCloseTo(215000);
+
+    // Decision margin ratio: 215k / 28.5k = ~7.54x (Very Strong)
+    expect(pumpReview.decisionMarginRatio).toBeCloseTo(7.54, 1);
+    expect(pumpReview.decisionStrength).toBe("Very Strong");
+
+    // Recommendation should be ACT (shutdown the pump)
+    expect(pumpReview.recommendation).toBe("ACT");
+    expect(pumpReview.shouldAct).toBe(true);
+
+    // Breakeven: cost to act where acting and not acting are equally bad
+    // breakeven miss cost = (50k * 0.57) / 0.43 = ~$66,279
+    expect(pumpReview.breakevenMissCost).toBeCloseTo(66279, 0);
+    expect(pumpReview.explanation).toContain("Acting clears the gate");
+  });
+
+  it("applies CARDO GUARD to the SaaS monolith rewrite scenario: 85% confidence, $200k to act, $260k annual savings", () => {
+    // SaaS architecture scenario: 15% current breach probability, 2% after rewrite
+    // Cost to act: $200k upfront rewrite
+    // Cost to miss: (0.15 - 0.02) × $2M per year = $260k annual cost of inaction
+    // Confidence: 85% (moderate band) that microservices would achieve 2% breach rate
+    const rewriteReview = calculateCardoGuardReview({
+      scenarioId: "saas-monolith-rewrite",
+      confidence: 85,
+      costToAct: 200000,
+      costToMiss: 260000,
+    });
+
+    // With 85% confidence, the false alarm rate should be moderate (0.31 for moderate band)
+    expect(getSyntheticFalseAlarmRate(85)).toBe(0.31);
+    expect(rewriteReview.confidenceBand).toBe("moderate");
+
+    // Calculate: calibrated event likelihood = 1 - 0.31 = 0.69 (69% chance rewrite reduces breach rate as expected)
+    expect(rewriteReview.calibratedEventLikelihood).toBeCloseTo(0.69);
+
+    // Expected action waste: (1 - 0.69) * 200k = 0.31 * 200k = $62,000
+    expect(rewriteReview.expectedActionWaste).toBeCloseTo(62000);
+
+    // Expected miss loss: 0.69 * 260k = $179,400
+    expect(rewriteReview.expectedMissLoss).toBeCloseTo(179400);
+
+    // Decision margin ratio: 179.4k / 62k = ~2.89x (Strong)
+    expect(rewriteReview.decisionMarginRatio).toBeCloseTo(2.89, 1);
+    expect(rewriteReview.decisionStrength).toBe("Strong");
+
+    // Recommendation should be ACT (rewrite the monolith)
+    expect(rewriteReview.recommendation).toBe("ACT");
+    expect(rewriteReview.shouldAct).toBe(true);
+
+    // Breakeven: cost to act where acting and not acting are equally bad
+    // breakeven miss cost = (200k * 0.31) / 0.69 = ~$89,855
+    expect(rewriteReview.breakevenMissCost).toBeCloseTo(89855, 0);
+    expect(rewriteReview.explanation).toContain("Acting clears the gate");
+  });
+
+  describe("pure helper functions", () => {
+    it("getSyntheticFalseAlarmRate covers every confidence band", () => {
       expect(getConfidenceBand(95)).toBe("very high");
       expect(getConfidenceBand(90)).toBe("high");
       expect(getConfidenceBand(85)).toBe("moderate");

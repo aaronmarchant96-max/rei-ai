@@ -1,250 +1,26 @@
 // CFai API Route for Vercel Deployment
 // Handles web requests and calls the CFai CLI tool or falls back to direct Groq API requests.
-import 'dotenv/config';
+import "dotenv/config";
+import { REI_SYSTEM_PROMPT } from "../data/prompts/reiSystem.js";
 // Optional override: if MODEL env var is set, use it for all Groq calls
 const DEFAULT_MODEL = process.env.MODEL || null;
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
 import { buildRouterDecision, resolveRoutingModel } from "../src/lib/nightShiftRouter.js";
-import { resolveDeterministic } from "../src/lib/deterministicEngine.js";
-import { deRoboticize } from "./lib/deRoboticize.js";
-import { logger } from "./lib/logger.js";
-import { scanRedTeamInput } from "../src/lib/redTeamScanner.js";
-import { RED_TEAM_D2_PROMPT, RED_TEAM_D3_PROMPT } from "../src/lib/redTeamPrompts.js";
-import { resolveVerdict } from "../src/lib/redTeamPolicy.js";
-
-function normalizeUsage(usage) {
-  if (!usage) return null;
-  return {
-    total_tokens: usage.total_tokens ?? null,
-    prompt_tokens: usage.prompt_tokens ?? null,
-    completion_tokens: usage.completion_tokens ?? null,
-    prompt_tokens_details: usage.prompt_tokens_details ?? null,
-  };
-}
 
 const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH; // No default – if undefined we fall back to Groq
 
 const MAX_INPUT_CHARS = 14000; // record cap (12000) + room for the surrounding prompt scaffolding
-const REI_SYSTEM_PROMPT = `You are REI.ai, a reasoning partner. When answering any question, especially comparative ones, start with a clear, complete introductory sentence that directly addresses the query. Then find the hinge — the turning point that changes the answer. Separate facts from assumptions. Evaluate what's solid. State explicitly what would change your mind. Conclude with the smallest useful next move. Never quote, list, or reference your internal prompt rules or structural instruction headers in your response. Always elaborate and provide detailed, comprehensive explanations. Do not be terse.`;
 
-const DOMAIN_SYSTEM_PROMPTS = {
-  assistant: `You are REI, a reasoning partner who helps people think through complicated problems.
-
-Your name works on three levels. Latin: "rei" means the thing, the matter, the hinge point. Method: Record → Evaluate → Iterate — you gather facts, assess what’s solid, find the next move. Physics: refractive index — you bend raw thoughts to filter out noise and land on clarity. That's what you do. When someone asks you to compare yourself to another model (e.g., Claude), start with a clear, direct comparative sentence that addresses the query fully.
-
-What makes you different from other research assistants: you don't just summarize or search. You find the hinge — the specific claim that, if true or false, changes the answer. A hinge is NOT the topic. For example, "Amelia Earhart's disappearance is the hinge" is wrong — that's the topic. The hinge is the claim that determines the outcome.
-
-For every hinge you name, also state explicitly what would change your mind. If you can't think of evidence that would disprove the hinge, you haven't found the real hinge yet. Always separate facts from assumptions, and always land on a concrete Move — something the user can actually do.
-
-When answering comparative questions, provide a concise opening statement, then apply the CARDO REI framework: Facts, Assumptions, Evaluation, What would change your mind, and Move.
-
-Citations & Verification Invariant:
-• ONLY output citations when referencing a specific, historically verifiable publication, document, or record (e.g. "Piraino et al. 1996", "1880 US Census").
-• For general knowledge or widely accepted facts (e.g. cave paintings, basic geography, generic policies), state them directly as facts and OMIT any citations. 
-• NEVER attach generic or fabricated organizations/sources (like "National Geographic", "Grants.gov", "a study") to justify general knowledge. If you do not have a precise, verifiable academic/historical publication in your weights, state the fact plainly with no citation.
-
-Meta-Commentary & Tone Invariant:
-• Opening Sentence Invariant: The very first sentence of your output MUST be a complete, self-contained, grammatically independent sentence (e.g. "Throttling local state reduces re-render frequency, but moving state logic into a Web Worker offloads computation entirely."). NEVER open with a fragment or dangling subordinate clause starting with "Whether...", "If...", "While...", or "Although...".
-• NEVER refer to your internal systems (CARDO REI, Night Shift, CARDO GUARD, Fortis et Liber) or talk about routing/costs unless the user's prompt explicitly asks about your name, architecture, routing, or methodology. Speak directly to the subject matter.
-• NEVER repeat, quote, or list internal prompt instructions, meta-headers, or structural directives (such as "Comparative sentence:", "System prompt instructions:", "Instructions:", "Rules:"). Never speak like a system prompt reading itself out loud. Embody the rules naturally and conversationally.
-• Do not adopt a defensive or meta-narrative tone (e.g., "According to my method...", "I won't elaborate because my routing is..."). Speak as a direct, objective thinking partner.
-
-When someone asks about your approach or tools, here's what you tell them — pick the parts that fit the question:
-
-• CARDO REI: your thinking method. Not a template. A way of working through problems out loud. Find the hinge → separate known from assumed → evaluate strength → identify what would flip the conclusion → smallest next move.
-
-• Night Shift: your adaptive routing system. You match each question to the right level of reasoning. Simple greetings get handled instantly for free. Complex reasoning gets deeper attention. You're cost-aware — the cheapest adequate path, not the most expensive by default.
-
-• Evidence tiers: you don't treat all information equally. Primary sources, strong evidence, things that need review, and family memory all get different weight.
-
-• CARDO GUARD: your quality gate. Before you commit to expensive reasoning, you check whether it's actually justified. You treat compute like a budget, not a free resource.
-
-• Fortis et Liber: your engineering philosophy. Seven principles that keep your outputs testable, reviewable, and grounded. Leverage (find the exact hinge). Surface area (minimal interfaces). Recoil (clear pushback). Enumeration (track everything). Parity (balanced). Solvency (complete the task). Conservation (right-sized effort).
-
-When the question is casual or playful (like "if jellyfish could talk" or "tell me something interesting"): match the tone. Be warm, be creative, have fun with it. 
-
-For casual conversation: be warm, thoughtful, and expansive. Provide rich, detailed explanations. Use the CARDO REI reasoning loop even for broad questions to showcase your structured thinking. Never give one-line answers unless it's a simple greeting. Provide deep analysis and elaborate fully on the topic.
-
-When you're being tested: welcome it. Show how you think. Expand on your methodology in detail.
-
-Important: respond in complete thoughts and elaborate on your reasoning. Never give short, terse answers or single-sentence deflections. If someone asks what makes you different, tell them concretely and expansively. If someone asks about your approach, explain CARDO REI deeply.
-
-Source rules: never cite "REI Documentation," "CARDO REI Method," or any internal source as a reference. Only cite a source if the user provided one or you can give a real URL. If asked how your routing works, give the comprehensive explanation: "I have a routing layer that matches your question to the right level of reasoning depth. Simple things get handled instantly. Complex things get more attention."`,
-  coding: `You are REI.ai, a senior software engineer executing the CARDO REI methodology. When answering coding requests, start with a clear, direct introductory sentence that addresses the prompt, then apply the CARDO REI framework: Facts (what the code currently does), Assumptions (environment expectations), Evaluation (why this approach works), What would change your mind (conditions that would alter the implementation), and Move (the concrete code change or next step). Ensure comparative or explanatory answers also begin with a concise opening sentence.
-
-## Phase 0 — The Questioning Stance (runs before any code is written)
-Before producing code for any non-trivial request, silently answer these. If you cannot answer in 1-2 sentences each, stop and ask the user instead of writing code:
-1. What is the real problem (not the symptom being described)?
-2. Who uses this, and in what context?
-3. What are the failure modes — bad input, network failure, race conditions?
-4. What existing code does this touch? What's the dependency surface?
-5. Is there a simpler existing solution — reuse over rewrite?
-6. What are the non-functional constraints (perf, memory, bundle size, accessibility, privacy)?
-7. How will this be verified before it's considered done?
-
-## HARD STOP RULE (Non-Negotiable)
-If you cannot answer 2+ Phase 0 questions, your response MUST follow this exact format:
-\`\`\`
-**STOP: Request underspecified**
-
-I cannot proceed without:
-
-1. [First unanswerable question]
-2. [Second unanswerable question]
-3. [Third unanswerable question] (if applicable)
-
-Please provide these details before I can generate any code.
-\`\`\`
-
-**FORBIDDEN:** No code snippets, no partial solutions, no hedging.
-**ALLOWED:** Only the questions, only the STOP declaration, only the required details list.
-
----
-
-## The CARDO REI Loop — 8 Stages
-
-### 1. COLLECT — Precision Contextualization
-- Find the exact call site, the exact import, the exact function — and read only that plus its immediate dependents.
-- Locate the Hinge: the smallest surface area where your change touches the existing system. Name it explicitly before writing code.
-- Treat documentation as a hypothesis. Verify against actual exported source when you have access. If you don't, say so explicitly.
-
-### 2. ANALYZE — Risk-Weighted Impact
-- Classify every change as High (core logic/data integrity), Medium (UI/UX), or Low (docs/comments).
-- State the blast radius: what else could break. For High-risk changes, propose a feature flag or staged rollout.
-- Ask explicitly: "What's the most likely way this breaks in production?"
-
-### 3. RECORD — Test-Driven Design
-- For non-trivial logic, produce tests at three layers: unit (edge cases), integration (real dependencies), E2E (user flow). If you can only produce one, say why.
-- Mock only at true boundaries (network, filesystem, time). Don't mock core logic you're trying to verify.
-- Never silently skip tests. If skipping, state it and why.
-
-### 4. DISTINGUISH — Fact vs. Assumption
-- Never write code against a guessed API shape. Verify or flag the line as unverified.
-- Distinguish compile-time failures from runtime failures — they need different handling.
-- Don't paper over uncertainty with any, @ts-expect-error, or silent try/catch. Surface it.
-
-### 5. ORGANIZE — Write for the Human
-- Functions: pure where possible, single-responsibility, ≤3 parameters (use options object beyond that).
-- Names reveal intent. Comments explain why, never what.
-- No magic numbers. React: stable unique keys, never array index.
-
-### 6. REVIEW — Adversarial Verification
-- After producing code, re-read your own diff as an adversarial reviewer would.
-- Call out untested branches. If something looks flaky, say so.
-
-### 7. EVALUATE — Resource Consciousness
-- Flag O(n²) on data that can grow. Note dependency weight when introducing packages.
-- Deliberately choosing simplicity over performance? Say so, and why it's right at this stage.
-
-### 8. ITERATE — Root-Cause Debugging
-- State the minimal reproduction before proposing a fix.
-- Distinguish symptom from root cause — articulate both.
-- After any fix, the full test suite must be considered, not just the one line that changed.
-
----
-
-## Senior X-Factors
-- Treat coding as a shared journey — warm, supportive, collaborative. Celebrate breakthroughs.
-- Ask "why" before implementing. If something looks like a symptom, say what the real problem might be.
-- Over-communicate trade-offs. Every response states what you chose not to do and why.
-- Bias toward small, shippable increments. If a request is large, propose how to split it.
-- Flag technical debt out loud instead of quietly working around it.
-- Self-critique before presenting. Catch your own mistakes.
-
----
-
-## Hard Constraints
-- Never present guessed code as verified. Inferring? Say so plainly.
-- Never skip Phase 0 silently. Answer or ask — no third option.
-- Never expand scope unasked. Fix what was asked; flag adjacent issues separately.
-- Boring beats clever, unless the user explicitly asks for a performance-critical solution and accepts the readability trade-off.`,
-  genealogy: `You are REI.ai, a genealogical research assistant executing the CARDO REI evidence-evaluation methodology. CARDO REI is Latin for finding the hinge of the problem—the core turning point (such as a disputed parentage, a same-name disambiguation, or a key birth record). Dissect records to isolate this pivot. Tier every claim explicitly: 🟢 Primary Source, 🔵 Strong Evidence, 🟠 Needs Review, 🟡 Family Memory. State your tier and reasoning inline with each claim.
-
-When answering genealogy queries, start with a concise introductory sentence that directly addresses the question, then follow the CARDO REI framework: Facts (what the record says), Assumptions (what you infer), Evaluation (how strong the evidence is), What would change your mind (which new record would overturn the conclusion), and Move (the next research step).
-
-Your reasoning is grounded in the Marchant Family Archive canonical profiles:
-1. **Charles Dyer**: Confirmed direct patriot ancestor. Honorably discharged September 25, 1778 after serving as a soldier in Captain William McKee's company of the 12th Virginia Regiment at Fort Randolph. Father of Jonathan Dyer (b. 1802). Disambiguation note: Not the William Dyer of the 15th Virginia (sick in Eastern Virginia).
-2. **William Moore**: Painter of Springwell Street, Ballymena, County Antrim. Married Isabella Law on March 29, 1846. Emigrated to Canada (Hull, Quebec) shortly after, then later to New York City by 1865. Father of James Moore (b. 1860) and Robert Harvey Moore.
-3. **Josiah Ramsey Sr.**: Born 1728 in Delaware Colony, died 1811 in Davidson, Tennessee. Confirmed North Carolina Militia Revolutionary War veteran with verified 1782 pay voucher. Married Alice Bower (1744, Delaware). Father of Josiah Ramsey Jr. (1769-1835).
-Dissect all queries regarding these lines against these verified facts. Do not allow oral family traditions or same-name duplicates to override these primary sources.`,
-  story: `You are REI.ai, a creative story architect using the CARDO REI narrative methodology. CARDO REI is Latin for finding the hinge of the story—the core turning point or character driver hinge (what each character actually wants and fears that pivots the arc). Dissect the narrative blueprint to isolate this hinge before expanding any outline.
-
-When answering story prompts, begin with a clear, direct opening sentence that addresses the request, then apply the CARDO REI framework: Facts (setting, characters), Assumptions (interpretive choices), Evaluation (why this direction works), What would change your mind (alternative pivots), and Move (the concrete next plot beat or outline step).
-
-Speak with direct narrative clarity, avoid cliché tropes, and structure clear structural timelines.`,
-};
-
-/**
- * resolveSystemPrompt — Resolves the system prompt for a given domain.
- * @param {string} systemPrompt - Explicit system prompt override
- * @param {string} domain - Domain identifier
- * @param {string} domainLabel - Domain label
- * @param {Array} domainRules - Domain-specific rules
- * @returns {string} Resolved system prompt
- */
-function resolveSystemPrompt(systemPrompt, domain, domainLabel, domainRules) {
-  if (domain && DOMAIN_SYSTEM_PROMPTS[domain]) {
-    return DOMAIN_SYSTEM_PROMPTS[domain];
-  }
-  if (systemPrompt && DOMAIN_SYSTEM_PROMPTS[systemPrompt]) {
-    return DOMAIN_SYSTEM_PROMPTS[systemPrompt];
-  }
-  return systemPrompt || REI_SYSTEM_PROMPT;
-}
-
-/**
- * buildPromptWithContext — Constructs a context-aware prompt with domain info.
- * @param {string} prompt - User query
- * @param {string} domainLabel - Domain label
- * @param {Array} domainRules - Domain-specific rules
- * @param {string} recordBlock - Additional record context
- * @returns {string} Formatted prompt with domain context
- */
-function buildPromptWithContext(prompt, domainLabel, domainRules, recordBlock) {
-  const label = domainLabel || "REI.ai";
-  const rules = Array.isArray(domainRules) ? domainRules.join(", ") : "";
-  const record = recordBlock || "";
-  const userQuery = prompt;
-  return `Domain: ${label}\nRules: ${rules}${record}\n\nUser Query: ${userQuery}`;
-}
-
-/**
- * selectGroqModel — Routes input to the appropriate LLM based on fingerprint analysis.
- * 
- * @param {string} prompt - User input to analyze
- * @param {Object} routerDecision - (Optional) Pre-computed routing decision
- * @returns {string} Model name (e.g., "gpt-4o", "llama-3.3-70b-versatile")
- * 
- * @example
- *   selectGroqModel("write a function")  // → "llama-3.3-70b-versatile" (fast)
- *   selectGroqModel("explain my bug", {model: "gpt-4o"})  // → "gpt-4o" (premium)
- */
 function selectGroqModel(prompt = "", routerDecision = null) {
   const decision = routerDecision || buildRouterDecision({ input: prompt });
   return resolveRoutingModel(decision) || DEFAULT_MODEL || "llama-3.3-70b-versatile";
 }
 
-/**
- * callGroqDirectly — Calls the Groq API (or OpenAI for premium routes) with the given prompt.
- * 
- * @param {string} prompt - The user's input/query
- * @param {string} systemPrompt - System message to prepend (defaults to REI_SYSTEM_PROMPT)
- * @param {Array} history - Previous conversation messages
- * @param {Object} routerDecision - (Optional) Pre-computed routing decision for model selection
- * @returns {Promise<Object>} Response containing content, model used, and usage stats
- * 
- * @example
- *   await callGroqDirectly("What is the capital of France?")
- *   // → { content: "The capital of France is Paris.", model: "llama-3.3-70b-versatile", usage: {...} }
- */
 async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerDecision = null) {
-  const isPremiumRoute =
-    routerDecision?.model === "gpt-4o" ||
-    routerDecision?.model?.startsWith("openai/") ||
-    routerDecision?.id === "adversarial-validation";
+  const isPremiumRoute = routerDecision?.model === "gpt-4o" || routerDecision?.id === "adversarial-validation";
   const isGptMode =
     isPremiumRoute ||
     prompt.toLowerCase().includes("proprietary model profiles") ||
@@ -284,11 +60,10 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
 
       if (response.ok) {
         const data = await response.json();
-      return {
-        content: data.choices?.[0]?.message?.content || "No content returned from OpenAI.",
-        model: "gpt-4o",
-        usage: data.usage ? normalizeUsage(data.usage) : null,
-      };
+        return {
+          content: data.choices?.[0]?.message?.content || "No content returned from OpenAI.",
+          model: "gpt-4o",
+        };
       }
     } catch (e) {
       console.warn("OpenAI API routing failed, falling back to Groq:", e);
@@ -296,11 +71,11 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   }
 
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey || apiKey.includes('your_groq_api_key_here')) {
+  if (!apiKey || apiKey.includes("your_groq_api_key_here")) {
     // No real key – return a mock response
     return {
       content: `[REI.AI NOTICE] GROQ_API_KEY not set or placeholder. Mock response for prompt: ${prompt}`,
-      model: 'mock',
+      model: "mock",
       routerDecision,
     };
   }
@@ -350,12 +125,11 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
         content = "[REI.AI NOTICE] Empty response received; defaulting to placeholder message.";
       }
 
-      if (isGptMode && !process.env.OPENAI_API_KEY && routerDecision) {
-        routerDecision.fallbackReason = "OPENAI_KEY_NOT_CONFIGURED";
-        routerDecision.fallbackNotice = `Frontier route executed via Open-Source Router (${selectedModel}).`;
+      if (isGptMode && !process.env.OPENAI_API_KEY) {
+        content = `[REI.AI ROUTING WARNING: OPENAI_API_KEY not found in Vercel. Falling back to Open-Source Router: ${selectedModel}]\n\n${content}`;
       }
 
-      return { content, model: selectedModel, routerDecision, usage: data.usage ? normalizeUsage(data.usage) : null };
+      return { content, model: selectedModel, routerDecision };
     }
 
     const errText = await response.text();
@@ -369,309 +143,31 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
 
   // Return a graceful user-facing message instead of throwing a 500.
   return {
-    content: `[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.`,
+    content: "[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.",
     model: "rate-limited",
     routerDecision,
     rateLimited: true,
   };
 }
 
-/**
- * handleRedTeamRequest — Processes red-team/adversarial inputs through the scanner pipeline.
- * @param {Object} options - Request options
- * @param {string} options.input - User input to scan
- * @param {Array} options.history - Conversation history
- * @param {Object} options.routerDecision - (Optional) Pre-computed routing decision
- * @returns {Promise<Object>} Red team scan results with verdict and findings
- */
-async function handleRedTeamRequest({ input, history = [], routerDecision = null }) {
-  const d1Result = scanRedTeamInput(input);
-
-  if (!d1Result.escalateToD2) {
-    return {
-      success: true,
-      result: {
-        verdict: d1Result.verdict,
-        score: d1Result.score,
-        dimensionsTriggered: ["D1"],
-        findings: d1Result.findings,
-        routingTrace: {
-          d1: {
-            confidence: d1Result.confidence,
-            escalated: false
-          }
-        },
-        cost: 0
-      },
-      model: "deterministic",
-      routerDecision,
-      timestamp: new Date().toISOString(),
-    };
-  }
-
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey || apiKey.includes('your_groq_api_key_here')) {
-    return {
-      success: true,
-      result: {
-        verdict: d1Result.verdict,
-        score: d1Result.score,
-        dimensionsTriggered: ["D1"],
-        findings: d1Result.findings,
-        routingTrace: {
-          d1: {
-            confidence: d1Result.confidence,
-            escalated: true,
-            d2Status: "no_api_key"
-          }
-        },
-        cost: 0
-      },
-      model: "mock",
-      routerDecision,
-      timestamp: new Date().toISOString(),
-    };
-  }
-
-  const d2Prompt = RED_TEAM_D2_PROMPT.replace("{{PROMPT}}", input);
-  const d2RequestBody = {
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      {
-        role: "system",
-        content: "You are REI D2 Semantic Judge. Return only valid JSON.",
-      },
-      {
-        role: "user",
-        content: d2Prompt,
-      }
-    ],
-    temperature: 0.1,
-    max_tokens: 1000,
-  };
-
-  let d2Findings = [];
-  let d2Cost = 0;
-
-  try {
-    const d2Response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(d2RequestBody),
-    });
-
-    if (d2Response.ok) {
-      const d2Data = await d2Response.json();
-      d2Cost = ((d2Data.usage?.prompt_tokens || 0) * 0.00059 + (d2Data.usage?.completion_tokens || 0) * 0.00079) / 1000;
-
-      try {
-        const d2Content = d2Data.choices?.[0]?.message?.content || "{}";
-        const d2Parsed = JSON.parse(d2Content);
-        d2Findings = d2Parsed.findings || [];
-      } catch (e) {
-        logger.warn("d2_parse_error", { error: e.message });
-      }
-    }
-  } catch (e) {
-    logger.warn("d2_api_error", { error: e.message });
-  }
-
-  const allFindings = [...d1Result.findings, ...d2Findings];
-  const finalVerdict = resolveVerdict(allFindings, { unresolvedSpans: [] });
-
-  return {
-    success: true,
-    result: {
-      ...finalVerdict,
-      routingTrace: {
-        d1: {
-          confidence: d1Result.confidence,
-          escalated: true
-        },
-        d2: {
-          findingsCount: d2Findings.length,
-          cost: d2Cost
-        }
-      },
-      cost: d2Cost
-    },
-    model: "llama-3.3-70b-versatile",
-    routerDecision,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-/**
- * handleCfaiRequest — Main request handler for CFai API. Routes through CLI or direct API calls.
- * 
- * @param {string} command - Command to execute (e.g., "chat", "eval", "route")
- * @param {Array} args - Command arguments
- * @param {string} input - User input/prompt
- * @param {string} systemPrompt - System message override
- * @param {Array} history - Conversation history
- * @param {Object} routerDecision - (Optional) Pre-computed routing decision
- * @param {string} domain - Domain context (e.g., "assistant", "genealogy", "coding")
- * @param {string} domainLabel - Label for the domain
- * @param {Array} domainRules - Domain-specific rules
- * @param {string} recordBlock - Additional context block
- * @returns {Promise<Object>} Response with result, model, usage, and metadata
- * 
- * @example
- *   await handleCfaiRequest("chat", [], "Write a Python function", "", [])
- *   // → { success: true, result: "Here's a Python function:", model: "llama-3.3-70b-versatile", ... }
- */
-async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null, domain = "", domainLabel = "", domainRules = [], recordBlock = "") {
-  const resolvedPrompt = resolveSystemPrompt(systemPrompt, domain, domainLabel, domainRules);
-  const payload = input || (args.length > 0 ? args.join(" ") : "help");
-
-  const detResult = resolveDeterministic(payload);
-  if (detResult) {
-    return {
-      success: true,
-      result: detResult.response,
-      model: "deterministic",
-      routerDecision: routerDecision,
-      usage: normalizeUsage({ total_tokens: 0 }),
-      timestamp: new Date().toISOString(),
-    };
-  }
-
-  const contextPayload = buildPromptWithContext(payload, domainLabel || domain, domainRules, recordBlock);
-
+async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null) {
   // Check if CLI is available locally
   const localCliExists = CFAI_PATH && fs.existsSync(CFAI_PATH);
 
   if (!localCliExists) {
     try {
       // Fallback: execute direct Groq API routing
-      const response = await callGroqDirectly(contextPayload, resolvedPrompt, history, routerDecision);
-
-      if (response.usage) {
-        logger.info("api_call", {
-          model: response.model,
-          prompt_tokens: response.usage.prompt_tokens,
-          completion_tokens: response.usage.completion_tokens,
-          total_tokens: response.usage.total_tokens,
-          prompt_tokens_details: response.usage.prompt_tokens_details || null,
-          route: routerDecision?.id || "unknown",
-          pathway: routerDecision?.pathway || "unknown",
-        });
-      }
-
-      const cleanResult = deRoboticize(response.content);
-
-      const paragraphs = cleanResult.split(/\n\n+/).filter(Boolean).length;
-      const sourceCitations = (cleanResult.match(/\([A-Za-zÀ-ÿ]+[^)]*\d{4}[^)]*\)/g) || []).length;
-      const depthWarning = paragraphs < 3 || sourceCitations < 2
-        ? `Depth: ${paragraphs} para, ${sourceCitations} sources — may be shallow`
-        : null;
-
-      if (response.rateLimited) {
-        return {
-          success: true,
-          result: cleanResult,
-          model: response.model,
-          routerDecision: response.routerDecision || routerDecision,
-          usage: null,
-          rateLimited: true,
-          timestamp: new Date().toISOString(),
-        };
-      }
-
-      // Existing shallow response check
-      if (depthWarning && response.model !== "gpt-4o" && routerDecision?.pathway !== "premium") {
-        logger.info("depth_escalation", {
-          originalModel: response.model,
-          depthWarning,
-          route: routerDecision?.id || "unknown",
-        });
-
-        const premiumDecision = {
-          ...routerDecision,
-          id: "depth-escalation",
-          model: "gpt-4o",
-          pathway: "premium",
-          escalatedByDepth: true,
-          rationale: "Depth gate: base model produced shallow response. Escalated to premium for quality.",
-        };
-
-        try {
-          const premiumResponse = await callGroqDirectly(contextPayload, resolvedPrompt, history, premiumDecision);
-
-          if (premiumResponse.model !== "gpt-4o") {
-            logger.warn("depth_escalation_fallback", {
-              actualModel: premiumResponse.model,
-              expectedModel: "gpt-4o",
-            });
-          }
-
-          if (!premiumResponse.rateLimited && premiumResponse.model === "gpt-4o") {
-            return {
-              success: true,
-              result: deRoboticize(premiumResponse.content),
-              model: premiumResponse.model,
-              routerDecision: premiumDecision,
-              usage: premiumResponse.usage || null,
-              depthEscalated: true,
-              depthEscalationReason: depthWarning,
-              timestamp: new Date().toISOString(),
-            };
-          }
-        } catch (e) {
-          logger.warn("depth_escalation_failed", { error: e.message });
-        }
-      }
-
-      // Additional CARDO section validation for structured reasoning responses
-      const cardoRequiredSections = [/Facts/i, /Assumptions/i, /Evaluation/i, /What would change your mind/i, /Move/i];
-      const hasAllCARDO = cardoRequiredSections.every((re) => re.test(cleanResult));
-      if (!hasAllCARDO && response.model !== "gpt-4o" && routerDecision?.pathway !== "premium") {
-        logger.info("cardo_section_escalation", {
-          originalModel: response.model,
-          missingSections: cardoRequiredSections.filter((re) => !re.test(cleanResult)).map((re) => re.source),
-          route: routerDecision?.id || "unknown",
-        });
-
-        const cardoDecision = {
-          ...routerDecision,
-          id: "cardo-section-escalation",
-          model: "gpt-4o",
-          pathway: "premium",
-          escalatedByCARDO: true,
-          rationale: "Missing CARDO REI sections in response; escalated to premium for completeness.",
-        };
-        try {
-          const cardoResponse = await callGroqDirectly(contextPayload, resolvedPrompt, history, cardoDecision);
-          if (!cardoResponse.rateLimited && cardoResponse.model === "gpt-4o") {
-            return {
-              success: true,
-              result: deRoboticize(cardoResponse.content),
-              model: cardoResponse.model,
-              routerDecision: cardoDecision,
-              usage: cardoResponse.usage || null,
-              cardoEscalated: true,
-              cardoEscalationReason: "Missing CARDO sections",
-              timestamp: new Date().toISOString(),
-            };
-          }
-        } catch (e) {
-          logger.warn("cardo_section_escalation_failed", { error: e.message });
-        }
-      }
+      const payload = input || (args.length > 0 ? args.join(" ") : "help");
+      const response = await callGroqDirectly(payload, systemPrompt, history, routerDecision);
       return {
         success: true,
-        result: cleanResult,
+        result: response.content,
         model: response.model,
         routerDecision: response.routerDecision || routerDecision,
-        usage: response.usage || null,
-        depthWarning,
         timestamp: new Date().toISOString(),
       };
     } catch (apiError) {
-      console.error('handleCfaiRequest apiError:', apiError);
+      console.error("handleCfaiRequest apiError:", apiError);
       return {
         success: false,
         error: `CLI fallback error: ${apiError.message}`,
@@ -695,52 +191,35 @@ async function handleCfaiRequest(command, args = [], input = "", systemPrompt = 
         success: true,
         result: stdout.trim(),
         warning: stderr.trim(),
-        routerDecision: routerDecision,
         timestamp: new Date().toISOString(),
       };
     }
 
-      // Ensure stdout is not empty; provide fallback message
-      const trimmedStdout = stdout.trim();
-      const resultText = trimmedStdout.length > 0 ? trimmedStdout : "[REI.AI NOTICE] Empty CLI response; defaulting to placeholder.";
-      return {
-        success: true,
-        result: resultText,
-        routerDecision: routerDecision,
-        model: routerDecision?.model || "cli",
-        timestamp: new Date().toISOString(),
-      };
+    // Ensure stdout is not empty; provide fallback message
+    const trimmedStdout = stdout.trim();
+    const resultText = trimmedStdout.length > 0 ? trimmedStdout : "[REI.AI NOTICE] Empty CLI response; defaulting to placeholder.";
+    return {
+      success: true,
+      result: resultText,
+      timestamp: new Date().toISOString(),
+    };
   } catch (execError) {
     return {
       success: false,
       error: `Local execution error: ${execError.message}`,
-      routerDecision: routerDecision,
       timestamp: new Date().toISOString(),
     };
   }
 }
 
-/**
- * handler — Vercel API route handler for CFai requests.
- * @param {Object} req - HTTP request object
- * @param {Object} res - HTTP response object
- * @returns {void} Sends JSON response
- */
 export default async function handler(req, res) {
   try {
-    // Set headers for JSON response
+    // Set headers
     res.setHeader("Content-Type", "application/json");
 
     if (req.method === "POST") {
-      const { command, args = [], input = "", systemPrompt = "", history = [], routerDecision, domain, domainLabel, domainRules, recordBlock } = req.body || {};
-
-      // Red Team domain — handle separately
-      if (domain === "red-team") {
-        const result = await handleRedTeamRequest({ input, history, routerDecision });
-        res.status(200).json(result);
-        return;
-      }
-
+      const { command, args = [], input = "", systemPrompt = "", history = [], routerDecision } = req.body || {};
+      
       // Backend length guard - never trust client-side validation alone
       if (typeof input === "string" && input.length > MAX_INPUT_CHARS) {
         return res.status(400).json({
@@ -749,7 +228,7 @@ export default async function handler(req, res) {
         });
       }
       
-      const result = await handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision, domain, domainLabel, domainRules, recordBlock);
+      const result = await handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision);
       res.status(result.success ? 200 : 500).json(result);
       return;
     }
@@ -771,7 +250,7 @@ export default async function handler(req, res) {
     });
     return;
   } catch (error) {
-    console.error('Handler caught error stack:', error.stack);
+    console.error("Handler caught error stack:", error.stack);
     res.status(500).json({
       success: false,
       error: "Serverless execution error",

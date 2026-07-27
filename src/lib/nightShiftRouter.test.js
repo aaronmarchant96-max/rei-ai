@@ -31,17 +31,17 @@ describe("nightShiftRouter", () => {
   });
 
   it("routes genealogy prompts to the evidence-tier path", () => {
-   const decision = buildRouterDecision({ input: "Did this ancestor marry in 1846 and which record is strongest?", domain: "assistant" });
+    const decision = buildRouterDecision({ input: "Did this ancestor marry in 1846 and which record is strongest?", domain: "assistant" });
 
-   expect(decision.id).toBe("genealogy-deep-dive");
-   expect(decision.enforce).toBe("EVIDENCE_TIERS");
+    expect(decision.id).toBe("genealogy-deep-dive");
+    expect(decision.enforce).toBe("EVIDENCE_TIERS");
   });
 
   it("routes evidence-heavy genealogy prompts using catalog keyword matches", () => {
-   const decision = buildRouterDecision({ input: "Which burial record is strongest for this family line?", domain: "assistant" });
+    const decision = buildRouterDecision({ input: "Which burial record is strongest for this family line?", domain: "assistant" });
 
-   expect(decision.id).toBe("genealogy-deep-dive");
-   expect(decision.enforce).toBe("EVIDENCE_TIERS");
+    expect(decision.id).toBe("genealogy-deep-dive");
+    expect(decision.enforce).toBe("EVIDENCE_TIERS");
   });
 
   it("routes adversarial prompts to the red team surface scan path", () => {
@@ -74,6 +74,20 @@ describe("nightShiftRouter", () => {
     const decision = buildRouterDecision({ input: "Can you help me review this family record?", domain: "assistant" });
 
     expect(decision.id).toBe("genealogy-deep-dive");
+  });
+
+  it("routes operational maintenance questions to structured reasoning domain", () => {
+    const pumpDecision = buildRouterDecision({ input: "We have a vibration sensor on a critical pump showing a 49% increase above baseline, but a new AI risk score says the probability of failure is only 23%. Should I schedule a shutdown, or can I wait until the next planned outage?", domain: "assistant" });
+
+    expect(pumpDecision.id).toBe("structured-reasoning");
+    expect(pumpDecision.qualityGate).toContain("Hinge + Facts + Move");
+  });
+
+  it("routes architecture/technical-debt decisions to structured reasoning domain", () => {
+    const architectureDecision = buildRouterDecision({ input: "I'm the CTO of a mid-sized SaaS company. Our legacy monolith app has a 15% annual chance of a major security breach, which would cost us $2M to clean up. Rewriting it into microservices would cost $200k upfront, but it would drop the breach probability to 2%. Should we rewrite, or keep patching the monolith?", domain: "assistant" });
+
+    expect(architectureDecision.id).toBe("structured-reasoning");
+    expect(architectureDecision.qualityGate).toContain("Hinge + Facts + Move");
   });
 
   it("falls back to the balanced reasoning profile for unclassified prompts", () => {

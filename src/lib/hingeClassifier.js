@@ -9,20 +9,8 @@
 
 import { scanRedTeamInput } from "./redTeamScanner.js";
 import trainedWeightsArtifact from "../../data/ml/ecs_weights.json" with { type: "json" };
+import { UNCERTAINTY_TERMS, HIGH_STRUCTURE_TERMS } from "./routingConstants.js";
 
-const UNCERTAINTY_TERMS = ["uncertain", "unclear", "missing", "unknown", "not sure", "unsure", "doubt", "uncertainty"];
-const HIGH_STRUCTURE_TERMS = [
-  "what am i missing",
-  "what would change my mind",
-  "what would make this wrong",
-  "real hinge",
-  "how do i know",
-  "how reliable",
-  "prove it wrong",
-  "why is this uncertain",
-  "what evidence",
-  "what matters most",
-];
 const CONDITIONAL_TERMS = ["if", "unless", "assuming", "given that", "provided that", "in case", "supposing"];
 const COMPARISON_TERMS = ["compare", "versus", "vs", "weigh", "trade-off", "tradeoff", "difference", "better", "worse"];
 const NEGATION_TERMS = ["not", "never", "without", "except", "neither", "nor", "lack", "lacking"];

@@ -65,9 +65,9 @@ function isGenericDebate(debate) {
     ...(Array.isArray(debate.changeB) ? debate.changeB : []),
     ...(Array.isArray(debate.rounds)
       ? debate.rounds.flatMap((round) => {
-          if (Array.isArray(round)) return round;
-          return [round?.aArg, round?.bArg];
-        })
+        if (Array.isArray(round)) return round;
+        return [round?.aArg, round?.bArg];
+      })
       : []),
   ];
 
