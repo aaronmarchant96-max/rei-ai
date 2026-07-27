@@ -17,6 +17,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
         <div className="rei-router-badge" style={{ marginBottom: "6px" }}>
           <span style={{ fontSize: "11px" }}>⚡</span>
           <span>{msg.rawJson.routerDecision.label}</span>
+          <span style={{ margin: "0 2px" }}>·</span>
           <span style={{ color: "#f0c965", fontWeight: 700 }}>
             {msg.rawJson.routerDecision.model}
           </span>

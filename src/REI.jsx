@@ -71,7 +71,7 @@ export function buildDomainSystemMessage(domainId, currentDomain) {
   const domainDescription = currentDomain?.description || "reasoning assistant";
 
   if (domainId === "assistant") {
-    return `System initialized. ${getAssistantWelcomeCopy()}`;
+    return "Hey! I'm REI — The Generalist. I use the CARDO framework to help you think through problems, separate facts from assumptions, and find the hinge that changes the answer. What's on your mind?";
   }
 
   const domainConfig = getDomain(domainId);
@@ -389,7 +389,7 @@ Limitations:
  
         {/* Domain selection tab strip */}
         <div className="rei-domain-tabs">
-          {DOMAIN_PROFILES.filter((dom) => ["assistant", "coding", "red-team"].includes(dom.id)).map((dom) => (
+          {DOMAIN_PROFILES.map((dom) => (
             <button
               key={dom.id}
               type="button"

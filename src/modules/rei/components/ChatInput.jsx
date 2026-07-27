@@ -11,8 +11,8 @@ export default function ChatInput() {
   ];
 
   return (
-    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40 }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: "12px 16px 16px", background: "rgba(10, 12, 18, 0.92)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(240, 201, 101, 0.12)" }}>
+      <div style={{ maxWidth: "960px", margin: "0 auto" }}>
         {selectedDomain === "assistant" && (
           <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px" }}>
             {quickPrompts.map((item) => (
@@ -67,6 +67,9 @@ export default function ChatInput() {
             </button>
           </div>
         </form>
+        <div style={{ textAlign: "center", marginTop: "8px", fontSize: "10px", color: "rgba(148, 163, 184, 0.4)" }}>
+          ⚡ Night Shift v3 · cost-aware routing active · Shift + Enter for new line
+        </div>
       </div>
     </div>
   );
