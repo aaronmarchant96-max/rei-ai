@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-07-25T02:30:37.707Z",
+  "architecture": "Night Shift v3 Unified Hinge Classifier",
+  "datasetSize": 73,
+  "finalMseLoss": 0.020076,
+  "weights": {
+    "w0": -0.8617,
+    "w1": 0.1307,
+    "w2": 0.0295,
+    "w3": 0.0049,
+    "w4": 0.0273,
+    "w5": 0.0031,
+    "w6": 0.0581,
+    "w7": 0.0173,
+    "w8": 0,
+    "w_das": 1.9716,
+    "w_aps": 0.7401
+  }
+}

@@ -1,12 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useMobile, useSwipe } from "./useMobile.js";
-import DebateFurnace from "./DebateFurnace.jsx";
-import CreativeEngine from "./CreativeEngine.jsx";
-import StormReplay from "./StormReplay.jsx";
-import CardoGuard from "./CardoGuard.jsx";
-import REI from "./REI.jsx";
-import Tracepoint from "./Tracepoint.jsx";
-import ToolsLanding from "./ToolsLanding.jsx";
+
+const DebateFurnace = lazy(() => import("./DebateFurnace.jsx"));
+const CreativeEngine = lazy(() => import("./CreativeEngine.jsx"));
+const StormReplay = lazy(() => import("./StormReplay.jsx"));
+const CardoGuard = lazy(() => import("./CardoGuard.jsx"));
+const REI = lazy(() => import("./REI.jsx"));
+const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
+const ToolsLanding = lazy(() => import("./ToolsLanding.jsx"));
+
+function LoadingShell() {
+  return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+      <div style={{ color: "#fb923c", fontSize: "14px", fontWeight: 600 }}>Loading…</div>
+    </div>
+  );
+}
 
 const TOP_LEVEL = [
   {
@@ -86,6 +95,7 @@ function getToolLabel(tool) {
 export default function AppShell() {
   const [tool, setTool] = useState(getInitialTool);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [reiInitialPrompt, setReiInitialPrompt] = useState(null);
   const mobile = useMobile(45); // 45em = 720px
 
   // Swipe handlers for mobile drawer
@@ -234,8 +244,12 @@ export default function AppShell() {
       ) : null}
 
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
+        <Suspense fallback={<LoadingShell />}>
         {tool === "tools" ? (
-          <ToolsLanding onOpenTool={setTool} />
+          <ToolsLanding onOpenTool={({ tool: t, prompt }) => {
+            setReiInitialPrompt(prompt || null);
+            setTool(t);
+          }} />
         ) : tool === "story-forge" ? (
           <CreativeEngine />
         ) : tool === "storm-replay" ? (
@@ -243,14 +257,15 @@ export default function AppShell() {
         ) : tool === "cardo-guard" ? (
           <CardoGuard />
         ) : tool === "rei" ? (
-          <REI />
+          <REI initialPrompt={reiInitialPrompt} />
         ) : tool === "tracepoint" ? (
           <Tracepoint />
         ) : tool === "cfai" ? (
-          <REI />
+          <REI initialPrompt={reiInitialPrompt} />
         ) : (
           <DebateFurnace />
         )}
+        </Suspense>
       </main>
     </div>
   );

@@ -1,0 +1,257 @@
+[
+  {
+    "id": "donoghue-v-stevenson",
+    "name": "Donoghue v Stevenson",
+    "year": 1932,
+    "court": "House of Lords",
+    "citation": "[1932] AC 562",
+    "hinge": "Whether a manufacturer owes a duty of care to the ultimate consumer absent contractual privity",
+    "holding": "A manufacturer owes a duty of care to the ultimate consumer — established the 'neighbour principle'",
+    "outcomeDeterminativeFact": "The bottle was opaque, so no one had a chance to inspect it before consumption",
+    "keyFacts": [
+      "A decomposed snail was found in a bottle of ginger beer",
+      "The bottle was opaque, preventing visual inspection",
+      "The plaintiff was not the purchaser — a friend bought the drink for her",
+      "No contract existed between the manufacturer and the plaintiff"
+    ],
+    "ruleEstablished": "Neighbour principle: you must take reasonable care to avoid acts or omissions which you can reasonably foresee would be likely to injure your neighbour",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": [],
+    "distinguishedFrom": ["winterbottom-v-wright"]
+  },
+  {
+    "id": "winterbottom-v-wright",
+    "name": "Winterbottom v Wright",
+    "year": 1842,
+    "court": "Court of Exchequer",
+    "citation": "(1842) 10 M&W 109",
+    "hinge": "Whether a party outside a contract can sue in negligence over a defective product",
+    "holding": "No duty of care exists absent contractual privity — a third party injured by a defective product cannot recover in tort",
+    "outcomeDeterminativeFact": "The plaintiff was a mail coach driver, not a party to the contract between the Postmaster-General and the coach supplier",
+    "keyFacts": [
+      "The plaintiff was employed by the Postmaster-General to drive mail coaches",
+      "The defendant contracted with the Postmaster-General to supply and maintain coaches",
+      "A coach collapsed due to a latent defect, injuring the driver",
+      "No contract existed between the driver and the supplier"
+    ],
+    "ruleEstablished": "Privity of contract required for a duty of care (later displaced in product liability by Donoghue)",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": [],
+    "displacedInContextBy": ["donoghue-v-stevenson"]
+  },
+  {
+    "id": "carlill-v-carbolic-smoke-ball",
+    "name": "Carlill v Carbolic Smoke Ball Co",
+    "year": 1893,
+    "court": "Court of Appeal",
+    "citation": "[1893] 1 QB 256",
+    "hinge": "Whether a public advertisement can constitute a binding unilateral offer",
+    "holding": "Yes — a public advertisement can be a binding unilateral offer where the advertiser's language shows serious intent, and performance of the requested act constitutes acceptance",
+    "outcomeDeterminativeFact": "The company's own advertisement stated that £1,000 was deposited with a specific bank to show sincerity of the offer",
+    "keyFacts": [
+      "The Carbolic Smoke Ball Co advertised a reward of £100 to anyone who used their product and still caught influenza",
+      "The advertisement stated £1,000 was deposited with the Alliance Bank to show sincerity",
+      "Mrs Carlill used the smoke ball as directed and caught influenza",
+      "The company argued the advertisement was mere 'puff' and not a serious offer"
+    ],
+    "ruleEstablished": "A unilateral offer can be accepted by performance without prior notification where the terms clearly demonstrate an intention to be bound",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": []
+  },
+  {
+    "id": "marbury-v-madison",
+    "name": "Marbury v Madison",
+    "year": 1803,
+    "court": "United States Supreme Court",
+    "citation": "5 U.S. (1 Cranch) 137",
+    "hinge": "Whether the Supreme Court has the power to declare an act of Congress unconstitutional",
+    "holding": "Yes — the Supreme Court has the power of judicial review to strike down laws that conflict with the Constitution",
+    "outcomeDeterminativeFact": "Section 13 of the Judiciary Act of 1789 purported to expand the Supreme Court's original jurisdiction beyond what Article III of the Constitution permits",
+    "keyFacts": [
+      "William Marbury was appointed as a justice of the peace in the final days of the Adams administration",
+      "His commission was not delivered before the new administration took office",
+      "Marbury petitioned the Supreme Court directly for a writ of mandamus to compel delivery",
+      "The Court found that Marbury was entitled to the commission, but the Court lacked jurisdiction"
+    ],
+    "ruleEstablished": "It is emphatically the province and duty of the judicial department to say what the law is — established judicial review",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": [],
+    "foundational": true
+  },
+  {
+    "id": "brown-v-board-of-education",
+    "name": "Brown v Board of Education",
+    "year": 1954,
+    "court": "United States Supreme Court",
+    "citation": "347 U.S. 483",
+    "hinge": "Whether segregated public schools violate the Equal Protection Clause of the Fourteenth Amendment",
+    "holding": "Separate educational facilities are inherently unequal and violate the Equal Protection Clause — overruled Plessy v Ferguson's 'separate but equal' doctrine as applied to education",
+    "outcomeDeterminativeFact": "The psychological evidence (doll studies) showed segregation instilled a sense of inferiority in Black children that affected their educational opportunity",
+    "keyFacts": [
+      "Black children were denied admission to white public schools under state laws permitting racial segregation",
+      "The cases were consolidated from Kansas, South Carolina, Virginia, Delaware, and the District of Columbia",
+      "Expert psychological testimony demonstrated the harmful effects of segregation on children",
+      "The 'separate but equal' doctrine from Plessy v Ferguson (1896) had been the controlling precedent"
+    ],
+    "ruleEstablished": "In the field of public education, the doctrine of 'separate but equal' has no place — separate educational facilities are inherently unequal",
+    "overruled": ["plessy-v-ferguson"],
+    "affirmedBy": [],
+    "limitedBy": [],
+    "foundational": true
+  },
+  {
+    "id": "rylands-v-fletcher",
+    "name": "Rylands v Fletcher",
+    "year": 1868,
+    "court": "House of Lords",
+    "citation": "(1868) LR 3 HL 330",
+    "hinge": "Whether a landowner is strictly liable when something they bring onto their land escapes and causes harm",
+    "holding": "Yes — a person who brings onto their land something likely to do mischief if it escapes is strictly liable for all damage that is the natural consequence of its escape, regardless of negligence",
+    "outcomeDeterminativeFact": "The defendants employed independent contractors to build a reservoir, and the contractors failed to seal disused mine shafts — water escaped into the plaintiff's mine",
+    "keyFacts": [
+      "Rylands built a reservoir on his land to supply water to his mill",
+      "Unknown to him, the site contained disused mine shafts connected to Fletcher's adjoining mine",
+      "The contractors failed to properly seal the shafts",
+      "Water from the reservoir flooded Fletcher's mine"
+    ],
+    "ruleEstablished": "Strict liability for non-natural use of land — a person who brings or keeps a dangerous thing on their land is liable for damage caused by its escape",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": [],
+    "doctrine": "rule-in-rylands-v-fletcher"
+  },
+  {
+    "id": "palsgraf-v-long-island-rr",
+    "name": "Palsgraf v Long Island Railroad Co.",
+    "year": 1928,
+    "court": "New York Court of Appeals",
+    "citation": "248 N.Y. 339, 162 N.E. 99",
+    "hinge": "Whether a defendant owes a duty of care to a plaintiff who was not within the foreseeable zone of danger",
+    "holding": "No duty is owed to an unforeseeable plaintiff — the orbit of the danger as perceived by a reasonable person defines the scope of duty (Cardozo, majority)",
+    "outcomeDeterminativeFact": "The railroad guards could not reasonably foresee that a dropped package of fireworks would explode and cause a scale to tip over on a passenger standing at the far end of the platform",
+    "keyFacts": [
+      "Two guards helped a passenger board a moving train",
+      "The passenger dropped a package wrapped in newspaper",
+      "The package contained fireworks, which exploded on impact",
+      "The explosion caused scales at the far end of the platform to fall onto Mrs. Palsgraf",
+      "No one (including the guards) knew the package contained fireworks"
+    ],
+    "ruleEstablished": "Negligence requires a duty to the specific plaintiff — 'the risk reasonably to be perceived defines the duty to be obeyed' (Cardozo). Andrews' dissent argued that proximate cause, not duty, was the correct framework.",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": [],
+    "notableDissent": "Judge Andrews — argued the focus should be on proximate causation ('was the harm a natural and probable consequence?'), not on duty to the specific plaintiff"
+  },
+  {
+    "id": "miranda-v-arizona",
+    "name": "Miranda v Arizona",
+    "year": 1966,
+    "court": "United States Supreme Court",
+    "citation": "384 U.S. 436",
+    "hinge": "Whether statements obtained during custodial interrogation are admissible without the suspect having been informed of the right to remain silent and the right to counsel",
+    "holding": "No — the Fifth Amendment privilege against self-incrimination requires that a person taken into custody be warned that they have the right to remain silent, that anything they say can be used against them, that they have the right to an attorney, and that an attorney will be appointed if they cannot afford one",
+    "outcomeDeterminativeFact": "Miranda was interrogated for two hours in police custody without being informed of his constitutional rights",
+    "keyFacts": [
+      "Ernesto Miranda was arrested and taken into police custody for questioning",
+      "After two hours of interrogation, he signed a written confession",
+      "At no point was Miranda told he had the right to remain silent or to have an attorney",
+      "His confession was used at trial and he was convicted",
+      "The prosecution conceded Miranda was not advised of his rights"
+    ],
+    "ruleEstablished": "Procedural safeguards are necessary to secure the Fifth Amendment privilege against self-incrimination — police must give the now-famous 'Miranda warning' before custodial interrogation",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": ["dickerson-v-united-states"],
+    "doctrine": "miranda-warnings"
+  },
+  {
+    "id": "gideon-v-wainwright",
+    "name": "Gideon v Wainwright",
+    "year": 1963,
+    "court": "United States Supreme Court",
+    "citation": "372 U.S. 335",
+    "hinge": "Whether the Sixth Amendment right to counsel in criminal cases applies to state courts through the Fourteenth Amendment",
+    "holding": "Yes — the right to counsel is fundamental and essential to a fair trial; states must provide attorneys for indigent defendants in felony cases",
+    "outcomeDeterminativeFact": "Clarence Earl Gideon, too poor to hire a lawyer, was forced to represent himself at trial, cross-examine witnesses, and make legal arguments without any legal training",
+    "keyFacts": [
+      "Gideon was charged with breaking and entering a pool hall",
+      "He asked the trial judge to appoint a lawyer because he could not afford one",
+      "The judge refused — Florida law only allowed appointed counsel in capital cases",
+      "Gideon defended himself and was convicted",
+      "From prison, he hand-wrote a petition to the Supreme Court"
+    ],
+    "ruleEstablished": "The right of an indigent defendant to appointed counsel is a fundamental right essential to a fair trial, incorporated against the states via the Fourteenth Amendment. Overruled Betts v Brady (1942).",
+    "overruled": ["betts-v-brady"],
+    "affirmedBy": [],
+    "limitedBy": [],
+    "foundational": true
+  },
+  {
+    "id": "nyt-v-sullivan",
+    "name": "New York Times Co. v Sullivan",
+    "year": 1964,
+    "court": "United States Supreme Court",
+    "citation": "376 U.S. 254",
+    "hinge": "Whether a public official can recover damages for a defamatory falsehood relating to official conduct without proving the statement was made with 'actual malice'",
+    "holding": "No — the First and Fourteenth Amendments require a public official suing for defamation to prove actual malice: that the statement was made with knowledge of its falsity or with reckless disregard for whether it was true or false",
+    "outcomeDeterminativeFact": "The advertisement contained minor factual errors (e.g., students sang 'My Country 'Tis of Thee' not the National Anthem) that were not material to the core criticism of police conduct",
+    "keyFacts": [
+      "Civil rights activists published a full-page ad in the NYT describing police actions against protesters in Montgomery, Alabama",
+      "The ad contained several minor factual inaccuracies",
+      "L.B. Sullivan, the Montgomery police commissioner, sued for libel even though he was not named in the ad",
+      "An Alabama jury awarded Sullivan $500,000",
+      "The actual number of times police 'ringed' the campus was wrong; the song students sang was wrong"
+    ],
+    "ruleEstablished": "The First Amendment protects criticism of public officials — a public official cannot recover damages for defamation absent proof of 'actual malice' (knowledge of falsity or reckless disregard for the truth)",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": [],
+    "doctrine": "actual-malice-standard"
+  },
+  {
+    "id": "plessy-v-ferguson",
+    "name": "Plessy v Ferguson",
+    "year": 1896,
+    "court": "United States Supreme Court",
+    "citation": "163 U.S. 537",
+    "hinge": "Whether a state law mandating separate railway cars for Black and white passengers violates the Equal Protection Clause of the Fourteenth Amendment",
+    "holding": "No — 'separate but equal' accommodations do not violate the Equal Protection Clause. The Fourteenth Amendment was not intended to abolish distinctions based on color or to enforce social equality",
+    "outcomeDeterminativeFact": "The Court reasoned that enforced separation does not stamp either race with a badge of inferiority — if members of the affected race feel inferior, 'it is not by reason of anything found in the act, but solely because the colored race chooses to put that construction upon it'",
+    "keyFacts": [
+      "Homer Plessy, who was seven-eighths white, boarded a white-only railway car in Louisiana",
+      "He was arrested under Louisiana's Separate Car Act (1890)",
+      "Plessy argued the law violated the Thirteenth and Fourteenth Amendments",
+      "The Court upheld the Louisiana law 7-1 (Justice Harlan dissented)"
+    ],
+    "ruleEstablished": "The 'separate but equal' doctrine — racial segregation is constitutional as long as the separate facilities are equal. Overruled by Brown v Board of Education (1954).",
+    "overruledBy": ["brown-v-board-of-education"],
+    "affirmedBy": [],
+    "limitedBy": [],
+    "notableDissent": "Justice John Marshall Harlan — 'Our constitution is color-blind, and neither knows nor tolerates classes among citizens.' The majority's holding will prove as 'pernicious' as Dred Scott."
+  },
+  {
+    "id": "chevron-v-nrdc",
+    "name": "Chevron U.S.A., Inc. v Natural Resources Defense Council, Inc.",
+    "year": 1984,
+    "court": "United States Supreme Court",
+    "citation": "467 U.S. 837",
+    "hinge": "Whether courts must defer to a federal agency's reasonable interpretation of an ambiguous statute the agency administers",
+    "holding": "Yes — established 'Chevron deference': Step 1 — if the statute is clear, that is the end of the matter; Step 2 — if the statute is ambiguous, the court must defer to the agency's reasonable interpretation",
+    "outcomeDeterminativeFact": "Congress had not directly addressed whether a 'stationary source' under the Clean Air Act meant each individual smokestack or an entire industrial plant — the EPA interpreted it as the latter, and the Court held that was a permissible construction of the ambiguous term",
+    "keyFacts": [
+      "The Clean Air Act required states to regulate 'stationary sources' of pollution",
+      "The EPA interpreted this to mean an entire industrial plant could be treated as one source (the 'bubble concept')",
+      "The NRDC argued each individual emission point within a plant was a separate source",
+      "The Court found Congress had not clearly defined the term"
+    ],
+    "ruleEstablished": "Courts apply a two-step framework when reviewing agency interpretations: (1) if Congress has spoken clearly, that controls; (2) if the statute is ambiguous, courts defer to the agency's reasonable interpretation — called 'Chevron deference'",
+    "overruled": null,
+    "affirmedBy": [],
+    "limitedBy": ["lodgervs"],
+    "doctrine": "chevron-deference"
+  }
+]

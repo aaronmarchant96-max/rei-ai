@@ -37,7 +37,7 @@
     "qualityGate": "Phase 0 + HARD STOP",
     "enforce": "HARD_STOP",
     "description": "Coding tasks that need clarification, root-cause analysis, and explicit verification.",
-    "matchTerms": ["implement", "build", "debug", "fix", "refactor", "function", "component", "module", "api", "jest", "vite", "react", "node", "typescript", "javascript", "python", "test", "patch", "class", "service", "hook", "route"],
+    "matchTerms": ["implement", "debug", "fix", "refactor", "function", "component", "module", "api", "jest", "vite", "react", "node", "typescript", "javascript", "python", "test", "patch", "class", "service", "hook", "route", "next.js", "tailwind", "express", "middleware", "build.script", "build.error", "build.target"],
     "temperature": 0.3,
     "fallbackPriority": "structured-reasoning"
   },
@@ -51,7 +51,7 @@
     "qualityGate": "Evidence tiers + citations",
     "enforce": "EVIDENCE_TIERS",
     "description": "Genealogy, archival record analysis, and evidence-tiered reasoning.",
-    "matchTerms": ["ancestor", "descendant", "birth", "death", "marriage", "census", "familysearch", "find a grave", "pedigree", "genealogy", "lineage", "archive", "parish", "baptism", "burial", "probate", "will", "surname", "provenance", "citation", "source"],
+    "matchTerms": ["ancestor", "descendant", "birth", "death", "marriage", "census", "familysearch", "find a grave", "pedigree", "genealogy", "lineage", "archive", "parish", "baptism", "burial", "probate", "surname", "provenance", "citation", "source"],
     "temperature": 0.2,
     "fallbackPriority": "structured-reasoning"
   },
@@ -81,6 +81,20 @@
     "description": "High-stakes critique, adversarial review, or stress-testing.",
     "matchTerms": ["red team", "red-team", "adversarial", "stress test", "attack", "challenge", "prove wrong", "counterargument", "break it", "stress-test"],
     "temperature": 0.1,
+    "fallbackPriority": "structured-reasoning"
+  },
+  {
+    "id": "legal-hinge",
+    "jobType": "legal-hinge",
+    "label": "Legal Hinge",
+    "model": "llama-3.3-70b-versatile",
+    "maxTokens": 700,
+    "costPer1k": 1.0,
+    "qualityGate": "Verified-index check + hinge-before-holding",
+    "enforce": null,
+    "description": "Case analysis grounded in the verified precedent index — flags anything outside it as unverified.",
+    "matchTerms": ["precedent", "holding", "dicta", "plaintiff", "defendant", "tort", "statute", "case law", "court held", "ruling", "litigation", "overruled", "distinguish", "donoghue", "winterbottom", "carlill", "marbury", "brown v board", "rylands", "judicial review", "duty of care"],
+    "temperature": 0.2,
     "fallbackPriority": "structured-reasoning"
   }
 ]

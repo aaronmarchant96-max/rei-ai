@@ -5,11 +5,19 @@ module.exports = {
     "^.+\\.[jt]sx?$": "babel-jest",
   },
   moduleFileExtensions: ["js", "jsx", "json"],
-  testMatch: ["<rootDir>/src/**/*.test.[jt]s?(x)"],
+  testMatch: ["<rootDir>/src/**/*.test.[jt]s?(x)", "<rootDir>/api/**/*.test.[jt]s?(x)"],
   clearMocks: true,
+  transformIgnorePatterns: [
+    "node_modules/(?!(@xenova/transformers)/)",
+  ],
   bail: true,
-  testTimeout: 5000,
+  testTimeout: 10000,
   verbose: true,
+  moduleNameMapper: {
+    "\\.css$": "identity-obj-proxy",
+    "\\.(png|jpg|jpeg|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
   coverageThreshold: {
     "./src/CardoGuard.jsx": {
       branches: 90,

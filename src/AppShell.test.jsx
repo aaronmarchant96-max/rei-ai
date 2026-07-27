@@ -28,7 +28,9 @@ describe("AppShell", () => {
     await waitFor(() => {
       expect(document.title).toBe("PromptHound Labs | Tools");
     });
-    expect(screen.getByRole("heading", { name: /^tools$/i })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/the cardo framework/i)).toBeInTheDocument();
+    });
   });
 
   it("opens a tool from the Tools landing page", async () => {
@@ -39,14 +41,17 @@ describe("AppShell", () => {
       expect(window.location.pathname).toBe("/tools");
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /Old sources into story blueprints/i }));
+    await waitFor(() => {
+      const btns = screen.queryAllByRole("button", { name: /launch/i });
+      expect(btns.length).toBeGreaterThanOrEqual(5);
+    });
 
+    const launchBtns = screen.getAllByRole("button", { name: /launch/i });
+    fireEvent.click(launchBtns[2]); // 0=hero REI, 1=Debate Furnace, 2=Story Forge
     await waitFor(() => {
       expect(window.location.hash).toBe("#story-forge");
     });
-    await waitFor(() => {
-      expect(document.title).toBe("PromptHound Labs | Story Forge");
-    });
+    expect(document.title).toBe("PromptHound Labs | Story Forge");
   });
 
   it("respects the initial hash on load", () => {

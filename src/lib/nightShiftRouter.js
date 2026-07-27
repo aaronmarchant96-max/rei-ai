@@ -1,20 +1,22 @@
 import fingerprintCatalog from "../../data/fingerprints.json" with { type: "json" };
+import { computeHingeScore } from "./hingeClassifier.js";
+import { HIGH_STRUCTURE_TERMS, UNCERTAINTY_TERMS, isSimpleGreeting } from "./routingConstants.js";
+import { getDomainMatchTerms } from "../domains/_index.js";
 
 const ROUTER_CATALOG = Array.isArray(fingerprintCatalog) ? fingerprintCatalog : [];
+const FALLBACK_COST_INPUT = 0.00059;
+const FALLBACK_COST_OUTPUT = 0.00079;
 const STORAGE_KEY = "night-shift-user-fingerprint";
-const HIGH_STRUCTURE_TERMS = [
-  "what am i missing",
-  "what would change my mind",
-  "what would make this wrong",
-  "real hinge",
-  "how do i know",
-  "how reliable",
-  "prove it wrong",
-  "why is this uncertain",
-  "what evidence",
-  "what matters most",
-];
-const UNCERTAINTY_TERMS = ["uncertain", "unclear", "missing", "unknown", "not sure", "unsure", "doubt", "uncertainty"];
+const PREMIUM_INPUT_RATE = 0.0025;
+const PREMIUM_OUTPUT_RATE = 0.0100;
+
+function getModelCeilingRate(model) {
+  if (model === "gpt-4o") return PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE;
+  const catalog = getRouterCosts();
+  const entry = catalog[model];
+  if (entry) return entry.costPer1kInput + entry.costPer1kOutput;
+  return FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT;
+}
 
 function normalizeText(value = "") {
   return String(value ?? "").toLowerCase().trim();
@@ -24,11 +26,18 @@ function getCatalogEntry(id) {
   return ROUTER_CATALOG.find((entry) => entry.id === id) || ROUTER_CATALOG[1] || ROUTER_CATALOG[0];
 }
 
+function computeCatalogScores(text) {
+  return ROUTER_CATALOG.map((entry) => {
+    const terms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
+    return terms.filter((term) => keywordMatches(text, term)).length;
+  });
+}
+
 function escapeKeyword(term = "") {
   return String(term ?? "")
     .trim()
-    .replace(/\s+/g, "\\s+")
-    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\s+/g, "\\s+");
 }
 
 function keywordMatches(text, term = "") {
@@ -50,6 +59,14 @@ function getCatalogRouteMatch(text) {
   }
 
   return null;
+}
+
+function domainKeywordMatches(text, domainId) {
+  const terms = getDomainMatchTerms(domainId);
+  return terms.some((term) => {
+    const normalized = term.replace(/\./g, " ");
+    return keywordMatches(text, normalized);
+  });
 }
 
 function getStoredRouteHistory() {
@@ -98,9 +115,9 @@ function getStoredRoutePreference() {
   return Object.entries(routeCounts).sort((left, right) => right[1] - left[1])[0]?.[0] || null;
 }
 
-function buildDecision(id, overrides = {}) {
+function buildDecision(id, overrides = {}, hingeData = null) {
   const baseEntry = getCatalogEntry(id) || {};
-  return {
+  const decision = {
     id: baseEntry.id || id,
     jobType: baseEntry.jobType || id,
     label: baseEntry.label || id,
@@ -115,26 +132,18 @@ function buildDecision(id, overrides = {}) {
     routingSignals: {},
     ...overrides,
   };
-}
-
-function isSimpleGreeting(text) {
-  return /^(hi|hello|hey|yo|hiya|good (morning|afternoon|evening))([\s!.?]|$)/i.test(text.trim());
-}
-
-function isLikelyCodingRequest(text) {
-  return /\b(implement|build|debug|fix|refactor|function|component|module|api|jest|vite|react|node|typescript|javascript|python|test|patch|class|service|hook|route)\b/i.test(text);
-}
-
-function isLikelyGenealogyRequest(text) {
-  return /\b(ancestor|descendant|birth|death|marriage|census|familysearch|find a grave|record|pedigree|genealogy|lineage|same-name|disambiguat|archive|parish|will|baptism|burial)\b/i.test(text);
-}
-
-function isLikelyStoryRequest(text) {
-  return /\b(story|plot|character|scene|narrative|outline|dialogue|arc|worldbuilding|conflict|hero|villain)\b/i.test(text);
+  if (hingeData) {
+    decision.hingeScore = hingeData.hs;
+    decision.hingeVector = hingeData.hingeVector;
+    decision.hingeTier = hingeData.tier;
+    decision.estimatedCost = ((decision.maxTokens || 400) / 1000) * getModelCeilingRate(decision.model);
+    decision.premiumCost = ((decision.maxTokens || 400) / 1000) * (PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE);
+  }
+  return decision;
 }
 
 function isAdversarialRequest(text) {
-  return /\b(red[- ]?team|adversarial|stress test|attack|challenge|prove wrong|counterargument|break it|stress-test)\b/i.test(text);
+  return /\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text);
 }
 
 function getComplexityTier(text) {
@@ -195,9 +204,10 @@ export function buildRouterDecision({
   const complexityTier = getComplexityTier(text);
   const highStructureSignals = getHighStructureSignals(text);
   const storedPreference = getStoredPreferenceForContext(text, domainName);
+  const hingeResult = computeHingeScore(combinedInput, computeCatalogScores(text));
 
   if (!text) {
-    return buildDecision("structured-reasoning");
+    return buildDecision("structured-reasoning", {}, hingeResult);
   }
 
   if (isSimpleGreeting(text)) {
@@ -209,7 +219,7 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
       },
-    });
+    }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
   }
@@ -223,12 +233,12 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
       },
-    });
+    }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
   }
 
-  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || isLikelyGenealogyRequest(text)) {
+  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")) {
     const decision = buildDecision("genealogy-deep-dive", {
       rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
       routingSignals: {
@@ -237,12 +247,12 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
       },
-    });
+    }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
   }
 
-  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || isLikelyCodingRequest(text)) {
+  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")) {
     const decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",
       routingSignals: {
@@ -251,12 +261,12 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
       },
-    });
+    }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
   }
 
-  if (domainName === "story" || catalogRoute?.id === "story-architect" || isLikelyStoryRequest(text)) {
+  if (domainName === "story" || catalogRoute?.id === "story-architect" || domainKeywordMatches(text, "story")) {
     const decision = buildDecision("story-architect", {
       rationale: "Story or narrative language detected; route through the storytelling blueprint path.",
       routingSignals: {
@@ -265,7 +275,21 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
       },
-    });
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
+  if (domainName === "legal" || catalogRoute?.id === "legal-hinge" || domainKeywordMatches(text, "legal")) {
+    const decision = buildDecision("legal-hinge", {
+      rationale: "Legal case analysis or precedent evaluation detected; enforce verified-index grounding.",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: catalogRoute?.matchTerms || [],
+        highStructureSignals,
+        storedPreference,
+      },
+    }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
   }
@@ -283,7 +307,7 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
       },
-    });
+    }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
   }
@@ -297,7 +321,7 @@ export function buildRouterDecision({
         highStructureSignals,
         storedPreference,
       },
-    });
+    }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
   }
@@ -310,7 +334,7 @@ export function buildRouterDecision({
       highStructureSignals,
       storedPreference,
     },
-  });
+  }, hingeResult);
   persistRouteHistory(decision.id);
   return decision;
 }
@@ -338,4 +362,18 @@ export function getRouterSummary(routerDecision) {
     temperature: routerDecision.temperature,
     fallbackPriority: routerDecision.fallbackPriority,
   };
+}
+
+export function getRouterCosts() {
+  const models = {};
+  for (const entry of ROUTER_CATALOG) {
+    if (entry.model && !models[entry.model]) {
+      models[entry.model] = {
+        costPer1kInput: entry.costPer1kInput ?? FALLBACK_COST_INPUT,
+        costPer1kOutput: entry.costPer1kOutput ?? FALLBACK_COST_OUTPUT,
+        label: entry.label || entry.model,
+      };
+    }
+  }
+  return models;
 }
