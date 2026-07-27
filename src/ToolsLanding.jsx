@@ -119,12 +119,12 @@ export default function ToolsLanding({ onOpenTool }) {
     : "Generic reasoning. Balanced cost/safety profile.";
 
   return (
-    <section className="landing-page" style={{ padding: "0 16px 48px", maxWidth: "960px", margin: "0 auto" }}>
+    <div className="relume-container" style={{ padding: "0 16px 80px" }}>
       {/* ── 1. Hero ── */}
       <header
-        className="landing-section"
+        className="relume-section"
         style={{
-          textAlign: "center", padding: "48px 0 32px",
+          textAlign: "center", padding: "80px 0 40px",
           opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
           transition: "all 0.5s ease-out",
         }}
@@ -183,7 +183,7 @@ export default function ToolsLanding({ onOpenTool }) {
       </div>
 
       {/* ── 3. CARDO Framework ── */}
-      <section className="landing-section" style={{ marginBottom: "48px" }}>
+      <section className="relume-section" style={{ padding: "60px 0" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
           <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
             Philosophy &amp; Methodology
@@ -263,7 +263,7 @@ export default function ToolsLanding({ onOpenTool }) {
       </section>
 
       {/* ── 4. Live Router Demo ── */}
-      <section className="landing-section" style={{ marginBottom: "48px" }}>
+      <section className="relume-section" style={{ padding: "60px 0" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
           <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
             The Flagship
@@ -361,7 +361,7 @@ export default function ToolsLanding({ onOpenTool }) {
       </section>
 
       {/* ── 5. Case Studies ── */}
-      <section className="landing-section" style={{ marginBottom: "48px" }}>
+      <section className="relume-section" style={{ padding: "60px 0" }}>
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
           <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
             CARDO Applied
@@ -439,9 +439,9 @@ export default function ToolsLanding({ onOpenTool }) {
 
       {/* ── 6. Footer ── */}
       <footer
-        className="landing-section"
+        className="relume-section"
         style={{
-          textAlign: "center", padding: "32px 0",
+          textAlign: "center", padding: "48px 0 24px",
           borderTop: "1px solid rgba(240,201,101,0.15)",
           opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(8px)",
           transition: "all 0.4s ease-out 0.4s",
@@ -464,6 +464,6 @@ export default function ToolsLanding({ onOpenTool }) {
           300 tests passing · <a href={REPO_URL} target="_blank" rel="noreferrer" style={{ color: "#94a3b8" }}>GitHub &rarr;</a>
         </div>
       </footer>
-    </section>
+    </div>
   );
 }
