@@ -393,8 +393,7 @@ export default function ToolsLanding({ onOpenTool }) {
               >
                 <div style={{
                   width: "36px", height: "36px", borderRadius: "9px",
-                  background: "rgba(240, 201, 101, 0.1)",
-                  border: "1px solid rgba(240, 201, 101, 0.3)",
+                  background: "linear-gradient(135deg, #f97316, #fbbf24)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0,
                 }}>
@@ -418,20 +417,18 @@ export default function ToolsLanding({ onOpenTool }) {
                 Launch &rarr;
               </button>
             </div>
-              {expandedCase === cs.id && (
-                <div style={{ marginTop: "12px", paddingLeft: "48px" }}>
-                  <div style={{
-                    padding: "10px 14px", borderRadius: "8px",
-                    background: "rgba(240,201,101,0.08)", border: "1px solid rgba(240,201,101,0.15)",
-                    fontSize: "12px", color: "#f0c965",
-                  }}>
-                    <strong style={{ color: "#f0c965" }}>
-                      {cs.toolId === "furnace" ? "Debate Hinge" : cs.toolId === "story-forge" ? "Story Seed" : cs.toolId === "storm-replay" ? "Radar Signal" : cs.toolId === "cardo-guard" ? "Risk Gate" : "Telemetry Drift"}:
-                    </strong>{" "}
-                    {cs.hinge}
-                  </div>
+              <div style={{ marginTop: "12px", paddingLeft: "48px" }}>
+                <div style={{
+                  padding: "10px 14px", borderRadius: "8px",
+                  background: "rgba(240,201,101,0.08)", border: "1px solid rgba(240,201,101,0.15)",
+                  fontSize: "12px", color: "#f0c965",
+                }}>
+                  <strong style={{ color: "#f0c965" }}>
+                    {cs.toolId === "furnace" ? "Debate Hinge" : cs.toolId === "story-forge" ? "Story Seed" : cs.toolId === "storm-replay" ? "Radar Signal" : cs.toolId === "cardo-guard" ? "Risk Gate" : "Telemetry Drift"}:
+                  </strong>{" "}
+                  {cs.hinge}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
