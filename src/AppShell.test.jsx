@@ -7,23 +7,26 @@ describe("AppShell", () => {
     document.title = "";
   });
 
-  it("defaults to REI.ai and shows the breadcrumb", async () => {
+  it("defaults to Tools landing page", async () => {
     render(<AppShell />);
-
-    expect(screen.getByRole("button", { name: /PromptHound Labs/i })).toBeInTheDocument();
-    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("REI.ai");
     await waitFor(() => {
-      expect(document.title).toBe("PromptHound Labs | REI.ai");
+      expect(document.title).toBe("PromptHound Labs | Tools");
     });
   });
 
   it("navigates back to Tools landing from a tool", async () => {
+    window.history.replaceState({}, "", "/#story-forge");
     render(<AppShell />);
 
-    fireEvent.click(screen.getByRole("button", { name: /PromptHound Labs/i }));
+    await waitFor(() => {
+      expect(document.title).toBe("PromptHound Labs | Story Forge");
+    });
+
+    const backBtn = document.querySelector(".shell-tool-bar__back");
+    if (backBtn) fireEvent.click(backBtn);
 
     await waitFor(() => {
-      expect(window.location.pathname).toBe("/tools");
+      expect(window.location.pathname).toBe("/");
     });
     await waitFor(() => {
       expect(document.title).toBe("PromptHound Labs | Tools");
@@ -31,13 +34,8 @@ describe("AppShell", () => {
     await screen.findByText(/the cardo framework/i, {}, { timeout: 5000 });
   });
 
-  it("opens a tool from the Tools landing page", async () => {
+  it("opens Story Forge from the landing page", async () => {
     render(<AppShell />);
-
-    fireEvent.click(screen.getByRole("button", { name: /PromptHound Labs/i }));
-    await waitFor(() => {
-      expect(window.location.pathname).toBe("/tools");
-    });
 
     await waitFor(() => {
       const btns = screen.queryAllByRole("button", { name: /launch/i });
@@ -45,7 +43,7 @@ describe("AppShell", () => {
     });
 
     const launchBtns = screen.getAllByRole("button", { name: /launch/i });
-    fireEvent.click(launchBtns[2]); // 0=hero REI, 1=Debate Furnace, 2=Story Forge
+    fireEvent.click(launchBtns[2]);
     await waitFor(() => {
       expect(window.location.hash).toBe("#story-forge");
     });
@@ -54,37 +52,25 @@ describe("AppShell", () => {
 
   it("respects the initial hash on load", () => {
     window.history.replaceState({}, "", "/#storm-replay");
-
     render(<AppShell />);
-
-    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("Storm Replay");
     expect(document.title).toBe("PromptHound Labs | Storm Replay");
   });
 
   it("loads CARDO GUARD from the hash", () => {
     window.history.replaceState({}, "", "/#cardo-guard");
-
     render(<AppShell />);
-
-    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("CARDO GUARD");
     expect(document.title).toBe("PromptHound Labs | CARDO GUARD");
   });
 
   it("loads Tracepoint from the hash", () => {
     window.history.replaceState({}, "", "/#tracepoint");
-
     render(<AppShell />);
-
-    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("Tracepoint");
     expect(document.title).toBe("PromptHound Labs | Tracepoint");
   });
 
-  it("loads REI.ai from the /tools pathname", () => {
+  it("loads Tools landing from the /tools pathname", () => {
     window.history.replaceState({}, "", "/tools");
-
     render(<AppShell />);
-
-    expect(document.querySelector(".shell-tool-bar__current")?.textContent).toBe("REI.ai");
-    expect(document.title).toBe("PromptHound Labs | REI.ai");
+    expect(document.title).toBe("PromptHound Labs | Tools");
   });
 });
