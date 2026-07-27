@@ -96,5 +96,5 @@ npm test
 
 ## 🔗 Project Links
 
-*   **Live Demo:** [https://debate-furnace-git-main-prompthound-s-projects.vercel.app/#rei](https://debate-furnace-git-main-prompthound-s-projects.vercel.app/#rei)
+*   **Live Demo:** [https://debate-furnace.vercel.app/#rei](https://debate-furnace.vercel.app/#rei)
 *   **Source Code:** [https://github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
