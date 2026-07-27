@@ -25,7 +25,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
 
       <div
         className={`rei-chat-bubble ${msg.sender === "user" ? "rei-chat-bubble--user" : "rei-chat-bubble--rei"}`}
-        style={{ padding: "16px 20px" }}
+        style={{ padding: "16px 52px 16px 20px" }}
       >
         {selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback ? (
           (() => {
