@@ -195,10 +195,11 @@ export function buildRouterDecision({
   attachedRecord = "",
   requiresAdversarial = false,
 } = {}) {
+  const currentText = normalizeText([input, attachedRecord].filter(Boolean).join(" "));
   const combinedInput = [input, attachedRecord, history?.map((message) => message?.content || "").join(" ")]
     .filter(Boolean)
     .join(" ");
-  const text = normalizeText(combinedInput);
+  const text = currentText || normalizeText(combinedInput);
   const domainName = String(domain || "assistant").toLowerCase();
   const catalogRoute = getCatalogRouteMatch(text);
   const complexityTier = getComplexityTier(text);
