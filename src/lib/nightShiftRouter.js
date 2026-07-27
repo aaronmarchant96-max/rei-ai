@@ -12,9 +12,13 @@ const PREMIUM_OUTPUT_RATE = 0.0100;
 
 function getModelCeilingRate(model) {
   if (model === "gpt-4o") return PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE;
-  const catalog = getRouterCosts();
-  const entry = catalog[model];
-  if (entry) return entry.costPer1kInput + entry.costPer1kOutput;
+
+  const entry = ROUTER_CATALOG.find((e) => e.model === model);
+  if (entry) {
+    const input = entry.costPer1kInput ?? entry.costPer1k / 1000;
+    const output = entry.costPer1kOutput ?? entry.costPer1k / 1000;
+    if (input || output) return (input || 0) + (output || 0);
+  }
   return FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT;
 }
 
@@ -147,7 +151,7 @@ function isAdversarialRequest(text) {
 }
 
 function isMetaQuery(text) {
-  return /\bhow (do|are) you|who are you|what (is|are) you|what is the hinge|what is carlo|explain (how|what)|tell me about (yourself|you)\b/i.test(text);
+  return /\bhow (do|are) you|who are you|what (is|are) you|what is carlo|explain (how|what)|tell me about (yourself|you)\b/i.test(text);
 }
 
 function getComplexityTier(text) {
