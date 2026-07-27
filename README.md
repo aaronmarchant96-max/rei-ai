@@ -1,141 +1,100 @@
-# REI.ai — Cost-Performance Routing for Enterprise AI
+# REI.ai — Cost-Aware LLM Routing & Structured Reasoning
 
-> **"The OpenAI-compatible router that thinks before it spends."**
+> **REI.ai by PromptHound Labs**  
+> *"A structured reasoning framework with cost-aware LLM routing."*
 
-REI.ai automatically minimizes your LLM API costs by intelligently routing every request to the lowest-cost option that meets your target quality—deflecting up to 78% of inference spend before firing a single token.
-
----
-
-## 📊 Telemetry Highlights (The Two Numbers)
-*   **92.0% Zero-Shot ML Accuracy:** The v4 Semantic Router (running `all-MiniLM-L6-v2` locally via ONNX/WASM) achieves 92.0% strict zero-shot classification accuracy across 15 domains.
-*   **$9.03 to build it:** 795 million tokens of deep reasoning and planning processed via DeepSeek & OpenCode CLI for the cost of two cups of coffee.
-*   **78% cheaper to run it:** The routing suite deflects greetings and simple queries, saving 78% in API costs compared to an always-premium baseline.
-*   **Product Roadmap:** See [`docs/REI_V4_SEMANTIC_ROUTER_PLAN.md`](docs/REI_V4_SEMANTIC_ROUTER_PLAN.md) for the current ML transition details and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the Open-Core strategy.
+REI.ai automatically minimizes LLM API costs by classifying prompts locally and routing them to the cheapest capable model before a single remote token is processed. 
 
 ---
 
-## 🧠 Design Philosophy
+## 📊 Performance & Testing Metrics
 
-REI is built on five core design principles adapted from theoretical physics decomposition:
+We prioritize verifiable, empirical benchmarks over generalized claims:
 
-| Phase | Physics Principle | REI Implementation |
-| :--- | :--- | :--- |
-| **1. Reduce** | Strip a complex system down to its fundamental components. | **CARDO REI 8-Stage Pipeline:** Every task decomposes into the same structured phases (Collect, Analyze, Record, Distinguish, Organize, Review, Evaluate, Iterate). |
-| **2. Formulaic Gate** | Express the core dynamics mathematically. | **CARDO GUARD Equation:** All operational decisions reduce to a single cost-weighted utility inequality (`Miss Loss > Action Waste`). |
-| **3. Unify** | Prove the same governing equation holds across diverse domains. | **Multi-Domain Registry:** Genealogy, coding, debate, telemetry, and creative writing are routed and verified using the same core logic with zero domain-specific code. |
-| **4. Test** | Validate model constraints experimentally. | **Assertion-Gated Tests:** 283 automated Jest tests across 20 test suites assert chronological, biological, security, and cost boundaries. Current canonical stats are tracked in [`data/telemetry.json`](data/telemetry.json) and correction history in [`CHANGELOG.md`](CHANGELOG.md). |
-| **5. Falsify** | Define the criteria that would disprove the system's claims. | **Reproducible Benchmarks:** Zero-inference lexical routing can be run and audited by any third party with identical, deterministic results (`npm test`). |
+*   **90% Route Accuracy:** Verified on our fresh, 30-prompt blind holdout set for the v3 keyword router (evolving from a 67% baseline to 90% post-tuning).
+*   **v4 Semantic Router (Research):** Currently at **70% accuracy** running local 384-dimensional dense vector embeddings (`all-MiniLM-L6-v2` via ONNX/WASM in browser/Node).
+*   **399 Automated Tests:** 27 test suites running 399 regression tests assert chronological, logical, and safety boundaries with 0 regressions.
+*   **12 Landmark Legal Cases:** Our legal reasoning domain is grounded in a 12-case verified index to prevent hallucination.
 
 ---
 
-## 📐 Formal Definition: The Routing Model
+## 🧠 The 5 Reasoning Domains
 
-REI operates on a dual-layered pipeline: a lightweight **v4 ML Semantic Router** running locally via ONNX/WASM (`all-MiniLM-L6-v2`), followed by the **v3 Lexical Complexity Index**.
+The routing engine classifies prompts into one of five core domains:
 
-### 1. Semantic Domain Router (v4)
-Every prompt is embedded into a 384-dimensional dense vector and compared against a pre-computed $k=3$ centroid matrix covering 15 specialized domains using cosine similarity and a calibrated Softmax temperature ($\tau=0.50$). It enforces an Out-Of-Distribution (OOD) gate to capture novel prompts.
-
-### 2. Lexical Complexity Index $R(T)$ (v3)
-Let $T$ be a reasoning task. The system computes the **Complexity Index** $R(T)$:
-$$R(T) = \text{Base Score} + (\text{Code Fences} \times 15) + (\text{Markdown Tables} \times 12) + (\text{Bullet List Length} \times 8) + (\text{URL Count} \times 5) + (\text{Multi-clause IF} \times 10) + (\text{Compare Verbs} \times 6)$$
-
-Where $\text{Base Score} = (\text{Word Count} \times 2) + (\text{Question Marks} \times 8) + (\text{Uncertainty Keyword Hits} \times 10)$.
-
-### Complexity Tier Mapping:
-*   $R(T) < 25 \rightarrow$ **Low:** Routed to Deterministic ($0 cost) or Base/Cheap models.
-*   $25 \le R(T) < 55 \rightarrow$ **Medium:** Routed to Standard pathway (`llama-3.3-70b-versatile`).
-*   $55 \le R(T) < 90 \rightarrow$ **High:** Routed to Premium reasoning pathway (`gpt-4o`) via the CARDO GUARD gate.
-*   $R(T) \ge 90 \rightarrow$ **Ultra:** Automatically escalates directly to the frontier remote model (`openai/gpt-oss-120b`).
+1.  **The Generalist (assistant):** Everyday queries, reasoning, and low-complexity tasks.
+2.  **The Hinge Finder (coding):** Advanced software logic executing the CARDO REI methodology (verifies API shapes, enforces developer checks, and halts on ambiguity).
+3.  **The Archivist (genealogy):** Evidence-tiered historical records analysis (same-name disambiguation, parish registers, age boundary validation).
+4.  **The Storyteller (story):** Narrative architecture and character hinge generators.
+5.  **The Lex (legal):** Local precedent grounding utilizing the `Case Hinge` engine.
 
 ---
 
-## 🛡️ The CARDO GUARD Decision Gate
+## 📐 Router Architecture & Core Components
 
-Escalation to premium models is treated as a thermodynamic utility trade-off under uncertainty:
+REI's routing pipeline runs in less than 5ms locally and consists of:
 
-*   **Expected Action Waste ($W$):** The cost of escalating when the warning is a false alarm.
-    $$W = C_a \times P_f$$
-    *(Where $C_a$ is the Cost to Act, and $P_f$ is the false alarm rate of the model).*
-*   **Expected Miss Loss ($L$):** The risk-adjusted cost of ignoring a complex query.
-    $$L = C_m \times (1 - P_f)$$
-    *(Where $C_m$ is the Cost of Missing).*
-*   **The Decision Rule:**
-    $$\text{Verdict} = \begin{cases} \text{ACT (Escalate to Premium)}, & \text{if } L > W \\ \text{DO NOT ACT (Use Base/Standard)}, & \text{if } L \le W \end{cases}$$
+### 1. Zero-Inference Matcher (Layer 0)
+Regex-based scanner that intercepts simple greetings, metadata inquiries, and smalltalk, returning instant local responses at $0 cost.
 
-*Note: The false alarm rate is dynamically adjusted on security alerts when adversarial suspicion is high ($> 0.3$), forcing escalation to protect systems.*
+### 2. Night Shift Router (v3 Keyword Engine)
+High-speed keyword-based router that parses input structural properties, mapping prompts to domain profiles and executing the `isLikelyLegalRequest()` and coding branches.
+
+### 3. Local ONNX Embeddings (v4 Research Engine)
+Processes inputs through a 384-dimensional semantic embedding pipeline (`@xenova/transformers` running the `all-MiniLM-L6-v2` model) to determine cosine similarity against domain centroids.
+
+### 4. CARDO GUARD Decision Gate
+Escalates high-complexity queries to premium models under an expected-utility inequality:
+$$\text{Verdict} = \text{ACT (Escalate)} \iff \text{Miss Loss} > \text{Action Waste}$$
+
+### 5. Adversarial Defense & Red-Team Scanner
+Scans payloads for injection vectors and malicious prompts, instantly routing suspicious traffic to hardened security models.
+
+### 6. Case Hinge (Legal Grounding)
+A deterministic parser that extracts standard citations (e.g., *Donoghue v Stevenson*, *410 U.S. 113*), matches them against a landmark cases dataset, and flags unverified citations before the LLM generates a response.
 
 ---
 
-## 🌐 Unification Across Domains
+## 🌐 User Interface & Case Studies
 
-The same 8-stage CARDO REI pipeline + cost-weighted CARDO GUARD gate governs specialized domains with **zero domain-specific code**:
+Our landing page is structured to highlight both the flagship router and the specialized tools that prove the CARDO framework:
+*   **Interactive Router Demo:** Live playground displaying the selected model, estimated token usage, and real-time cost delta.
+*   **CARDO Pipeline Trace:** Full visibility into the reasoning steps (Collect, Analyze, Record, Distinguish, Operate).
+*   **Vibrant GUI:** Responsive glassmorphism dashboards with staggered entrance animations and real-time telemetry metrics.
 
-| Domain | Input Type | The Hinge (Phase Transition) | Evidence Tiers | Cost Risk |
-| :--- | :--- | :--- | :--- | :--- |
-| **Genealogy** | Timelines, parish certs, military rolls | Identification of same-name generation gaps | 🟢 Primary $\rightarrow$ 🟡 Family Memory | False positive on misattributed ancestor |
-| **Coding** | Repositories, APIs, stack traces | Is prompt details specific enough to compile? | HARD STOP validation | Premium vs Standard cost delta |
-| **Debate** | Arguments, claims, references | Burden of proof allocation | Source citation credibility | Cost of generating vs verifying |
-| **Industrial** | Telemetry, vibrations, thermal data | Anomaly exceeds safety threshold | Sensor reading $\rightarrow$ Feature $\rightarrow$ Score | Cost of shutdown vs missed failure |
-| **Creative** | Story prompts, character outlines, structures | Character motivation hinge (want/fear) | Coherence and genre alignment | Token budget on long generation |
-| **Finance** | Budgets, spend metrics, token efficiency | Hinge point of cost-minimization logic | Ledger check / Audit | Token price fluctuation vs value |
-| **Structured Data** | CSV, JSON, SQL database schemas | Tabular structural parity alignment | Schema compliance | Data parsing errors vs performance |
-| **Meta-Routing** | Inquiries about routing decisions | Rationalizing routing telemetry path | Transparency & validation | Inefficient self-reflective overhead |
-| **Multi-Turn** | Long-context conversation history | Core synthesis compression points | Dialogue history recap | Token inflation on long contexts |
+---
+
+## 🛠️ Tech Stack & Deployment
+
+*   **Frontend:** React (lazy-loaded code splitting), Tailwind CSS (Relume gold preset).
+*   **Backend:** Node.js, Vercel Serverless Functions (`api/cfai.js`).
+*   **Embeddings:** ONNX Runtime Web / WASM.
+*   **Testing:** Jest (jsdom environment).
 
 ---
 
 ## ⚡ Quick Start
 
-### 1. Installation
+### 1. Clone & Install
 ```bash
+git clone https://github.com/aaronmarchant96-max/rei-ai
+cd rei-ai
 npm install
+```
+
+### 2. Run Locally
+```bash
 npm run dev
 ```
-Starts the local Vite development server. Backend routes through `api/cfai.js` (with local Groq/OpenAI failover).
 
-### 2. Run the Benchmark
-Verify the cost-savings assertions and routing accuracy:
-```bash
-npm test -- --testPathPatterns=routingEval
-```
-
-### 3. Run the Blind Test Set
-Validate routing against held-out prompts never seen during development:
-```bash
-npm test -- --testPathPatterns=routingEvalBlind
-```
-
-### 4. Run the Full Test Suite
+### 3. Run Benchmark Suite
 ```bash
 npm test
 ```
-Runs all 231 regression tests across 18 test suites confirming logical correctness, error boundary recovery, and budget safety.
 
 ---
 
-## 🛠️ Key Components
+## 🔗 Project Links
 
-| File | Purpose |
-| :--- | :--- |
-| [**`src/lib/nightShiftRouter.js`**](src/lib/nightShiftRouter.js) | Core routing engine — complexity scoring, catalog matching, and cost estimation. |
-| [**`src/lib/deterministicEngine.js`**](src/lib/deterministicEngine.js) | Layer 0 — returns $0-cost instant answers for smalltalk and greetings. |
-| [**`src/lib/cardoGuard.js`**](src/lib/cardoGuard.js) | Cost-governor — executes the `L > W` escalation inequality check. |
-| [**`src/lib/costHelpers.js`**](src/lib/costHelpers.js) | Unified cost tracker enforcing ceiling-based estimates. |
-| [**`src/__eval__/routingEval.test.js`**](src/__eval__/routingEval.test.js) | 57-prompt benchmark harness with assertion-gated cost/savings checks. |
-| [**`api/v1/chat/completions.js`**](api/v1/chat/completions.js) | OpenAI‑compatible chat completions proxy with REI headers. |
-| [**`data/fingerprints.json`**](data/fingerprints.json) | The static fingerprint catalog with domain keywords and thresholds. |
-
----
-
-## 🐋 Run with Docker
-```bash
-docker compose up
-```
-
-## ⚙️ Environment Variables
-Create a `.env` file in the root directory:
-```env
-GROQ_API_KEY=your_groq_key
-OPENAI_API_KEY=your_openai_key  # Optional fallback for premium pathway
-```
-If no keys are found, the platform falls back to deterministic mock outputs.
+*   **Live Demo:** [https://debate-furnace-git-main-prompthound-s-projects.vercel.app/#rei](https://debate-furnace-git-main-prompthound-s-projects.vercel.app/#rei)
+*   **Source Code:** [https://github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
