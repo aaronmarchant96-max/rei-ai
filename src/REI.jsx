@@ -383,7 +383,7 @@ Limitations:
  
         {/* Domain selection tab strip */}
         <div className="rei-domain-tabs">
-          {DOMAIN_PROFILES.map((dom) => (
+          {DOMAIN_PROFILES.filter((dom) => ["assistant", "coding", "red-team"].includes(dom.id)).map((dom) => (
             <button
               key={dom.id}
               type="button"

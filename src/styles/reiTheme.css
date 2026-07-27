@@ -21,17 +21,20 @@
   50% { transform: rotate(-18deg); }
 }
 
-/* Theme styles override - Metallic Gold & Cyberpunk Dark */
+/* Theme styles override - Metallic Gold & Cyberpunk Dark Glass */
 .rei-dashboard-wrapper {
   background: #07090e !important;
 }
+
 .rei-custom-container {
-  background: radial-gradient(circle at 30% 15%, #161c28 0%, #0c1017 45%, #07090e 100%) !important;
+  background: radial-gradient(circle at 30% 15%, #141a26 0%, #0c1017 45%, #07090e 100%) !important;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(240, 201, 101, 0.2) !important;
+  border: 1px solid rgba(240, 201, 101, 0.22) !important;
   border-radius: 16px !important;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
+
 .rei-custom-container::before {
   content: '';
   position: absolute;
@@ -39,6 +42,7 @@
   background: linear-gradient(135deg, rgba(240, 201, 101, 0.08), transparent 55%);
   pointer-events: none;
 }
+
 .rei-custom-container::after {
   content: '';
   position: absolute;
@@ -49,26 +53,31 @@
   background: radial-gradient(circle, rgba(240, 201, 101, 0.12), transparent 70%);
   pointer-events: none;
 }
+
+/* Logo Mark - Glassmorphic Gold Frame */
 .rei-logo-mark {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #f0c965, #d6b04c);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(240, 201, 101, 0.1) !important;
+  border: 1px solid rgba(240, 201, 101, 0.35) !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 24px rgba(240, 201, 101, 0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+  box-shadow: 0 0 20px rgba(240, 201, 101, 0.2);
   flex-shrink: 0;
   position: relative;
 }
+
 .rei-logo-mark::after {
   content: '';
   position: absolute;
   inset: -2px;
-  border-radius: 16px;
-  border: 1px solid rgba(240, 201, 101, 0.5);
+  border-radius: 14px;
+  border: 1px solid rgba(240, 201, 101, 0.4);
   animation: pulse-ring 2.4s ease-in-out infinite;
 }
+
 .rei-logo-title {
   font-weight: 800;
   font-size: 22px;
@@ -78,64 +87,34 @@
   background-clip: text;
   color: transparent;
 }
+
 .rei-logo-sub {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #94a3b8;
   letter-spacing: 0.03em;
   margin-top: 2px;
 }
-.rei-custom-tab {
-  padding: 9px 14px;
-  border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 600;
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #94a3b8;
-  background: rgba(255,255,255,0.02);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  line-height: 1.3;
-}
-.rei-custom-tab:hover {
-  border-color: rgba(240, 201, 101, 0.4);
-  color: #f0c965;
-  transform: translateY(-1px);
-}
-.rei-custom-tab-active {
-  background: linear-gradient(135deg, rgba(240, 201, 101, 0.2), rgba(214, 176, 76, 0.12)) !important;
-  border-color: #f0c965 !important;
-  color: #f0c965 !important;
-  box-shadow: 0 0 18px rgba(240, 201, 101, 0.2);
-}
-.rei-custom-card {
-  width: 100%;
-  border-radius: 12px;
-  padding: 16px 18px;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(240, 201, 101, 0.18);
-  position: relative;
-  z-index: 1;
-}
+
+/* Header bar */
 .rei-header {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 16px 12px;
+  padding: 16px 20px;
   background: rgba(7, 9, 14, 0.92);
   border-bottom: 1px solid rgba(240, 201, 101, 0.2);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
 }
+
 .rei-header__brand {
   display: flex;
   align-items: center;
   gap: 12px;
   min-width: 0;
 }
+
 .rei-domain-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -144,11 +123,12 @@
   justify-content: flex-end;
   flex: 1 1 320px;
 }
+
 .rei-domain-tab {
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.02);
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
   color: #94a3b8;
   font-size: 12px;
   font-weight: 600;
@@ -158,67 +138,81 @@
   align-items: flex-start;
   gap: 2px;
   text-align: left;
-  min-height: 46px;
+  min-height: 44px;
   transition: all 0.2s ease;
 }
+
 .rei-domain-tab:hover {
   border-color: rgba(240, 201, 101, 0.4);
   color: #f0c965;
   background: rgba(240, 201, 101, 0.08);
   transform: translateY(-1px);
 }
+
 .rei-domain-tab.is-active {
-  background: linear-gradient(135deg, rgba(240, 201, 101, 0.22), rgba(214, 176, 76, 0.14));
-  border-color: #f0c965;
-  color: #f0c965;
-  box-shadow: 0 0 18px rgba(240, 201, 101, 0.2);
+  background: linear-gradient(135deg, rgba(240, 201, 101, 0.22), rgba(214, 176, 76, 0.14)) !important;
+  border-color: #f0c965 !important;
+  color: #f0c965 !important;
+  box-shadow: 0 0 20px rgba(240, 201, 101, 0.25);
 }
+
 .rei-action-btn {
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
-  padding: 9px 14px;
+  padding: 8px 14px;
   font-size: 12px;
   font-weight: 700;
   color: #e2e8f0;
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
 .rei-action-btn:hover {
   border-color: rgba(240, 201, 101, 0.4);
   color: #f0c965;
   transform: translateY(-1px);
 }
+
 .rei-action-btn--danger {
   color: #fda4af;
-  border-color: rgba(251,113,133,0.25);
+  border-color: rgba(251, 113, 133, 0.25);
 }
+
 .rei-action-btn--accent {
   color: #f0c965;
   border-color: rgba(240, 201, 101, 0.35);
   background: rgba(240, 201, 101, 0.1);
 }
+
+/* Active Voice Glassmorphism Banner */
 .rei-domain-banner {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(240, 201, 101, 0.2);
+  background: rgba(15, 20, 32, 0.75) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(240, 201, 101, 0.25) !important;
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 16px 18px;
   margin-bottom: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(240, 201, 101, 0.1);
 }
+
 .rei-domain-banner__eyebrow {
   font-size: 11px;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #f0c965;
-  margin-bottom: 8px;
-  font-weight: 700;
+  margin-bottom: 10px;
+  font-weight: 800;
 }
+
 .rei-domain-banner__row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
+
 .rei-domain-banner__meta {
   display: flex;
   flex-wrap: wrap;
@@ -226,42 +220,57 @@
   color: #e2e8f0;
   font-size: 13px;
 }
+
 .rei-domain-banner__meta--secondary {
   color: #94a3b8;
 }
+
 .rei-domain-banner__label {
   color: #f0c965;
   font-weight: 700;
 }
+
 .rei-domain-banner__steps {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: 10px;
 }
+
 .rei-domain-banner__step {
-  padding: 5px 10px;
+  padding: 5px 12px;
   border-radius: 999px;
-  background: rgba(240, 201, 101, 0.1);
-  border: 1px solid rgba(240, 201, 101, 0.25);
-  color: #f0c965;
+  background: rgba(240, 201, 101, 0.12) !important;
+  border: 1px solid rgba(240, 201, 101, 0.3) !important;
+  color: #f0c965 !important;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
+
 .rei-reasoning-loop {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 8px;
   margin-top: 10px;
 }
+
 .rei-reasoning-loop__step {
-  border: 1px solid rgba(240, 201, 101, 0.18);
+  border: 1px solid rgba(240, 201, 101, 0.2) !important;
   border-radius: 10px;
-  background: rgba(255,255,255,0.03);
-  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.02) !important;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  transition: all 0.2s ease;
 }
+
+.rei-reasoning-loop__step:hover {
+  border-color: rgba(240, 201, 101, 0.4) !important;
+  background: rgba(240, 201, 101, 0.06) !important;
+}
+
 .rei-reasoning-loop__label {
   color: #f0c965;
   font-weight: 700;
@@ -269,22 +278,27 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
 .rei-reasoning-loop__detail {
   color: #cbd5e1;
   font-size: 12px;
   line-height: 1.35;
 }
+
+/* Chat container & bubbles */
 .rei-chat-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
+
 .rei-chat-history {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   padding-bottom: 8px;
 }
+
 .rei-chat-message {
   display: flex;
   flex-direction: column;
@@ -292,15 +306,18 @@
   animation: fadeIn 0.3s ease-in-out forwards;
   opacity: 0;
 }
+
 .rei-chat-message--user {
   align-items: flex-end;
 }
+
 .rei-chat-message--rei {
   align-items: flex-start;
 }
+
 .rei-chat-bubble {
   border-radius: 12px;
-  padding: 12px 14px 12px 14px;
+  padding: 14px 16px;
   font-family: inherit;
   font-size: 14.5px;
   white-space: pre-wrap;
@@ -309,81 +326,49 @@
   width: 100%;
   box-sizing: border-box;
 }
+
 .rei-chat-bubble--user {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
   color: #E2E8F0;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
+
 .rei-chat-bubble--rei {
-  background: rgba(240, 201, 101, 0.06);
-  color: #E2E8F0;
-  border: 1px solid rgba(240, 201, 101, 0.2);
+  background: linear-gradient(135deg, rgba(240, 201, 101, 0.08) 0%, rgba(15, 20, 32, 0.8) 100%) !important;
+  color: #E2E8F0 !important;
+  border: 1px solid rgba(240, 201, 101, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(240, 201, 101, 0.08);
 }
+
 .rei-chat-meta {
   font-size: 0.78em;
   color: #94A3B8;
-  margin-top: 4px;
+  margin-top: 6px;
 }
-.rei-router-badge {
-  margin-bottom: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(240, 201, 101, 0.3);
-  background: rgba(240, 201, 101, 0.1);
-  color: #f0c965;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-.rei-router-panel {
-  margin-top: 12px;
-  border-top: 1px dashed rgba(240, 201, 101, 0.2);
-  padding-top: 8px;
-}
-.rei-router-panel__title {
-  color: #94A3B8;
-  font-size: 0.85em;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-.rei-router-panel__grid {
-  display: grid;
-  gap: 4px;
-  font-size: 0.82em;
-  color: #cbd5e1;
-}
-.rei-router-panel__item {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.rei-router-panel__label {
-  color: #f0c965;
-  font-weight: 700;
-}
+
 .rei-copy-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(240, 201, 101, 0.12);
-  border: 1px solid rgba(240, 201, 101, 0.3);
-  border-radius: 4px;
-  color: #f0c965;
+  top: 10px;
+  right: 10px;
+  background: rgba(240, 201, 101, 0.12) !important;
+  border: 1px solid rgba(240, 201, 101, 0.3) !important;
+  border-radius: 6px;
+  color: #f0c965 !important;
   cursor: pointer;
-  font-size: 0.75em;
-  padding: 2px 6px;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-  min-width: 44px;
-  min-height: 44px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  opacity: 0.85;
+  transition: all 0.2s ease;
 }
+
 .rei-copy-btn:hover {
   opacity: 1;
+  background: rgba(240, 201, 101, 0.25) !important;
+  box-shadow: 0 0 12px rgba(240, 201, 101, 0.3);
 }
+
+/* Input Shell */
 .rei-input-shell {
   width: 100%;
   max-width: 1400px;
@@ -393,148 +378,78 @@
   margin-right: auto;
   background: rgba(7, 9, 14, 0.92);
   border-top: 1px solid rgba(240, 201, 101, 0.2);
-  padding: 16px;
+  padding: 16px 20px;
   box-sizing: border-box;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
 }
+
 .rei-input-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
+
 .rei-input-row {
   display: flex;
   gap: 12px;
   align-items: center;
 }
+
 .rei-input-area {
   flex: 1;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   color: #E2E8F0;
-  border: 1px solid rgba(240, 201, 101, 0.2);
-  border-radius: 8px;
+  border: 1px solid rgba(240, 201, 101, 0.25);
+  border-radius: 10px;
   font-family: inherit;
   font-size: 15px;
   outline: none;
+  padding: 12px 14px;
 }
+
 .rei-input-area:focus {
   border-color: #f0c965;
-  box-shadow: 0 0 0 2px rgba(240, 201, 101, 0.2);
+  box-shadow: 0 0 0 2px rgba(240, 201, 101, 0.25);
 }
+
 .rei-touch-button {
-  background: linear-gradient(135deg, #f0c965, #d6b04c);
-  color: #07090d;
+  background: linear-gradient(135deg, #f0c965 0%, #d6b04c 100%) !important;
+  color: #07090d !important;
   border: none;
   border-radius: 8px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
+  padding: 0 22px;
+  height: 44px;
   transition: all 0.2s ease;
-  min-width: 48px;
-  align-self: center;
-  font-size: 15px;
+  box-shadow: 0 4px 16px rgba(240, 201, 101, 0.3);
 }
-.rei-quick-prompt {
-  flex: 1 1 auto;
-  min-width: 100px;
-  padding: 10px 14px;
-  white-space: normal;
-  line-height: 1.3;
-  border-radius: 999px;
-  background: rgba(240, 201, 101, 0.08);
-  color: #f0c965;
-  border: 1px solid rgba(240, 201, 101, 0.2);
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-}
-.rei-quick-prompt:hover {
-  border-color: #f0c965;
-  background: rgba(240, 201, 101, 0.18);
+
+.rei-touch-button:hover {
   transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(240, 201, 101, 0.45);
 }
 
-/* Philosophy Modal Styles */
-.rei-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  backdrop-filter: blur(6px);
-}
-.rei-glass-modal {
-  background: rgba(12, 16, 26, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(240, 201, 101, 0.3);
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 580px;
-  width: 90%;
-  color: #e2e8f0;
-  font-family: inherit;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px rgba(240, 201, 101, 0.15);
-}
-.rei-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(240, 201, 101, 0.2);
-  padding-bottom: 12px;
-  margin-bottom: 18px;
-}
-.rei-modal-header h2 {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: 0.05em;
-  color: #f0c965;
-  font-weight: bold;
-}
-.rei-close-btn {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  font-size: 24px;
+.rei-quick-prompt {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(240, 201, 101, 0.08) !important;
+  color: #f0c965 !important;
+  border: 1px solid rgba(240, 201, 101, 0.25) !important;
   cursor: pointer;
-  transition: color 0.2s ease;
-  line-height: 1;
-}
-.rei-close-btn:hover {
-  color: #ffffff;
-}
-.rei-concept-layer {
-  margin-bottom: 18px;
-}
-.rei-concept-layer h3 {
-  font-size: 14px;
-  color: #f0c965;
-  margin: 0 0 6px 0;
-  border-left: 3px solid #f0c965;
-  padding-left: 8px;
-  font-weight: bold;
-}
-.rei-concept-layer p {
   font-size: 12.5px;
-  line-height: 1.5;
-  margin: 4px 0;
-  padding-left: 11px;
-  color: #cbd5e1;
-}
-.rei-tagline {
-  font-style: italic;
-  color: #f0c965;
-  opacity: 0.85;
-  font-size: 11.5px;
-  margin-top: 4px;
-  padding-left: 11px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ── Landing page & site-wide ambient dark background ── */
+.rei-quick-prompt:hover {
+  border-color: #f0c965 !important;
+  background: rgba(240, 201, 101, 0.2) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(240, 201, 101, 0.25);
+}
+
+/* ── Ambient dark background ── */
 @keyframes ambient-shift {
   0%   { background-position: 0% 50%; }
   50%  { background-position: 100% 50%; }
