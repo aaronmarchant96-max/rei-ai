@@ -144,7 +144,6 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
           onClick={() => onCopy(msg.text)}
           className="rei-copy-btn touch-target"
           aria-label="Copy message"
-          style={{ fontSize: mobile ? "0.85em" : "0.75em", padding: mobile ? "6px 10px" : "2px 6px" }}
           onMouseOver={(e) => e.currentTarget.style.opacity = 1}
           onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
           title="Copy message"
