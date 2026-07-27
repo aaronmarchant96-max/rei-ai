@@ -200,5 +200,41 @@ describe("nightShiftRouter", () => {
       const decision = buildRouterDecision({ input, domain: "assistant" });
       expect(decision.id).toBe("adversarial-validation");
     });
+
+    it("does not route narrative prompts with 'build' to coding", () => {
+      const decision = buildRouterDecision({ input: "build a fantasy world where magic drains memory", domain: "assistant" });
+      expect(decision.id).not.toBe("coding-hinge");
+    });
+
+    it("does not route 'stack trace' or 'trace the memory leak' to genealogy", () => {
+      const traceCoding = buildRouterDecision({ input: "stack trace error in production", domain: "assistant" });
+      expect(traceCoding.id).not.toBe("genealogy-deep-dive");
+
+      const traceMem = buildRouterDecision({ input: "trace the memory leak", domain: "assistant" });
+      expect(traceMem.id).not.toBe("genealogy-deep-dive");
+
+      const traceGenealogy = buildRouterDecision({ input: "trace my maternal line back to the 1800s", domain: "assistant" });
+      expect(traceGenealogy.id).toBe("genealogy-deep-dive");
+    });
+
+    it("routes meta-queries to the cheap model", () => {
+      const decision = buildRouterDecision({ input: "how do you work", domain: "assistant" });
+      expect(decision.id).toBe("simple-greeting");
+      expect(decision.model).toBe("llama-3.1-8b-instant");
+    });
+
+    it("differentiates cost between 8B and 70B models", () => {
+      const greeting = buildRouterDecision({ input: "hello", domain: "assistant" });
+      const reasoning = buildRouterDecision({ input: "evaluate tradeoffs between monorepo and polyrepo", domain: "assistant" });
+
+      expect(greeting.model).toBe("llama-3.1-8b-instant");
+      expect(reasoning.model).toBe("llama-3.3-70b-versatile");
+      expect(reasoning.estimatedCost).toBeGreaterThan(greeting.estimatedCost);
+    });
+
+    it("routes adversarial 'poke holes' to adversarial-validation", () => {
+      const decision = buildRouterDecision({ input: "poke holes in my business plan", domain: "assistant" });
+      expect(decision.id).toBe("adversarial-validation");
+    });
   });
 });
