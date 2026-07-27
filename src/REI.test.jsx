@@ -27,7 +27,7 @@ describe("REI", () => {
 
     render(<REI />);
 
-    expect(screen.getByText(/REI is live/i)).toBeInTheDocument();
+    expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
     const stored = JSON.parse(window.localStorage.getItem("rei_chat_history_assistant") || "{}");
     expect(stored.version).toBe("hcm_v1");
     expect(stored.domainId).toBe("assistant");

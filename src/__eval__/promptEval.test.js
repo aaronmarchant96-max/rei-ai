@@ -19,7 +19,7 @@ describe("Prompt Eval — domain system messages", () => {
   test("assistant system message is initialized", () => {
     const msg = buildDomainSystemMessage("assistant", DOMAIN_PROFILES[0]);
     expect(msg).toMatch(/^System initialized/);
-    expect(msg).toContain("REI is live");
+    expect(msg).toContain("Hey. Say what you want");
   });
 
   test("coding system message mentions domain", () => {
