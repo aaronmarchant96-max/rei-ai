@@ -32,26 +32,33 @@ The routing engine classifies prompts into one of five core domains:
 
 ## 📐 Router Architecture & Core Components
 
-REI's routing pipeline runs in less than 5ms locally and consists of:
+REI's routing pipeline runs in less than 5ms locally:
 
-### 1. Zero-Inference Matcher (Layer 0)
-Regex-based scanner that intercepts simple greetings, metadata inquiries, and smalltalk, returning instant local responses at $0 cost.
+```mermaid
+flowchart LR
+    A[Prompt Input] --> B{Greeting / Meta?}
+    B -->|Greeting| C[⚡ Layer 0<br/>Deterministic<br/>$0 · &lt;5ms]
+    B -->|Substantive| D{Keyword Match?}
+    D -->|Match| E[🌙 Layer 1<br/>Night Shift v3<br/>Keyword Router]
+    D -->|No Match| F{Adversarial?}
+    F -->|Yes| G[🛡️ Layer 2<br/>Red-Team Scanner<br/>gpt-4o Escalation]
+    F -->|No| H{Complex?}
+    H -->|High Risk| I[⚖️ Layer 3<br/>CARDO GUARD<br/>Expected-Utility Gate]
+    H -->|Standard| J[📐 Layer 4<br/>Structured Reasoning<br/>llama-3.3-70b]
+    E --> J
+    G --> K[⚖️ Domain Prompt<br/>+ Verified Index]
+    I --> K
+    J --> K
+    K --> L[REI Response]
+```
 
-### 2. Night Shift Router (v3 Keyword Engine)
-High-speed keyword-based router that parses input structural properties, mapping prompts to domain profiles via the domain registry and keyword matchers.
-
-### 3. Local ONNX Embeddings (v4 Research Engine)
-Processes inputs through a 384-dimensional semantic embedding pipeline (`@xenova/transformers` running the `all-MiniLM-L6-v2` model) to determine cosine similarity against domain centroids.
-
-### 4. CARDO GUARD Decision Gate
-Escalates high-complexity queries to premium models under an expected-utility inequality:
-$$\text{Verdict} = \text{ACT (Escalate)} \iff \text{Miss Loss} > \text{Action Waste}$$
-
-### 5. Adversarial Defense & Red-Team Scanner
-Scans payloads for injection vectors and malicious prompts, instantly routing suspicious traffic to hardened security models.
-
-### 6. Case Hinge (Legal Grounding)
-A deterministic parser that extracts standard citations (e.g., *Donoghue v Stevenson*, *410 U.S. 113*), matches them against a landmark cases dataset, and flags unverified citations before the LLM generates a response.
+**6-layer cascade:**
+1. **Zero-Inference Matcher** — greetings & meta return $0 local responses
+2. **Night Shift v3 Router** — keyword + structural signals classify domains
+3. **Red-Team Scanner** — adversarial prompts escalate to gpt-4o
+4. **CARDO GUARD Gate** — cost-weighted decisions (ACT vs WAIT)
+5. **Structured Reasoning** — standard queries to llama-3.3-70b
+6. **Domain Prompts** — domain-specific instructions + Case Hinge legal grounding
 
 ---
 
