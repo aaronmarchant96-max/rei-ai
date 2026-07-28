@@ -150,7 +150,7 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   };
 }
 
-async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null) {
+export async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null) {
   // Check if CLI is available locally
   const localCliExists = CFAI_PATH && fs.existsSync(CFAI_PATH);
 
