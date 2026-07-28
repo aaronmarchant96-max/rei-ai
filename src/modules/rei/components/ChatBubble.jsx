@@ -156,6 +156,32 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
         >
           Copy
         </button>
+        {msg.sender === "rei" && (() => {
+          const s = parseAssistantStyleReply(msg.text);
+          if (!s.Hinge && !s.Facts) return null;
+          const report = [
+            "## CARDO Analysis",
+            s.Hinge && `**Hinge:** ${s.Hinge}`,
+            s.Facts && `**Facts:** ${s.Facts}`,
+            s.Assumptions && `**Assumptions:** ${s.Assumptions}`,
+            s.Evaluation && `**Evaluation:** ${s.Evaluation}`,
+            s.ChangeMind && `**What would change my mind:** ${s.ChangeMind}`,
+            s.Move && `**Move:** ${s.Move}`,
+          ].filter(Boolean).join("\n\n");
+          return (
+            <button
+              onClick={() => onCopy(report)}
+              className="rei-copy-btn touch-target"
+              aria-label="Copy report"
+              style={{ right: "56px", fontSize: "9px" }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+              onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+              title="Copy CARDO report"
+            >
+              Report
+            </button>
+          );
+        })()}
       </div>
 
       <span className="rei-chat-meta">

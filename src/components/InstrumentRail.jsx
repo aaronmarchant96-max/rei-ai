@@ -73,11 +73,11 @@ export default function InstrumentRail({
       <div className="rei-instrument-rail__section rei-instrument-rail__section--muted">
         <div className="rei-instrument-rail__row">
           <span>Build</span>
-          <span className="rei-instrument-rail__value">v2.0</span>
+          <span className="rei-instrument-rail__value">v3.0</span>
         </div>
         <div className="rei-instrument-rail__row">
           <span>Router</span>
-          <span className="rei-instrument-rail__value">v4 Semantic</span>
+          <span className="rei-instrument-rail__value">v3 Keyword</span>
         </div>
         <div className="rei-instrument-rail__row">
           <span>Gateway</span>

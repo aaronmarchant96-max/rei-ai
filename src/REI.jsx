@@ -13,6 +13,8 @@ import DomainBanner from "./modules/rei/components/DomainBanner.jsx";
 import ChatHistory from "./modules/rei/components/ChatHistory.jsx";
 import ChatInput from "./modules/rei/components/ChatInput.jsx";
 import PhilosophyModal from "./modules/rei/components/PhilosophyModal.jsx";
+import { useSessionTracker } from "./hooks/useSessionTracker.js";
+import InstrumentRail from "./components/InstrumentRail.jsx";
 import WelcomePanel from "./modules/rei/components/WelcomePanel.jsx";
 import ReiContext from "./modules/rei/ReiContext.js";
 
@@ -134,18 +136,6 @@ export default function REI({ initialPrompt } = {}) {
     }
   }, []);
 
-  // Clear any existing domain‑specific chat history entries on first load to ensure a fresh start
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith("rei_chat_history_")) {
-          console.info(`Removing stale chat history key '${key}'`);
-          localStorage.removeItem(key);
-        }
-      });
-    }
-  }, []);
-
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState(() => {
     const storedMessages = readStoredMessages(selectedDomain);
@@ -166,6 +156,8 @@ export default function REI({ initialPrompt } = {}) {
   const [assistantPromptIndex, setAssistantPromptIndex] = useState(0);
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
+
+  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, escalationCount, trackMessage, resetSession } = useSessionTracker();
 
   // Pre-fill input when navigated from landing page with a prompt
   useEffect(() => {
@@ -207,6 +199,7 @@ export default function REI({ initialPrompt } = {}) {
   }, [messages, selectedDomain]);
 
   const handleClearHistory = () => {
+    resetSession();
     const domainSpecificMessage = {
       sender: "rei",
       text: buildDomainSystemMessage(selectedDomain, currentDomain),
@@ -319,6 +312,14 @@ export default function REI({ initialPrompt } = {}) {
           }
         }
       ]);
+
+      trackMessage(
+        routerDecision?.maxTokens || 0,
+        data.model || routerDecision?.model || "unknown",
+        routerDecision?.estimatedCost || 0,
+        routerDecision?.premiumCost || 0,
+        routerDecision?.model === "gpt-4o"
+      );
     } catch (error) {
       console.error("REI.ai API error:", error);
       
@@ -432,6 +433,7 @@ Limitations:
       </header>
 
       {/* Scrollable Main Content with keyboard space */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
       <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
         <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
 
@@ -448,7 +450,11 @@ Limitations:
         />
 
         {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
-          <WelcomePanel onStart={(prompt) => {
+          <WelcomePanel
+            onResume={(domainId) => {
+              setSelectedDomain(domainId);
+            }}
+            onStart={(prompt) => {
             setInputMessage(prompt);
             handleSendMessage({ preventDefault: () => {} });
           }} />
@@ -456,6 +462,17 @@ Limitations:
 
         <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} />
       </main>
+      {!mobile && (
+        <InstrumentRail
+          sessionTokens={sessionTokens}
+          sessionMessages={sessionMessages}
+          sessionCost={sessionCost}
+          savingsVsPremium={savingsVsPremium}
+          escalationCount={escalationCount}
+          modelBreakdown={modelBreakdown}
+        />
+      )}
+      </div>
 
       <ChatInput />
       

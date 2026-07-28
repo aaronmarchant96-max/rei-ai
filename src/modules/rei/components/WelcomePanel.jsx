@@ -29,27 +29,39 @@ const GENERIC_STARTERS = [
   { label: "Test an argument", prompt: "What would change my mind about this?", icon: "🧪" },
 ];
 
-export default function WelcomePanel({ onStart }) {
+export default function WelcomePanel({ onStart, onResume }) {
   const [activeDomain, setActiveDomain] = useState(null);
+  const [recentTopics, setRecentTopics] = useState([]);
 
   useEffect(() => {
     try {
       const keys = ["legal", "coding", "genealogy", "story"];
       let best = null;
       let bestLen = 0;
+      let recent = [];
+
       for (const key of keys) {
         const raw = localStorage.getItem(`rei_chat_history_${key}`);
         if (raw) {
-          const msgs = JSON.parse(raw).messages || [];
+          const parsed = JSON.parse(raw);
+          const msgs = parsed.messages || [];
           if (msgs.length > bestLen) {
             bestLen = msgs.length;
             best = key;
+            // Extract last 2 user messages for resume cards
+            const userMsgs = msgs.filter(m => m.role === "user" || m.sender === "user");
+            recent = userMsgs.slice(-2).map(m => ({
+              text: (m.content || m.text || "").slice(0, 80) + ((m.content || m.text || "").length > 80 ? "…" : ""),
+              domain: key,
+            }));
           }
         }
       }
-      setActiveDomain(bestLen > 2 ? best : null); // 3+ messages = established domain use, not a one-off. Reasonable default, not empirically tuned.
+      setActiveDomain(bestLen > 2 ? best : null);
+      setRecentTopics(bestLen > 2 ? recent : []);
     } catch {
       setActiveDomain(null);
+      setRecentTopics([]);
     }
   }, []);
 
@@ -69,6 +81,40 @@ export default function WelcomePanel({ onStart }) {
         I use the CARDO framework to find the <b style={{ color: "#f0c965" }}>hinge</b> — the single factor that changes the answer.
         {activeDomain ? ` Looks like you've been using the ${activeDomain} domain — here are some relevant starters:` : " Pick a starting point:"}
       </div>
+
+      {recentTopics.length > 0 && (
+        <div style={{ marginBottom: "14px" }}>
+          <div style={{ fontSize: "11px", color: "rgba(148, 163, 184, 0.6)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+            Resume recent session
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {recentTopics.map((t, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onResume && onResume(t.domain)}
+                style={{
+                  padding: "10px 14px", borderRadius: "8px",
+                  background: "rgba(240, 201, 101, 0.04)", border: "1px solid rgba(240, 201, 101, 0.08)",
+                  color: "#cbd5e1", cursor: "pointer",
+                  textAlign: "left", fontSize: "12px",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(240, 201, 101, 0.25)";
+                  e.currentTarget.style.background = "rgba(240, 201, 101, 0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(240, 201, 101, 0.08)";
+                  e.currentTarget.style.background = "rgba(240, 201, 101, 0.04)";
+                }}
+              >
+                {t.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {starters.map((s) => (
