@@ -146,7 +146,7 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   const geminiKey = process.env.GEMINI_API_KEY;
   if (geminiKey && geminiKey.startsWith("AQ.")) {
     try {
-      const geminiBody = { ...requestBody, model: "gemini-2.0-flash" };
+      const geminiBody = { ...requestBody, model: "gemini-flash-latest" };
       const geminiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
@@ -159,8 +159,8 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
       if (geminiResponse.ok) {
         const data = await geminiResponse.json();
         let content = data.choices?.[0]?.message?.content || "No content returned from Gemini fallback.";
-        content = `[REI.AI ROUTING WARNING: Groq API failed. Falling back to Gemini 2.0 Flash]\n\n${content}`;
-        return { content, model: "gemini-2.0-flash", routerDecision };
+        content = `[REI.AI ROUTING WARNING: Groq API failed. Falling back to Gemini Flash]\n\n${content}`;
+        return { content, model: "gemini-flash-latest", routerDecision };
       } else {
         console.warn("Gemini fallback failed with status:", geminiResponse.status);
       }
