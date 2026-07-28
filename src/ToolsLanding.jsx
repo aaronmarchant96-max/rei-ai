@@ -257,9 +257,9 @@ export default function ToolsLanding({ onOpenTool }) {
         <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.06)" }}>
           <h3 style={{ fontSize: "15px", margin: "0 0 8px", color: "#f0c965" }}>Why Philosophy First?</h3>
           <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: 1.6, margin: "0 0 12px" }}>
-            Most LLM routers are ad-hoc heuristics. REI.ai is built on an adversarial-tested reasoning architecture.
-            The same CARDO hinge logic that substantially reduces LLM API costs also powers our evidence verification,
-            debate stress-testing, and meteorological signal analysis.
+            Engelbart argued that computers should augment human intellect, not replace it. Kaku defines intelligence as the ability to use feedback loops to model reality.
+            REI embodies both: the router augments your reasoning by finding the hinge, and the eval suite creates a feedback loop that improves the system over time —
+            the artifact proposes, the human decides, and the methodology gets sharper through iteration.
           </p>
           <div style={{ fontSize: "12px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ color: "#22c55e" }}>✓</span>

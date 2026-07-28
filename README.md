@@ -62,6 +62,17 @@ flowchart LR
 
 ---
 
+## 🧠 Philosophy
+
+REI is grounded in two principles:
+
+- **Engelbart's H-LAM/T framework:** The artifact (router) does not replace human reasoning — it augments it. The system proposes improvements (bootstrapper suggests keywords), the human decides (review before applying). Together they close the Engelbart feedback loop.
+- **Kaku's definition of intelligence:** Higher intelligence is the ability to use feedback loops to model reality. REI's eval benchmarks measure accuracy, the router improves, the gap closes. The methodology gets sharper through iteration — not through claims.
+
+Read more: [Philosophy & Methodology](docs/README.md) · [Testing Strategy](docs/TESTING.md) · [ARCHITECTURE DECISIONS](docs/DECISIONS.md)
+
+---
+
 ## 🌐 User Interface & Case Studies
 
 Our landing page is structured to highlight both the flagship router and the specialized tools that prove the CARDO framework:
