@@ -142,43 +142,6 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   }
 
   // Return a graceful user-facing message instead of throwing a 500.
-  // If Groq is rate limited and Gemini is available, fall back to Gemini.
-  if (process.env.GEMINI_API_KEY) {
-    try {
-      const geminiBody = {
-        contents: [
-          { parts: [{ text: prompt }] },
-        ],
-        systemInstruction: systemPrompt
-          ? { parts: [{ text: systemPrompt }] }
-          : undefined,
-        generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens },
-      };
-      const geminiResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(geminiBody),
-        }
-      );
-
-      if (geminiResponse.ok) {
-        const data = await geminiResponse.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        if (text) {
-          return {
-            content: `${text}\n\n*Generated via Gemini fallback (Groq was rate limited)*`,
-            model: "gemini-1.5-pro",
-            routerDecision,
-          };
-        }
-      }
-    } catch (geminiError) {
-      console.log("[CFAI] Gemini fallback attempted");console.warn("Gemini fallback also failed:", geminiError);
-    }
-  }
-
   return {
     content: "[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.",
     model: "rate-limited",
