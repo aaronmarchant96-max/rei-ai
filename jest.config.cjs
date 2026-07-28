@@ -5,7 +5,7 @@ module.exports = {
     "^.+\\.[jt]sx?$": "babel-jest",
   },
   moduleFileExtensions: ["js", "jsx", "json"],
-  testMatch: ["<rootDir>/src/**/*.test.[jt]s?(x)", "<rootDir>/api/**/*.test.[jt]s?(x)"],
+  testMatch: ["<rootDir>/src/**/*.test.[jt]s?(x)", "<rootDir>/api/**/*.test.[jt]s?(x)", "<rootDir>/scripts/**/*.test.[jt]s?(x)"],
   clearMocks: true,
   transformIgnorePatterns: [
     "node_modules/(?!(@xenova/transformers)/)",

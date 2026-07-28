@@ -47,7 +47,7 @@ export default function WelcomePanel({ onStart }) {
           }
         }
       }
-      setActiveDomain(bestLen > 2 ? best : null); // need 3+ messages to consider it established
+      setActiveDomain(bestLen > 2 ? best : null); // 3+ messages = established domain use, not a one-off. Reasonable default, not empirically tuned.
     } catch {
       setActiveDomain(null);
     }

@@ -1,5 +1,9 @@
 # REI.ai — Documentation Index
 
+> **Engelbart's H-LAM/T framework describes how humans augment their reasoning through language, artifacts, and methodology.**
+> **CARDO REI is the methodology — finding the hinge that changes the answer. REI is the artifact — making the reasoning visible, auditable, and cost-aware.**
+> **The artifact proposes (bootstrapper suggests keyword improvements), the human decides (review before applying). Together they close the Engelbart loop.**
+
 ## 📐 Canonical specifications (read these first)
 
 | Document | What it covers | Status |
