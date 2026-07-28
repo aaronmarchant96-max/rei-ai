@@ -13,7 +13,7 @@ We prioritize verifiable, empirical benchmarks over generalized claims:
 
 *   **90% Route Accuracy:** Verified on our fresh, 30-prompt blind holdout set for the v3 keyword router (evolving from a 67% baseline to 90% post-tuning).
 *   **v4 Semantic Router (Research):** Currently at **70% accuracy** running local 384-dimensional dense vector embeddings (`all-MiniLM-L6-v2` via ONNX/WASM in browser/Node).
-*   **200+ Tests:** 29 test suites with 100% pass rate — router decisions, classifier math, adversarial scanning, chat rendering, domain registry, and blind-holdout methodology.
+*   **440+ Tests:** 31 test suites with 100% pass rate — router decisions, classifier math, adversarial scanning, chat rendering, collapsible instrument rail, domain registry, and blind-holdout methodology.
 *   **12 Landmark Legal Cases:** Our legal reasoning domain is grounded in a 12-case verified index to prevent hallucination.
 
 ---
@@ -26,7 +26,7 @@ The routing engine classifies prompts into one of five core domains:
 2.  **The Engineer (coding):** Advanced software logic executing the CARDO REI methodology (verifies API shapes, enforces developer checks, and halts on ambiguity).
 3.  **The Archivist (genealogy):** Evidence-tiered historical records analysis (same-name disambiguation, parish registers, age boundary validation).
 4.  **The Storyteller (story):** Narrative architecture and character hinge generators.
-5.  **The Lex (legal):** Local precedent grounding utilizing the `Case Hinge` engine.
+5.  **The Precedent Engine (legal):** Local precedent grounding utilizing the `Case Hinge` engine.
 
 ---
 
@@ -73,12 +73,14 @@ Read more: [Philosophy & Methodology](docs/README.md) · [Testing Strategy](docs
 
 ---
 
-## 🌐 User Interface & Case Studies
+## 🌐 User Interface & Core Features
 
-Our landing page is structured to highlight both the flagship router and the specialized tools that prove the CARDO framework:
+Our landing page and chat shell highlight both the flagship router and specialized reasoning tools:
 *   **Interactive Router Demo:** Live playground displaying the selected model, estimated token usage, and real-time cost delta.
+*   **Collapsible Instrument Rail:** Real-time desktop telemetry panel displaying session tokens, dollar savings vs. premium models, model breakdown, and efficiency metrics with compact 50px collapse mode.
+*   **Optimistic Message Stream:** Instant zero-lag UI updates on message send with one-click export for formatted CARDO markdown reports.
 *   **CARDO Pipeline Trace:** Full visibility into the reasoning steps (Collect, Analyze, Record, Distinguish, Operate).
-*   **Vibrant GUI:** Responsive glassmorphism dashboards with staggered entrance animations and real-time telemetry metrics.
+*   **Vibrant Cyberpunk GUI:** Responsive glassmorphism dashboards with gold gradients and real-time telemetry metrics.
 
 ---
 
@@ -86,7 +88,7 @@ Our landing page is structured to highlight both the flagship router and the spe
 
 *   **[Architecture & Methodology](docs/README.md)** — Canonical doc index: information-theoretic architecture, CARDO REI framework, Night Shift router, v4 semantic research, red-team spec
 *   **[Architecture Decision Records](docs/DECISIONS.md)** — Dated ADRs with trade-offs, alternatives considered, and code references
-*   **[Testing Strategy](docs/TESTING.md)** — 30 suites, 440 tests, testing philosophy, how to write new tests
+*   **[Testing Strategy](docs/TESTING.md)** — 31 suites, 443 tests, testing philosophy, how to write new tests
 *   **[Contributing](CONTRIBUTING.md)** — Setup, code style, pull request checklist
 *   **[Security Policy](SECURITY.md)** — Vulnerability reporting, scope
 
@@ -94,7 +96,7 @@ Our landing page is structured to highlight both the flagship router and the spe
 
 ## 🛠️ Tech Stack & Deployment
 
-*   **Frontend:** React (lazy-loaded code splitting), Tailwind CSS (Relume gold preset).
+*   **Frontend:** React (lazy-loaded code splitting, Context state), Tailwind CSS (Relume gold preset).
 *   **Backend:** Node.js, Vercel Serverless Functions (`api/cfai.js`).
 *   **Embeddings:** ONNX Runtime Web / WASM.
 *   **Testing:** Jest (jsdom environment).
@@ -124,5 +126,6 @@ npm test
 
 ## 🔗 Project Links
 
-*   **Live Demo:** [https://debate-furnace.vercel.app/#rei](https://debate-furnace.vercel.app/#rei)
+*   **Live App:** [https://debate-furnace.vercel.app/#rei](https://debate-furnace.vercel.app/#rei)
+*   **Production Deployment:** [https://rei-aa0e6olw1-prompthound-s-projects.vercel.app/#rei](https://rei-aa0e6olw1-prompthound-s-projects.vercel.app/#rei)
 *   **Source Code:** [https://github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
