@@ -46,7 +46,7 @@ describe("ToolsLanding", () => {
 
     const launchBtns = screen.getAllByRole("button", { name: /launch/i });
     expect(launchBtns.length).toBeGreaterThanOrEqual(5);
-    fireEvent.click(launchBtns[1]); // 0=hero, 1=Furnace
+    fireEvent.click(launchBtns[2]);
     expect(onOpenTool).toHaveBeenCalledWith({ tool: "furnace" });
   });
 
