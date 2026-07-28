@@ -3,7 +3,7 @@ import { getDomainProfiles } from "./domains/_index.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 
-const REPO_URL = "https://github.com/aaronmarchant96-max/debate-furnace";
+const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 
 function ToolIcon({ id, size = 24 }) {
   switch (id) {
@@ -74,6 +74,9 @@ const DEMO_SCENARIOS = [
 ];
 
 const CASE_STUDIES = [
+  { id: "rei", toolId: "rei", label: "REI.ai", subtitle: "Cost-Aware Router",
+    description: "Live LLM Routing · 5 CARDO domains applied",
+    hinge: "90% route accuracy · &lt;5ms latency · 440 tests" },
   { id: "furnace", toolId: "furnace", label: "Debate Furnace", subtitle: "Adversarial Pressure Test",
     description: "Argument Pressure Testing · 4 CARDO steps applied",
     hinge: "Ultimate Authorship vs Reason-Responsive Agency" },
@@ -114,7 +117,7 @@ export default function ToolsLanding({ onOpenTool }) {
   const savingsPct = premiumCost > 0 ? Math.round((1 - reiCost / premiumCost) * 100) : 0;
   const hsv = demoResult?.hingeVector || {};
   const hingeRationale = demoResult?.id === "simple-greeting" ? "Cheap deterministic path — zero reasoning cost."
-    : demoResult?.id?.includes("coding") ? "Structural complexity fits 70B. Frontier adds cost, not precision."
+    : demoResult?.id?.includes("coding") ? "Structural complexity fits 70B. gpt-4o adds cost, not precision."
     : demoResult?.id?.includes("adversarial") ? "Injection pattern detected. Escalated to premium validation."
     : "Generic reasoning. Balanced cost/safety profile.";
 
@@ -176,7 +179,7 @@ export default function ToolsLanding({ onOpenTool }) {
         }}
       >
         <span>Open Source · Local-First</span>
-        <span style={{ color: "#f0c965", fontWeight: 700 }}>200+ tests passing</span>
+        <span style={{ color: "#f0c965", fontWeight: 700 }}>440 tests passing</span>
         <span>{domains.length} reasoning domains</span>
         <span>12 landmark cases</span>
       </div>
@@ -284,8 +287,8 @@ export default function ToolsLanding({ onOpenTool }) {
         }}>
           {[
             { val: "90%", label: "Route Accuracy\n(30-prompt holdout)" },
-            { val: "~65.5%", label: "Cost vs Always\nPremium Model" },
-            { val: "<5ms", label: "Latency\nZero Inference" },
+            { val: "~65.5%", label: "Avg. Savings vs\ngpt-4o (eval)" },
+            { val: "<5ms", label: "Latency\nRouting Only" },
           ].map((m) => (
             <div key={m.label} style={{
               padding: "10px 16px", borderRadius: "10px",
@@ -360,7 +363,10 @@ export default function ToolsLanding({ onOpenTool }) {
           </div>
         )}
         <div style={{ fontSize: "11px", color: "#64748b", textAlign: "center", marginTop: "10px" }}>
-          v3.0 keyword router · {demoResult?.hingeTier || "—"} complexity tier · zero-inference local matcher
+          v3.0 keyword router · {demoResult?.hingeTier || "—"} complexity tier · zero-inference routing (rule-based, no model call)
+        </div>
+        <div style={{ fontSize: "9px", color: "rgba(148, 163, 184, 0.5)", textAlign: "center", marginTop: "4px" }}>
+          ECS = Embedding Complexity · DAS = Domain Ambiguity · APS = Adversarial Pressure
         </div>
       </section>
 
@@ -462,7 +468,7 @@ export default function ToolsLanding({ onOpenTool }) {
           <span style={{ color: "#64748b" }}> by PromptHound Labs</span>
         </div>
         <div style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
-          200+ tests passing · <a href={REPO_URL} target="_blank" rel="noreferrer" style={{ color: "#94a3b8" }}>GitHub &rarr;</a>
+          440 tests passing · <a href={REPO_URL} target="_blank" rel="noreferrer" style={{ color: "#94a3b8" }}>GitHub &rarr;</a>
         </div>
       </footer>
     </div>

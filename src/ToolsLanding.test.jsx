@@ -12,7 +12,7 @@ describe("ToolsLanding", () => {
   it("renders stats bar with test count", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getAllByText(/200\+ tests passing/i).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText(/440 tests passing/i).length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText(/open source/i)).toBeInTheDocument();
   });
 
