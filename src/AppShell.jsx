@@ -1,5 +1,6 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useMobile, useSwipe } from "./useMobile.js";
+import HingeMark from "./modules/rei/components/HingeMark.jsx";
 
 const DebateFurnace = lazy(() => import("./DebateFurnace.jsx"));
 const CreativeEngine = lazy(() => import("./CreativeEngine.jsx"));
@@ -204,9 +205,7 @@ export default function AppShell() {
         <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
              <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
-                 <svg className="w-5 h-5 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                 </svg>
+                 <HingeMark size={16} animated={false} color="#F59E0B" />
              </div>
             <div>
               <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>
