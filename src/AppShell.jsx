@@ -201,26 +201,32 @@ export default function AppShell() {
       )}
 
       {tool === "tools" ? (
-        <header className="shell-header shell-header--landing">
-          <div className="shell-brand">
-            <div className="shell-brand__title">PromptHound Labs</div>
-            <div className="shell-brand__sub">Structured outputs for messy input.</div>
+        <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
+                 <svg className="w-5 h-5 text-[#F59E0B]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                 </svg>
+             </div>
+            <div>
+              <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>
+            </div>
           </div>
 
           {!mobile && (
-            <nav className="top-tabs hide-mobile" aria-label="Top-level tools">
-              {TOP_LEVEL.map((item) => (
+            <nav className="flex items-center gap-8" aria-label="Top-level tools">
+              {TOP_LEVEL.slice(1).map((item) => (
                 <button
                   key={item.id}
                   type="button"
-                  className={tool === item.id ? "top-tab is-active" : "top-tab touch-target"}
+                  className={`text-sm font-medium transition-colors hover:text-[#F59E0B] ${tool === item.id ? "text-[#F59E0B]" : "text-gray-400"}`}
                   onClick={() => setTool(item.id)}
-                  aria-pressed={tool === item.id}
                 >
-                  <span className="top-tab__label">{item.label}</span>
-                  <span className="top-tab__sub">{item.subtitle}</span>
+                  {item.label}
                 </button>
               ))}
+              <div className="w-px h-4 bg-gray-700 mx-2"></div>
+              <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">GitHub</a>
             </nav>
           )}
         </header>

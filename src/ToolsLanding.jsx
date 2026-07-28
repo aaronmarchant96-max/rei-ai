@@ -94,34 +94,37 @@ export default function ToolsLanding({ onOpenTool }) {
       {/* ── 1. Hero (The Pivot) ── */}
       <motion.header 
         initial="hidden" animate="visible" variants={fadeIn}
-        className="relative z-10 max-w-4xl mx-auto pt-32 pb-16 text-center flex flex-col items-center"
+        className="relative z-10 max-w-4xl mx-auto pt-24 pb-32 text-center flex flex-col items-center overflow-hidden"
       >
+        {/* Subtle Radial Gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.1),transparent_50%)] pointer-events-none"></div>
+
         <motion.div 
           whileHover={{ rotate: 90 }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          className="w-16 h-16 rounded-lg bg-surface border-2 border-hinge flex items-center justify-center mb-8 shadow-[0_0_30px_rgba(212,175,55,0.2)] cursor-crosshair"
+          className="relative w-16 h-16 rounded-lg bg-surface border-2 border-hinge flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(245,158,11,0.3)] cursor-crosshair z-10"
         >
           <HingeMark size={32} animated={false} color="#F59E0B" />
         </motion.div>
         
-        <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
+        <div className="relative font-mono text-xs font-bold tracking-widest uppercase text-[#F59E0B] mb-4 z-10">
           REI.ai by PromptHound Labs
         </div>
         
-        <h1 className="font-heading text-5xl md:text-7xl font-black leading-tight mb-6">
-          Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-hinge to-hinge-bright">Hinge</span>.<br />
+        <h1 className="relative font-heading text-6xl md:text-8xl font-black leading-tight mb-6 z-10">
+          Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F59E0B] to-[#FFD700]">Hinge</span>.<br />
           Route Smarter.
         </h1>
         
-        <p className="text-foreground-muted text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-          CARDO is the open-source framework that isolates the load-bearing pivot point in any prompt—routing queries to the cheapest, most capable model.
+        <p className="relative text-[#E2E8F0] text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed font-light z-10">
+          CARDO is the open-source framework that isolates the load-bearing pivot point in any prompt—routing queries to the <strong className="text-white font-bold">cheapest, most capable model</strong>.
         </p>
         
         <button
           onClick={() => onOpenTool({ tool: "rei" })}
-          className="group flex items-center gap-2 bg-surface border-2 border-hinge-bright text-hinge-bright px-8 py-4 rounded-md font-heading font-bold uppercase tracking-wider hover:bg-hinge-bright hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.15)] hover:shadow-[0_0_30px_rgba(212,175,55,0.4)]"
+          className="relative z-10 group flex items-center gap-2 bg-gradient-to-r from-[#F59E0B] to-[#FFD700] text-black px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:scale-105 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all duration-300"
         >
-          Launch REI.ai <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
       </motion.header>
 
@@ -136,16 +139,21 @@ export default function ToolsLanding({ onOpenTool }) {
         </div>
 
         {/* Technical Badges */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-4xl mx-auto">
           {[
-            { val: "92.0%", label: "Zero-Shot Accuracy", sub: "(ONNX embeddings)" },
-            { val: "443+", label: "Passing Tests", sub: "(Across 31 suites)" },
-            { val: "<5ms", label: "Latency", sub: "(Routing only)" },
-          ].map((m) => (
-            <div key={m.label} className="bg-surface border border-border p-4 rounded-md min-w-[160px] text-center shadow-lg">
-              <div className="font-mono text-2xl font-bold text-hinge-bright mb-1">{m.val}</div>
-              <div className="font-heading text-sm font-semibold">{m.label}</div>
-              <div className="font-sans text-xs text-foreground-muted">{m.sub}</div>
+            { icon: "🎯", val: "92.0%", label: "Zero-Shot Accuracy" },
+            { icon: "✅", val: "443+", label: "Passing Tests" },
+            { icon: "⚡", val: "<5ms", label: "Latency" },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-8 text-center hover:border-[#F59E0B] transition-all"
+            >
+              <div className="text-4xl mb-4">{stat.icon}</div>
+              <div className="text-4xl font-bold text-white mb-2">{stat.val}</div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider">
+                {stat.label}
+              </div>
             </div>
           ))}
         </div>
