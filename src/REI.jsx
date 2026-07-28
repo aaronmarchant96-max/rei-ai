@@ -240,6 +240,9 @@ export default function REI({ initialPrompt } = {}) {
         : null,
     };
 
+    // Optimistically render user message and clear input field for instant responsiveness
+    setMessages((prev) => [...prev, userMsg]);
+    setInputMessage("");
     setIsTyping(true);
 
     // Capture and clear ingest state up front, so it can't accidentally attach to a later, unrelated message.
@@ -295,7 +298,6 @@ export default function REI({ initialPrompt } = {}) {
 
       setMessages((prev) => [
         ...prev,
-        userMsg,
         {
           sender: "rei",
           text: data.result,
@@ -336,7 +338,6 @@ Limitations:
 
       setMessages((prev) => [
         ...prev,
-        userMsg,
         {
           sender: "rei",
           text: fallbackText,
@@ -351,7 +352,6 @@ Limitations:
       ]);
     } finally {
       setIsTyping(false);
-      setInputMessage("");
     }
   }
 
