@@ -143,12 +143,11 @@ export default function ToolsLanding({ onOpenTool }) {
           REI.ai by PromptHound Labs
         </div>
         <h1 style={{ fontSize: "28px", lineHeight: 1.3, margin: "0 0 12px", fontWeight: 800 }}>
-          A structured reasoning framework<br />that routes prompts to the cheapest capable model.
+          CARDO helps you find the hinge —<br />the single factor that changes the answer.
         </h1>
         <p style={{ color: "#94a3b8", fontSize: "14px", maxWidth: "600px", margin: "0 auto 20px", lineHeight: 1.6 }}>
-          REI.ai applies CARDO — Collect, Analyze, Record, Distinguish, Operate — to every prompt.
-          It finds the hinge point, routes to the cheapest model that won&rsquo;t fumble the answer,
-          and proves the methodology works across domains from adversarial debate to storm analysis.
+          REI makes CARDO visible, auditable, and cost-aware — routing every prompt to the cheapest capable model
+          and proving the methodology works across domains from adversarial debate to storm analysis.
         </p>
         <button
           type="button"
