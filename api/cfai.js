@@ -147,10 +147,10 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
     try {
       const geminiBody = {
         contents: [
-          { role: "user", parts: [{ text: prompt }] },
+          { parts: [{ text: prompt }] },
         ],
         systemInstruction: systemPrompt
-          ? { role: "user", parts: [{ text: systemPrompt }] }
+          ? { parts: [{ text: systemPrompt }] }
           : undefined,
         generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens },
       };
@@ -175,7 +175,7 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
         }
       }
     } catch (geminiError) {
-      console.warn("Gemini fallback also failed:", geminiError);
+      console.log("[CFAI] Gemini fallback attempted");console.warn("Gemini fallback also failed:", geminiError);
     }
   }
 
