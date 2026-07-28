@@ -261,9 +261,9 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")) {
-    const decision = buildDecision("genealogy-deep-dive", {
-      rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
+  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")) {
+    const decision = buildDecision("coding-hinge", {
+      rationale: "Coding language detected; route through the verification-first coding path.",
       routingSignals: {
         complexityTier,
         matchedTerms: catalogRoute?.matchTerms || [],
@@ -275,9 +275,9 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")) {
-    const decision = buildDecision("coding-hinge", {
-      rationale: "Coding language detected; route through the verification-first coding path.",
+  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")) {
+    const decision = buildDecision("genealogy-deep-dive", {
+      rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
       routingSignals: {
         complexityTier,
         matchedTerms: catalogRoute?.matchTerms || [],
