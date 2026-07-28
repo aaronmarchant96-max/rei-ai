@@ -1,23 +1,34 @@
-# REI.ai — Core Documentation Index
+# REI.ai — Documentation Index
 
-Welcome to the **REI.ai** documentation center. Here you will find architectural specifications, machine learning routing plans, information-theoretic specs, and product roadmaps.
+## 📐 Canonical specifications (read these first)
 
----
-
-## 📚 Key Architectural Documents
-
-| Document | Description | Status |
+| Document | What it covers | Status |
 | :--- | :--- | :--- |
-| 🗺️ [**Product Roadmap**](ROADMAP.md) | 30-day commercial launch plan, open-core architecture, and **v4.0 ONNX local embedding roadmap**. | Active |
-| 🧠 [**REI.ai v4.0 Semantic Router Plan**](REI_V4_SEMANTIC_ROUTER_PLAN.md) | Architectural plan for elevating zero-shot out-of-sample holdout accuracy to **>85%** using local ONNX semantic vector embeddings (`all-MiniLM-L6-v2`). | Proposed (v4.0 Build) |
-| 🌙 [**Night Shift v3 ML Router Plan**](NIGHT_SHIFT_V3_ML_PLAN.md) | Architectural specification for Layer 1.5 ML Hinge Classifier ($f_1 \dots f_8$, normalized $\text{DAS}$, $\text{APS}$). | Deployed (v2.0.2) |
-| 📐 [**Information-Theoretic Architecture Spec**](INFORMATION_THEORETIC_ARCHITECTURE.md) | Ground-truth mathematical specification for CARDO REI 8-phase loop, $R(T)$ index, and CARDO GUARD equation. | Canonical Spec |
-| 🛡️ [**Red Team Scanner Specification**](RED_TEAM_SPEC.md) | 16-category threat detection taxonomy and surface-scan pipeline. | Deployed |
-| 🔬 [**Research Index**](RESEARCH_INDEX.md) | Historical timeline of experiments across all repositories from 2026-04 to present. | Active |
-| ⚡ [**Token Efficiency Audit**](TOKEN_EFFICIENCY_AUDIT.md) | Token optimization guide and context window guidelines. | Active |
+| [**Information-Theoretic Architecture**](INFORMATION_THEORETIC_ARCHITECTURE.md) | **Authoritative.** Formal spec: CARDO REI 8-phase loop, complexity index, CARDO GUARD equation, claim stratification, testable hypotheses | Canonical |
+| [**Architecture Decision Records**](DECISIONS.md) | **Authoritative.** Dated ADRs with trade-offs, alternatives, and code references | Canonical |
+| [**Testing Strategy**](TESTING.md) | 30 suites, 440 tests, testing philosophy, how to write new tests | Active |
 
----
+## 📋 Detailed references
 
-## 📊 Canonical Metrics & Correction History
-- **Canonical Telemetry Data:** [`../data/telemetry.json`](../data/telemetry.json)
-- **Historical Correction Trail & Version Changelog:** [`../CHANGELOG.md`](../CHANGELOG.md)
+| Document | What it covers | Status |
+| :--- | :--- | :--- |
+| [**REI.ai Detailed Explanation**](REI_DETAILED_EXPLANATION.md) | Comprehensive system manual with code fragments | Active |
+| [**Night Shift v3 ML Router Plan**](NIGHT_SHIFT_V3_ML_PLAN.md) | v3 keyword router architecture ($f_1\dots f_8$, DAS, APS) | Deployed |
+| [**REI.ai v4 Semantic Router Plan**](REI_V4_SEMANTIC_ROUTER_PLAN.md) | v4 ONNX semantic routing plan (research, not production) | Research |
+| [**Red Team Scanner Spec**](RED_TEAM_SPEC.md) | 16-category threat detection taxonomy | Deployed |
+| [**Product Roadmap**](ROADMAP.md) | 30-day launch plan, open-core architecture | Active |
+| [**Common Mistakes**](COMMON_MISTAKES.md) | Troubleshooting matrix: deployment, build, API, routing | Active |
+
+## 📊 Data & changelog
+
+- [**CHANGELOG**](../CHANGELOG.md) — version history with correction audit trails
+- [**Research Index**](RESEARCH_INDEX.md) — experiment timeline across all repos
+- [**Token Efficiency Audit**](TOKEN_EFFICIENCY_AUDIT.md) — context window guidelines
+
+## ⚠️ Legacy (pre-REI.ai pivot)
+
+| Document | Era |
+| :--- | :--- |
+| [Debate Furnace Origin](Debate_Furnace_Origin.md) | June 2026 (superseded) |
+| [Debate Furnace Rich Script Reference](Debate_Furnace_Rich_Script_Reference.md) | June 2026 (superseded) |
+| Hinge Meter / Hinge Market docs | June 2026 (deferred) |

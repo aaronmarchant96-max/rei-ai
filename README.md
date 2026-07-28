@@ -64,6 +64,16 @@ Our landing page is structured to highlight both the flagship router and the spe
 
 ---
 
+## 📚 Documentation
+
+*   **[Architecture & Methodology](docs/README.md)** — Canonical doc index: information-theoretic architecture, CARDO REI framework, Night Shift router, v4 semantic research, red-team spec
+*   **[Architecture Decision Records](docs/DECISIONS.md)** — Dated ADRs with trade-offs, alternatives considered, and code references
+*   **[Testing Strategy](docs/TESTING.md)** — 30 suites, 440 tests, testing philosophy, how to write new tests
+*   **[Contributing](CONTRIBUTING.md)** — Setup, code style, pull request checklist
+*   **[Security Policy](SECURITY.md)** — Vulnerability reporting, scope
+
+---
+
 ## 🛠️ Tech Stack & Deployment
 
 *   **Frontend:** React (lazy-loaded code splitting), Tailwind CSS (Relume gold preset).
