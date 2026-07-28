@@ -154,6 +154,10 @@ function isMetaQuery(text) {
   return /\bhow (do|are) you|who are you|what (is|are) you|what is carlo|explain (how|what)|tell me about (yourself|you)\b/i.test(text);
 }
 
+function isSelfEvaluation(text) {
+  return /\b(self-evaluate|evaluate yourself|evaluate your architecture|self-diagnose)\b/i.test(text);
+}
+
 function getComplexityTier(text) {
   const words = text.split(/\s+/).filter(Boolean).length;
   const questionMarks = (text.match(/\?/g) || []).length;
@@ -239,6 +243,23 @@ export function buildRouterDecision({
       routingSignals: {
         complexityTier,
         matchedTerms: [],
+        highStructureSignals,
+        storedPreference,
+      },
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
+  if (isSelfEvaluation(text)) {
+    const decision = buildDecision("coding-hinge", {
+      rationale: "Self-evaluation request detected; routing to The Engineer with strict reasoning threshold.",
+      qualityGate: "Architecture self-evaluation gate",
+      maxTokens: 800,
+      temperature: 0.2,
+      routingSignals: {
+        complexityTier,
+        matchedTerms: ["self-evaluate"],
         highStructureSignals,
         storedPreference,
       },
