@@ -142,37 +142,40 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   }
 
   // Return a graceful user-facing message instead of throwing a 500.
-  // If Groq is rate limited and OpenAI is available, fall back to OpenAI.
-  if (process.env.OPENAI_API_KEY) {
+  // If Groq is rate limited and Gemini is available, fall back to Gemini.
+  if (process.env.GEMINI_API_KEY) {
     try {
-      const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt || REI_SYSTEM_PROMPT },
-            ...formattedHistory,
-            { role: "user", content: prompt },
-          ],
-          temperature: 0.7,
-          max_tokens: maxTokens,
-        }),
-      });
+      const geminiBody = {
+        contents: [
+          { role: "user", parts: [{ text: prompt }] },
+        ],
+        systemInstruction: systemPrompt
+          ? { role: "user", parts: [{ text: systemPrompt }] }
+          : undefined,
+        generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens },
+      };
+      const geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(geminiBody),
+        }
+      );
 
-      if (openaiResponse.ok) {
-        const data = await openaiResponse.json();
-        return {
-          content: `${data.choices?.[0]?.message?.content || "No content returned from OpenAI."}\n\n*Generated via OpenAI fallback (Groq was rate limited)*`,
-          model: "gpt-4o-mini",
-          routerDecision,
-        };
+      if (geminiResponse.ok) {
+        const data = await geminiResponse.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (text) {
+          return {
+            content: `${text}\n\n*Generated via Gemini fallback (Groq was rate limited)*`,
+            model: "gemini-1.5-pro",
+            routerDecision,
+          };
+        }
       }
-    } catch (openaiError) {
-      console.warn("OpenAI fallback also failed:", openaiError);
+    } catch (geminiError) {
+      console.warn("Gemini fallback also failed:", geminiError);
     }
   }
 
