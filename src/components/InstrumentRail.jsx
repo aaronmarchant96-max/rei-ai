@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export default function InstrumentRail({
   sessionTokens,
   sessionMessages,
@@ -6,13 +8,44 @@ export default function InstrumentRail({
   escalationCount,
   modelBreakdown,
 }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   const totalPremiumCost = sessionCost + savingsVsPremium;
   const savingsPercent = totalPremiumCost > 0
     ? Math.round((savingsVsPremium / totalPremiumCost) * 100)
     : 0;
 
+  if (isCollapsed) {
+    return (
+      <aside className="rei-instrument-rail is-collapsed" aria-label="Session instrumentation">
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="rei-instrument-rail__toggle-btn"
+          aria-label="Expand sidebar"
+          title="Expand sidebar"
+        >
+          ‹
+        </button>
+        <div className="rei-instrument-rail__collapsed-hero" title={`Efficiency: ${savingsPercent}%`}>
+          <div className="rei-instrument-rail__collapsed-hero-value">
+            EFFICIENCY: {totalPremiumCost > 0 ? `${savingsPercent}%` : "—"}
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside className="rei-instrument-rail" aria-label="Session instrumentation">
+      <button
+        onClick={() => setIsCollapsed(true)}
+        className="rei-instrument-rail__toggle-btn"
+        aria-label="Collapse sidebar"
+        title="Collapse sidebar"
+      >
+        ›
+      </button>
+
       <div className="rei-instrument-rail__section rei-instrument-rail__section--hero">
         <div className="rei-instrument-rail__hero-label">Efficiency</div>
         <div className="rei-instrument-rail__hero-value">
