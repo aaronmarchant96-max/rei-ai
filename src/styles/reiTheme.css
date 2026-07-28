@@ -566,3 +566,10 @@ body {
   background-size: 400% 400%;
   animation: ambient-shift 30s ease infinite;
 }
+
+/* ── Landing page animations ── */
+@keyframes hinge-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(249,115,22,0); }
+  50%  { box-shadow: 0 0 20px 4px rgba(249,115,22,0.4); }
+  100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); }
+}

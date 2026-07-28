@@ -228,6 +228,11 @@ export default function ToolsLanding({ onOpenTool }) {
                     : "1px solid rgba(255,255,255,0.08)",
                   color: "#e2e8f0", cursor: "pointer",
                   textAlign: "left", transition: "all 0.2s ease",
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? "translateY(0)" : "translateY(8px)",
+                  transitionDelay: visible ? "0s" : `${0.6 + (i - 1) * 0.15}s`,
+                  transitionProperty: "opacity, transform, background, border-color",
+                  animation: item.isHinge ? "hinge-pulse 1.2s ease-out 0.4s 1" : "none",
                 }}
               >
                 <div style={{ fontSize: "10px", color: "#f0c965", fontWeight: 700, marginBottom: "4px" }}>

@@ -1,4 +1,5 @@
 import ChatBubble from "./ChatBubble.jsx";
+import TypingPipeline from "./TypingPipeline.jsx";
 
 export default function ChatHistory({ messages, selectedDomain, isTyping, chatEndRef, mobile, onCopy }) {
   return (
@@ -8,21 +9,7 @@ export default function ChatHistory({ messages, selectedDomain, isTyping, chatEn
           <ChatBubble key={index} msg={msg} selectedDomain={selectedDomain} mobile={mobile} onCopy={onCopy} />
         ))}
 
-        {isTyping && (
-          <div style={{
-            alignSelf: "flex-start",
-            color: "#FFB300",
-            fontFamily: "inherit",
-            fontSize: "1.02em",
-            animation: "pulse 1.5s ease-in-out infinite",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px"
-          }}>
-            <span>●</span>
-            <span>REI is shaping the reply...</span>
-          </div>
-        )}
+        {isTyping && <TypingPipeline />}
         <div ref={chatEndRef} />
       </div>
     </div>
