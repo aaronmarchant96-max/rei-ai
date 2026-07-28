@@ -141,6 +141,34 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
     }
   }
 
+  // --- Gemini API Fallback ---
+  // If Groq fails (e.g., context length exceeded or persistent rate limits), fallback to Gemini.
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (geminiKey && geminiKey.startsWith("AQ.")) {
+    try {
+      const geminiBody = { ...requestBody, model: "gemini-2.0-flash" };
+      const geminiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${geminiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(geminiBody),
+      });
+
+      if (geminiResponse.ok) {
+        const data = await geminiResponse.json();
+        let content = data.choices?.[0]?.message?.content || "No content returned from Gemini fallback.";
+        content = `[REI.AI ROUTING WARNING: Groq API failed. Falling back to Gemini 2.0 Flash]\n\n${content}`;
+        return { content, model: "gemini-2.0-flash", routerDecision };
+      } else {
+        console.warn("Gemini fallback failed with status:", geminiResponse.status);
+      }
+    } catch (fallbackError) {
+      console.warn("Gemini fallback error:", fallbackError);
+    }
+  }
+
   // Return a graceful user-facing message instead of throwing a 500.
   return {
     content: "[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.",
