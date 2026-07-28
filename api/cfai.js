@@ -147,6 +147,7 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   if (geminiKey && geminiKey.startsWith("AQ.")) {
     try {
       const geminiBody = { ...requestBody, model: "gemini-flash-latest" };
+      delete geminiBody.max_tokens;
       const geminiResponse = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         headers: {
