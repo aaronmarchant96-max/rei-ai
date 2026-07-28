@@ -142,6 +142,40 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   }
 
   // Return a graceful user-facing message instead of throwing a 500.
+  // If Groq is rate limited and OpenAI is available, fall back to OpenAI.
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: systemPrompt || REI_SYSTEM_PROMPT },
+            ...formattedHistory,
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens,
+        }),
+      });
+
+      if (openaiResponse.ok) {
+        const data = await openaiResponse.json();
+        return {
+          content: `${data.choices?.[0]?.message?.content || "No content returned from OpenAI."}\n\n*Generated via OpenAI fallback (Groq was rate limited)*`,
+          model: "gpt-4o-mini",
+          routerDecision,
+        };
+      }
+    } catch (openaiError) {
+      console.warn("OpenAI fallback also failed:", openaiError);
+    }
+  }
+
   return {
     content: "[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.",
     model: "rate-limited",
