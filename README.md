@@ -23,7 +23,7 @@ We prioritize verifiable, empirical benchmarks over generalized claims:
 The routing engine classifies prompts into one of five core domains:
 
 1.  **The Generalist (assistant):** Everyday queries, reasoning, and low-complexity tasks.
-2.  **The Hinge Finder (coding):** Advanced software logic executing the CARDO REI methodology (verifies API shapes, enforces developer checks, and halts on ambiguity).
+2.  **The Engineer (coding):** Advanced software logic executing the CARDO REI methodology (verifies API shapes, enforces developer checks, and halts on ambiguity).
 3.  **The Archivist (genealogy):** Evidence-tiered historical records analysis (same-name disambiguation, parish registers, age boundary validation).
 4.  **The Storyteller (story):** Narrative architecture and character hinge generators.
 5.  **The Lex (legal):** Local precedent grounding utilizing the `Case Hinge` engine.

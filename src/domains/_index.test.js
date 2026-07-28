@@ -7,11 +7,11 @@ describe("domain registry", () => {
 
   it("getDomain returns correct domain by id", () => {
     const legal = getDomain("legal");
-    expect(legal.label).toBe("The Hinge Analyst");
+    expect(legal.label).toBe("The Precedent Engine");
     expect(legal.sessionLabel).toBe("precedent analysis");
 
     const coding = getDomain("coding");
-    expect(coding.label).toBe("The Hinge Finder");
+    expect(coding.label).toBe("The Engineer");
     expect(coding.sessionLabel).toBe("coding session");
   });
 

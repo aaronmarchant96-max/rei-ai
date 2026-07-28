@@ -115,7 +115,7 @@ describe("handler", () => {
         input: "implement a react hook",
         systemPrompt: "coding",
         domain: "coding",
-        domainLabel: "The Hinge Finder",
+        domainLabel: "The Engineer",
         domainRules: ["Verify API shapes", "Name hinges explicitly"],
       },
     };

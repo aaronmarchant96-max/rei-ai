@@ -2,11 +2,11 @@ import { CASE_HINGE_PROMPT } from "../../systemPrompts.js";
 
 export default {
   id: "legal",
-  label: "The Hinge Analyst",
+  label: "The Precedent Engine",
   badge: "Beta",
   subtitle: "Legal precedent analysis",
   sessionLabel: "precedent analysis",
-  description: "Grounded legal case analysis and precedent evaluation.",
+  description: "Legal precedent analysis and case evaluation.",
   rules: ["Verified-index grounding", "Hinge before holding", "Flag unverified cases explicitly"],
   exemplar: "Extracting the decisive legal principle and what fact would have changed the outcome.",
   systemPrompt: CASE_HINGE_PROMPT,

@@ -2,7 +2,7 @@ import { CODING_PROMPT } from "../../systemPrompts.js";
 
 export default {
   id: "coding",
-  label: "The Hinge Finder",
+  label: "The Engineer",
   badge: "Active",
   subtitle: "Senior coding logic",
   sessionLabel: "coding session",
