@@ -224,18 +224,6 @@ export default function AppShell() {
             </nav>
           )}
         </header>
-      ) : !mobile ? (
-        <div className="shell-tool-bar" aria-label="Breadcrumb">
-          <button
-            type="button"
-            className="shell-tool-bar__back"
-            onClick={() => setTool("tools")}
-          >
-            ← PromptHound Labs
-          </button>
-          <span className="shell-tool-bar__sep" aria-hidden="true">/</span>
-          <span className="shell-tool-bar__current">{currentToolLabel}</span>
-        </div>
       ) : null}
 
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>

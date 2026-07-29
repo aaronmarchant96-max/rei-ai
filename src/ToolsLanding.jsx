@@ -84,14 +84,9 @@ export default function ToolsLanding({ onOpenTool }) {
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans px-4 pb-24 overflow-x-hidden relative">
+    <div className="min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
       
-      {/* Background Architectural Grid */}
-      <div className="absolute inset-0 pointer-events-none" 
-           style={{ backgroundImage: 'linear-gradient(to right, #27272A 1px, transparent 1px), linear-gradient(to bottom, #27272A 1px, transparent 1px)', backgroundSize: '4rem 4rem', opacity: 0.2 }} 
-      />
-
-      {/* ── 1. Hero (The Pivot) ── */}
+      {/* ── 1. Premium Hero ── */}
       <motion.header 
         initial="hidden" animate="visible" variants={fadeIn}
         className="relative z-10 max-w-4xl mx-auto pt-24 pb-32 text-center flex flex-col items-center overflow-hidden"

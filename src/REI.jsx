@@ -376,7 +376,7 @@ Limitations:
     >
       {/* Sticky Header with safe area top */}
       <header className="safe-top rei-header">
-        <div className="rei-header__brand">
+        <a href="/" className="rei-header__brand" style={{ textDecoration: 'none' }}>
           {/* Logo Mark */}
           <div className="rei-logo-mark">
             <HingeMark size={20} animated={true} />
@@ -387,7 +387,7 @@ Limitations:
                 Latin: <em>Rei</em> (The Matter / Hinge) &nbsp;|&nbsp; Loop: <strong>Record • Evaluate • Iterate</strong>
             </p>
           </div>
-        </div>
+        </a>
  
         {/* Domain selection tab strip */}
         <div className="rei-domain-tabs">

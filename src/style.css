@@ -62,7 +62,7 @@ button {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background: var(--page);
+  background: transparent;
 }
 
 .shell-header {
