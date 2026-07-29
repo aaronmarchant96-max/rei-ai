@@ -425,7 +425,7 @@ Limitations:
               setInputMessage("What is the hinge in Donoghue v Stevenson?");
             }}
             className="rei-action-btn"
-            style={{ color: "#f0c965", borderColor: "rgba(240, 201, 101, 0.25)" }}
+            style={{ color: "#F59E0B", borderColor: "rgba(245, 158, 11, 0.25)" }}
           >
               ⚖️ Try a Case
           </button>
