@@ -225,6 +225,7 @@ export default function AppShell() {
                 </button>
               ))}
               <div className="w-px h-4 bg-gray-700 mx-2"></div>
+              <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
               <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">GitHub</a>
             </nav>
           )}
