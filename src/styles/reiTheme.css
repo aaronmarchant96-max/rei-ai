@@ -543,11 +543,7 @@
   100% { background-position: 0% 50%; }
 }
 
-body {
-  background-color: #0A0A0A;
-  background-image: linear-gradient(to right, rgba(39, 39, 42, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(39, 39, 42, 0.2) 1px, transparent 1px);
-  background-size: 4rem 4rem;
-}
+
 .rei-shell {
   background-color: transparent !important;
 }
