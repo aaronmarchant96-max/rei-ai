@@ -45,15 +45,15 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
             }
 
             return (
-              <div style={{ display: "grid", gap: "16px", paddingRight: "36px" }}>
-                {sections.intro && <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{sections.intro}</div>}
+                            <div style={{ display: "grid", gap: "22px", paddingRight: "36px" }}>
+                                {sections.intro && <div style={{ fontSize: "15px", lineHeight: "1.45" }}>{sections.intro}</div>}
 
                 {/* 📌 1. THE HINGE FOCUS CONTAINER */}
                 {hasHinge && (
                   <div
                     style={{
-                      background: "rgba(240, 201, 101, 0.1)",
                       borderLeft: "4px solid #f0c965",
+                      marginBottom: "12px",
                       borderRadius: "0 10px 10px 0",
                       padding: "12px 16px",
                       boxShadow: "0 4px 14px rgba(240, 201, 101, 0.08)",
@@ -72,51 +72,51 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
                 {(hasFacts || hasAssumptions) && (
                   <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: "12px" }}>
                     {hasFacts && (
-                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(240, 201, 101, 0.15)", borderRadius: "10px", padding: "12px" }}>
-                        <div style={{ color: "#38bdf8", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                          🔬 FACTS (Known Reality)
-                        </div>
-                        <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.5" }}>{sections.Facts}</div>
-                      </div>
+                         <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(240, 201, 101, 0.15)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
+                           <div style={{ color: "#38bdf8", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                             🔬 FACTS (Known Reality)
+                           </div>
+                           <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.45" }}>{sections.Facts}</div>
+                         </div>
                     )}
                     {hasAssumptions && (
-                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(251, 146, 60, 0.15)", borderRadius: "10px", padding: "12px" }}>
-                        <div style={{ color: "#fb923c", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                          ❓ ASSUMPTIONS (Uncertainty)
-                        </div>
-                        <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.5" }}>{sections.Assumptions}</div>
-                      </div>
+                         <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(251, 146, 60, 0.15)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
+                           <div style={{ color: "#fb923c", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                             ❓ ASSUMPTIONS (Uncertainty)
+                           </div>
+                           <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.45" }}>{sections.Assumptions}</div>
+                         </div>
                     )}
                   </div>
                 )}
 
                 {/* ⚖️ 3. EVALUATION & CHANGE MIND */}
                 {hasEval && (
-                  <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px" }}>
-                    <div style={{ color: "#f0c965", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                      ⚖️ EVALUATION &amp; RISK
-                    </div>
-                    <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.5" }}>{sections.Evaluation}</div>
-                  </div>
+                     <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
+                       <div style={{ color: "#f0c965", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                         ⚖️ EVALUATION & RISK
+                       </div>
+                       <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.45" }}>{sections.Evaluation}</div>
+                     </div>
                 )}
 
                 {hasChange && (
-                  <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px" }}>
-                    <div style={{ color: "#a855f7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                      🔄 WHAT WOULD CHANGE MY MIND
-                    </div>
-                    <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.5" }}>{sections.ChangeMind}</div>
-                  </div>
+                     <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
+                       <div style={{ color: "#a855f7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                         🔄 WHAT WOULD CHANGE MY MIND
+                       </div>
+                       <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.45" }}>{sections.ChangeMind}</div>
+                     </div>
                 )}
 
                 {/* 🚀 4. NEXT MOVE */}
                 {hasMove && (
-                  <div style={{ background: "rgba(240, 201, 101, 0.06)", border: "1px solid rgba(240, 201, 101, 0.2)", borderRadius: "10px", padding: "12px" }}>
-                    <div style={{ color: "#4ade80", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                      🚀 NEXT MOVE
-                    </div>
-                    <div style={{ fontSize: "14px", color: "#f8fafc", fontWeight: 600, lineHeight: "1.5" }}>{sections.Move}</div>
-                  </div>
+                      <div style={{ background: "rgba(240, 201, 101, 0.06)", border: "1px solid rgba(240, 201, 101, 0.2)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
+                       <div style={{ color: "#4ade80", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                         🚀 NEXT MOVE
+                       </div>
+                       <div style={{ fontSize: "14px", color: "#f8fafc", fontWeight: 600, lineHeight: "1.45" }}>{sections.Move}</div>
+                     </div>
                 )}
               </div>
             );
