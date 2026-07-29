@@ -379,7 +379,7 @@ Limitations:
         <div className="rei-header__brand">
           {/* Logo Mark */}
           <div className="rei-logo-mark">
-            <HingeMark size={28} animated={true} />
+            <HingeMark size={20} animated={true} />
           </div>
           <div>
             <h1 className="rei-logo-title">REI.ai</h1>

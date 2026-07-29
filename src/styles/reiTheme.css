@@ -30,7 +30,7 @@
   background: radial-gradient(circle at 30% 15%, #111111 0%, #111111 45%, #0A0A0A 100%) !important;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(245, 158, 11, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 16px !important;
   box-shadow: 0 20px 50px rgba(0,0,0,0.6);
 }
@@ -56,11 +56,11 @@
 
 /* Logo Mark - Glassmorphic Gold Frame */
 .rei-logo-mark {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(245, 158, 11, 0.1) !important;
-  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: transparent !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,14 +69,7 @@
   position: relative;
 }
 
-.rei-logo-mark::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 14px;
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  animation: pulse-ring 2.4s ease-in-out infinite;
-}
+
 
 .rei-logo-title {
   font-weight: 900;
@@ -105,7 +98,7 @@
   gap: 12px;
   padding: 16px 20px;
   background: rgba(10, 10, 10, 0.92);
-  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(16px);
 }
 
@@ -158,7 +151,7 @@
 }
 
 .rei-action-btn {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   padding: 8px 14px;
   font-size: 12px;
@@ -191,7 +184,7 @@
   background: rgba(17, 17, 17, 0.75) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 14px;
   padding: 16px 18px;
   margin-bottom: 16px;
@@ -242,7 +235,7 @@
   padding: 5px 12px;
   border-radius: 999px;
   background: rgba(245, 158, 11, 0.12) !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: #F59E0B !important;
   font-size: 11px;
   font-weight: 700;
@@ -257,7 +250,7 @@
 }
 
 .rei-reasoning-loop__step {
-  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.02) !important;
   padding: 10px 12px;
@@ -335,10 +328,10 @@
 }
 
 .rei-chat-bubble--rei {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(17, 17, 17, 0.8) 100%) !important;
+  background: #111111 !important;
   color: #E2E8F0 !important;
-  border: 1px solid rgba(245, 158, 11, 0.25) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .rei-chat-meta {
@@ -355,7 +348,7 @@
   min-height: 0;
   margin: 0;
   background: rgba(17, 17, 17, 0.55);
-  border: 1px solid rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   color: #94A3B8;
   cursor: pointer;
@@ -384,7 +377,7 @@
   margin-left: auto;
   margin-right: auto;
   background: rgba(10, 10, 10, 0.92);
-  border-top: 1px solid rgba(245, 158, 11, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 16px 20px;
   box-sizing: border-box;
   backdrop-filter: blur(16px);
@@ -406,7 +399,7 @@
   flex: 1;
   background: rgba(0, 0, 0, 0.4);
   color: #E2E8F0;
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   font-family: inherit;
   font-size: 15px;
@@ -478,7 +471,7 @@
   background: rgba(17, 17, 17, 0.95) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 16px !important;
   padding: 28px !important;
   max-width: 580px !important;
@@ -492,7 +485,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding-bottom: 14px;
   margin-bottom: 20px;
 }
@@ -579,7 +572,7 @@ body {
   background: rgba(17, 17, 17, 0.75) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border-left: 1px solid rgba(245, 158, 11, 0.15) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
@@ -607,7 +600,7 @@ body {
   height: 24px;
   border-radius: 50%;
   background: rgba(17, 17, 17, 0.95) !important;
-  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   color: #F59E0B !important;
   display: flex;
   align-items: center;
@@ -637,7 +630,7 @@ body {
 
 .rei-instrument-rail__section--hero {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%) !important;
-  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px;
   padding: 16px;
   align-items: center;
