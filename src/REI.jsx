@@ -368,10 +368,7 @@ Limitations:
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
-        maxWidth: mobile ? undefined : "1400px",
-        marginLeft: mobile ? undefined : "auto",
-        marginRight: mobile ? undefined : "auto"
+        overflow: "hidden"
       }}
     >
       {/* Sticky Header with safe area top */}
