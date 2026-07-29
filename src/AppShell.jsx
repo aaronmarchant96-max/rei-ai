@@ -201,30 +201,36 @@ export default function AppShell() {
         </>
       )}
 
-      {tool === "tools" ? (
-        <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
-                 <HingeMark size={16} animated={false} color="#F59E0B" />
-             </div>
-            <div>
-              <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>
-            </div>
+      <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
+        <a href="/" className="flex items-center gap-3 cursor-pointer" onClick={(e) => {
+          if (window.location.pathname === '/' && !window.location.hash) {
+            e.preventDefault();
+            setTool('tools');
+          }
+        }}>
+           <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
+               <HingeMark size={16} animated={false} color="#F59E0B" />
+           </div>
+          <div>
+            <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>
           </div>
+        </a>
 
-          {!mobile && (
-            <nav className="flex items-center gap-6" aria-label="Primary navigation">
-              <button onClick={() => {
+        {!mobile && (
+          <nav className="flex items-center gap-6" aria-label="Primary navigation">
+            <button onClick={() => {
+              if (tool !== 'tools') setTool('tools');
+              setTimeout(() => {
                 const el = document.getElementById('ecosystem');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }} className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">Ecosystem</button>
-              <div className="w-px h-4 bg-gray-700 mx-1"></div>
-              <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
-              <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">GitHub</a>
-            </nav>
-          )}
-        </header>
-      ) : null}
+              }, 100);
+            }} className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">Ecosystem</button>
+            <div className="w-px h-4 bg-gray-700 mx-1"></div>
+            <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
+            <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">GitHub</a>
+          </nav>
+        )}
+      </header>
 
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
         <Suspense fallback={<LoadingShell />}>
