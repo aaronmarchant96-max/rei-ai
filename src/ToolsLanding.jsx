@@ -247,6 +247,7 @@ export default function ToolsLanding({ onOpenTool }) {
 
       {/* ── 4. Experimental Ecosystem ── */}
       <motion.section 
+        id="ecosystem"
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
         className="relative z-10 max-w-6xl mx-auto py-20 border-t-2 border-border"
       >
@@ -300,11 +301,9 @@ export default function ToolsLanding({ onOpenTool }) {
           REI.ai <span className="text-foreground-muted">by PromptHound</span>
         </div>
         <div className="font-mono text-xs text-foreground-muted flex flex-wrap items-center justify-center gap-4 mt-2">
-          <span>443+ Tests Passing</span>
-          <span>|</span>
           <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
           <span>|</span>
-          <a href={REPO_URL} target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">GitHub Repository</a>
+          <a href={REPO_URL} target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">GitHub</a>
         </div>
       </footer>
     </div>

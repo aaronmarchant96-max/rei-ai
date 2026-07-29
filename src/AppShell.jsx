@@ -213,18 +213,12 @@ export default function AppShell() {
           </div>
 
           {!mobile && (
-            <nav className="flex items-center gap-8" aria-label="Top-level tools">
-              {TOP_LEVEL.slice(1).map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`text-sm font-medium transition-colors hover:text-[#F59E0B] ${tool === item.id ? "text-[#F59E0B]" : "text-gray-400"}`}
-                  onClick={() => setTool(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
-              <div className="w-px h-4 bg-gray-700 mx-2"></div>
+            <nav className="flex items-center gap-6" aria-label="Primary navigation">
+              <button onClick={() => {
+                const el = document.getElementById('ecosystem');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }} className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">Ecosystem</button>
+              <div className="w-px h-4 bg-gray-700 mx-1"></div>
               <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
               <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">GitHub</a>
             </nav>
