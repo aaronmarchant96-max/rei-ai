@@ -17,6 +17,7 @@ import { useSessionTracker } from "./hooks/useSessionTracker.js";
 import InstrumentRail from "./components/InstrumentRail.jsx";
 import WelcomePanel from "./modules/rei/components/WelcomePanel.jsx";
 import ReiContext from "./modules/rei/ReiContext.js";
+import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
 
@@ -113,6 +114,26 @@ export default function REI({ initialPrompt } = {}) {
       // Could add a toast notification here if needed
     } catch (err) {
       console.error("Failed to copy: ", err);
+    }
+  };
+
+  const handleExport = async (exportData) => {
+    try {
+      const currentDomain = getDomain(selectedDomain);
+      const report = buildDecisionReport(exportData.sections, {
+        domainLabel: currentDomain?.label || selectedDomain,
+        routerDecision: exportData.routerDecision,
+        timestamp: exportData.timestamp,
+      });
+      const blob = new Blob([report.markdown], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = report.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to export decision document:", err);
     }
   };
 
@@ -444,7 +465,7 @@ Limitations:
           }} />
         )}
 
-        <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} />
+        <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} />
       </main>
       {!mobile && (
         <InstrumentRail

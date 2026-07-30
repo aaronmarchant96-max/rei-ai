@@ -1,6 +1,6 @@
 import { parseAssistantStyleReply } from "../../../lib/replyParser.js";
 
-export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
+export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport }) {
   return (
     <div
       className={`rei-chat-message ${msg.sender === "user" ? "rei-chat-message--user" : "rei-chat-message--rei"}`}
@@ -169,17 +169,30 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy }) {
             s.Move && `**Move:** ${s.Move}`,
           ].filter(Boolean).join("\n\n");
           return (
-            <button
-              onClick={() => onCopy(report)}
-              className="rei-copy-btn touch-target"
-              aria-label="Copy report"
-              style={{ right: "56px", fontSize: "9px" }}
-              onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-              onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-              title="Copy CARDO report"
-            >
-              Report
-            </button>
+            <>
+              <button
+                onClick={() => onCopy(report)}
+                className="rei-copy-btn touch-target"
+                aria-label="Copy report"
+                style={{ right: "56px", fontSize: "9px" }}
+                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+                title="Copy CARDO report"
+              >
+                Report
+              </button>
+              <button
+                onClick={() => onExport && onExport({ sections: s, routerDecision: msg.rawJson?.routerDecision, timestamp: msg.timestamp })}
+                className="rei-copy-btn touch-target"
+                aria-label="Export decision document"
+                style={{ right: "100px", fontSize: "9px" }}
+                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+                title="Download CARDO decision report"
+              >
+                📄 Export
+              </button>
+            </>
           );
         })()}
       </div>
