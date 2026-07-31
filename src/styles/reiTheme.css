@@ -397,6 +397,10 @@
   border-radius: 10px;
   font-family: inherit;
   font-size: 15px;
+  min-height: 44px;
+  resize: none;
+  overflow-y: auto;
+  line-height: 1.5;
   outline: none;
   padding: 12px 14px;
 }
@@ -407,21 +411,23 @@
 }
 
 .rei-touch-button {
-  background: linear-gradient(135deg, #F59E0B 0%, #D4AF37 100%) !important;
-  color: #07090d !important;
-  border: none;
+  background: transparent !important;
+  color: #F59E0B !important;
+  border: 1px solid rgba(245, 158, 11, 0.5);
   border-radius: 8px;
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 13px;
   cursor: pointer;
-  padding: 0 22px;
+  padding: 0 20px;
   height: 44px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+  white-space: nowrap;
 }
 
 .rei-touch-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+  background: rgba(245, 158, 11, 0.1) !important;
+  border-color: #F59E0B;
+  color: #F59E0B !important;
 }
 
 .rei-quick-prompt {
