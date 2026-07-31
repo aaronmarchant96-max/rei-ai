@@ -1,6 +1,23 @@
 import { parseAssistantStyleReply } from "../../../lib/replyParser.js";
 
-export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport }) {
+export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport, domainLabel = "REI.ai" }) {
+  const isAssistantStructuredReply = selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback;
+  const sections = isAssistantStructuredReply ? parseAssistantStyleReply(msg.text) : null;
+  const hasHinge = sections?.Hinge && sections.Hinge.trim();
+  const hasFacts = sections?.Facts && sections.Facts.trim();
+  const hasAssumptions = sections?.Assumptions && sections.Assumptions.trim();
+  const hasEval = sections?.Evaluation && sections.Evaluation.trim();
+  const hasChange = sections?.ChangeMind && sections.ChangeMind.trim();
+  const hasMove = sections?.Move && sections.Move.trim();
+  const isStructured = hasHinge || hasFacts || hasAssumptions || hasEval || hasChange || hasMove;
+  const exportPayload = {
+    sections,
+    routerDecision: msg.rawJson?.routerDecision,
+    domainLabel,
+    sourceText: msg.text,
+    createdAt: msg.rawJson?.timestamp || new Date().toISOString(),
+  };
+
   return (
     <div
       className={`rei-chat-message ${msg.sender === "user" ? "rei-chat-message--user" : "rei-chat-message--rei"}`}
@@ -28,18 +45,8 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
         className={`rei-chat-bubble ${msg.sender === "user" ? "rei-chat-bubble--user" : "rei-chat-bubble--rei"}`}
         style={{ padding: "16px 52px 16px 20px" }}
       >
-        {selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback ? (
+        {isAssistantStructuredReply ? (
           (() => {
-            const sections = parseAssistantStyleReply(msg.text);
-            const hasHinge = sections.Hinge && sections.Hinge.trim();
-            const hasFacts = sections.Facts && sections.Facts.trim();
-            const hasAssumptions = sections.Assumptions && sections.Assumptions.trim();
-            const hasEval = sections.Evaluation && sections.Evaluation.trim();
-            const hasChange = sections.ChangeMind && sections.ChangeMind.trim();
-            const hasMove = sections.Move && sections.Move.trim();
-
-            const isStructured = hasHinge || hasFacts || hasAssumptions || hasEval || hasChange || hasMove;
-
             if (!isStructured) {
               return <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>;
             }
@@ -144,6 +151,21 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                 : "—"}</div>
             </div>
           </details>
+        )}
+
+        {onExport && isStructured && (
+          <button
+            type="button"
+            onClick={() => onExport(exportPayload)}
+            className="rei-copy-btn touch-target"
+            aria-label="Export decision"
+            onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+            onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+            title="Export decision"
+            style={{ marginRight: "8px" }}
+          >
+            Export
+          </button>
         )}
 
         <button

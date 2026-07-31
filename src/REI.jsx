@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useMobile, useKeyboardVisible } from "./useMobile.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
+import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
@@ -465,7 +466,7 @@ Limitations:
           }} />
         )}
 
-        <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} />
+        <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
       </main>
       {!mobile && (
         <InstrumentRail
