@@ -39,7 +39,7 @@ describe("ToolsLanding", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
     expect(screen.getByText(/domain experiments/i)).toBeInTheDocument();
-    expect(screen.getByText(/debate furnace/i)).toBeInTheDocument();
+    expect(screen.getByText(/the furnace/i)).toBeInTheDocument();
     expect(screen.getByText(/storm replay/i)).toBeInTheDocument();
   });
 

@@ -1,4 +1,4 @@
-# Development Setup Guide - Debate Furnace
+# Development Setup Guide - REI.ai
 
 ## 📦 Installed Plugins & Connectors
 
