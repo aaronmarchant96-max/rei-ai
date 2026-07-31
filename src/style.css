@@ -1,13 +1,13 @@
 :root {
-  --page: #07090d;
+  --page: #0A0A0A;
   --page-soft: #090d12;
-  --surface: #0e1413;
-  --surface-lift: #111827;
-  --surface-inner: #121a18;
-  --surface-inner-alt: #151d24;
+  --surface: #111111;
+  --surface-lift: #171717;
+  --surface-inner: #111111;
+  --surface-inner-alt: #111111;
   --border: rgba(255, 255, 255, 0.08);
   --border-green: rgba(159, 179, 160, 0.14);
-  --accent: #d6b04c;
+  --accent: #F59E0B;
   --accent-strong: var(--rei-accent);
   --accent-muted: rgba(214, 176, 76, 0.12);
   --support: #86a890;
@@ -33,7 +33,9 @@ body,
   margin: 0;
 }
 body {
-  background: var(--page);
+  background-color: var(--page);
+  background-image: linear-gradient(to right, rgba(39, 39, 42, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(39, 39, 42, 0.2) 1px, transparent 1px);
+  background-size: 4rem 4rem;
   color: var(--text);
   font-family:
     Inter,
@@ -62,7 +64,7 @@ button {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-  background: var(--page);
+  background: transparent;
 }
 
 .shell-header {

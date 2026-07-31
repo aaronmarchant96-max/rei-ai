@@ -43,7 +43,7 @@ describe("AppShell", () => {
     });
 
     const launchBtns = screen.getAllByRole("button", { name: /launch/i });
-    fireEvent.click(launchBtns[2]);
+    fireEvent.click(launchBtns[3]);
     await waitFor(() => {
       expect(window.location.hash).toBe("#story-forge");
     });

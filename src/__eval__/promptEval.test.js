@@ -2,7 +2,7 @@ import { parseAssistantStyleReply, buildDomainSystemMessage, getAssistantWelcome
 
 const DOMAIN_PROFILES = [
   { id: "assistant", label: "The Generalist", description: "Everyday reasoning, judgment, and decision support.", rules: ["Short sentences", "Hinge first", "Facts with sources", "Flag uncertainty"] },
-  { id: "coding", label: "The Hinge Finder", description: "Senior coding logic executing CARDO REI methodology.", rules: ["Verify API shapes", "Name hinges explicitly", "Stop and ask if underspecified"] },
+  { id: "coding", label: "The Engineer", description: "Senior coding logic executing CARDO REI methodology.", rules: ["Verify API shapes", "Name hinges explicitly", "Stop and ask if underspecified"] },
   { id: "genealogy", label: "The Archivist", description: "Evidence-tiered genealogy and disambiguating same-name profiles.", rules: ["Compare parent-child age limits", "Assign evidence tiers", "Log negative search results"] },
   { id: "story", label: "The Storyteller", description: "Narrative architecture generating story blueprints.", rules: ["Establish blueprint structure", "Identify character driver hinges", "Avoid cliché tropes"] },
 ];
@@ -25,7 +25,7 @@ describe("Prompt Eval — domain system messages", () => {
   test("coding system message mentions domain", () => {
     const msg = buildDomainSystemMessage("coding", DOMAIN_PROFILES[1]);
     expect(msg).toContain("coding session");
-    expect(msg).toContain("Hinge Finder");
+    expect(msg).toContain("Engineer");
     expect(msg).toContain("CARDO REI");
   });
 

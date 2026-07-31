@@ -2,67 +2,33 @@ import { useState, useEffect, useMemo } from "react";
 import { getDomainProfiles } from "./domains/_index.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck } from "lucide-react";
 
-const REPO_URL = "https://github.com/aaronmarchant96-max/debate-furnace";
+const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 
-function ToolIcon({ id, size = 24 }) {
+function ToolIcon({ id, size = 24, className = "" }) {
+  const iconProps = { size, className: `text-hinge-bright ${className}`, strokeWidth: 1.5 };
   switch (id) {
-    case "furnace":
-      return (
-        <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <path d="M14 4 L21 12 L18 12 L18 24 L10 24 L10 12 L7 12 Z" fill="#f0c965"/>
-          <path d="M11 4 Q14 0 17 4" fill="#f0c965"/>
-        </svg>
-      );
-    case "story-forge":
-      return (
-        <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <path d="M6 22 L18 4 L22 10 L10 24 Z" fill="#f0c965"/>
-          <circle cx="18" cy="6" r="3" fill="#f0c965"/>
-        </svg>
-      );
-    case "storm-replay":
-      return (
-        <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <circle cx="14" cy="14" r="10" stroke="#f0c965" strokeWidth="2.5"/>
-          <circle cx="14" cy="14" r="5" stroke="#f0c965" strokeWidth="2"/>
-          <line x1="14" y1="14" x2="14" y2="4" stroke="#f0c965" strokeWidth="2.5" strokeLinecap="round"/>
-        </svg>
-      );
-    case "cardo-guard":
-      return (
-        <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <line x1="6" y1="10" x2="22" y2="10" stroke="#f0c965" strokeWidth="2.5" strokeLinecap="round"/>
-          <line x1="12" y1="10" x2="12" y2="22" stroke="#f0c965" strokeWidth="2" strokeLinecap="round"/>
-          <circle cx="8" cy="20" r="3" fill="#f0c965"/>
-          <circle cx="20" cy="20" r="3" fill="#f0c965"/>
-        </svg>
-      );
-    case "tracepoint":
-      return (
-        <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-          <line x1="2" y1="14" x2="16" y2="14" stroke="#f0c965" strokeWidth="2.5" strokeLinecap="round"/>
-          <line x1="18" y1="4" x2="18" y2="14" stroke="#f0c965" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="20" y1="20" x2="12" y2="20" stroke="#f0c965" strokeWidth="2" strokeLinecap="round"/>
-          <line x1="22" y1="10" x2="22" y2="18" stroke="#f0c965" strokeWidth="1.5" strokeLinecap="round"/>
-          <line x1="24" y1="24" x2="24" y2="20" stroke="#f0c965" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-      );
-    default:
-      return null;
+    case "furnace": return <MessageSquare {...iconProps} />;
+    case "story-forge": return <ExternalLink {...iconProps} />;
+    case "storm-replay": return <Activity {...iconProps} />;
+    case "cardo-guard": return <ShieldCheck {...iconProps} />;
+    case "tracepoint": return <Crosshair {...iconProps} />;
+    case "rei": return <Scale {...iconProps} />;
+    default: return <Scale {...iconProps} />;
   }
 }
 
 const CARDO_STEPS = [
-  { id: "collect", label: "Collect", num: "01", tag: "C",
-    detail: "Gather raw inputs, context tokens, and domain evidence without pre-filtering bias." },
-  { id: "analyze", label: "Analyze & Distinguish", num: "02", tag: "A",
-    detail: "Dissect inputs by separating hard facts from implicit assumptions and noisy prompts." },
-  { id: "record", label: "Record the Hinge", num: "03", tag: "R",
-    detail: "Isolate the single load-bearing detail (the hinge) that dictates complexity and safety.",
-    isHinge: true },
-  { id: "operate", label: "Operate & Decide", num: "04", tag: "DO",
-    detail: "Execute deterministic low-cost actions or route to specialized tiers with continuous audit logs." },
+  { id: "collect", label: "Collect", num: "01", tag: "C", detail: "Gather raw inputs and context without filtering." },
+  { id: "analyze", label: "Analyze", num: "02", tag: "A", detail: "Examine patterns and separate facts from interpretation." },
+  { id: "record", label: "Record", num: "03", tag: "R", detail: "Isolate the load-bearing detail (the hinge).", isHinge: true },
+  { id: "distinguish", label: "Distinguish", num: "04", tag: "D", detail: "Keep evidence separate from inference." },
+  { id: "organize", label: "Organize", num: "05", tag: "O", detail: "Structure for human review and action." },
+  { id: "review", label: "Review", num: "06", tag: "R", detail: "Validate against known truths." },
+  { id: "evaluate", label: "Evaluate", num: "07", tag: "E", detail: "Assign confidence and make cost-weighted decisions." },
+  { id: "iterate", label: "Iterate", num: "08", tag: "I", detail: "Refine based on feedback and new evidence." },
 ];
 
 const DEMO_SCENARIOS = [
@@ -75,29 +41,24 @@ const DEMO_SCENARIOS = [
 
 const CASE_STUDIES = [
   { id: "furnace", toolId: "furnace", label: "Debate Furnace", subtitle: "Adversarial Pressure Test",
-    description: "Argument Pressure Testing · 4 CARDO steps applied",
+    description: "Argument Pressure Testing Engine",
     hinge: "Ultimate Authorship vs Reason-Responsive Agency" },
-  { id: "story", toolId: "story-forge", label: "Story Forge", subtitle: "Source Trail & Remix",
-    description: "Archival Narrative Synthesis · 4 CARDO steps applied",
-    hinge: "The Storyteller's Gambit" },
   { id: "storm", toolId: "storm-replay", label: "Storm Replay", subtitle: "Radar Signal Review",
-    description: "Historical Radar Signal Review · 4 CARDO steps applied",
+    description: "Historical Radar Signal Review Pipeline",
     hinge: "Motion 0.0162 | Graves Co 22:00 CST" },
   { id: "cardo", toolId: "cardo-guard", label: "CARDO Guard", subtitle: "Cost-Weighted Gate",
-    description: "AI Risk Decision Gate · 4 CARDO steps applied",
-    hinge: "Act $42k | Miss $850k → ACT" },
+    description: "AI Risk Decision Gate",
+    hinge: "Act $42k | Miss $850k → ACT",
+    badge: "✅ 443+ Tests Passing" },
   { id: "trace", toolId: "tracepoint", label: "Tracepoint", subtitle: "Industrial Telemetry",
-    description: "Industrial Telemetry & Handover Review · 4 CARDO steps applied",
+    description: "Industrial Telemetry & Handover Review",
     hinge: "P-204 Vibration +49.7% vs Baseline" },
 ];
 
 export default function ToolsLanding({ onOpenTool }) {
-  const [visible, setVisible] = useState(false);
   const [expandedCardo, setExpandedCardo] = useState(null);
   const [demoScenario, setDemoScenario] = useState("coding");
-  const [expandedCase, setExpandedCase] = useState(null);
-  useEffect(() => { setVisible(true); }, []);
-
+  
   const domains = useMemo(() => getDomainProfiles(), []);
 
   const demoResult = useMemo(() => {
@@ -114,356 +75,230 @@ export default function ToolsLanding({ onOpenTool }) {
   const savingsPct = premiumCost > 0 ? Math.round((1 - reiCost / premiumCost) * 100) : 0;
   const hsv = demoResult?.hingeVector || {};
   const hingeRationale = demoResult?.id === "simple-greeting" ? "Cheap deterministic path — zero reasoning cost."
-    : demoResult?.id?.includes("coding") ? "Structural complexity fits 70B. Frontier adds cost, not precision."
+    : demoResult?.id?.includes("coding") ? "Structural complexity fits 70B. gpt-4o adds cost, not precision."
     : demoResult?.id?.includes("adversarial") ? "Injection pattern detected. Escalated to premium validation."
     : "Generic reasoning. Balanced cost/safety profile.";
 
+  // Framer Motion variants
+  const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
+  const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+
   return (
-    <div className="relume-container" style={{ padding: "0 16px 80px" }}>
-      {/* ── 1. Hero ── */}
-      <header
-        className="relume-section"
-        style={{
-          textAlign: "center", padding: "80px 0 40px",
-          opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)",
-          transition: "all 0.5s ease-out",
-        }}
+    <div className="min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
+      
+      {/* ── 1. Premium Hero ── */}
+      <motion.header 
+        initial="hidden" animate="visible" variants={fadeIn}
+        className="relative z-10 max-w-4xl mx-auto pt-24 pb-32 text-center flex flex-col items-center overflow-hidden"
       >
-        <div style={{
-          width: "56px", height: "56px", borderRadius: "14px",
-          background: "rgba(240, 201, 101, 0.1)",
-          border: "1px solid rgba(240, 201, 101, 0.35)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 16px",
-          boxShadow: "0 0 32px rgba(240,201,101,0.25)",
-        }}>
-          <HingeMark size={30} animated={false} />
-        </div>
-        <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
+        {/* Subtle Radial Gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.1),transparent_50%)] pointer-events-none"></div>
+
+        <motion.div 
+          whileHover={{ rotate: 90 }}
+          transition={{ type: "spring", stiffness: 200, damping: 10 }}
+          className="relative w-16 h-16 rounded-lg bg-surface border-2 border-hinge flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(245,158,11,0.3)] cursor-crosshair z-10"
+        >
+          <HingeMark size={32} animated={false} color="#F59E0B" />
+        </motion.div>
+        
+        <div className="relative font-mono text-xs font-bold tracking-widest uppercase text-[#F59E0B] mb-4 z-10">
           REI.ai by PromptHound Labs
         </div>
-        <h1 style={{ fontSize: "28px", lineHeight: 1.3, margin: "0 0 12px", fontWeight: 800 }}>
-          A structured reasoning framework<br />that routes prompts to the cheapest capable model.
+        
+        <h1 className="relative font-heading text-6xl md:text-8xl font-black leading-tight mb-6 z-10">
+          Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F59E0B] to-[#FFD700]">Hinge</span>.<br />
+          Route Smarter.
         </h1>
-        <p style={{ color: "#94a3b8", fontSize: "14px", maxWidth: "600px", margin: "0 auto 20px", lineHeight: 1.6 }}>
-          REI.ai applies CARDO — Collect, Analyze, Record, Distinguish, Operate — to every prompt.
-          It finds the hinge point, routes to the cheapest model that won&rsquo;t fumble the answer,
-          and proves the methodology works across domains from adversarial debate to storm analysis.
+        
+        <p className="relative text-[#E2E8F0] text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed font-light z-10">
+          CARDO is the open-source framework that isolates the load-bearing pivot point in any prompt—routing queries to the <strong className="text-white font-bold">cheapest, most capable model</strong>.
         </p>
+        
         <button
-          type="button"
           onClick={() => onOpenTool({ tool: "rei" })}
-          className="relume-card__btn--gold hover-lift"
-          style={{
-            padding: "12px 28px", borderRadius: "10px",
-            fontWeight: 700, fontSize: "14px", cursor: "pointer",
-          }}
+          className="relative z-10 group flex items-center gap-2 bg-gradient-to-r from-[#F59E0B] to-[#FFD700] text-black px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:scale-105 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all duration-300"
         >
-          Launch REI.ai &rarr;
+          LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
-      </header>
+      </motion.header>
 
-      {/* ── 2. Stats Bar ── */}
-      <div
-        className="landing-stats"
-        style={{
-          opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(8px)",
-          transition: "all 0.4s ease-out 0.2s",
-          display: "flex", justifyContent: "center", gap: "20px",
-          padding: "14px 0", marginBottom: "48px",
-          borderTop: "1px solid rgba(251,146,60,0.1)", borderBottom: "1px solid rgba(251,146,60,0.1)",
-          fontSize: "11px", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.08em",
-          flexWrap: "wrap",
-        }}
+      {/* ── 2. The Flagship (REI.ai) ── */}
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
+        className="relative z-10 max-w-6xl mx-auto py-20 border-t-2 border-b-2 border-border"
       >
-        <span>Open Source · Local-First</span>
-        <span style={{ color: "#f0c965", fontWeight: 700 }}>200+ tests passing</span>
-        <span>{domains.length} reasoning domains</span>
-        <span>12 landmark cases</span>
-      </div>
-
-      {/* ── 3. CARDO Framework ── */}
-      <section className="relume-section" style={{ padding: "60px 0" }}>
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
-            Philosophy &amp; Methodology
-          </div>
-          <h2 style={{ fontSize: "22px", margin: "0 0 8px" }}>The CARDO Framework</h2>
-          <p style={{ color: "#94a3b8", fontSize: "13px", maxWidth: "560px", margin: "0 auto" }}>
-            Named after the Latin <em style={{ color: "#f0c965" }}>cardo</em> (the load-bearing hinge on which everything pivots).
-            A systematic cognitive framework designed to isolate the single pivot point in complex, noisy data.
-          </p>
+        <div className="text-center mb-12">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">The Flagship Project</div>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4">Cost-Aware LLM Router</h2>
         </div>
 
-        {/* Flow diagram */}
-        <div style={{
-          display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "8px",
-          alignItems: "stretch", marginBottom: "24px",
-        }}>
-          {[{ label: "Prompt Input", isLabel: true }].concat(
-            CARDO_STEPS.map((s) => ({ ...s, isStep: true })),
-            [{ label: "Optimal Route", isLabel: true }]
-          ).map((item, i) =>
-            item.isLabel ? (
-              <div key={i} style={{
-                padding: "10px 16px", borderRadius: "10px",
-                border: "1px dashed rgba(240,201,101,0.25)", color: "#94a3b8",
-                fontSize: "11px", display: "flex", alignItems: "center",
-                fontWeight: 600, letterSpacing: "0.05em",
-              }}>
-                {item.label}
-              </div>
-            ) : (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setExpandedCardo(expandedCardo === item.id ? null : item.id)}
-                style={{
-                  flex: "1 1 180px", minWidth: "140px",
-                  padding: "14px", borderRadius: "12px",
-                  background: expandedCardo === item.id
-                    ? "rgba(240,201,101,0.15)" : "rgba(255,255,255,0.03)",
-                  border: item.isHinge
-                    ? "1px solid rgba(240,201,101,0.35)"
-                    : "1px solid rgba(255,255,255,0.08)",
-                  color: "#e2e8f0", cursor: "pointer",
-                  textAlign: "left", transition: "all 0.2s ease",
-                  opacity: visible ? 1 : 0,
-                  transform: visible ? "translateY(0)" : "translateY(8px)",
-                  transitionDelay: visible ? "0s" : `${0.6 + (i - 1) * 0.15}s`,
-                  transitionProperty: "opacity, transform, background, border-color",
-                  animation: item.isHinge ? "hinge-pulse 1.2s ease-out 0.4s 1" : "none",
-                }}
-              >
-                <div style={{ fontSize: "10px", color: "#f0c965", fontWeight: 700, marginBottom: "4px" }}>
-                  {item.tag} · {item.num}
-                </div>
-                <div style={{ fontWeight: 700, fontSize: "13px", marginBottom: expandedCardo === item.id ? "8px" : "0" }}>
-                  {item.isHinge ? "📌 " : ""}{item.label}
-                </div>
-                {expandedCardo === item.id && (
-                  <div style={{ fontSize: "12px", color: "#cbd5e1", lineHeight: 1.5 }}>
-                    {item.detail}
-                  </div>
-                )}
-              </button>
-            )
-          )}
-        </div>
-
-        {/* Why Philosophy */}
-        <div style={{ padding: "16px", background: "rgba(255,255,255,0.02)", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.06)" }}>
-          <h3 style={{ fontSize: "15px", margin: "0 0 8px", color: "#f0c965" }}>Why Philosophy First?</h3>
-          <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: 1.6, margin: "0 0 12px" }}>
-            Most LLM routers are ad-hoc heuristics. REI.ai is built on an adversarial-tested reasoning architecture.
-            The same CARDO hinge logic that substantially reduces LLM API costs also powers our evidence verification,
-            debate stress-testing, and meteorological signal analysis.
-          </p>
-          <div style={{ fontSize: "12px", color: "#64748b", display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ color: "#22c55e" }}>✓</span>
-            <strong style={{ color: "#f0c965" }}>200+ Automated Unit &amp; Integration Tests Passing</strong>
-            <span>(29 suites, 100% pass rate)</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. Live Router Demo ── */}
-      <section className="relume-section" style={{ padding: "60px 0" }}>
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
-            The Flagship
-          </div>
-          <h2 style={{ fontSize: "22px", margin: "0 0 8px" }}>REI.ai — Cost-Aware LLM Router</h2>
-          <p style={{ color: "#94a3b8", fontSize: "13px", maxWidth: "560px", margin: "0 auto" }}>
-            CARDO applied to your API spend. Every prompt gets analyzed, hinge-pointed, and routed to the cheapest model that passes quality gates.
-          </p>
-        </div>
-
-        {/* Metric badges */}
-        <div style={{
-          display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px", marginBottom: "20px",
-        }}>
+        {/* Technical Badges */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-4xl mx-auto">
           {[
-            { val: "90%", label: "Route Accuracy\n(30-prompt holdout)" },
-            { val: "~65.5%", label: "Cost vs Always\nPremium Model" },
-            { val: "<5ms", label: "Latency\nZero Inference" },
-          ].map((m) => (
-            <div key={m.label} style={{
-              padding: "10px 16px", borderRadius: "10px",
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
-              textAlign: "center", minWidth: "100px",
-            }}>
-              <div style={{ fontSize: "20px", fontWeight: 800, color: "#fdba74" }}>{m.val}</div>
-              <div style={{ fontSize: "10px", color: "#94a3b8", whiteSpace: "pre-line", lineHeight: 1.3 }}>
-                {m.label}
+            { icon: "🎯", val: "92.0%", label: "Zero-Shot Accuracy" },
+            { icon: "✅", val: "443+", label: "Passing Tests" },
+            { icon: "⚡", val: "<5ms", label: "Latency" },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-8 text-center hover:border-[#F59E0B] transition-all"
+            >
+              <div className="text-4xl mb-4">{stat.icon}</div>
+              <div className="text-4xl font-bold text-white mb-2">{stat.val}</div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider">
+                {stat.label}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Scenario buttons */}
-        <div style={{
-          display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px", marginBottom: "16px",
-        }}>
-          {DEMO_SCENARIOS.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => setDemoScenario(s.id)}
-              style={{
-                padding: "8px 14px", borderRadius: "8px",
-                background: demoScenario === s.id ? "rgba(249,115,22,0.18)" : "rgba(255,255,255,0.03)",
-                border: demoScenario === s.id ? "1px solid #f97316" : "1px solid rgba(255,255,255,0.08)",
-                color: demoScenario === s.id ? "#fed7aa" : "#94a3b8",
-                fontSize: "12px", fontWeight: 600, cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-            >
-              {s.label}
-            </button>
-          ))}
-        </div>
+        {/* Live Router Demo */}
+        <div className="max-w-4xl mx-auto bg-surface border-2 border-border rounded-lg p-6 md:p-10 shadow-2xl">
+          <div className="flex flex-wrap justify-center gap-3 mb-8">
+            {DEMO_SCENARIOS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setDemoScenario(s.id)}
+                className={`px-4 py-2 rounded font-mono text-xs transition-colors border ${
+                  demoScenario === s.id 
+                    ? "bg-hinge-bright/10 border-hinge-bright text-hinge-bright" 
+                    : "bg-background border-border text-foreground-muted hover:border-hinge hover:text-foreground"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
 
-        {/* Demo output panel */}
-        {demoResult && (
-          <div style={{
-            padding: "16px", borderRadius: "12px",
-            background: "rgba(255,255,255,0.03)", border: "1px solid rgba(249,115,22,0.18)",
-            display: "flex", flexDirection: "column", gap: "10px",
-          }}>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
-              <div style={{ flex: "1 1 250px" }}>
-                <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.08em", color: "#64748b", marginBottom: "4px" }}>
-                  User Input
+          {demoResult && (
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <div className="font-mono text-xs uppercase tracking-wider text-foreground-muted">Input Signal</div>
+                <div className="font-mono text-sm bg-background border border-border p-4 rounded text-foreground/90 leading-relaxed">
+                  {demoInput}
                 </div>
-                <div style={{ fontSize: "13px", color: "#e2e8f0", lineHeight: 1.5 }}>{demoInput}</div>
               </div>
-              <div style={{ flex: "1 1 200px", display: "flex", flexDirection: "column", gap: "6px" }}>
-                {[
-                  { label: "Routing Hinge", val: hingeRationale },
-                  { label: "Model Selected", val: demoResult.model },
-                  { label: "Estimated Tokens", val: estimatedTokens.toLocaleString() },
-                  { label: "ML Hinge Vector", val: `ECS:${hsv.ecs?.toFixed(2) || "—"} · DAS:${hsv.das?.toFixed(2) || "—"} · APS:${hsv.aps?.toFixed(2) || "—"}` },
-                ].map((r) => (
-                  <div key={r.label} style={{ display: "flex", justifyContent: "space-between", gap: "8px", fontSize: "12px" }}>
-                    <span style={{ color: "#64748b" }}>{r.label}</span>
-                    <span style={{ color: "#fed7aa", fontWeight: 600, textAlign: "right" }}>{r.val}</span>
-                  </div>
-                ))}
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", fontSize: "12px", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "6px", marginTop: "4px" }}>
-                  <span style={{ color: "#64748b" }}>Cost</span>
-                  <span style={{ color: "#22c55e", fontWeight: 700, textAlign: "right" }}>
-                    ${reiCost.toFixed(4)} vs ${premiumCost.toFixed(4)} gpt-4o · Save {savingsPct}%
+              <div className="space-y-4 font-mono text-sm">
+                <div className="flex justify-between border-b border-border pb-2">
+                  <span className="text-foreground-muted">Routing Hinge</span>
+                  <span className="text-hinge-bright text-right max-w-[200px] leading-tight">{hingeRationale}</span>
+                </div>
+                <div className="flex justify-between border-b border-border pb-2">
+                  <span className="text-foreground-muted">Model Selected</span>
+                  <span className="text-foreground font-semibold">{demoResult.model}</span>
+                </div>
+                <div className="flex justify-between border-b border-border pb-2">
+                  <span className="text-foreground-muted">ML Hinge Vector</span>
+                  <span className="text-foreground-muted">
+                    ECS:{hsv.ecs?.toFixed(2)||"—"} | DAS:{hsv.das?.toFixed(2)||"—"} | APS:{hsv.aps?.toFixed(2)||"—"}
+                  </span>
+                </div>
+                <div className="flex justify-between pt-2">
+                  <span className="text-foreground-muted font-bold">Cost Projection</span>
+                  <span className="text-green-400 font-bold">
+                    ${reiCost.toFixed(4)} <span className="text-foreground-muted font-normal text-xs">vs ${premiumCost.toFixed(4)} (Save {savingsPct}%)</span>
                   </span>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-        <div style={{ fontSize: "11px", color: "#64748b", textAlign: "center", marginTop: "10px" }}>
-          v3.0 keyword router · {demoResult?.hingeTier || "—"} complexity tier · zero-inference local matcher
+          )}
         </div>
-      </section>
+      </motion.section>
 
-      {/* ── 5. Case Studies ── */}
-      <section className="relume-section" style={{ padding: "60px 0" }}>
-        <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          <div style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.1em", textTransform: "uppercase", color: "#f0c965", marginBottom: "8px" }}>
-            CARDO Applied
-          </div>
-          <h2 style={{ fontSize: "22px", margin: "0 0 8px" }}>Domain Case Studies</h2>
-          <p style={{ color: "#94a3b8", fontSize: "13px", maxWidth: "560px", margin: "0 auto" }}>
-            Five specialized tools. One underlying framework. These aren&rsquo;t disconnected products —
-            they are living proof that CARDO hinge reasoning generalizes across domains.
-          </p>
+      {/* ── 3. The True CARDO Pipeline ── */}
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
+        className="relative z-10 max-w-6xl mx-auto py-24"
+      >
+        <div className="text-center mb-16">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">Structural Methodology</div>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold">The CARDO REI Pipeline</h2>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {CASE_STUDIES.map((cs) => (
-            <div key={cs.id} style={{
-              padding: "14px 16px", borderRadius: "12px",
-              background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
-            }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%" }}>
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => setExpandedCase(expandedCase === cs.id ? null : cs.id)}
-                onKeyDown={(e) => { if (e.key === 'Enter') setExpandedCase(expandedCase === cs.id ? null : cs.id); }}
-                style={{
-                  display: "flex", alignItems: "center", gap: "12px", flex: 1, minWidth: 0,
-                  background: "none", border: "none", color: "inherit", cursor: "pointer",
-                  padding: "0", textAlign: "left",
-                }}
-              >
-                <div style={{
-                  width: "36px", height: "36px", borderRadius: "9px",
-                  background: "linear-gradient(135deg, #f97316, #fbbf24)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  flexShrink: 0,
-                }}>
-                  <ToolIcon id={cs.toolId} size={22} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: "14px" }}>{cs.label}</div>
-                  <div style={{ fontSize: "11px", color: "#94a3b8" }}>{cs.description}</div>
-                </div>
+        <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {CARDO_STEPS.map((step) => (
+            <motion.div 
+              key={step.id} variants={fadeIn}
+              onMouseEnter={() => setExpandedCardo(step.id)}
+              onMouseLeave={() => setExpandedCardo(null)}
+              className={`relative p-5 rounded-md border-2 transition-all duration-300 ${
+                step.isHinge ? "border-hinge-bright bg-hinge-bright/5 shadow-[0_0_20px_rgba(212,175,55,0.1)]" : "border-border bg-surface hover:border-muted"
+              }`}
+            >
+              <div className="font-mono text-xs text-foreground-muted mb-2 font-bold">
+                <span className={step.isHinge ? "text-hinge-bright" : ""}>{step.num}</span> // {step.tag}
               </div>
-              <button
-                type="button"
-                onClick={() => onOpenTool({ tool: cs.toolId })}
-                style={{
-                  padding: "6px 14px", borderRadius: "8px",
-                  background: "rgba(240,201,101,0.12)", border: "1px solid rgba(240,201,101,0.25)",
-                  color: "#f0c965", fontSize: "12px", fontWeight: 600, cursor: "pointer",
-                  flexShrink: 0,
-                }}
-              >
-                Launch &rarr;
-              </button>
-            </div>
-              <div style={{ marginTop: "12px", paddingLeft: "48px" }}>
-                <div style={{
-                  padding: "10px 14px", borderRadius: "8px",
-                  background: "rgba(240,201,101,0.08)", border: "1px solid rgba(240,201,101,0.15)",
-                  fontSize: "12px", color: "#f0c965",
-                }}>
-                  <strong style={{ color: "#f0c965" }}>
-                    {cs.toolId === "furnace" ? "Debate Hinge" : cs.toolId === "story-forge" ? "Story Seed" : cs.toolId === "storm-replay" ? "Radar Signal" : cs.toolId === "cardo-guard" ? "Risk Gate" : "Telemetry Drift"}:
-                  </strong>{" "}
-                  {cs.hinge}
+              <div className={`font-heading font-bold text-lg mb-2 ${step.isHinge ? "text-hinge-bright" : ""}`}>
+                {step.label}
+              </div>
+              <div className={`text-sm text-foreground-muted transition-opacity duration-300 ${expandedCardo === step.id ? "opacity-100" : "opacity-60"}`}>
+                {step.detail}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.section>
+
+      {/* ── 4. Experimental Ecosystem ── */}
+      <motion.section 
+        id="ecosystem"
+        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
+        className="relative z-10 max-w-6xl mx-auto py-20 border-t-2 border-border"
+      >
+        <div className="mb-12">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">Ecosystem Spin-Offs</div>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold">Domain Experiments</h2>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {CASE_STUDIES.map((cs) => (
+            <div key={cs.id} className="group bg-surface border-2 border-border p-6 rounded-md hover:border-hinge transition-colors">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-background border border-border rounded flex items-center justify-center">
+                    <ToolIcon id={cs.toolId} size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-bold text-xl">{cs.label}</h3>
+                    <div className="font-mono text-xs text-foreground-muted">{cs.subtitle}</div>
+                  </div>
                 </div>
+                <button 
+                  onClick={() => onOpenTool({ tool: cs.toolId })}
+                  className="p-2 bg-background border border-border rounded text-foreground-muted hover:text-hinge-bright hover:border-hinge-bright transition-colors"
+                >
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+              
+              <div className="font-sans text-sm text-foreground/80 mb-4">{cs.description}</div>
+              
+              <div className="flex items-center justify-between">
+                <div className="font-mono text-xs bg-background px-3 py-2 border border-border rounded text-foreground-muted">
+                  <span className="text-hinge-bright font-bold">Hinge:</span> {cs.hinge}
+                </div>
+                {cs.badge && (
+                  <div className="font-mono text-xs text-green-400 font-bold">{cs.badge}</div>
+                )}
               </div>
             </div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      {/* ── 6. Footer ── */}
-      <footer
-        className="relume-section"
-        style={{
-          textAlign: "center", padding: "48px 0 24px",
-          borderTop: "1px solid rgba(240,201,101,0.15)",
-          opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(8px)",
-          transition: "all 0.4s ease-out 0.4s",
-        }}
-      >
-        <div style={{
-          width: "32px", height: "32px", borderRadius: "9px",
-          background: "rgba(240, 201, 101, 0.1)",
-          border: "1px solid rgba(240, 201, 101, 0.3)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 8px",
-        }}>
-          <HingeMark size={18} animated={false} />
+      {/* ── Footer ── */}
+      <footer className="relative z-10 max-w-6xl mx-auto py-12 border-t-2 border-border text-center">
+        <div className="w-10 h-10 mx-auto border border-hinge/30 rounded flex items-center justify-center mb-4">
+          <HingeMark size={20} animated={false} color="#D4AF37" />
         </div>
-        <div style={{ fontSize: "13px", fontWeight: 700 }}>
-          <span style={{ color: "#e2e8f0" }}>REI.ai</span>
-          <span style={{ color: "#64748b" }}> by PromptHound Labs</span>
+        <div className="font-heading font-bold tracking-widest uppercase text-sm mb-2">
+          REI.ai <span className="text-foreground-muted">by PromptHound</span>
         </div>
-        <div style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
-          200+ tests passing · <a href={REPO_URL} target="_blank" rel="noreferrer" style={{ color: "#94a3b8" }}>GitHub &rarr;</a>
+        <div className="font-mono text-xs text-foreground-muted flex flex-wrap items-center justify-center gap-4 mt-2">
+          <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
+          <span>|</span>
+          <a href={REPO_URL} target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">GitHub</a>
         </div>
       </footer>
     </div>

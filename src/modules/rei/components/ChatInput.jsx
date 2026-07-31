@@ -11,7 +11,7 @@ export default function ChatInput() {
   ];
 
   return (
-    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: "12px 16px 16px", background: "rgba(10, 12, 18, 0.92)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(240, 201, 101, 0.12)" }}>
+    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: "12px 16px 16px", background: "rgba(10, 12, 18, 0.75)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(240, 201, 101, 0.08)" }}>
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
         {selectedDomain === "assistant" && (
           <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px" }}>
@@ -39,9 +39,13 @@ export default function ChatInput() {
             <textarea
               ref={inputRef}
               className="rei-input-area"
-              rows={mobile ? 2 : 2}
+              rows={1}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
+              onInput={(e) => {
+                e.target.style.height = "auto";
+                e.target.style.height = Math.min(e.target.scrollHeight, 100) + "px";
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -62,14 +66,12 @@ export default function ChatInput() {
                           : "What are you trying to think through?"
               }
             />
-            <button type="submit" className="rei-touch-button touch-target">
-              Send ➔
+            <button type="submit" className="rei-touch-button touch-target" style={{ minWidth: "64px" }}>
+              Send
             </button>
           </div>
         </form>
-        <div style={{ textAlign: "center", marginTop: "8px", fontSize: "10px", color: "rgba(148, 163, 184, 0.4)" }}>
-          ⚡ Night Shift v3 · cost-aware routing active · Shift + Enter for new line
-        </div>
+
       </div>
     </div>
   );

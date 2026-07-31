@@ -1,4 +1,4 @@
-export default function HingeMark({ size = 36, animated = false }) {
+export default function HingeMark({ size = 36, animated = false, color = "#F59E0B" }) {
   return (
     <svg
       width={size}
@@ -13,13 +13,13 @@ export default function HingeMark({ size = 36, animated = false }) {
       {/* Fixed arm */}
       <path
         d="M18 18 L18 6"
-        stroke="#f0c965"
+        stroke={color}
         strokeWidth="3"
         strokeLinecap="round"
       />
       <path
         d="M18 6 L26 6"
-        stroke="#f0c965"
+        stroke={color}
         strokeWidth="3"
         strokeLinecap="round"
       />
@@ -37,13 +37,13 @@ export default function HingeMark({ size = 36, animated = false }) {
       >
         <path
           d="M18 18 L18 30"
-          stroke="#f0c965"
+          stroke={color}
           strokeWidth="3"
           strokeLinecap="round"
         />
         <path
           d="M18 30 L26 30"
-          stroke="#f0c965"
+          stroke={color}
           strokeWidth="3"
           strokeLinecap="round"
         />

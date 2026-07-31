@@ -154,6 +154,10 @@ function isMetaQuery(text) {
   return /\bhow (do|are) you|who are you|what (is|are) you|what is carlo|explain (how|what)|tell me about (yourself|you)\b/i.test(text);
 }
 
+function isSelfEvaluation(text) {
+  return /\b(self-evaluate|evaluate yourself|evaluate your architecture|self-diagnose)\b/i.test(text);
+}
+
 function getComplexityTier(text) {
   const words = text.split(/\s+/).filter(Boolean).length;
   const questionMarks = (text.match(/\?/g) || []).length;
@@ -247,6 +251,23 @@ export function buildRouterDecision({
     return decision;
   }
 
+  if (isSelfEvaluation(text)) {
+    const decision = buildDecision("coding-hinge", {
+      rationale: "Self-evaluation request detected; routing to The Engineer with strict reasoning threshold.",
+      qualityGate: "Architecture self-evaluation gate",
+      maxTokens: 800,
+      temperature: 0.2,
+      routingSignals: {
+        complexityTier,
+        matchedTerms: ["self-evaluate"],
+        highStructureSignals,
+        storedPreference,
+      },
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
   if (requiresAdversarial || isAdversarialRequest(text)) {
     const decision = buildDecision("adversarial-validation", {
       rationale: "Adversarial or red-team request detected; use the premium validation path.",
@@ -261,9 +282,9 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")) {
-    const decision = buildDecision("genealogy-deep-dive", {
-      rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
+  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")) {
+    const decision = buildDecision("coding-hinge", {
+      rationale: "Coding language detected; route through the verification-first coding path.",
       routingSignals: {
         complexityTier,
         matchedTerms: catalogRoute?.matchTerms || [],
@@ -275,9 +296,9 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")) {
-    const decision = buildDecision("coding-hinge", {
-      rationale: "Coding language detected; route through the verification-first coding path.",
+  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")) {
+    const decision = buildDecision("genealogy-deep-dive", {
+      rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
       routingSignals: {
         complexityTier,
         matchedTerms: catalogRoute?.matchTerms || [],

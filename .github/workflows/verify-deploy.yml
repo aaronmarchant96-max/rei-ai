@@ -1,0 +1,22 @@
+name: Verify Vercel Auto-Deploy
+on: [push]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Vercel deploy hook is registered on GitHub
+        run: |
+          HOOKS=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/hooks")
+          if echo "$HOOKS" | grep -q "api.vercel.com/v1/integrations/deploy"; then
+            echo "✅ Vercel auto-deploy webhook active"
+          else
+            echo "⚠️  Vercel auto-deploy webhook missing — push won't deploy!"
+            echo "   Fix: gh api repos/${{ github.repository }}/hooks --method POST"
+            echo "     --field name=web --field active=true --field 'events[]=push'"
+            echo "     --raw-field 'config[url]=https://api.vercel.com/v1/integrations/deploy/prj_hI91HUiDFBnDE4Y7STtlzGDkwYGo/2SfIYuX4Rz'"
+            echo "     --raw-field 'config[content_type]=json'"
+          fi

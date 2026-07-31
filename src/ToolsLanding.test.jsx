@@ -12,7 +12,7 @@ describe("ToolsLanding", () => {
   it("renders stats bar with test count", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getAllByText(/200\+ tests passing/i).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText(/440 tests passing/i).length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText(/open source/i)).toBeInTheDocument();
   });
 
@@ -46,7 +46,7 @@ describe("ToolsLanding", () => {
 
     const launchBtns = screen.getAllByRole("button", { name: /launch/i });
     expect(launchBtns.length).toBeGreaterThanOrEqual(5);
-    fireEvent.click(launchBtns[1]); // 0=hero, 1=Furnace
+    fireEvent.click(launchBtns[2]);
     expect(onOpenTool).toHaveBeenCalledWith({ tool: "furnace" });
   });
 

@@ -1,5 +1,6 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useMobile, useSwipe } from "./useMobile.js";
+import HingeMark from "./modules/rei/components/HingeMark.jsx";
 
 const DebateFurnace = lazy(() => import("./DebateFurnace.jsx"));
 const CreativeEngine = lazy(() => import("./CreativeEngine.jsx"));
@@ -200,43 +201,36 @@ export default function AppShell() {
         </>
       )}
 
-      {tool === "tools" ? (
-        <header className="shell-header shell-header--landing">
-          <div className="shell-brand">
-            <div className="shell-brand__title">PromptHound Labs</div>
-            <div className="shell-brand__sub">Structured outputs for messy input.</div>
+      <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
+        <a href="/" className="flex items-center gap-3 cursor-pointer" onClick={(e) => {
+          if (window.location.pathname === '/' && !window.location.hash) {
+            e.preventDefault();
+            setTool('tools');
+          }
+        }}>
+           <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
+               <HingeMark size={16} animated={false} color="#F59E0B" />
+           </div>
+          <div>
+            <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>
           </div>
+        </a>
 
-          {!mobile && (
-            <nav className="top-tabs hide-mobile" aria-label="Top-level tools">
-              {TOP_LEVEL.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={tool === item.id ? "top-tab is-active" : "top-tab touch-target"}
-                  onClick={() => setTool(item.id)}
-                  aria-pressed={tool === item.id}
-                >
-                  <span className="top-tab__label">{item.label}</span>
-                  <span className="top-tab__sub">{item.subtitle}</span>
-                </button>
-              ))}
-            </nav>
-          )}
-        </header>
-      ) : !mobile ? (
-        <div className="shell-tool-bar" aria-label="Breadcrumb">
-          <button
-            type="button"
-            className="shell-tool-bar__back"
-            onClick={() => setTool("tools")}
-          >
-            ← PromptHound Labs
-          </button>
-          <span className="shell-tool-bar__sep" aria-hidden="true">/</span>
-          <span className="shell-tool-bar__current">{currentToolLabel}</span>
-        </div>
-      ) : null}
+        {!mobile && (
+          <nav className="flex items-center gap-6" aria-label="Primary navigation">
+            <button onClick={() => {
+              if (tool !== 'tools') setTool('tools');
+              setTimeout(() => {
+                const el = document.getElementById('ecosystem');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }} className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">Ecosystem</button>
+            <div className="w-px h-4 bg-gray-700 mx-1"></div>
+            <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
+            <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">GitHub</a>
+          </nav>
+        )}
+      </header>
 
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
         <Suspense fallback={<LoadingShell />}>

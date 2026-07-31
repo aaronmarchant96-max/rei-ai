@@ -13,8 +13,11 @@ import DomainBanner from "./modules/rei/components/DomainBanner.jsx";
 import ChatHistory from "./modules/rei/components/ChatHistory.jsx";
 import ChatInput from "./modules/rei/components/ChatInput.jsx";
 import PhilosophyModal from "./modules/rei/components/PhilosophyModal.jsx";
+import { useSessionTracker } from "./hooks/useSessionTracker.js";
+import InstrumentRail from "./components/InstrumentRail.jsx";
 import WelcomePanel from "./modules/rei/components/WelcomePanel.jsx";
 import ReiContext from "./modules/rei/ReiContext.js";
+import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
 
@@ -114,6 +117,26 @@ export default function REI({ initialPrompt } = {}) {
     }
   };
 
+  const handleExport = async (exportData) => {
+    try {
+      const currentDomain = getDomain(selectedDomain);
+      const report = buildDecisionReport(exportData.sections, {
+        domainLabel: currentDomain?.label || selectedDomain,
+        routerDecision: exportData.routerDecision,
+        timestamp: exportData.timestamp,
+      });
+      const blob = new Blob([report.markdown], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = report.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Failed to export decision document:", err);
+    }
+  };
+
   // Add fade-in animation style
   const fadeInStyle = {
     animation: "fadeIn 0.3s ease-in-out forwards",
@@ -131,18 +154,6 @@ export default function REI({ initialPrompt } = {}) {
     if (typeof window !== "undefined" && localStorage.getItem("rei_chat_history_v2")) {
       console.info("Removing legacy chat history key 'rei_chat_history_v2' to reset chat");
       localStorage.removeItem("rei_chat_history_v2");
-    }
-  }, []);
-
-  // Clear any existing domain‑specific chat history entries on first load to ensure a fresh start
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith("rei_chat_history_")) {
-          console.info(`Removing stale chat history key '${key}'`);
-          localStorage.removeItem(key);
-        }
-      });
     }
   }, []);
 
@@ -166,6 +177,8 @@ export default function REI({ initialPrompt } = {}) {
   const [assistantPromptIndex, setAssistantPromptIndex] = useState(0);
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
+
+  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, escalationCount, trackMessage, resetSession } = useSessionTracker();
 
   // Pre-fill input when navigated from landing page with a prompt
   useEffect(() => {
@@ -207,6 +220,7 @@ export default function REI({ initialPrompt } = {}) {
   }, [messages, selectedDomain]);
 
   const handleClearHistory = () => {
+    resetSession();
     const domainSpecificMessage = {
       sender: "rei",
       text: buildDomainSystemMessage(selectedDomain, currentDomain),
@@ -247,6 +261,9 @@ export default function REI({ initialPrompt } = {}) {
         : null,
     };
 
+    // Optimistically render user message and clear input field for instant responsiveness
+    setMessages((prev) => [...prev, userMsg]);
+    setInputMessage("");
     setIsTyping(true);
 
     // Capture and clear ingest state up front, so it can't accidentally attach to a later, unrelated message.
@@ -302,7 +319,6 @@ export default function REI({ initialPrompt } = {}) {
 
       setMessages((prev) => [
         ...prev,
-        userMsg,
         {
           sender: "rei",
           text: data.result,
@@ -319,6 +335,14 @@ export default function REI({ initialPrompt } = {}) {
           }
         }
       ]);
+
+      trackMessage(
+        routerDecision?.maxTokens || 0,
+        data.model || routerDecision?.model || "unknown",
+        routerDecision?.estimatedCost || 0,
+        routerDecision?.premiumCost || 0,
+        routerDecision?.model === "gpt-4o"
+      );
     } catch (error) {
       console.error("REI.ai API error:", error);
       
@@ -335,7 +359,6 @@ Limitations:
 
       setMessages((prev) => [
         ...prev,
-        userMsg,
         {
           sender: "rei",
           text: fallbackText,
@@ -350,7 +373,6 @@ Limitations:
       ]);
     } finally {
       setIsTyping(false);
-      setInputMessage("");
     }
   }
 
@@ -367,27 +389,11 @@ Limitations:
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
-        maxWidth: mobile ? undefined : "1400px",
-        marginLeft: mobile ? undefined : "auto",
-        marginRight: mobile ? undefined : "auto"
+        overflow: "hidden"
       }}
     >
       {/* Sticky Header with safe area top */}
       <header className="safe-top rei-header">
-        <div className="rei-header__brand">
-          {/* Logo Mark */}
-          <div className="rei-logo-mark">
-            <HingeMark size={28} animated={true} />
-          </div>
-          <div>
-            <h1 className="rei-logo-title">REI.ai</h1>
-            <p className="rei-logo-sub">
-                Latin: <em>Rei</em> (The Matter / Hinge) &nbsp;|&nbsp; Loop: <strong>Record • Evaluate • Iterate</strong>
-            </p>
-          </div>
-        </div>
- 
         {/* Domain selection tab strip */}
         <div className="rei-domain-tabs">
           {DOMAIN_PROFILES.map((dom) => (
@@ -424,7 +430,7 @@ Limitations:
               setInputMessage("What is the hinge in Donoghue v Stevenson?");
             }}
             className="rei-action-btn"
-            style={{ color: "#f0c965", borderColor: "rgba(240, 201, 101, 0.25)" }}
+            style={{ color: "#F59E0B", borderColor: "rgba(245, 158, 11, 0.25)" }}
           >
               ⚖️ Try a Case
           </button>
@@ -432,6 +438,7 @@ Limitations:
       </header>
 
       {/* Scrollable Main Content with keyboard space */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
       <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
         <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
 
@@ -448,14 +455,29 @@ Limitations:
         />
 
         {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
-          <WelcomePanel onStart={(prompt) => {
+          <WelcomePanel
+            onResume={(domainId) => {
+              setSelectedDomain(domainId);
+            }}
+            onStart={(prompt) => {
             setInputMessage(prompt);
             handleSendMessage({ preventDefault: () => {} });
           }} />
         )}
 
-        <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} />
+        <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} />
       </main>
+      {!mobile && (
+        <InstrumentRail
+          sessionTokens={sessionTokens}
+          sessionMessages={sessionMessages}
+          sessionCost={sessionCost}
+          savingsVsPremium={savingsVsPremium}
+          escalationCount={escalationCount}
+          modelBreakdown={modelBreakdown}
+        />
+      )}
+      </div>
 
       <ChatInput />
       
