@@ -10,7 +10,7 @@ module.exports = {
   transformIgnorePatterns: [
     "node_modules/(?!(@xenova/transformers)/)",
   ],
-  bail: true,
+  bail: false,
   testTimeout: 10000,
   verbose: true,
   moduleNameMapper: {

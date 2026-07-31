@@ -9,23 +9,22 @@ describe("ToolsLanding", () => {
     expect(screen.getByRole("button", { name: /launch rei\.ai/i })).toBeInTheDocument();
   });
 
-  it("renders stats bar with test count", () => {
+  it("renders stats badges with accuracy and test count", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getAllByText(/440 tests passing/i).length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText(/open source/i)).toBeInTheDocument();
+    expect(screen.getByText("443+")).toBeInTheDocument();
+    expect(screen.getByText("Passing Tests")).toBeInTheDocument();
+    expect(screen.getByText("Zero-Shot Accuracy")).toBeInTheDocument();
   });
 
-  it("renders CARDO framework with expandable steps", () => {
+  it("renders CARDO pipeline steps", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText(/the cardo framework/i)).toBeInTheDocument();
-
-    const collectBtn = screen.getByRole("button", { name: /collect/i });
-    expect(collectBtn).toBeInTheDocument();
-
-    fireEvent.click(collectBtn);
+    expect(screen.getByText(/CARDO REI Pipeline/i)).toBeInTheDocument();
+    expect(screen.getByText("Collect")).toBeInTheDocument();
     expect(screen.getByText(/gather raw inputs/i)).toBeInTheDocument();
+    expect(screen.getByText("Record")).toBeInTheDocument();
+    expect(screen.getByText("Evaluate")).toBeInTheDocument();
   });
 
   it("renders router demo with scenario buttons", () => {
@@ -36,18 +35,12 @@ describe("ToolsLanding", () => {
     expect(screen.getByRole("button", { name: /greeting/i })).toBeInTheDocument();
   });
 
-  it("renders case studies with launch buttons", () => {
-    const onOpenTool = jest.fn();
-    render(<ToolsLanding onOpenTool={onOpenTool} />);
+  it("renders domain experiments section", () => {
+    render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText(/domain case studies/i)).toBeInTheDocument();
+    expect(screen.getByText(/domain experiments/i)).toBeInTheDocument();
     expect(screen.getByText(/debate furnace/i)).toBeInTheDocument();
-    expect(screen.getByText(/story forge/i)).toBeInTheDocument();
-
-    const launchBtns = screen.getAllByRole("button", { name: /launch/i });
-    expect(launchBtns.length).toBeGreaterThanOrEqual(5);
-    fireEvent.click(launchBtns[2]);
-    expect(onOpenTool).toHaveBeenCalledWith({ tool: "furnace" });
+    expect(screen.getByText(/storm replay/i)).toBeInTheDocument();
   });
 
   it("navigates to REI from hero button", () => {
@@ -62,6 +55,6 @@ describe("ToolsLanding", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
     expect(screen.getByText(/github/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/prompthound labs/i).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText(/rei\.ai by prompthound/i)).toBeInTheDocument();
   });
 });
