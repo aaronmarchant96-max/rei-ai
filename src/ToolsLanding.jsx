@@ -107,12 +107,11 @@ export default function ToolsLanding({ onOpenTool }) {
         </div>
         
         <h1 className="relative font-heading text-6xl md:text-8xl font-black leading-tight mb-6 z-10">
-          Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F59E0B] to-[#FFD700]">Hinge</span>.<br />
-          Route Smarter.
+          Find the one fact that <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F59E0B] to-[#FFD700]">changes the answer</span>.
         </h1>
         
         <p className="relative text-[#E2E8F0] text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed font-light z-10">
-          CARDO is the open-source framework that isolates the load-bearing pivot point in any prompt—routing queries to the <strong className="text-white font-bold">cheapest, most capable model</strong>.
+          Structured reasoning with cost-aware AI routing. Pick a problem. Find the hinge. Make the call.
         </p>
         
         <button
