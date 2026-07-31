@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import DebateFurnace from "./DebateFurnace.jsx";
 
-const HISTORY_KEY = "debate_furnace_history_v1";
+const HISTORY_KEY = "rei_furnace_history_v1";
 
 describe("DebateFurnace", () => {
   beforeEach(() => {

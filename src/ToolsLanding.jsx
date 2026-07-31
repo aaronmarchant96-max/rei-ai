@@ -40,7 +40,7 @@ const DEMO_SCENARIOS = [
 ];
 
 const CASE_STUDIES = [
-  { id: "furnace", toolId: "furnace", label: "Debate Furnace", subtitle: "Adversarial Pressure Test",
+  { id: "furnace", toolId: "furnace", label: "The Furnace", subtitle: "Adversarial Pressure Test",
     description: "Argument Pressure Testing Engine",
     hinge: "Ultimate Authorship vs Reason-Responsive Agency" },
   { id: "storm", toolId: "storm-replay", label: "Storm Replay", subtitle: "Radar Signal Review",

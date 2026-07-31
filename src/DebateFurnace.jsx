@@ -135,7 +135,7 @@ function summarizeAiFailure(error) {
     return "AI generation was unavailable because the debate API returned a server error.";
   }
 
-  return "AI generation was unavailable, so Debate Furnace used its local fallback.";
+  return "AI generation was unavailable, so The Furnace used its local fallback.";
 }
 
 function safelyReplaceUrl(url) {
@@ -147,9 +147,9 @@ function safelyReplaceUrl(url) {
   }
 }
 
-const HISTORY_KEY = "debate_furnace_history_v1";
+const HISTORY_KEY = "rei_furnace_history_v1";
 const HISTORY_LIMIT = 12;
-const DECISION_PATH_KEY = "debate_furnace_decision_path_v1";
+const DECISION_PATH_KEY = "rei_furnace_decision_path_v1";
 
 function safeParseHistory(value) {
   try {
@@ -3286,7 +3286,7 @@ export default function DebateFurnace() {
     const decisionPathBlock = showDecisionPath
       ? `\n## Recommended Decision Path\n- Framework: ${decisionPath.framework}\n- Driver: ${decisionPath.driver}\n- Approver: ${decisionPath.approver}\n- Contributors: ${decisionPath.contributors}\n- Input deadline: ${decisionPath.deadline}\n- Decision log template: ${decisionPath.logTemplate}\n- Why this path fits: ${decisionPath.why}\n`
       : "";
-    const md = `# Debate Furnace — Final Report\n\n**Question:** ${question}\n**Type:** ${debate.label}\n${cardoReiBlock}\n## The Hinge\n**Question type:** ${hinge.questionType}\n**Hinge clarity:** ${hinge.hingeClarityLevel} — ${hinge.hingeClarityReason}\n\n- **${debate.shortA} protects:** ${hinge.sideAProtects}\n- **${debate.shortA} fears losing:** ${hinge.sideAFears}\n- **${debate.shortB} protects:** ${hinge.sideBProtects}\n- **${debate.shortB} fears losing:** ${hinge.sideBFears}\n- **Core tension:** ${hinge.coreTension}\n- **Bridge point:** ${hinge.bridgePoint}\n\n## What Survived The Heat\n**Result:** ${result}\n**Score:** ${debate.shortA}: ${debate.aWins} | ${debate.shortB}: ${debate.bWins}${debate.ties ? ` | ${debate.ties} tie` : ""}\n\n## What the Question Was Really Asking\n${debate.desc}\n\n## Key Takeaways\n${debate.take.map(([t, b]) => `- **${t}:** ${b}`).join("\n")}\n\n## Strongest Cases\n- **${debate.shortA}:** ${debate.strongA}\n- **${debate.shortB}:** ${debate.strongB}\n\n## Where Each Side Cracked\n- **${debate.shortA}:** ${debate.crackA}\n- **${debate.shortB}:** ${debate.crackB}\n\n## ${label}\n${debate.verify.map((v) => `- ${v}`).join("\n")}\n\n## What Would Change the Verdict?\n### Make ${debate.shortA} stronger\n${debate.changeA.map((v) => `- ${v}`).join("\n")}\n\n### Make ${debate.shortB} stronger\n${debate.changeB.map((v) => `- ${v}`).join("\n")}\n\n## What This Really Depends On\n${debate.core}\n\n- If you value **${debate.comp[0]}**, ${debate.shortA} feels stronger.\n- If you value **${debate.comp[1]}**, ${debate.shortB} feels stronger.\n- The real question is: ${debate.comp[2]}.${decisionPathBlock}\n\n## Transcript\n${debate.rounds.map((r) => `### Round ${r.round} — ${r.label}\n**${debate.shortA}:** ${r.aArg}\n\n**${debate.shortB}:** ${r.bArg}\n\n**Judge:** ${r.judgeNote}`).join("\n\n")}\n\n**Share link:** ${shareLink}\n\n---\n*Pressure-test both sides. Find the hinge. Decide what matters.*`;
+    const md = `# The Furnace — Final Report\n\n**Question:** ${question}\n**Type:** ${debate.label}\n${cardoReiBlock}\n## The Hinge\n**Question type:** ${hinge.questionType}\n**Hinge clarity:** ${hinge.hingeClarityLevel} — ${hinge.hingeClarityReason}\n\n- **${debate.shortA} protects:** ${hinge.sideAProtects}\n- **${debate.shortA} fears losing:** ${hinge.sideAFears}\n- **${debate.shortB} protects:** ${hinge.sideBProtects}\n- **${debate.shortB} fears losing:** ${hinge.sideBFears}\n- **Core tension:** ${hinge.coreTension}\n- **Bridge point:** ${hinge.bridgePoint}\n\n## What Survived The Heat\n**Result:** ${result}\n**Score:** ${debate.shortA}: ${debate.aWins} | ${debate.shortB}: ${debate.bWins}${debate.ties ? ` | ${debate.ties} tie` : ""}\n\n## What the Question Was Really Asking\n${debate.desc}\n\n## Key Takeaways\n${debate.take.map(([t, b]) => `- **${t}:** ${b}`).join("\n")}\n\n## Strongest Cases\n- **${debate.shortA}:** ${debate.strongA}\n- **${debate.shortB}:** ${debate.strongB}\n\n## Where Each Side Cracked\n- **${debate.shortA}:** ${debate.crackA}\n- **${debate.shortB}:** ${debate.crackB}\n\n## ${label}\n${debate.verify.map((v) => `- ${v}`).join("\n")}\n\n## What Would Change the Verdict?\n### Make ${debate.shortA} stronger\n${debate.changeA.map((v) => `- ${v}`).join("\n")}\n\n### Make ${debate.shortB} stronger\n${debate.changeB.map((v) => `- ${v}`).join("\n")}\n\n## What This Really Depends On\n${debate.core}\n\n- If you value **${debate.comp[0]}**, ${debate.shortA} feels stronger.\n- If you value **${debate.comp[1]}**, ${debate.shortB} feels stronger.\n- The real question is: ${debate.comp[2]}.${decisionPathBlock}\n\n## Transcript\n${debate.rounds.map((r) => `### Round ${r.round} — ${r.label}\n**${debate.shortA}:** ${r.aArg}\n\n**${debate.shortB}:** ${r.bArg}\n\n**Judge:** ${r.judgeNote}`).join("\n\n")}\n\n**Share link:** ${shareLink}\n\n---\n*Pressure-test both sides. Find the hinge. Decide what matters.*`;
     navigator.clipboard.writeText(md).finally(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
@@ -3303,7 +3303,7 @@ export default function DebateFurnace() {
 
   const copyRound = (rr) => {
     if (!debate || !rr) return;
-    const text = `# Debate Furnace — Round ${rr.round}\n\n**Question:** ${question}\n**Type:** ${debate.label}\n**Round:** ${rr.label}\n\n**${debate.shortA}:** ${rr.aArg}\n\n**${debate.shortB}:** ${rr.bArg}\n\n**Judge:** ${rr.judgeNote}\n`;
+    const text = `# The Furnace — Round ${rr.round}\n\n**Question:** ${question}\n**Type:** ${debate.label}\n**Round:** ${rr.label}\n\n**${debate.shortA}:** ${rr.aArg}\n\n**${debate.shortB}:** ${rr.bArg}\n\n**Judge:** ${rr.judgeNote}\n`;
     navigator.clipboard.writeText(text).finally(() => {
       setRoundCopied(`r${rr.round}`);
       setTimeout(() => setRoundCopied(""), 1500);
@@ -3364,7 +3364,7 @@ export default function DebateFurnace() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Debate Furnace
+              The Furnace
             </h1>
             <p style={{ color: T.textDim, fontSize: 14, lineHeight: 1.5, marginBottom: 8 }}>
               Pressure-test both sides.

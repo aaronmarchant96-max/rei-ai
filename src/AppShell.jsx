@@ -26,7 +26,7 @@ const TOP_LEVEL = [
   },
   {
     id: "furnace",
-    label: "Debate Furnace",
+    label: "The Furnace",
     subtitle: "Arguments get pressure-tested here."
   },
   {
@@ -85,7 +85,7 @@ function getToolLabel(tool) {
   if (tool === "cardo-guard") return "CARDO GUARD";
   if (tool === "rei" || tool === "cfai") return "REI.ai";
   if (tool === "tracepoint") return "Tracepoint";
-  return "Debate Furnace";
+  return "The Furnace";
 }
 
 export default function AppShell() {
@@ -125,7 +125,7 @@ export default function AppShell() {
                 ? "PromptHound Labs | REI.ai"
                 : tool === "tracepoint"
                   ? "PromptHound Labs | Tracepoint"
-                  : "PromptHound Labs | Debate Furnace";
+                  : "PromptHound Labs | The Furnace";
   }, [tool]);
 
   const currentToolLabel = getToolLabel(tool);
