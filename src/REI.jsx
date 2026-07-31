@@ -18,7 +18,6 @@ import { useSessionTracker } from "./hooks/useSessionTracker.js";
 import InstrumentRail from "./components/InstrumentRail.jsx";
 import WelcomePanel from "./modules/rei/components/WelcomePanel.jsx";
 import ReiContext from "./modules/rei/ReiContext.js";
-import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
 

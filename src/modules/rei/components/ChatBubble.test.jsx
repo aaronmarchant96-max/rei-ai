@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import ChatBubble from "./ChatBubble.jsx";
 
 describe("ChatBubble", () => {
@@ -54,5 +54,23 @@ describe("ChatBubble", () => {
   it("renders copy button", () => {
     render(<ChatBubble msg={baseMsg} selectedDomain="assistant" mobile={false} onCopy={jest.fn()} />);
     expect(screen.getByTitle("Copy message")).toBeInTheDocument();
+  });
+
+  it("renders export button for structured CARDO replies", () => {
+    const onExport = jest.fn();
+    const structuredMsg = {
+      ...baseMsg,
+      text: "Intro text.\n\nHinge: The core pivot point.\n\nFacts: What is known.\n\nMove: Next step.",
+    };
+
+    render(<ChatBubble msg={structuredMsg} selectedDomain="assistant" mobile={false} onCopy={jest.fn()} onExport={onExport} domainLabel="Legal" />);
+    fireEvent.click(screen.getByTitle("Export decision"));
+
+    expect(onExport).toHaveBeenCalledWith(expect.objectContaining({
+      domainLabel: "Legal",
+      sections: expect.objectContaining({
+        Hinge: "The core pivot point.",
+      }),
+    }));
   });
 });
