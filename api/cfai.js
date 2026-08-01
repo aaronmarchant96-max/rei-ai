@@ -172,11 +172,13 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
 
   // Return a graceful user-facing message instead of throwing a 500.
   return {
-    content: "[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.",
-    model: "rate-limited",
-    routerDecision,
-    rateLimited: true,
-  };
+      content: "[REI.AI NOTICE] The reasoning backend is temporarily busy (rate limit). Please wait a moment and try again.",
+      model: selectedModel || "rate-limited",
+      routerDecision,
+      rateLimited: true,
+      attemptedModel: selectedModel,
+      retryAfter: "~15s",
+    };
 }
 
 export async function handleCfaiRequest(command, args = [], input = "", systemPrompt = "", history = [], routerDecision = null) {

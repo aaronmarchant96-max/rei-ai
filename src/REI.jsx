@@ -383,7 +383,7 @@ Limitations:
       assistantPromptIndex, setAssistantPromptIndex,
     }}>
     <div
-      className="mobile-container safe-area rei-shell"
+      data-theme="light" className="mobile-container safe-area rei-shell"
       style={{
         width: "100%",
         height: "100%",

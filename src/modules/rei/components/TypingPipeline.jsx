@@ -44,8 +44,8 @@ export default function TypingPipeline() {
             color: i < activeStep
               ? "rgba(240,201,101,0.7)"
               : i === activeStep
-                ? "#f0c965"
-                : "#475569",
+                ? "var(--amber-text)"
+                : "var(--text-dim)",
             fontWeight: 700, fontSize: "10px",
             transition: "all 0.4s ease",
             boxShadow: i === activeStep
@@ -59,7 +59,7 @@ export default function TypingPipeline() {
 
       {/* Current step label */}
       <span style={{
-        color: "#f0c965", fontWeight: 600,
+        color: "var(--amber-text)", fontWeight: 600,
         animation: "fadeInStep 0.4s ease",
         minWidth: "140px",
       }}>

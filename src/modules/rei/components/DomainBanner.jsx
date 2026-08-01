@@ -16,16 +16,16 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <span style={{
             display: "inline-block", width: "7px", height: "7px", borderRadius: "50%",
-            background: "#f0c965", boxShadow: "0 0 8px #f0c965", flexShrink: 0,
+            background: "var(--amber-fill)", boxShadow: "0 0 8px var(--amber-border)", flexShrink: 0,
           }} />
           <span style={{
             fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "15px",
-            color: "#f8fafc",
+            color: "var(--text)",
           }}>
             {currentDomain.label}
           </span>
           <span style={{
-            fontSize: "12px", color: "#94a3b8", fontWeight: 400,
+            fontSize: "12px", color: "var(--text-muted)", fontWeight: 400,
             maxWidth: "360px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>
             {currentDomain.description}
@@ -33,11 +33,11 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "10px", color: "#475569", fontFamily: "monospace" }}>
+          <span style={{ fontSize: "10px", color: "var(--text-dim)", fontFamily: "monospace" }}>
             CARDO v3.4
           </span>
           <span style={{
-            fontSize: "11px", color: "#64748b", transition: "transform 0.2s",
+            fontSize: "11px", color: "var(--text-dim)", transition: "transform 0.2s",
             transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
           }}>
             ▼
@@ -65,23 +65,23 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
 
           {selectedDomain === "assistant" && (
             <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid rgba(240, 201, 101, 0.12)" }}>
-              <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "#f0c965", textTransform: "uppercase", marginBottom: "8px" }}>
+              <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--amber-text)", textTransform: "uppercase", marginBottom: "8px" }}>
                 CARDO Cognitive Pipeline (Pivot Dissection)
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px" }}>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#e2e8f0", padding: "3px 8px", borderRadius: "4px" }}>
+                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
                   C · Collect Raw Data
                 </span>
-                <span style={{ color: "#f0c965", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#e2e8f0", padding: "3px 8px", borderRadius: "4px" }}>
+                <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
+                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
                   A · Analyze Patterns
                 </span>
-                <span style={{ color: "#f0c965", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(240,201,101,0.2)", border: "1px solid #f0c965", color: "#f0c965", padding: "3px 8px", borderRadius: "4px", boxShadow: "0 0 12px rgba(240,201,101,0.2)" }}>
+                <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
+                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(240,201,101,0.2)", border: "1px solid var(--amber-border)", color: "var(--amber-text)", padding: "3px 8px", borderRadius: "4px", boxShadow: "0 0 12px rgba(240,201,101,0.2)" }}>
                   📌 R · Record Hinge
                 </span>
-                <span style={{ color: "#f0c965", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "#e2e8f0", padding: "3px 8px", borderRadius: "4px" }}>
+                <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
+                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
                   DO · Execute Move
                 </span>
               </div>

@@ -20,3 +20,11 @@ window.matchMedia = (query) => ({
   removeEventListener: jest.fn(),
   dispatchEvent: jest.fn(),
 });
+
+// Mock IntersectionObserver for jsdom (unavailable in test environment)
+global.IntersectionObserver = class IntersectionObserver {
+  constructor() {}
+  observe() { return null; }
+  unobserve() { return null; }
+  disconnect() { return null; }
+};

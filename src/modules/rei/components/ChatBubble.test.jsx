@@ -64,7 +64,7 @@ describe("ChatBubble", () => {
     };
 
     render(<ChatBubble msg={structuredMsg} selectedDomain="assistant" mobile={false} onCopy={jest.fn()} onExport={onExport} domainLabel="Legal" />);
-    fireEvent.click(screen.getByTitle("Export decision"));
+    fireEvent.click(screen.getByTitle("Export Report decision"));
 
     expect(onExport).toHaveBeenCalledWith(expect.objectContaining({
       domainLabel: "Legal",
