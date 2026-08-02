@@ -7,6 +7,8 @@ export default function InstrumentRail({
   savingsVsPremium,
   escalationCount,
   modelBreakdown,
+  lifetimeCost,
+  lifetimeSavings,
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -28,7 +30,7 @@ export default function InstrumentRail({
         </button>
         <div className="rei-instrument-rail__collapsed-hero" title={`Efficiency: ${savingsPercent}%`}>
           <div className="rei-instrument-rail__collapsed-hero-value">
-            EFFICIENCY: {totalPremiumCost > 0 ? `${savingsPercent}%` : "—"}
+            EFFICIENCY: {totalPremiumCost > 0 ? `${savingsPercent}%` : "\u2014"}
           </div>
         </div>
       </aside>
@@ -80,6 +82,14 @@ export default function InstrumentRail({
             ${savingsVsPremium.toFixed(4)}
           </span>
         </div>
+        {lifetimeCost > 0 && (
+          <div className="rei-instrument-rail__row">
+            <span>Lifetime</span>
+            <span className="rei-instrument-rail__value">
+              ${lifetimeCost.toFixed(4)} / ${lifetimeSavings.toFixed(2)} saved
+            </span>
+          </div>
+        )}
         {escalationCount > 0 && (
           <div className="rei-instrument-rail__row">
             <span>Escalations</span>
