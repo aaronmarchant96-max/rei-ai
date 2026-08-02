@@ -49,8 +49,8 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
       {expanded && (
         <div style={{
           marginTop: "6px", padding: "12px 14px",
-          background: "rgba(15, 17, 22, 0.7)", borderRadius: "6px",
-          border: "1px solid rgba(240, 201, 101, 0.1)",
+          background: "var(--surface)", borderRadius: "6px",
+          border: "1px solid var(--border)",
         }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <div className="rei-domain-banner__meta" style={{ fontSize: "12px" }}>
@@ -64,16 +64,16 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
           </div>
 
           {selectedDomain === "assistant" && (
-            <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid rgba(240, 201, 101, 0.12)" }}>
+            <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid var(--border)" }}>
               <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--amber-text)", textTransform: "uppercase", marginBottom: "8px" }}>
                 CARDO Cognitive Pipeline (Pivot Dissection)
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px" }}>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
+                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "var(--page)", border: "1px solid var(--border)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
                   C · Collect Raw Data
                 </span>
                 <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
+                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "var(--page)", border: "1px solid var(--border)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
                   A · Analyze Patterns
                 </span>
                 <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
@@ -81,7 +81,7 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
                   📌 R · Record Hinge
                 </span>
                 <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
+                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "var(--page)", border: "1px solid var(--border)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
                   DO · Execute Move
                 </span>
               </div>

@@ -1,0 +1,7 @@
+{
+  "cline.apiProvider": "deepseek",
+  "cline.deepseekApiKey": "",
+  "cline.model": "deepseek-chat",
+  "cline.planModeSeparateModel": false,
+  "cline.autoRetryApiErrors": true
+}
