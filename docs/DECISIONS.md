@@ -182,7 +182,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 ---
 
-*Last updated: July 12, 2026*  
+*Last updated: July 31, 2026*  
 *Next: add decisions as they're made. Don't let 6 months pass.*
 
 ---
@@ -218,4 +218,24 @@ Each entry captures: what problem was being solved, what alternatives were consi
 3. **Enterprise Specialized Slices**: Dual-license domain-specific high-value engines (Legal Hinge Analyzer, Math Solver, Red Team Scanner).
 
 **Code & Specs:** `docs/ROADMAP.md`, `src/ToolsLanding.jsx`, `src/lib/nightShiftRouter.js`
+
+---
+
+## 13. DebateFurnace.jsx Decomposition — Maintainability, Not Bundle Size
+
+**Date:** July 31, 2026  
+**Problem:** `src/DebateFurnace.jsx` was a 4,381-line monolith — state, handlers, inline components, and the entire render tree in one file. Any change risked touching unrelated logic.
+
+**Choice:** Extract in three phases:
+1. **Functions/data** → `src/modules/debate-furnace/` (`config.js`, `utils.js`, `history.js`, `decisionPath.js`, `classifier.js`)
+2. **Presentational components** → `components.jsx` (8 exports: Pill, Section, Card, HingeCard, Score, DecisionPathControls, DecisionPathPanel)
+3. **Render sections** → `OpeningScreen.jsx`, `RoundScreen.jsx`, `AnalysisScreen.jsx`, `FinalReport.jsx`
+
+**Result:** 4,381 → 2,810 lines. Render tree is now `!debate ? <OpeningScreen/>` / `analysis ? <AnalysisScreen/> : !final ? <RoundScreen/> : <FinalReport/>`.
+
+**Trade-offs (explicitly recorded to avoid misremembering):**
+- **This is a maintainability win, NOT a bundle-size win.** The DebateFurnace chunk was 173.50 kB (gzip 55.44 kB) after Phase 3a and 174.31 kB (gzip 55.42 kB) after Phase 3b — effectively flat. All extracted files are **static imports** inside `DebateFurnace.jsx`, which is itself already lazy-loaded at the AppShell level (`src/AppShell.jsx:5`). The lazy boundary predates this refactor; the initial-load footprint was fixed by React.lazy code-splitting, not by this decomposition.
+- **Scope boundary: this is DebateFurnace-specific debt.** It must NOT be cited as REI.ai's technical-debt story. REI.ai's reduction (1,476 → 447 lines, `src/modules/rei/`) is a separate refactor and is the correct citation for REI.ai's scope.
+
+**Code:** `src/DebateFurnace.jsx`, `src/modules/debate-furnace/` (10 files)
 

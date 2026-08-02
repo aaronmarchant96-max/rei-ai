@@ -25,7 +25,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
       onAnimationEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
       {msg.sender === "user" && msg.attachedRecord && (
-        <div style={{ fontSize: "11px", color: "#f0c965", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
+        <div style={{ fontSize: "11px", color: "var(--amber-text)", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
           📋 Attached Record — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
         </div>
       )}
@@ -35,9 +35,17 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
           <span style={{ fontSize: "11px" }}>⚡</span>
           <span>{msg.rawJson.routerDecision.label}</span>
           <span style={{ margin: "0 2px" }}>·</span>
-          <span style={{ color: "#f0c965", fontWeight: 700 }}>
+          <span style={{ color: "var(--amber-text)", fontWeight: 700 }}>
             {msg.rawJson.routerDecision.model}
           </span>
+          {msg.rawJson.routerDecision.hingeScore != null && msg.rawJson.routerDecision.hingeScore < 0.3 && (!msg.rawJson.routerDecision.matchedTerms || msg.rawJson.routerDecision.matchedTerms.length === 0) && (
+            <span style={{ fontSize: "10px", color: "var(--amber-badge-tx)", background: "var(--amber-badge-bg)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }}>Low confidence</span>
+          )}
+          {msg.rawJson?.rateLimited && (
+            <span style={{ fontSize: "10px", color: "var(--text-muted)", marginLeft: "4px" }}>
+              ({msg.rawJson.attemptedModel || "model"} busy · retry {msg.rawJson.retryAfter || "soon"})
+            </span>
+          )}
         </div>
       )}
 
@@ -59,17 +67,17 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                 {hasHinge && (
                   <div
                     style={{
-                      borderLeft: "4px solid #f0c965",
+                      borderLeft: "4px solid var(--amber-border)",
                       marginBottom: "12px",
                       borderRadius: "0 10px 10px 0",
                       padding: "12px 16px",
                       boxShadow: "0 4px 14px rgba(240, 201, 101, 0.08)",
                     }}
                   >
-                    <div style={{ color: "#f0c965", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 800, marginBottom: "4px" }}>
+                    <div style={{ color: "var(--amber-text)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 800, marginBottom: "4px" }}>
                       📌 THE HINGE (Core Pivot Point)
                     </div>
-                    <div style={{ color: "#f8fafc", fontSize: "14.5px", fontWeight: 600, lineHeight: "1.5" }}>
+                    <div style={{ color: "var(--text)", fontSize: "14.5px", fontWeight: 600, lineHeight: "1.5" }}>
                       {sections.Hinge}
                     </div>
                   </div>
@@ -80,18 +88,18 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                   <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: "12px" }}>
                     {hasFacts && (
                          <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(240, 201, 101, 0.15)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                           <div style={{ color: "#38bdf8", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                           <div style={{ color: "var(--cardo-facts)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
                              🔬 FACTS (Known Reality)
                            </div>
-                           <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.45" }}>{sections.Facts}</div>
+                           <div style={{ fontSize: "13.5px", color: "var(--text-secondary)", lineHeight: "1.45" }}>{sections.Facts}</div>
                          </div>
                     )}
                     {hasAssumptions && (
                          <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(251, 146, 60, 0.15)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                           <div style={{ color: "#fb923c", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                           <div style={{ color: "var(--cardo-assumptions)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
                              ❓ ASSUMPTIONS (Uncertainty)
                            </div>
-                           <div style={{ fontSize: "13.5px", color: "#cbd5e1", lineHeight: "1.45" }}>{sections.Assumptions}</div>
+                           <div style={{ fontSize: "13.5px", color: "var(--text-secondary)", lineHeight: "1.45" }}>{sections.Assumptions}</div>
                          </div>
                     )}
                   </div>
@@ -100,29 +108,29 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                 {/* ⚖️ 3. EVALUATION & CHANGE MIND */}
                 {hasEval && (
                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                       <div style={{ color: "#f0c965", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                       <div style={{ color: "var(--amber-text)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
                          ⚖️ EVALUATION & RISK
                        </div>
-                       <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.45" }}>{sections.Evaluation}</div>
+                       <div style={{ fontSize: "13.5px", color: "var(--text)", lineHeight: "1.45" }}>{sections.Evaluation}</div>
                      </div>
                 )}
 
                 {hasChange && (
                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                       <div style={{ color: "#a855f7", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                       <div style={{ color: "var(--cardo-change)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
                          🔄 WHAT WOULD CHANGE MY MIND
                        </div>
-                       <div style={{ fontSize: "13.5px", color: "#e2e8f0", lineHeight: "1.45" }}>{sections.ChangeMind}</div>
+                       <div style={{ fontSize: "13.5px", color: "var(--text)", lineHeight: "1.45" }}>{sections.ChangeMind}</div>
                      </div>
                 )}
 
                 {/* 🚀 4. NEXT MOVE */}
                 {hasMove && (
                       <div style={{ background: "rgba(240, 201, 101, 0.06)", border: "1px solid rgba(240, 201, 101, 0.2)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                       <div style={{ color: "#4ade80", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
+                       <div style={{ color: "var(--cardo-move)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
                          🚀 NEXT MOVE
                        </div>
-                       <div style={{ fontSize: "14px", color: "#f8fafc", fontWeight: 600, lineHeight: "1.45" }}>{sections.Move}</div>
+                       <div style={{ fontSize: "14px", color: "var(--text)", fontWeight: 600, lineHeight: "1.45" }}>{sections.Move}</div>
                      </div>
                 )}
               </div>
@@ -135,12 +143,14 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
         {/* Collapsible Telemetry Dropdown */}
         {msg.rawJson && (
           <details style={{ marginTop: "14px", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "8px" }}>
-            <summary style={{ fontSize: "11.5px", color: "#94a3b8", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
+            <summary style={{ fontSize: "11.5px", color: "var(--text-muted)", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
               🔍 View Night Shift Routing Telemetry ({msg.rawJson.routerDecision?.model || "auto"})
             </summary>
             <div className="rei-router-panel__grid" style={{ marginTop: "8px" }}>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Route:</span> {msg.rawJson.routerDecision?.label || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Model:</span> {msg.rawJson.routerDecision?.model || msg.rawJson.model || "n/a"}</div>
+              <div class="rei-router-panel__item"><span class="rei-router-panel__label">Hinge score:</span> {msg.rawJson.routerDecision?.hingeScore?.toFixed(2) || "n/a"}</div>
+              <div class="rei-router-panel__item"><span class="rei-router-panel__label">Matched terms:</span> {msg.rawJson.routerDecision?.matchedTerms?.join(", ") || "none"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Max tokens:</span> {msg.rawJson.routerDecision?.maxTokens || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Quality gate:</span> {msg.rawJson.routerDecision?.qualityGate || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Enforcement:</span> {msg.rawJson.routerDecision?.enforce || "none"}</div>
@@ -158,13 +168,13 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
             type="button"
             onClick={() => onExport(exportPayload)}
             className="rei-copy-btn touch-target"
-            aria-label="Export decision"
+            aria-label="Export Report decision"
             onMouseOver={(e) => e.currentTarget.style.opacity = 1}
             onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-            title="Export decision"
+            title="Export Report decision"
             style={{ marginRight: "8px" }}
           >
-            Export
+            Export Report
           </button>
         )}
 
@@ -206,13 +216,13 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
               <button
                 onClick={() => onExport && onExport({ sections: s, routerDecision: msg.rawJson?.routerDecision, timestamp: msg.timestamp })}
                 className="rei-copy-btn touch-target"
-                aria-label="Export decision document"
+                aria-label="Export Report decision document"
                 style={{ right: "100px", fontSize: "9px" }}
                 onMouseOver={(e) => e.currentTarget.style.opacity = 1}
                 onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
                 title="Download CARDO decision report"
               >
-                📄 Export
+                📄 Export Report
               </button>
             </>
           );

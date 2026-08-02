@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useMobile, useKeyboardVisible } from "./useMobile.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
@@ -175,10 +175,17 @@ export default function REI({ initialPrompt } = {}) {
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef(null);
   const [assistantPromptIndex, setAssistantPromptIndex] = useState(0);
+  const [showRecap, setShowRecap] = useState(true);
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
 
-  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, escalationCount, trackMessage, resetSession } = useSessionTracker();
+
+  const sessionRecap = useMemo(() => {
+    if (messages.length < 3) return null;
+    const decisions = messages.filter(m => m?.sender === "rei" && (m?.rawJson?.routerDecision?.hingeScore || 0) > 0.3).length;
+    return decisions > 0 ? { decisions } : null;
+  }, [messages]);
+  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, escalationCount, trackMessage, lifetimeCost, lifetimeSavings, resetSession } = useSessionTracker();
 
   // Pre-fill input when navigated from landing page with a prompt
   useEffect(() => {
@@ -383,7 +390,7 @@ Limitations:
       assistantPromptIndex, setAssistantPromptIndex,
     }}>
     <div
-      className="mobile-container safe-area rei-shell"
+      data-theme="light" className="mobile-container safe-area rei-shell"
       style={{
         width: "100%",
         height: "100%",
@@ -465,6 +472,21 @@ Limitations:
           }} />
         )}
 
+
+        {showRecap && sessionRecap && (
+          <div className="rei-session-recap" style={{
+            padding: "10px 14px", borderRadius: "8px",
+            background: "rgba(240, 201, 101, 0.04)", border: "1px solid rgba(240, 201, 101, 0.12)",
+            margin: "0 16px 8px", display: "flex", justifyContent: "space-between", alignItems: "center",
+            fontSize: "12px", color: "var(--text-secondary)",
+          }}>
+            <span>{sessionRecap.decisions} decisions \u2022 saved ${savingsVsPremium.toFixed(4)} vs premium</span>
+            <button onClick={() => setShowRecap(false)} style={{
+              background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer",
+              fontSize: "16px", lineHeight: 1, padding: "0 2px",
+            }}>×</button>
+          </div>
+        )}
         <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
       </main>
       {!mobile && (
@@ -475,6 +497,8 @@ Limitations:
           savingsVsPremium={savingsVsPremium}
           escalationCount={escalationCount}
           modelBreakdown={modelBreakdown}
+          lifetimeCost={lifetimeCost}
+          lifetimeSavings={lifetimeSavings}
         />
       )}
       </div>

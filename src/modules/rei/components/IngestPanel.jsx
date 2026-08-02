@@ -13,7 +13,7 @@ export default function IngestPanel({ selectedDomain, rawRecordText, setRawRecor
         style={{
           background: "rgba(240, 201, 101, 0.08)",
           border: "1px solid rgba(240, 201, 101, 0.25)",
-          color: "#f0c965",
+          color: "var(--amber-text)",
           borderRadius: "8px",
           padding: "8px 12px",
           fontSize: "12.5px",
@@ -38,12 +38,12 @@ export default function IngestPanel({ selectedDomain, rawRecordText, setRawRecor
                   padding: "5px 10px",
                   borderRadius: "6px",
                   border: recordSourceType === s.id
-                    ? "1px solid #f0c965"
+                    ? "1px solid var(--amber-border)"
                     : "1px solid rgba(255,255,255,0.1)",
                   background: recordSourceType === s.id
                     ? "rgba(240, 201, 101, 0.18)"
                     : "rgba(255,255,255,0.02)",
-                  color: recordSourceType === s.id ? "#f0c965" : "#94a3b8",
+                  color: recordSourceType === s.id ? "var(--amber-text)" : "var(--text-muted)",
                   cursor: "pointer",
                 }}
               >
@@ -64,7 +64,7 @@ export default function IngestPanel({ selectedDomain, rawRecordText, setRawRecor
                 ? "1px solid #ef4444"
                 : "1px solid rgba(240, 201, 101, 0.2)",
               borderRadius: "8px",
-              color: "#E2E8F0",
+              color: "var(--text)",
               fontSize: "12.5px",
               padding: "10px 12px",
               fontFamily: "monospace",
@@ -77,7 +77,7 @@ export default function IngestPanel({ selectedDomain, rawRecordText, setRawRecor
               style={{
                 fontSize: "11px",
                 marginTop: "4px",
-                color: overLimit ? "#f87171" : nearLimit ? "#fbbf24" : "#94a3b8",
+                color: overLimit ? "#f87171" : nearLimit ? "var(--amber-text)" : "var(--text-muted)",
               }}
             >
               {charCount.toLocaleString()} / {maxRecordChars.toLocaleString()} characters

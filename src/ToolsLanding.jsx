@@ -84,7 +84,22 @@ export default function ToolsLanding({ onOpenTool }) {
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
 
   return (
-    <div className="min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
+    <div data-theme="light" className="min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
+      {/* Light theme overrides for Tailwind color tokens */}
+      <style>{`
+        [data-theme="light"] .bg-background { background-color: #F8F9FA !important; }
+        [data-theme="light"] .bg-surface { background-color: #FFFFFF !important; }
+        [data-theme="light"] .bg-hinge { background-color: #F59E0B !important; }
+        [data-theme="light"] .text-foreground { color: #1C1917 !important; }
+        [data-theme="light"] .text-foreground-muted { color: #767676 !important; }
+        [data-theme="light"] .text-hinge-bright { color: #B45309 !important; }
+        [data-theme="light"] .border-border { border-color: #E5E5E5 !important; }
+        [data-theme="light"] .border-hinge { border-color: #B45309 !important; }
+        [data-theme="light"] .hover\\:border-hinge:hover { border-color: #B45309 !important; }
+        [data-theme="light"] .hover\\:text-hinge-bright:hover { color: #B45309 !important; }
+        [data-theme="light"] .from-hinge-bright { --tw-gradient-from: #F59E0B; }
+        [data-theme="light"] .to-hinge-bright { --tw-gradient-to: #D4AF37; }
+      `}</style>
       
       {/* ── 1. Premium Hero ── */}
       <motion.header 
