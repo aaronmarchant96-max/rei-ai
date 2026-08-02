@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "openrouter/deepseek/deepseek-chat",
+  "default_agent": "build",
+  "plugin": [
+    "@tarquinen/opencode-dcp"
+  ],
+  "mcp": {
+    "sentry": {
+      "type": "remote",
+      "url": "https://mcp.sentry.dev/mcp",
+      "oauth": {}
+    }
+  },
+  "instructions": [
+    "AGENTS.md",
+    "docs/fortis-et-liber.md",
+    "docs/REI_CODE_PATTERNS.md",
+    "TOKEN_SAVERS.md"
+  ]
+}

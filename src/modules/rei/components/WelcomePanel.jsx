@@ -91,8 +91,8 @@ export default function WelcomePanel({ onStart, onResume }) {
   return (
     <div style={{
       padding: "24px", borderRadius: "14px",
-      background: "linear-gradient(135deg, rgba(240, 201, 101, 0.06) 0%, rgba(15, 20, 32, 0.8) 100%)",
-      border: "1px solid rgba(240, 201, 101, 0.15)",
+      background: "var(--surface)",
+      border: "1px solid var(--border)",
       textAlign: "center",
     }}>
       <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--amber-text)", marginBottom: "6px" }}>
@@ -149,7 +149,7 @@ export default function WelcomePanel({ onStart, onResume }) {
               onClick={function () { return onStart(s.prompt); }}
               style={{
                 padding: "12px 16px", borderRadius: "10px",
-                background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(240, 201, 101, 0.12)",
+                background: "var(--page)", border: "1px solid rgba(240, 201, 101, 0.12)",
                 color: "var(--text)", cursor: "pointer",
                 textAlign: "left", fontSize: "13px",
                 transition: "all 0.15s ease",

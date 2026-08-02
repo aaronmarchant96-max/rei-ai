@@ -11,7 +11,7 @@ export default function ChatInput() {
   ];
 
   return (
-    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: "12px 16px 16px", background: "rgba(10, 12, 18, 0.75)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(240, 201, 101, 0.08)" }}>
+    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: "12px 16px 16px", background: "var(--surface)", backdropFilter: "blur(12px)", borderTop: "1px solid var(--border)" }}>
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
         {selectedDomain === "assistant" && (
           <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px" }}>

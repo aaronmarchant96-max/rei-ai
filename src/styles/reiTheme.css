@@ -966,6 +966,7 @@
 }
 .rei-instrument-rail__card-label {
   font-size: 10.5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #94a3b8;
