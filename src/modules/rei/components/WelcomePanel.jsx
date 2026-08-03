@@ -91,10 +91,17 @@ export default function WelcomePanel({ onStart, onResume }) {
   return (
     <div style={{
       padding: "24px", borderRadius: "14px",
-      background: "var(--surface)",
+      background: "linear-gradient(150deg, var(--surface) 0%, var(--surface-lift) 100%)",
       border: "1px solid var(--border)",
+      boxShadow: "0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(245,158,11,0.08)",
+      position: "relative",
+      overflow: "hidden",
       textAlign: "center",
     }}>
+      <div style={{
+        position: "absolute", inset: 0, zIndex: -1, pointerEvents: "none",
+        background: "radial-gradient(circle at 85% -10%, rgba(245,158,11,0.10), transparent 60%)",
+      }} />
       <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--amber-text)", marginBottom: "6px" }}>
         REI.ai — {activeDomain ? "The " + (activeDomain.charAt(0).toUpperCase() + activeDomain.slice(1) + " Specialist") : "The Generalist"}
       </div>

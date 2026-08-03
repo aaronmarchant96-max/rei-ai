@@ -166,6 +166,7 @@
 [data-theme="light"] .rei-input-shell {
   background: var(--surface);
   border-top-color: var(--border);
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.05);
 }
 [data-theme="light"] .rei-input-area {
   background: var(--surface-lift);
@@ -190,9 +191,9 @@
 
 /* Light: quick prompts */
 [data-theme="light"] .rei-quick-prompt {
-  background: var(--amber-badge-bg) !important;
-  color: var(--amber-badge-tx) !important;
-  border-color: var(--amber-border) !important;
+  background: rgba(245,158,11,0.06) !important;
+  color: var(--amber-text) !important;
+  border-color: rgba(245,158,11,0.25) !important;
 }
 [data-theme="light"] .rei-quick-prompt:hover {
   border-color: var(--amber-fill) !important;
