@@ -3,9 +3,8 @@
     "id": "simple-greeting",
     "jobType": "simple-greeting",
     "label": "Simple Greeting",
-    "model": "deepseek-chat",
+    "model": "llama-3.1-8b-instant",
     "maxTokens": 50,
-    "costPer1k": 0.3,
     "qualityGate": "Single sentence + invitation",
     "enforce": null,
     "description": "Fast, cheap responses for greetings and light warm-up context.",
@@ -20,7 +19,9 @@
       "hiya"
     ],
     "temperature": 0.9,
-    "fallbackPriority": null
+    "fallbackPriority": null,
+    "costPer1kInput": 5e-05,
+    "costPer1kOutput": 8e-05
   },
   {
     "id": "structured-reasoning",
@@ -211,7 +212,7 @@
     "costPer1k": 1,
     "qualityGate": "Verified-index check + hinge-before-holding",
     "enforce": null,
-    "description": "Case analysis grounded in the verified precedent index — flags anything outside it as unverified.",
+    "description": "Case analysis grounded in the verified precedent index \u2014 flags anything outside it as unverified.",
     "matchTerms": [
       "precedent",
       "holding",
