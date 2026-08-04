@@ -317,6 +317,8 @@ export default function REI({ initialPrompt } = {}) {
     setShowIngest(false);
     setRecordSourceType("other");
 
+    let routerDecision;
+
     try {
       let systemContext = getDomainPrompt(selectedDomain);
 
@@ -336,7 +338,7 @@ export default function REI({ initialPrompt } = {}) {
         : "";
 
       const routerStart = performance.now();
-      const routerDecision = buildRouterDecision({
+      routerDecision = buildRouterDecision({
         input: userMsg.text,
         domain: selectedDomain,
         history: historyPayload,
@@ -460,8 +462,8 @@ export default function REI({ initialPrompt } = {}) {
 The reasoning engine couldn't reach a backend for this request.
 
 Error: ${error.message}
-Route: ${routerDecision.id}
-Model: ${routerDecision.model}
+Route: ${routerDecision?.id || "unknown"}
+Model: ${routerDecision?.model || "unknown"}
 
 Try again — if the issue persists, the API backend may be temporarily unavailable.`;
 

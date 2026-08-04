@@ -118,12 +118,13 @@ describe("REI", () => {
 
     fireEvent.click(screen.getByText(/Try a Case/i));
 
-    setTimeout(async () => {
+    await waitFor(() => {
       expect(screen.getByText(/System initialized. Welcome to REI.ai The Precedent Engine/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
 
-      const textarea = screen.getByPlaceholderText(/what are you trying to think through/i);
-      expect(textarea.value).toBe("What is the hinge in Donoghue v Stevenson?");
-    }, 500);
+    await waitFor(() => {
+      expect(screen.getByText("What is the hinge in Donoghue v Stevenson?")).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it("clears chat history and shows only the welcome message", async () => {
@@ -146,21 +147,26 @@ describe("REI", () => {
     expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
   });
 
-  it.skip("shows fallback text when the API call fails", async () => {
-    global.fetch = jest.fn(() => Promise.reject(new Error("Network failure")))
+  it("shows fallback text when the API call fails", async () => {
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn(() => Promise.reject(new Error("Network failure")));
 
-    render(<REI />);
+    try {
+      render(<REI />);
 
-    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
-    fireEvent.change(input, { target: { value: "test fallback" } });
-    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+      const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+      fireEvent.change(input, { target: { value: "test fallback" } });
+      fireEvent.click(screen.getByRole("button", { name: /send/i }));
 
-    await waitFor(() => {
-      expect(screen.getByText("test fallback")).toBeInTheDocument();
-    }, { timeout: 3000 });
+      await waitFor(() => {
+        expect(screen.getByText("test fallback")).toBeInTheDocument();
+      }, { timeout: 3000 });
 
-    await waitFor(() => {
-      expect(screen.getByText(/REI.ai.*Backend Unavailable/i)).toBeInTheDocument();
-    }, { timeout: 3000 });
+      await waitFor(() => {
+        expect(screen.getByText(/REI.ai.*Backend Unavailable/i)).toBeInTheDocument();
+      }, { timeout: 3000 });
+    } finally {
+      global.fetch = originalFetch;
+    }
   });
 });
