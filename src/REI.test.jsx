@@ -7,6 +7,7 @@ describe("REI", () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
+        headers: { get: () => "application/json" },
         json: () => Promise.resolve({
           success: true,
           result: "Here is a direct answer to your question.\n\nHinge: The core pivot point.\nFacts: What is known.\nMove: Next step.",
@@ -159,7 +160,7 @@ describe("REI", () => {
     }, { timeout: 3000 });
 
     await waitFor(() => {
-      expect(screen.getByText(/REI.ai FALLBACK RESPONSE/i)).toBeInTheDocument();
+      expect(screen.getByText(/REI.ai.*Backend Unavailable/i)).toBeInTheDocument();
     }, { timeout: 3000 });
   });
 });

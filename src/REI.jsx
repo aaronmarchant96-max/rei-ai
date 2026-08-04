@@ -358,9 +358,29 @@ export default function REI({ initialPrompt } = {}) {
         })
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type") || "";
 
-      if (!response.ok || !data.success) {
+      if (!response.ok) {
+        let errorDetail = "";
+        try {
+          const text = await response.text();
+          errorDetail = text.startsWith("<")
+            ? "HTTP " + response.status + " — server error page (" + text.slice(0, 150).trim().replace(/\n/g, " ") + "...)"
+            : text.slice(0, 300);
+        } catch (_) {
+          errorDetail = "HTTP " + response.status;
+        }
+        throw new Error("Backend request failed: " + errorDetail);
+      }
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        throw new Error("Backend returned non-JSON response (content-type: " + (contentType || "unknown") + ")");
+      }
+
+      if (!data.success) {
         throw new Error(data.error || "Server returned failure response status");
       }
 
@@ -412,15 +432,15 @@ export default function REI({ initialPrompt } = {}) {
       console.error("REI.ai API error:", error);
       
       // Fallback: local evaluation if Vercel serverless function throws
-      const fallbackText = `[REI.ai FALLBACK RESPONSE]
-Confidence Score: 75%
-Decision Hinge: Whether context boundaries explicitly justify the assertions.
+      const fallbackText = `[REI.ai — Backend Unavailable]
 
-Unverified Claims:
-• Verification fallback active (Backend execution error: ${error.message}).
+The reasoning engine couldn't reach a backend for this request.
 
-Limitations:
-• Direct Groq backend not reachable. Running simulated local evaluation.`;
+Error: ${error.message}
+Route: ${routerDecision.id}
+Model: ${routerDecision.model}
+
+Try again — if the issue persists, the API backend may be temporarily unavailable.`;
 
       setMessages((prev) => [
         ...prev,
