@@ -337,6 +337,13 @@ export default function REI({ initialPrompt } = {}) {
 
 
       // Call route handler API with domain-specific context
+      const isGreeting = routerDecision.id === "simple-greeting";
+      const systemPrompt = isGreeting
+        ? "You are REI. Reply in one short, friendly sentence."
+        : systemContext;
+      const inputPayload = isGreeting
+        ? userMsg.text
+        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`;
       const response = await fetch("/api/cfai", {
         method: "POST",
         headers: {
@@ -344,8 +351,8 @@ export default function REI({ initialPrompt } = {}) {
         },
         body: JSON.stringify({
           command: "score",
-          input: `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`,
-          systemPrompt: systemContext,
+          input: inputPayload,
+          systemPrompt: systemPrompt,
           history: historyPayload,
           routerDecision,
         })

@@ -50,4 +50,23 @@ describe("REI", () => {
       expect(screen.getByText(/here is a direct answer/i)).toBeInTheDocument();
     }, { timeout: 3000 });
   });
+
+  it("sends a short prompt (not the full domain prompt) for simple greetings", async () => {
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "hello" } });
+
+    const sendButton = screen.getByRole("button", { name: /send/i });
+    fireEvent.click(sendButton);
+
+    await waitFor(() => {
+      const calls = global.fetch.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      const body = JSON.parse(lastCall[1].body);
+      expect(body.systemPrompt).toBe("You are REI. Reply in one short, friendly sentence.");
+      // input must not carry the full 6K-char Generalist prompt for a greeting
+      expect(body.input).toBe("hello");
+    }, { timeout: 3000 });
+  });
 });

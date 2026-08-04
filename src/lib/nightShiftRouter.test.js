@@ -18,7 +18,7 @@ describe("nightShiftRouter", () => {
     const decision = buildRouterDecision({ input: "Hello there", domain: "assistant" });
 
     expect(decision.id).toBe("simple-greeting");
-    expect(decision.model).toBe("deepseek-chat");
+    expect(decision.model).toBe("llama-3.1-8b-instant");
     expect(decision.maxTokens).toBe(50);
   });
 
@@ -220,14 +220,14 @@ describe("nightShiftRouter", () => {
     it("routes meta-queries to the cheap model", () => {
       const decision = buildRouterDecision({ input: "how do you work", domain: "assistant" });
       expect(decision.id).toBe("simple-greeting");
-      expect(decision.model).toBe("deepseek-chat");
+      expect(decision.model).toBe("llama-3.1-8b-instant");
     });
 
     it("differentiates cost between 8B and 70B models", () => {
       const greeting = buildRouterDecision({ input: "hello", domain: "assistant" });
       const reasoning = buildRouterDecision({ input: "evaluate tradeoffs between monorepo and polyrepo", domain: "assistant" });
 
-      expect(greeting.model).toBe("deepseek-chat");
+      expect(greeting.model).toBe("llama-3.1-8b-instant");
       expect(reasoning.model).toBe("deepseek-chat");
       expect(reasoning.estimatedCost).toBeGreaterThan(greeting.estimatedCost);
     });
