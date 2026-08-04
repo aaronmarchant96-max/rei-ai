@@ -22,8 +22,8 @@ describe("AppShell", () => {
       expect(document.title).toBe("PromptHound Labs | Story Forge");
     });
 
-    const backBtn = document.querySelector(".shell-tool-bar__back");
-    if (backBtn) fireEvent.click(backBtn);
+    // Current UI: back to landing is the header "Ecosystem" nav button
+    fireEvent.click(screen.getByRole("button", { name: /ecosystem/i }));
 
     await waitFor(() => {
       expect(window.location.pathname).toBe("/");
