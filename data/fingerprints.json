@@ -70,9 +70,9 @@
   {
     "id": "coding-hinge",
     "jobType": "coding-hinge",
-    "label": "Coding Hinge",
+    "label": "The Engineer",
     "model": "gemini-flash-latest",
-    "maxTokens": 1200,
+    "maxTokens": 2000,
     "costPer1k": 1,
     "qualityGate": "Phase 0 + HARD STOP",
     "enforce": "HARD_STOP",
