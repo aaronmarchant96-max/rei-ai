@@ -99,9 +99,12 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
           content: data.choices?.[0]?.message?.content || "No content returned from DeepSeek.",
           model: "deepseek-chat",
         };
+      } else {
+        const errText = await response.text().catch(() => "(unreadable)");
+        console.warn(`DeepSeek returned status ${response.status}: ${errText.slice(0, 300)}`);
       }
     } catch (e) {
-      console.warn("DeepSeek failed, falling back to Groq:", e.message);
+      console.warn("DeepSeek network error, falling back to Groq:", e.message);
     }
   }
 
