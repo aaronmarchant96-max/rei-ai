@@ -3,6 +3,7 @@ import { useMobile, useKeyboardVisible } from "./useMobile.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
+import { logRoutingDecision } from "./lib/routingLog.js";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
@@ -315,7 +316,20 @@ export default function REI({ initialPrompt } = {}) {
         domain: selectedDomain,
         history: historyPayload,
         attachedRecord: ingestedRecord,
+
       });
+
+      logRoutingDecision({
+        domain: selectedDomain,
+        routeId: routerDecision.id,
+        model: routerDecision.model,
+        hingeScore: routerDecision.hingeScore || 0,
+        estimatedCost: routerDecision.estimatedCost || 0,
+        premiumCost: routerDecision.premiumCost || 0,
+        tokenCount: routerDecision.maxTokens || 0,
+        inputPreview: userMsg.text.slice(0, 80),
+      });
+
 
       // Call route handler API with domain-specific context
       const response = await fetch("/api/cfai", {

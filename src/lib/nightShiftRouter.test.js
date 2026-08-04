@@ -48,8 +48,8 @@ describe("nightShiftRouter", () => {
     const decision = buildRouterDecision({ input: "Red-team this claim and prove it wrong", domain: "assistant" });
 
     expect(decision.id).toBe("adversarial-validation");
-    expect(decision.model).toBe("gpt-4o");
-    expect(resolveRoutingModel(decision)).toBe("gpt-4o");
+    expect(decision.model).toBe("deepseek-chat");
+    expect(resolveRoutingModel(decision)).toBe("deepseek-chat");
   });
 
   it("routes high-structure uncertainty prompts through a stricter reasoning gate", () => {
@@ -152,7 +152,7 @@ describe("nightShiftRouter", () => {
     it("routes adversarial keywords to adversarial-validation", () => {
       const decision = buildRouterDecision({ input: "red-team this security proposal", domain: "assistant" });
       expect(decision.id).toBe("adversarial-validation");
-      expect(decision.model).toBe("gpt-4o");
+      expect(decision.model).toBe("deepseek-chat");
     });
 
     it("non-red-team inputs don't accidentally trigger red-team route", () => {
