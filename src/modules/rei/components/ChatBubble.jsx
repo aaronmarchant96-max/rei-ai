@@ -41,6 +41,9 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
           {msg.rawJson.routerDecision.hingeScore != null && msg.rawJson.routerDecision.hingeScore < 0.3 && (!msg.rawJson.routerDecision.matchedTerms || msg.rawJson.routerDecision.matchedTerms.length === 0) && (
             <span style={{ fontSize: "10px", color: "var(--amber-badge-tx)", background: "var(--amber-badge-bg)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }}>Low confidence</span>
           )}
+          {msg.rawJson?.truncated && (
+            <span style={{ fontSize: "10px", color: "#DC2626", background: "rgba(220,38,38,0.12)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }} title={"Response truncated by model — finish_reason: " + (msg.rawJson?.routerDecision?.finishReason || "length")}>⚠️ Truncated</span>
+          )}
           {msg.rawJson?.rateLimited && (
             <span style={{ fontSize: "10px", color: "var(--text-muted)", marginLeft: "4px" }}>
               ({msg.rawJson.attemptedModel || "model"} busy · retry {msg.rawJson.retryAfter || "soon"})

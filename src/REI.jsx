@@ -367,7 +367,8 @@ export default function REI({ initialPrompt } = {}) {
             timestamp: data.timestamp || new Date().toISOString(),
             hadIngestedRecord: Boolean(ingestedRecord),
             recordSourceType: ingestedRecord ? recordSourceType : null,
-            routerDecision: data.routerDecision || routerDecision,
+            routerDecision: { ...(data.routerDecision || routerDecision), model: data.model || routerDecision?.model },
+            truncated: data.truncated || false,
           }
         }
       ]);

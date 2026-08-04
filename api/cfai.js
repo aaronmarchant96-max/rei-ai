@@ -45,7 +45,8 @@ async function callDeepSeek(messages, maxTokens) {
     return null;
   }
   const data = await res.json();
-  return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-chat", usage: data.usage || null };
+  var finishReason = data.choices?.[0]?.finish_reason || null;
+  return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-chat", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
 }
 
 async function callGemini(messages, maxTokens) {
@@ -61,7 +62,8 @@ async function callGemini(messages, maxTokens) {
     return null;
   }
   const data = await res.json();
-  return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-flash-latest", usage: data.usage || null };
+  var finishReason = data.choices?.[0]?.finish_reason || null;
+  return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-flash-latest", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
 }
 
 async function callGroq(messages, maxTokens, model) {
@@ -77,7 +79,8 @@ async function callGroq(messages, maxTokens, model) {
     return null;
   }
   const data = await res.json();
-  return { content: data.choices?.[0]?.message?.content || "No content from Groq.", model: model || "llama-3.3-70b-versatile", usage: data.usage || null };
+  var finishReason = data.choices?.[0]?.finish_reason || null;
+  return { content: data.choices?.[0]?.message?.content || "No content from Groq.", model: model || "llama-3.3-70b-versatile", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
 }
 
 async function callOpenAI(messages, maxTokens) {
@@ -90,7 +93,8 @@ async function callOpenAI(messages, maxTokens) {
   });
   if (!res.ok) return null;
   const data = await res.json();
-  return { content: data.choices?.[0]?.message?.content || "No content from OpenAI.", model: "gpt-4o", usage: data.usage || null };
+  var finishReason = data.choices?.[0]?.finish_reason || null;
+  return { content: data.choices?.[0]?.message?.content || "No content from OpenAI.", model: "gpt-4o", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
 }
 
 // ── Main API router: primary backend + fallback chain ──
@@ -124,7 +128,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
   if (primaryBackend && backends[primaryBackend]) {
     var result = await backends[primaryBackend]();
     if (result) {
-      return { content: result.content, model: primaryModel, routerDecision: routerDecision, usage: result.usage || null };
+      return { content: result.content, model: primaryModel, routerDecision: routerDecision, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
     }
   }
 
@@ -136,7 +140,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
       console.warn("Primary backend " + primaryBackend + " failed, falling back to " + backend);
       result = await backends[backend]();
       if (result) {
-        return { content: result.content, model: result.model + " (fallback)", routerDecision: routerDecision, usage: result.usage || null };
+        return { content: result.content, model: result.model + " (fallback)", routerDecision: routerDecision, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
       }
     }
   }
@@ -170,6 +174,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
         model: response.model,
         routerDecision: response.routerDecision || routerDecision,
         usage: response.usage || null,
+        truncated: response.truncated || false,
         timestamp: new Date().toISOString(),
       };
     } catch (apiError) {
