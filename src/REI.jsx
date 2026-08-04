@@ -119,23 +119,46 @@ export default function REI({ initialPrompt } = {}) {
     }
   };
 
-  const handleExport = async (exportData) => {
+  const handleExport = (exportData) => {
     try {
       const currentDomain = getDomain(selectedDomain);
-      const report = buildDecisionReport(exportData.sections, {
-        domainLabel: currentDomain?.label || selectedDomain,
+      const report = buildDecisionReport({
+        sections: exportData.sections,
         routerDecision: exportData.routerDecision,
-        timestamp: exportData.timestamp,
+        domainLabel: exportData.domainLabel || currentDomain?.label || "REI.ai",
+        sourceText: exportData.sourceText || "",
+        createdAt: exportData.createdAt || exportData.timestamp || new Date(),
       });
-      const blob = new Blob([report.markdown], { type: "text/markdown" });
+      const blob = new Blob([report.markdown], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = report.filename;
-      a.click();
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = report.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Failed to export decision document:", err);
+      // Fallback: open a print-ready window when the download path fails
+      try {
+        if (typeof window !== "undefined" && window.open) {
+          const printWindow = window.open("", "_blank", "width=800,height=900");
+          if (printWindow) {
+            printWindow.document.write(buildDecisionReport({
+              sections: exportData.sections,
+              routerDecision: exportData.routerDecision,
+              domainLabel: exportData.domainLabel || getDomain(selectedDomain)?.label || "REI.ai",
+              createdAt: exportData.createdAt || exportData.timestamp || new Date(),
+            }).html);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+          }
+        }
+      } catch (printErr) {
+        console.error("Print fallback also failed:", printErr);
+      }
     }
   };
 
