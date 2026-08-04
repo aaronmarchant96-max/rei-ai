@@ -56,6 +56,9 @@ const CASE_STUDIES = [
 ];
 
 export default function ToolsLanding({ onOpenTool }) {
+  const [themeMode, setThemeMode] = useState(() => {
+    try { return localStorage.getItem("rei_theme_mode") || "dark"; } catch { return "dark"; }
+  });
   const [expandedCardo, setExpandedCardo] = useState(null);
   const [demoScenario, setDemoScenario] = useState("coding");
   
@@ -84,7 +87,7 @@ export default function ToolsLanding({ onOpenTool }) {
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
 
   return (
-    <div data-theme="light" className="min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
+    <div data-theme={themeMode} className="min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
       {/* Light theme overrides for Tailwind color tokens */}
       <style>{`
         [data-theme="light"] .bg-background { background-color: #F8F9FA !important; }
@@ -309,6 +312,12 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="font-heading font-bold tracking-widest uppercase text-sm mb-2">
           REI.ai <span className="text-foreground-muted">by PromptHound</span>
         </div>
+        <button
+          onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
+          className="text-xs text-foreground-muted hover:text-hinge-bright transition-colors mb-3 px-3 py-1 rounded-full border border-border"
+        >
+          {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
+        </button>
         <div className="font-mono text-xs text-foreground-muted flex flex-wrap items-center justify-center gap-4 mt-2">
           <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
           <span>|</span>
