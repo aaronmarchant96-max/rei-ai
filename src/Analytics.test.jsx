@@ -32,5 +32,7 @@ describe("Analytics", () => {
     // Confidence badge label + matched term chip (router logs lowercase terms)
     expect(screen.getByText("High")).toBeInTheDocument();
     expect(screen.getByText("react")).toBeInTheDocument();
+    // Lifetime Saved derives from the log itself: premium 0.006 - actual (0.0005 + 0.0006) = 0.0049
+    expect(screen.getByText("$0.0049")).toBeInTheDocument();
   });
 });
