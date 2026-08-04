@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useMobile, useSwipe } from "./useMobile.js";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 
 const DebateFurnace = lazy(() => import("./DebateFurnace.jsx"));
 const CreativeEngine = lazy(() => import("./CreativeEngine.jsx"));
@@ -246,26 +247,28 @@ export default function AppShell() {
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
         <Suspense fallback={<LoadingShell />}>
         {tool === "tools" ? (
-          <ToolsLanding onOpenTool={({ tool: t, prompt }) => {
-            setReiInitialPrompt(prompt || null);
-            setTool(t);
-          }} />
+          <ErrorBoundary toolName="Tools">
+            <ToolsLanding onOpenTool={({ tool: t, prompt }) => {
+              setReiInitialPrompt(prompt || null);
+              setTool(t);
+            }} />
+          </ErrorBoundary>
         ) : tool === "story-forge" ? (
-          <CreativeEngine />
+          <ErrorBoundary toolName="Story Forge"><CreativeEngine /></ErrorBoundary>
         ) : tool === "storm-replay" ? (
-          <StormReplay />
+          <ErrorBoundary toolName="Storm Replay"><StormReplay /></ErrorBoundary>
         ) : tool === "cardo-guard" ? (
-          <CardoGuard />
+          <ErrorBoundary toolName="CARDO GUARD"><CardoGuard /></ErrorBoundary>
         ) : tool === "rei" ? (
-          <REI initialPrompt={reiInitialPrompt} />
+          <ErrorBoundary toolName="REI.ai"><REI initialPrompt={reiInitialPrompt} /></ErrorBoundary>
         ) : tool === "tracepoint" ? (
-          <Tracepoint />
+          <ErrorBoundary toolName="Tracepoint"><Tracepoint /></ErrorBoundary>
         ) : tool === "analytics" ? (
-          <Analytics />
+          <ErrorBoundary toolName="Analytics"><Analytics /></ErrorBoundary>
         ) : tool === "cfai" ? (
-          <REI initialPrompt={reiInitialPrompt} />
+          <ErrorBoundary toolName="REI.ai"><REI initialPrompt={reiInitialPrompt} /></ErrorBoundary>
         ) : (
-          <DebateFurnace />
+          <ErrorBoundary toolName="The Furnace"><DebateFurnace /></ErrorBoundary>
         )}
         </Suspense>
       </main>
