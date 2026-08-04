@@ -73,7 +73,7 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   const maxTokens = routerDecision?.maxTokens || 2048;
 
   // ── DeepSeek Primary ──
-  const deepseekKey = process.env.DEEPSEEK_API_KEY;
+  const deepseekKey = process.env.DEEPSEEK_API_KEY || process.env.deepseek;
   if (deepseekKey) {
     try {
       const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
