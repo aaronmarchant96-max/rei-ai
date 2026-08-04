@@ -19,12 +19,14 @@ export function useSessionTracker() {
 
   const [lifetimeCost, setLifetimeCost] = useState(() => loadLifetime("rei_lifetime_cost", "0"));
   const [lifetimeSavings, setLifetimeSavings] = useState(() => loadLifetime("rei_lifetime_savings", "0"));
+  const [lifetimePremium, setLifetimePremium] = useState(() => loadLifetime("rei_lifetime_premium", "0"));
 
   // Refs hold latest session values so the unmount effect always sees current state
   const sessionCostRef = useRef(0);
   sessionCostRef.current = sessionCost;
   const savingsRef = useRef(0);
   savingsRef.current = savingsVsPremium;
+  const premiumRef = useRef(0);
 
   const trackMessage = useCallback((totalTokens, model, cost, premiumCost, wasEscalated) => {
     setSessionTokens((prev) => prev + totalTokens);
@@ -36,6 +38,7 @@ export function useSessionTracker() {
     }));
     if (premiumCost) {
       setSavingsVsPremium((prev) => prev + (premiumCost - cost));
+      premiumRef.current += premiumCost;
     }
     if (wasEscalated) {
       setEscalationCount((prev) => prev + 1);
@@ -47,16 +50,20 @@ export function useSessionTracker() {
     return () => {
       localStorage.setItem("rei_lifetime_cost", (lifetimeCost + sessionCostRef.current).toString());
       localStorage.setItem("rei_lifetime_savings", (lifetimeSavings + savingsRef.current).toString());
+      localStorage.setItem("rei_lifetime_premium", (lifetimePremium + premiumRef.current).toString());
     };
   }, []);
 
   const resetSession = useCallback(() => {
     const newCost = loadLifetime("rei_lifetime_cost", "0") + sessionCostRef.current;
     const newSavings = loadLifetime("rei_lifetime_savings", "0") + savingsRef.current;
+    const newPremium = loadLifetime("rei_lifetime_premium", "0") + premiumRef.current;
     localStorage.setItem("rei_lifetime_cost", newCost.toString());
     localStorage.setItem("rei_lifetime_savings", newSavings.toString());
+    localStorage.setItem("rei_lifetime_premium", newPremium.toString());
     setLifetimeCost(newCost);
     setLifetimeSavings(newSavings);
+    setLifetimePremium(newPremium);
 
     setSessionTokens(0);
     setSessionMessages(0);
@@ -64,6 +71,7 @@ export function useSessionTracker() {
     setModelBreakdown({});
     setShowSessionSummary(false);
     setSavingsVsPremium(0);
+    premiumRef.current = 0;
     setEscalationCount(0);
   }, []);
 
@@ -78,6 +86,7 @@ export function useSessionTracker() {
     escalationCount,
     lifetimeCost,
     lifetimeSavings,
+    lifetimePremium,
     trackMessage,
     resetSession,
   };
