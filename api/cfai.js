@@ -133,7 +133,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
   }
 
   // Fallback: try remaining backends in priority order
-  var order = primaryBackend ? ["gemini", "deepseek", "groq", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["gemini", "deepseek", "groq", "openai"];
+  var order = primaryBackend ? ["groq", "gemini", "deepseek", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["groq", "gemini", "deepseek", "openai"];
   for (var i = 0; i < order.length; i++) {
     var backend = order[i];
     if (backends[backend]) {

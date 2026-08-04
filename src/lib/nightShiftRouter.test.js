@@ -223,15 +223,18 @@ describe("nightShiftRouter", () => {
       expect(decision.model).toBe("llama-3.1-8b-instant");
     });
 
-    it("differentiates cost between 8B and 70B models", () => {
+    it("differentiates cost between the free 70B path and paid routes", () => {
       const greeting = buildRouterDecision({ input: "hello", domain: "assistant" });
-      const reasoning = buildRouterDecision({ input: "evaluate tradeoffs between monorepo and polyrepo", domain: "assistant" });
+      const freeReasoning = buildRouterDecision({ input: "Help me think through a decision", domain: "assistant" });
+      const coding = buildRouterDecision({ input: "evaluate tradeoffs between monorepo and polyrepo", domain: "assistant" });
 
       expect(greeting.model).toBe("llama-3.1-8b-instant");
-      expect(reasoning.model).toBe("llama-3.3-70b-versatile");
-      // llama-3.3-70b is free on Groq; the 8b greeting still has a nominal rate
-      expect(reasoning.estimatedCost).toBe(0);
+      expect(freeReasoning.model).toBe("llama-3.3-70b-versatile");
+      expect(coding.model).toBe("gemini-flash-latest");
+      // llama-3.3-70b is free on Groq; greeting (8b) and coding (Gemini) have nominal rates
+      expect(freeReasoning.estimatedCost).toBe(0);
       expect(greeting.estimatedCost).toBeGreaterThan(0);
+      expect(coding.estimatedCost).toBeGreaterThan(0);
     });
 
     it("routes adversarial 'poke holes' to adversarial-validation", () => {
