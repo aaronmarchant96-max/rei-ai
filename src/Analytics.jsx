@@ -15,7 +15,7 @@ function formatCost(n) {
 }
 
 function exportCSV(logs) {
-  const header = "timestamp,domain,routeId,model,hingeScore,estimatedCost,premiumCost,tokenCount,inputPreview";
+  const header = "timestamp,domain,routeId,model,hingeScore,estimatedCost,premiumCost,tokenCount,rationale,matchedTerms,routingMs,inputPreview";
   const rows = logs.map(function (e) {
     return [
       e.timestamp,
@@ -26,6 +26,9 @@ function exportCSV(logs) {
       e.estimatedCost,
       e.premiumCost,
       e.tokenCount,
+      '"' + (e.rationale || "").replace(/"/g, '""') + '"',
+      '"' + (e.matchedTerms || []).join(" | ") + '"',
+      e.routingMs || "",
       '"' + (e.inputPreview || "").replace(/"/g, '""') + '"',
     ].join(",");
   });
@@ -45,6 +48,18 @@ function hingScoreColor(hs) {
   return "#c2410c";
 }
 
+function confidenceLabel(hs) {
+  if (hs >= 0.7) return "High";
+  if (hs >= 0.4) return "Medium";
+  return "Low";
+}
+
+function confidenceDot(hs) {
+  if (hs >= 0.7) return "🟢";
+  if (hs >= 0.4) return "🟡";
+  return "🟠";
+}
+
 export default function Analytics() {
   const [logs, setLogs] = useState(function () { return getLogs(); });
 
@@ -53,6 +68,8 @@ export default function Analytics() {
 
     var totalCost = 0;
     var totalPremium = 0;
+    var totalRoutingMs = 0;
+    var routingMsCount = 0;
     var domainCounts = {};
     var modelCounts = {};
 
@@ -60,6 +77,10 @@ export default function Analytics() {
       var e = logs[i];
       totalCost += e.estimatedCost || 0;
       totalPremium += e.premiumCost || 0;
+      if (e.routingMs != null) {
+        totalRoutingMs += e.routingMs;
+        routingMsCount += 1;
+      }
       domainCounts[e.domain] = (domainCounts[e.domain] || 0) + 1;
       modelCounts[e.model] = (modelCounts[e.model] || 0) + 1;
     }
@@ -79,6 +100,7 @@ export default function Analytics() {
       totalCost: totalCost,
       totalSavings: totalSavings,
       savingsPct: savingsPct,
+      avgRoutingMs: routingMsCount > 0 ? Math.round((totalRoutingMs / routingMsCount) * 100) / 100 : null,
       domainCount: sortedDomains.length,
       sortedDomains: sortedDomains,
       sortedModels: sortedModels,
@@ -87,9 +109,19 @@ export default function Analytics() {
     };
   }, [logs]);
 
+  var lifetimePremium = useMemo(function () {
+    try {
+      return parseFloat(localStorage.getItem("rei_lifetime_premium") || "0");
+    } catch (e) {
+      return 0;
+    }
+  }, [logs]);
+
   var lifetimeSaved = useMemo(function () {
     try {
-      return parseFloat(localStorage.getItem("rei_lifetime_savings") || "0");
+      var premium = parseFloat(localStorage.getItem("rei_lifetime_premium") || "0");
+      var actual = parseFloat(localStorage.getItem("rei_lifetime_cost") || "0");
+      return premium - actual;
     } catch (e) {
       return 0;
     }
@@ -205,7 +237,7 @@ export default function Analytics() {
         ) : (
           <>
             {/* ── Summary cards ── */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "28px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "12px" }}>
               <div style={cardStyle}>
                 <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Requests</div>
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{aggregates.totalRequests}</div>
@@ -214,15 +246,28 @@ export default function Analytics() {
                 <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Session Cost</div>
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{formatCost(aggregates.totalCost)}</div>
               </div>
-              <div style={cardStyle}>
-                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Savings</div>
-                <div style={{ fontSize: "24px", fontWeight: 800, color: "#16a34a" }}>{aggregates.savingsPct}%</div>
+              <div style={{ ...cardStyle, flex: "1 1 180px" }}>
+                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Savings vs gpt-4o baseline</div>
+                <div style={{ fontSize: "12px", color: colors.textDim, lineHeight: "1.6" }}>
+                  Without: <b style={{ color: colors.text }}>{formatCost(aggregates.totalPremium)}</b>
+                  <br />With: <b style={{ color: colors.text }}>{formatCost(aggregates.totalCost)}</b>
+                </div>
+                <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a", marginTop: "4px" }}>{aggregates.savingsPct}% saved</div>
               </div>
               <div style={cardStyle}>
+                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Avg route decision</div>
+                <div style={{ fontSize: "24px", fontWeight: 800 }}>{aggregates.avgRoutingMs != null ? aggregates.avgRoutingMs + " ms" : "—"}</div>
+                <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "2px" }}>router decision time</div>
+              </div>
+              <div style={{ ...cardStyle, flex: "1 1 160px" }}>
                 <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Lifetime Saved</div>
                 <div style={{ fontSize: "24px", fontWeight: 800, color: "#16a34a" }}>{formatCost(lifetimeSaved)}</div>
+                <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "2px" }}>vs gpt-4o baseline</div>
               </div>
             </div>
+            <p style={{ fontSize: "11px", color: colors.textDim, margin: "0 0 28px", lineHeight: "1.5" }}>
+              Lifetime savings are calculated against the configured premium baseline (currently GPT-4o pricing).
+            </p>
 
             {/* ── Domain distribution ── */}
             <div style={{
@@ -304,14 +349,17 @@ export default function Analytics() {
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Time</th>
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Domain</th>
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Model</th>
+                      <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Why</th>
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Cost</th>
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Confidence</th>
+                      <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Route</th>
                     </tr>
                   </thead>
                   <tbody>
                     {logs.slice(0, 20).map(function (entry, idx) {
                       var hs = entry.hingeScore || 0;
                       var color = hingScoreColor(hs);
+                      var terms = Array.isArray(entry.matchedTerms) ? entry.matchedTerms : [];
                       return (
                         <tr key={idx} style={{ borderBottom: "1px solid " + colors.border }}>
                           <td style={{ padding: "7px 10px", color: colors.textDim, whiteSpace: "nowrap" }}>
@@ -324,10 +372,36 @@ export default function Analytics() {
                             title={entry.model}>
                             {entry.model || ""}
                           </td>
+                          <td style={{ padding: "7px 10px", maxWidth: "220px" }}
+                            title={entry.rationale || (terms.length > 0 ? "Matched: " + terms.join(", ") : "")}>
+                            {terms.length > 0 ? (
+                              <span style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                                {terms.slice(0, 4).map(function (term) {
+                                  return (
+                                    <span key={term} style={{
+                                      fontSize: "10px", padding: "1px 6px", borderRadius: "4px",
+                                      background: colors.amberBg, color: colors.amber,
+                                      fontWeight: 600, whiteSpace: "nowrap",
+                                    }}>
+                                      {term}
+                                    </span>
+                                  );
+                                })}
+                                {terms.length > 4 ? <span style={{ fontSize: "10px", color: colors.textDim }}>+{terms.length - 4}</span> : null}
+                              </span>
+                            ) : (
+                              <span style={{
+                                fontSize: "11px", color: colors.textDim,
+                                display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                              }}>
+                                {entry.rationale || "—"}
+                              </span>
+                            )}
+                          </td>
                           <td style={{ padding: "7px 10px", color: colors.textDim, fontFamily: "monospace" }}>
                             {formatCost(entry.estimatedCost || 0)}
                           </td>
-                          <td style={{ padding: "7px 10px", minWidth: "90px" }}>
+                          <td style={{ padding: "7px 10px", minWidth: "110px" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                               <div style={{ ...barTrackStyle, height: "6px", minWidth: "40px" }}>
                                 <div style={{
@@ -335,10 +409,14 @@ export default function Analytics() {
                                   borderRadius: "3px", background: color,
                                 }} />
                               </div>
-                              <span style={{ fontSize: "11px", color: colors.textDim, fontFamily: "monospace", width: "32px" }}>
-                                {hs.toFixed(2)}
+                              <span style={{ fontSize: "11px", color: colors.textDim, whiteSpace: "nowrap" }}>
+                                <span>{confidenceDot(hs)}</span> {confidenceLabel(hs)}
+                                <span style={{ fontFamily: "monospace", color: colors.textDim }}> ({hs.toFixed(2)})</span>
                               </span>
                             </div>
+                          </td>
+                          <td style={{ padding: "7px 10px", color: colors.textDim, fontFamily: "monospace", whiteSpace: "nowrap" }}>
+                            {entry.routingMs != null ? entry.routingMs + " ms" : "—"}
                           </td>
                         </tr>
                       );

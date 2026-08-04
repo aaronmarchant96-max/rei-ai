@@ -9,6 +9,9 @@ function makeEntry(domain) {
     estimatedCost: 0.0005,
     premiumCost: 0.002,
     tokenCount: 420,
+    rationale: "Test rationale for " + domain,
+    matchedTerms: ["react", "api"],
+    routingMs: 1.24,
     inputPreview: "Test input " + domain,
   };
 }
@@ -60,5 +63,24 @@ describe("routingLog", () => {
     expect(entry.hingeScore).toBe(0.72);
     expect(entry.estimatedCost).toBe(0.0005);
     expect(entry.tokenCount).toBe(420);
+  });
+
+  it("round-trips rationale, matchedTerms, and routingMs", () => {
+    logRoutingDecision(makeEntry("coding"));
+    const entry = getLogs()[0];
+    expect(entry.rationale).toBe("Test rationale for coding");
+    expect(entry.matchedTerms).toEqual(["react", "api"]);
+    expect(entry.routingMs).toBe(1.24);
+  });
+
+  it("handles legacy entries without new fields", () => {
+    localStorage.setItem(
+      "rei_routing_log",
+      JSON.stringify([{ domain: "legal", routeId: "legal-hinge", model: "deepseek-chat", hingeScore: 0.3 }])
+    );
+    const entry = getLogs()[0];
+    expect(entry.rationale).toBeUndefined();
+    expect(Array.isArray(entry.matchedTerms)).toBe(false);
+    expect(entry.routingMs).toBeUndefined();
   });
 });

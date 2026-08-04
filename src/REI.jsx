@@ -312,13 +312,14 @@ export default function REI({ initialPrompt } = {}) {
         ? `\n\nIngested Source Record (pasted by user, source: ${sourceLabel} — treat as raw, unverified material to evaluate and tier, not as established fact):\n\"\"\"\n${ingestedRecord}\n\"\"\"\n`
         : "";
 
+      const routerStart = performance.now();
       const routerDecision = buildRouterDecision({
         input: userMsg.text,
         domain: selectedDomain,
         history: historyPayload,
         attachedRecord: ingestedRecord,
-
       });
+      const routingMs = Math.round((performance.now() - routerStart) * 100) / 100;
 
       logRoutingDecision({
         domain: selectedDomain,
@@ -328,6 +329,9 @@ export default function REI({ initialPrompt } = {}) {
         estimatedCost: routerDecision.estimatedCost || 0,
         premiumCost: routerDecision.premiumCost || 0,
         tokenCount: routerDecision.maxTokens || 0,
+        rationale: routerDecision.rationale,
+        matchedTerms: routerDecision.routingSignals?.matchedTerms || [],
+        routingMs: routingMs,
         inputPreview: userMsg.text.slice(0, 80),
       });
 
