@@ -194,7 +194,7 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
       if (geminiResponse.ok) {
         const data = await geminiResponse.json();
         let content = data.choices?.[0]?.message?.content || "No content returned from Gemini fallback.";
-        content = `[REI.AI ROUTING WARNING: Groq API failed. Falling back to Gemini Flash]\n\n${content}`;
+        content = `[REI.AI ROUTING WARNING: DeepSeek & Groq API failed. Falling back to Gemini Flash]\n\n${content}`;
         return { content, model: "gemini-flash-latest", routerDecision };
       } else {
         console.warn("Gemini fallback failed with status:", geminiResponse.status);
