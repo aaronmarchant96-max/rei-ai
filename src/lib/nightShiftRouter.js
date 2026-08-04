@@ -12,6 +12,7 @@ const PREMIUM_OUTPUT_RATE = 0.0100;
 
 function getModelCeilingRate(model) {
   if (model === "gpt-4o") return PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE;
+  if (model === "deepseek-chat") return 0.00014 + 0.00028;
 
   const entry = ROUTER_CATALOG.find((e) => e.model === model);
   if (entry) {
@@ -385,7 +386,7 @@ export function buildRouterDecision({
 
 export function resolveRoutingModel(routerDecision) {
   if (!routerDecision?.model) {
-    return "llama-3.3-70b-versatile";
+    return "deepseek-chat";
   }
 
   return routerDecision.model;

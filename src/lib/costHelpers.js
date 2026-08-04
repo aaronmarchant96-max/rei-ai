@@ -18,7 +18,7 @@ MODEL_COSTS.mock = { input: 0, output: 0, ceiling: 0 };
 MODEL_COSTS["rate-limited"] = { input: 0, output: 0, ceiling: 0 };
 MODEL_COSTS["gpt-4o"] = { input: 0.0025, output: 0.0100, ceiling: 0.0125 };
 
-export const DEFAULT_COST_MODEL = "llama-3.3-70b-versatile";
+export const DEFAULT_COST_MODEL = "deepseek-chat";
 
 export function getModelCosts(model) {
   return MODEL_COSTS[model] || MODEL_COSTS[DEFAULT_COST_MODEL];
