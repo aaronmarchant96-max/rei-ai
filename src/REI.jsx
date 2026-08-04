@@ -516,7 +516,7 @@ Limitations:
             margin: "0 16px 8px", display: "flex", justifyContent: "space-between", alignItems: "center",
             fontSize: "12px", color: "var(--text-secondary)",
           }}>
-            <span>{sessionRecap.decisions} decisions • saved ${savingsVsPremium.toFixed(4)} vs premium</span>
+            <span>{sessionRecap.decisions} {sessionRecap.decisions === 1 ? "decision" : "decisions"} • saved ${savingsVsPremium.toFixed(4)} vs premium</span>
             <button onClick={() => setShowRecap(false)} style={{
               background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer",
               fontSize: "16px", lineHeight: 1, padding: "0 2px",
