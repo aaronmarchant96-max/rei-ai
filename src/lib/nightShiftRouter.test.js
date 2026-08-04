@@ -48,8 +48,8 @@ describe("nightShiftRouter", () => {
     const decision = buildRouterDecision({ input: "Red-team this claim and prove it wrong", domain: "assistant" });
 
     expect(decision.id).toBe("adversarial-validation");
-    expect(decision.model).toBe("deepseek-chat");
-    expect(resolveRoutingModel(decision)).toBe("deepseek-chat");
+    expect(decision.model).toBe("llama-3.3-70b-versatile");
+    expect(resolveRoutingModel(decision)).toBe("llama-3.3-70b-versatile");
   });
 
   it("routes high-structure uncertainty prompts through a stricter reasoning gate", () => {
@@ -94,7 +94,7 @@ describe("nightShiftRouter", () => {
     const decision = buildRouterDecision({ input: "Help me think through a decision", domain: "assistant" });
 
     expect(decision.id).toBe("structured-reasoning");
-    expect(decision.model).toBe("deepseek-chat");
+    expect(decision.model).toBe("llama-3.3-70b-versatile");
   });
 
   describe("edge cases", () => {
@@ -152,7 +152,7 @@ describe("nightShiftRouter", () => {
     it("routes adversarial keywords to adversarial-validation", () => {
       const decision = buildRouterDecision({ input: "red-team this security proposal", domain: "assistant" });
       expect(decision.id).toBe("adversarial-validation");
-      expect(decision.model).toBe("deepseek-chat");
+      expect(decision.model).toBe("llama-3.3-70b-versatile");
     });
 
     it("non-red-team inputs don't accidentally trigger red-team route", () => {
@@ -228,8 +228,10 @@ describe("nightShiftRouter", () => {
       const reasoning = buildRouterDecision({ input: "evaluate tradeoffs between monorepo and polyrepo", domain: "assistant" });
 
       expect(greeting.model).toBe("llama-3.1-8b-instant");
-      expect(reasoning.model).toBe("deepseek-chat");
-      expect(reasoning.estimatedCost).toBeGreaterThan(greeting.estimatedCost);
+      expect(reasoning.model).toBe("llama-3.3-70b-versatile");
+      // llama-3.3-70b is free on Groq; the 8b greeting still has a nominal rate
+      expect(reasoning.estimatedCost).toBe(0);
+      expect(greeting.estimatedCost).toBeGreaterThan(0);
     });
 
     it("routes adversarial 'poke holes' to adversarial-validation", () => {
