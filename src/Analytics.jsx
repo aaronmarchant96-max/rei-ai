@@ -98,6 +98,7 @@ export default function Analytics() {
     return {
       totalRequests: logs.length,
       totalCost: totalCost,
+      totalPremium: totalPremium,
       totalSavings: totalSavings,
       savingsPct: savingsPct,
       avgRoutingMs: routingMsCount > 0 ? Math.round((totalRoutingMs / routingMsCount) * 100) / 100 : null,
