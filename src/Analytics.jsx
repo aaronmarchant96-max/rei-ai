@@ -110,22 +110,19 @@ export default function Analytics() {
     };
   }, [logs]);
 
-  var lifetimePremium = useMemo(function () {
-    try {
-      return parseFloat(localStorage.getItem("rei_lifetime_premium") || "0");
-    } catch (e) {
-      return 0;
-    }
-  }, [logs]);
-
+  // Lifetime Saved derives from the routing log itself (sum of premiumCost
+  // minus estimatedCost across all logged entries), so every number on this
+  // page comes from one source of truth. premiumCost is frozen at log time,
+  // so historical savings stay stable even if pricing config changes later.
   var lifetimeSaved = useMemo(function () {
-    try {
-      var premium = parseFloat(localStorage.getItem("rei_lifetime_premium") || "0");
-      var actual = parseFloat(localStorage.getItem("rei_lifetime_cost") || "0");
-      return premium - actual;
-    } catch (e) {
-      return 0;
+    var premium = 0;
+    var actual = 0;
+    for (var i = 0; i < logs.length; i++) {
+      var e = logs[i];
+      premium += e.premiumCost || 0;
+      actual += e.estimatedCost || 0;
     }
+    return premium - actual;
   }, [logs]);
 
   var themeMode = useMemo(function () {
