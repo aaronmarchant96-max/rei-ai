@@ -15,14 +15,16 @@ describe("costHelpers", () => {
       expect(typeof costs.input).toBe("number");
       expect(typeof costs.output).toBe("number");
       expect(typeof costs.ceiling).toBe("number");
-      expect(costs.input).toBeGreaterThan(0);
-      expect(costs.output).toBeGreaterThan(0);
+      // Default model (llama-3.3-70b-versatile) is free on Groq tier — allow 0
+      expect(costs.input).toBeGreaterThanOrEqual(0);
+      expect(costs.output).toBeGreaterThanOrEqual(0);
     });
 
     it("has ceiling === input + output, NOT (input + output) / 2", () => {
-      const costs = getModelCosts("llama-3.3-70b-versatile");
-      expect(costs.ceiling).toBe(costs.input + costs.output);
-      expect(costs.ceiling).not.toBe((costs.input + costs.output) / 2);
+      // Use a paid model for the non-average invariant; the free model is all zeros
+      const costs = getModelCosts("deepseek-chat");
+      expect(costs.ceiling).toBeCloseTo(costs.input + costs.output, 10);
+      expect(costs.ceiling).not.toBeCloseTo((costs.input + costs.output) / 2, 10);
     });
   });
 

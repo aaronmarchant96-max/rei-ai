@@ -15,7 +15,7 @@ export default {
     id: "legal-hinge",
     jobType: "legal-hinge",
     label: "Legal Hinge",
-    model: "deepseek-chat",
+    model: "llama-3.3-70b-versatile",
     maxTokens: 700,
     costPer1k: 1.0,
     qualityGate: "Verified-index check + hinge-before-holding",

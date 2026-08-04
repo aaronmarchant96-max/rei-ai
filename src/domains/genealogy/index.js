@@ -15,7 +15,7 @@ export default {
     id: "genealogy-deep-dive",
     jobType: "genealogy-deep-dive",
     label: "Genealogy Deep Dive",
-    model: "deepseek-chat",
+    model: "llama-3.3-70b-versatile",
     maxTokens: 800,
     costPer1k: 1.0,
     qualityGate: "Evidence tiers + citations",

@@ -14,7 +14,7 @@ export default {
     id: "structured-reasoning",
     jobType: "structured-reasoning",
     label: "Structured Reasoning",
-    model: "deepseek-chat",
+    model: "llama-3.3-70b-versatile",
     maxTokens: 400,
     costPer1k: 1.0,
     qualityGate: "Hinge + Facts + Move",
