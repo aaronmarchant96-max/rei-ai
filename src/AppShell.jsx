@@ -9,6 +9,7 @@ const CardoGuard = lazy(() => import("./CardoGuard.jsx"));
 const REI = lazy(() => import("./REI.jsx"));
 const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
 const ToolsLanding = lazy(() => import("./ToolsLanding.jsx"));
+const Analytics = lazy(() => import("./Analytics.jsx"));
 
 function LoadingShell() {
   return (
@@ -53,6 +54,11 @@ const TOP_LEVEL = [
     id: "tracepoint",
     label: "Tracepoint",
     subtitle: "Industrial signals stay evidence-first."
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    subtitle: "Routing patterns and cost observability."
   }
 ];
 
@@ -64,6 +70,7 @@ function getInitialTool() {
     if (hash === "#storm-replay") return "storm-replay";
     if (hash === "#cardo-guard") return "cardo-guard";
     if (hash === "#tracepoint") return "tracepoint";
+  if (hash === "#analytics") return "analytics";
   }
   return "tools";
 }
@@ -75,6 +82,7 @@ function getToolPath(tool) {
   if (tool === "cardo-guard") return "/#cardo-guard";
   if (tool === "rei") return "/#rei";
   if (tool === "tracepoint") return "/#tracepoint";
+  if (tool === "analytics") return "/#analytics";
   return "/";
 }
 
@@ -85,6 +93,7 @@ function getToolLabel(tool) {
   if (tool === "cardo-guard") return "CARDO GUARD";
   if (tool === "rei" || tool === "cfai") return "REI.ai";
   if (tool === "tracepoint") return "Tracepoint";
+  if (tool === "analytics") return "Analytics";
   return "The Furnace";
 }
 
@@ -123,9 +132,11 @@ export default function AppShell() {
               ? "PromptHound Labs | CARDO GUARD"
               : tool === "rei"
                 ? "PromptHound Labs | REI.ai"
-                : tool === "tracepoint"
-                  ? "PromptHound Labs | Tracepoint"
-                  : "PromptHound Labs | The Furnace";
+                  : tool === "tracepoint"
+                    ? "PromptHound Labs | Tracepoint"
+                    : tool === "analytics"
+                      ? "PromptHound Labs | Analytics"
+                      : "PromptHound Labs | The Furnace";
   }, [tool]);
 
   const currentToolLabel = getToolLabel(tool);
@@ -249,6 +260,8 @@ export default function AppShell() {
           <REI initialPrompt={reiInitialPrompt} />
         ) : tool === "tracepoint" ? (
           <Tracepoint />
+        ) : tool === "analytics" ? (
+          <Analytics />
         ) : tool === "cfai" ? (
           <REI initialPrompt={reiInitialPrompt} />
         ) : (

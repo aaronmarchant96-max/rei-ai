@@ -53,6 +53,9 @@ const CASE_STUDIES = [
   { id: "trace", toolId: "tracepoint", label: "Tracepoint", subtitle: "Industrial Telemetry",
     description: "Industrial Telemetry & Handover Review",
     hinge: "P-204 Vibration +49.7% vs Baseline" },
+  { id: "analytics", toolId: "analytics", label: "Analytics", subtitle: "Routing Observability",
+    description: "Client-side routing pattern dashboard",
+    hinge: "Cost Log • Model Distribution • Domain Heat", badge: "NEW" },
 ];
 
 export default function ToolsLanding({ onOpenTool }) {
