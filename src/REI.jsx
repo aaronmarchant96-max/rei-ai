@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useLayoutEffect } from "react";
 import { useMobile, useKeyboardVisible } from "./useMobile.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
+import { getModelCosts, computeActualCost } from "./lib/costHelpers.js";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import { logRoutingDecision } from "./lib/routingLog.js";
@@ -371,12 +372,29 @@ export default function REI({ initialPrompt } = {}) {
         }
       ]);
 
+      const usage = data.usage;
+      const actualTokens = usage
+        ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
+        : (routerDecision?.maxTokens || 0);
+
+      const modelName = data.model || routerDecision?.model || "deepseek-chat";
+      const rates = getModelCosts(modelName);
+      const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
+
+      const actualCost = usage
+        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
+        : (routerDecision?.estimatedCost || 0);
+
+      const actualPremium = usage
+        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, PREMIUM_RATES.input, PREMIUM_RATES.output)
+        : (routerDecision?.premiumCost || 0);
+
       trackMessage(
-        routerDecision?.maxTokens || 0,
-        data.model || routerDecision?.model || "unknown",
-        routerDecision?.estimatedCost || 0,
-        routerDecision?.premiumCost || 0,
-        routerDecision?.model === "gpt-4o"
+        actualTokens,
+        modelName,
+        actualCost,
+        actualPremium,
+        modelName === "gpt-4o"
       );
     } catch (error) {
       console.error("REI.ai API error:", error);
