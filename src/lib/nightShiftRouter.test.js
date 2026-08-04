@@ -27,7 +27,7 @@ describe("nightShiftRouter", () => {
 
     expect(decision.id).toBe("coding-hinge");
     expect(decision.enforce).toBe("HARD_STOP");
-    expect(decision.maxTokens).toBe(600);
+    expect(decision.maxTokens).toBe(1200);
   });
 
   it("routes genealogy prompts to the evidence-tier path", () => {

@@ -343,7 +343,7 @@ export function buildRouterDecision({
     const decision = buildDecision("structured-reasoning", {
       rationale: "High-structure or uncertain reasoning request detected; use a stricter evaluation gate.",
       qualityGate: "Hinge + Facts + Move + challenge test",
-      maxTokens: 600,
+      maxTokens: 800,
       temperature: 0.2,
       fallbackPriority: "adversarial-validation",
       routingSignals: {
