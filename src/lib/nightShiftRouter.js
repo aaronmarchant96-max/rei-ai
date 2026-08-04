@@ -126,7 +126,7 @@ function buildDecision(id, overrides = {}, hingeData = null) {
     id: baseEntry.id || id,
     jobType: baseEntry.jobType || id,
     label: baseEntry.label || id,
-    model: baseEntry.model || "llama-3.3-70b-versatile",
+    model: baseEntry.model || "deepseek-chat",
     maxTokens: baseEntry.maxTokens || 400,
     costPer1k: baseEntry.costPer1k ?? 1.0,
     qualityGate: baseEntry.qualityGate || "Default reasoning gate",
