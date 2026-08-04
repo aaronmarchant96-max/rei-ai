@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useLayoutEffect } from "react";
 import { useMobile, useKeyboardVisible } from "./useMobile.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter.js";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
@@ -142,6 +142,20 @@ export default function REI({ initialPrompt } = {}) {
     animation: "fadeIn 0.3s ease-in-out forwards",
     opacity: 0
   };
+
+  const [themeMode, setThemeMode] = useState(() => {
+    try {
+      return localStorage.getItem("rei_theme_mode") || "dark";
+    } catch (e) {
+      return "dark";
+    }
+  });
+
+  useLayoutEffect(() => {
+    try {
+      localStorage.setItem("rei_theme_mode", themeMode);
+    } catch (e) {}
+  }, [themeMode]);
 
   const [selectedDomain, setSelectedDomain] = useState("assistant");
   const [rawRecordText, setRawRecordText] = useState("");
@@ -390,7 +404,7 @@ Limitations:
       assistantPromptIndex, setAssistantPromptIndex,
     }}>
     <div
-      data-theme="light" className="mobile-container safe-area rei-shell"
+      data-theme={themeMode} className="mobile-container safe-area rei-shell"
       style={{
         width: "100%",
         height: "100%",
@@ -416,6 +430,14 @@ Limitations:
               </span>
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
+            className="rei-action-btn"
+            title="Toggle light / dark theme"
+          >
+              {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
+          </button>
           <button
             type="button"
             onClick={handleClearHistory}
