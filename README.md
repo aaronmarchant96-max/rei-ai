@@ -37,33 +37,43 @@ The routing engine classifies prompts into one of five core domains:
 
 ## 📐 Router Architecture
 
-REI's routing pipeline runs in less than 5ms locally. Here's how it decides which model to call:
+REI's routing pipeline is a **priority if-chain** — it checks the cheapest, most-specific paths first in a fixed order, and the first match wins. It runs locally with zero inference (pure keyword + structural regex) and produces a testable `RouterDecision`:
 
 ```mermaid
 flowchart LR
     A[Prompt Input] --> B{Greeting / Meta?}
-    B -->|Greeting| C[⚡ Layer 0<br/>Deterministic<br/>$0 · &lt;5ms]
-    B -->|Substantive| D{Keyword Match?}
-    D -->|Match| E[🌙 Layer 1<br/>Night Shift v3<br/>Keyword Router]
-    D -->|No Match| F{Adversarial?}
-    F -->|Yes| G[🛡️ Layer 2<br/>Red-Team Scanner<br/>gpt-4o Escalation]
-    F -->|No| H{High Stakes?}
-    H -->|Yes| I[⚖️ Layer 3<br/>CARDO GUARD<br/>Expected-Utility Gate]
-    H -->|No| J[📐 Layer 4<br/>Structured Reasoning<br/>llama-3.3-70b]
-    E --> J
-    G --> K[⚖️ Domain Prompt<br/>+ Verified Index]
-    I --> K
-    J --> K
-    K --> L[REI Response]
+    B -->|Yes| C[simple-greeting<br/>deepseek-chat · 50 tok]
+    B -->|No| D{Adversarial?}
+    D -->|Yes| E[adversarial-validation<br/>deepseek-chat · 5× cost]
+    D -->|No| F{Domain keyword?}
+    F -->|Coding| G[coding-hinge<br/>deepseek-chat · 1200 tok]
+    F -->|Genealogy| H[genealogy-deep-dive<br/>deepseek-chat · 1500 tok]
+    F -->|Story| I[story-architect<br/>gemini-flash-latest · 2000 tok]
+    F -->|Legal| J[legal-hinge<br/>deepseek-chat · 1500 tok]
+    F -->|None| K{High structure?}
+    K -->|Yes| L[structured-reasoning<br/>deepseek-chat · 800 tok]
+    K -->|No| M[structured-reasoning<br/>deepseek-chat · 800 tok]
+    C --> N[REI Response]
+    E --> N
+    G --> N
+    H --> N
+    I --> N
+    J --> N
+    L --> N
+    M --> N
 ```
 
-**6-layer cascade:**
-1. **Zero-Inference Matcher** — greetings & meta return $0 local responses
-2. **Night Shift v3 Router** — keyword + structural signals classify domains
-3. **Red-Team Scanner** — adversarial prompts escalate to gpt-4o premium
-4. **CARDO GUARD Gate** — cost-weighted decisions (ACT vs WAIT)
-5. **Structured Reasoning** — standard queries to llama-3.3-70b
-6. **Domain Prompts** — domain-specific instructions with verified-index grounding
+**Decision order (first match wins):**
+
+1. **Greeting / meta-query** → `simple-greeting` — cheapest path, 50-token budget
+2. **Adversarial / red-team** → `adversarial-validation` — strictest gate, 5× cost multiplier
+3. **Domain keyword match** (coding → genealogy → story → legal) — domain-specific enforcement rules (HARD_STOP, EVIDENCE_TIERS, etc.)
+4. **High-structure / high-complexity** → `structured-reasoning` — stricter evaluation gate
+5. **Fallback** → `structured-reasoning` — balanced default
+
+**What's NOT in the router:** CARDO GUARD is a decision gate that runs *after* routing — it's a standalone tool and a guidance frame in the generalist prompt, not a routing layer. Domain prompts are selected by the chat UI after the router returns, not by the router itself.
+
+**Models:** every route runs `deepseek-chat` except story (`gemini-flash-latest`). `gpt-4o` appears only as the **premium cost baseline** for the savings metric — it is not a production route.
 
 ---
 
