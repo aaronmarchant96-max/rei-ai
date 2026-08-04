@@ -239,3 +239,36 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 **Code:** `src/DebateFurnace.jsx`, `src/modules/debate-furnace/` (10 files)
 
+
+
+## 14. TypeScript Adoption (Phase A+B) — Lib Layer Only
+
+**Date:** August 4, 2026
+**Problem:** All 115 source files are plain JavaScript with no type checking. Runtime errors (like the Analytics `totalPremium` crash, PR #34) slip through CI because there's no compile-time safety net.
+
+**Choice:** Phase A+B only — tooling installation + lib layer conversion. Phase C (components → `.tsx`) deferred as documented future work.
+
+**Phase A — Tooling:**
+- Install `typescript`, `@types/react`, `@types/react-dom`, `@babel/preset-typescript`
+- `tsconfig.json` with `strict: true`, `allowJs: true`, `checkJs: false`, `jsx: "react-jsx"`, `moduleResolution: "bundler"`, `noEmit: true`, `include: ["src/**/*"]`
+- `babel.config.cjs`: `@babel/preset-typescript` as LAST preset (executes first)
+- `jest.config.cjs`: `moduleFileExtensions` extended with `"ts"` and `"tsx"`
+- `package.json`: `typecheck` script = `tsc --noEmit`
+- `.github/workflows/typecheck.yml`: CI runs `tsc --noEmit` on push/PR to main
+
+**Phase B — Lib Layer (4 files `.js` → `.ts`):**
+- `src/lib/routingLog.ts` — `RoutingLogEntry` interface
+- `src/lib/costHelpers.ts` — `ModelCost` interface, `CostBadgeUsage` interface
+- `src/lib/nightShiftRouter.ts` — `FingerprintEntry`, `RouterDecision`, `RoutingSignals`, `HingeResult`, `RouterSummary`, `RouterCostEntry` interfaces
+- `src/lib/hingeClassifier.ts` — `HingeFeatures`, `HingeWeights`, `HingeScoreResult` interfaces
+- ~20 import paths updated across 15 callers + 4 test files + api/cfai.js (`.js` extension stripped)
+
+**Phase C (deferred):**
+Components (`.jsx` → `.tsx`): ChatBubble, DomainBanner, WelcomePanel, IngestPanel, ChatHistory, ChatInput, TypingPipeline, PhilosophyModal, HingeMark, InstrumentRail, ErrorBoundary, ToolsLanding, REI, AppShell. Deferred because it's the regression-risk time sink.
+
+**Verification:**
+- `tsc --noEmit` exit 0 (clean)
+- Full suite 455/455 (34 suites)
+- Build ✅
+
+**Code:** `tsconfig.json`, `babel.config.cjs`, `jest.config.cjs`, `package.json`, `.github/workflows/typecheck.yml`, `src/lib/routingLog.ts`, `src/lib/costHelpers.ts`, `src/lib/nightShiftRouter.ts`, `src/lib/hingeClassifier.ts`

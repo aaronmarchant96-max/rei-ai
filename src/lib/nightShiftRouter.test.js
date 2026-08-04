@@ -1,4 +1,4 @@
-import { buildRouterDecision, getFingerprintCatalog, resolveRoutingModel } from "./nightShiftRouter.js";
+import { buildRouterDecision, getFingerprintCatalog, resolveRoutingModel } from "./nightShiftRouter";
 
 describe("nightShiftRouter", () => {
   beforeEach(() => {

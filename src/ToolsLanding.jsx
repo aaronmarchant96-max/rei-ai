@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { getDomainProfiles } from "./domains/_index.js";
-import { buildRouterDecision } from "./lib/nightShiftRouter.js";
+import { buildRouterDecision } from "./lib/nightShiftRouter";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck } from "lucide-react";

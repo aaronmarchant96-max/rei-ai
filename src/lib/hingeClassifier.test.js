@@ -5,7 +5,7 @@ import {
   DEFAULT_WEIGHTS,
   extractFeatures,
   sigmoid,
-} from "./hingeClassifier.js";
+} from "./hingeClassifier";
 
 describe("hingeClassifier (Night Shift v3)", () => {
   describe("sigmoid", () => {

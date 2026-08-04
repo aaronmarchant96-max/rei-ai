@@ -1,5 +1,5 @@
-import { buildRouterDecision } from "../lib/nightShiftRouter.js";
-import { computeHingeScore } from "../lib/hingeClassifier.js";
+import { buildRouterDecision } from "../lib/nightShiftRouter";
+import { computeHingeScore } from "../lib/hingeClassifier";
 
 // Frozen 26-prompt blind held-out dataset (STRICT DATA ISOLATION GUARANTEED)
 const BLIND_HELDOUT_DATASET = {

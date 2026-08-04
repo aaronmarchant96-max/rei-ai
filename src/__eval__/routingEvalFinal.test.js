@@ -4,7 +4,7 @@
  * These prompts were NOT used for any prior optimization pass.
  */
 
-import { buildRouterDecision } from "../lib/nightShiftRouter.js";
+import { buildRouterDecision } from "../lib/nightShiftRouter";
 
 const PROMPTS = [
   // ── greeting ──

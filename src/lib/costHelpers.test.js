@@ -5,7 +5,7 @@ import {
   computeActualCost,
   getCostBadgeLabel,
   DEFAULT_COST_MODEL,
-} from "./costHelpers.js";
+} from "./costHelpers";
 
 describe("costHelpers", () => {
   describe("getModelCosts", () => {
