@@ -19,3 +19,8 @@ global.IntersectionObserver = class {
   takeRecords() { return []; }
 };
 global.IntersectionObserverEntry = class {};
+
+// scrollIntoView no-op (jsdom doesn't implement it; AppShell Ecosystem nav scrolls)
+if (typeof window !== "undefined" && window.HTMLElement) {
+  window.HTMLElement.prototype.scrollIntoView = jest.fn();
+}
