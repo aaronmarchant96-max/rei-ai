@@ -28,7 +28,7 @@ export default function InstrumentRail({
         >
           ‹
         </button>
-        <div className="rei-instrument-rail__collapsed-hero" title={`Efficiency: ${savingsPercent}%`}>
+        <div className="rei-instrument-rail__collapsed-hero" title={`Rate Advantage: ${savingsPercent}%`}>
           <div className="rei-instrument-rail__collapsed-hero-value">
             EFFICIENCY: {totalPremiumCost > 0 ? `${savingsPercent}%` : "\u2014"}
           </div>
@@ -51,7 +51,7 @@ export default function InstrumentRail({
       {/* ── 2×2 Metric Grid ── */}
       <div className="rei-instrument-rail__grid">
         <div className="rei-instrument-rail__card rei-instrument-rail__card--hero">
-          <div className="rei-instrument-rail__card-label">Efficiency</div>
+          <div className="rei-instrument-rail__card-label">Rate Advantage</div>
           <div className="rei-instrument-rail__card-value">
             {totalPremiumCost > 0 ? `${savingsPercent}%` : "\u2014"}
           </div>
