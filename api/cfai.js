@@ -70,6 +70,41 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
     }
   }
 
+  const maxTokens = routerDecision?.maxTokens || 2048;
+
+  // ── DeepSeek Primary ──
+  const deepseekKey = process.env.DEEPSEEK_API_KEY;
+  if (deepseekKey) {
+    try {
+      const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${deepseekKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            { role: "system", content: systemPrompt || REI_SYSTEM_PROMPT },
+            ...formattedHistory,
+            { role: "user", content: prompt },
+          ],
+          temperature: 0.7,
+          max_tokens: maxTokens,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          content: data.choices?.[0]?.message?.content || "No content returned from DeepSeek.",
+          model: "deepseek-chat",
+        };
+      }
+    } catch (e) {
+      console.warn("DeepSeek failed, falling back to Groq:", e.message);
+    }
+  }
+
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey || apiKey.includes("your_groq_api_key_here")) {
     // No real key – return a mock response
@@ -81,7 +116,6 @@ async function callGroqDirectly(prompt, systemPrompt = "", history = [], routerD
   }
 
   const selectedModel = selectGroqModel(prompt, routerDecision);
-  const maxTokens = routerDecision?.maxTokens || 2048;
 
   const requestBody = {
     model: selectedModel,

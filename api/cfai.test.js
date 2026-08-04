@@ -13,6 +13,7 @@ beforeEach(() => {
   mockFetch({ choices: [{ message: { content: "mock ok" } }] });
   process.env.GROQ_API_KEY = "test-key";
   delete process.env.CFAI_PATH;
+  delete process.env.DEEPSEEK_API_KEY;
   delete process.env.OPENAI_API_KEY;
 });
 
