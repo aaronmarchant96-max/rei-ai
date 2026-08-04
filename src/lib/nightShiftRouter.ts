@@ -1,74 +1,129 @@
 import fingerprintCatalog from "../../data/fingerprints.json" with { type: "json" };
-import { computeHingeScore } from "./hingeClassifier.js";
+import { computeHingeScore } from "./hingeClassifier";
 import { HIGH_STRUCTURE_TERMS, UNCERTAINTY_TERMS, isSimpleGreeting } from "./routingConstants.js";
 import { getDomainMatchTerms } from "../domains/_index.js";
 
-const ROUTER_CATALOG = Array.isArray(fingerprintCatalog) ? fingerprintCatalog : [];
+interface FingerprintEntry {
+  id?: string;
+  jobType?: string;
+  label?: string;
+  model?: string;
+  maxTokens?: number;
+  costPer1k?: number;
+  costPer1kInput?: number;
+  costPer1kOutput?: number;
+  qualityGate?: string;
+  enforce?: string | null;
+  description?: string;
+  temperature?: number;
+  fallbackPriority?: string | null;
+  matchTerms?: string[];
+}
+
+interface RouterDecision {
+  id: string;
+  jobType: string;
+  label: string;
+  model: string;
+  maxTokens: number;
+  costPer1k: number;
+  qualityGate: string;
+  enforce: string | null;
+  description: string;
+  temperature: number;
+  fallbackPriority: string | null;
+  routingSignals: Record<string, any>;
+  rationale?: string;
+  hingeScore?: number;
+  hingeVector?: Record<string, any>;
+  hingeTier?: string;
+  estimatedCost?: number;
+  premiumCost?: number;
+}
+
+interface RoutingSignals {
+  complexityTier?: string;
+  matchedTerms?: string[];
+  highStructureSignals?: string[];
+  storedPreference?: string | null;
+}
+
+interface HingeResult {
+  hs: number;
+  cheapRouteConfidence: number;
+  tier: string;
+  hingeVector: {
+    ecs: number;
+    das: number;
+    aps: number;
+    features: Record<string, any>;
+  };
+}
+
+const ROUTER_CATALOG: FingerprintEntry[] = Array.isArray(fingerprintCatalog) ? fingerprintCatalog : [];
 const FALLBACK_COST_INPUT = 0.00059;
 const FALLBACK_COST_OUTPUT = 0.00079;
 const STORAGE_KEY = "night-shift-user-fingerprint";
 const PREMIUM_INPUT_RATE = 0.0025;
 const PREMIUM_OUTPUT_RATE = 0.0100;
 
-function getModelCeilingRate(model) {
+function getModelCeilingRate(model: string): number {
   if (model === "gpt-4o") return PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE;
   if (model === "deepseek-chat") return 0.00014 + 0.00028;
   if (model === "llama-3.1-8b-instant") return 0.00005 + 0.00008;
-  if (model === "llama-3.3-70b-versatile") return 0; // Groq free tier
+  if (model === "llama-3.3-70b-versatile") return 0;
 
   const entry = ROUTER_CATALOG.find((e) => e.model === model);
   if (entry) {
-    const input = entry.costPer1kInput ?? entry.costPer1k / 1000;
-    const output = entry.costPer1kOutput ?? entry.costPer1k / 1000;
+    const input = entry.costPer1kInput ?? (entry.costPer1k || 0) / 1000;
+    const output = entry.costPer1kOutput ?? (entry.costPer1k || 0) / 1000;
     if (input || output) return (input || 0) + (output || 0);
   }
   return FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT;
 }
 
-function normalizeText(value = "") {
+function normalizeText(value = ""): string {
   return String(value ?? "").toLowerCase().trim();
 }
 
-function getCatalogEntry(id) {
+function getCatalogEntry(id: string): FingerprintEntry {
   return ROUTER_CATALOG.find((entry) => entry.id === id) || ROUTER_CATALOG[1] || ROUTER_CATALOG[0];
 }
 
-function computeCatalogScores(text) {
+function computeCatalogScores(text: string): number[] {
   return ROUTER_CATALOG.map((entry) => {
     const terms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
-    return terms.filter((term) => keywordMatches(text, term)).length;
+    return terms.filter((term: string) => keywordMatches(text, term)).length;
   });
 }
 
-function escapeKeyword(term = "") {
+function escapeKeyword(term = ""): string {
   return String(term ?? "")
     .trim()
     .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     .replace(/\s+/g, "\\s+");
 }
 
-function keywordMatches(text, term = "") {
+function keywordMatches(text: string, term = ""): boolean {
   const escaped = escapeKeyword(term);
   if (!escaped) {
     return false;
   }
-
   const pattern = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i");
   return pattern.test(text);
 }
 
-function getCatalogRouteMatch(text) {
+function getCatalogRouteMatch(text: string): FingerprintEntry | null {
   for (const entry of ROUTER_CATALOG) {
     const terms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
     if (terms.some((term) => keywordMatches(text, term))) {
       return entry;
     }
   }
-
   return null;
 }
 
-function domainKeywordMatches(text, domainId) {
+function domainKeywordMatches(text: string, domainId: string): boolean {
   const terms = getDomainMatchTerms(domainId);
   return terms.some((term) => {
     const normalized = term.replace(/\./g, " ");
@@ -76,17 +131,15 @@ function domainKeywordMatches(text, domainId) {
   });
 }
 
-function getStoredRouteHistory() {
+function getStoredRouteHistory(): string[] {
   if (typeof window === "undefined" || !window.localStorage) {
     return [];
   }
-
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       return [];
     }
-
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
   } catch {
@@ -94,11 +147,10 @@ function getStoredRouteHistory() {
   }
 }
 
-function persistRouteHistory(routeId) {
+function persistRouteHistory(routeId: string): void {
   if (typeof window === "undefined" || !window.localStorage) {
     return;
   }
-
   try {
     const existing = getStoredRouteHistory();
     const next = [...existing, routeId].filter(Boolean).slice(-10);
@@ -108,23 +160,21 @@ function persistRouteHistory(routeId) {
   }
 }
 
-function getStoredRoutePreference() {
+function getStoredRoutePreference(): string | null {
   const history = getStoredRouteHistory();
   if (history.length < 3) {
     return null;
   }
-
-  const routeCounts = history.reduce((accumulator, routeId) => {
+  const routeCounts = history.reduce((accumulator: Record<string, number>, routeId) => {
     accumulator[routeId] = (accumulator[routeId] || 0) + 1;
     return accumulator;
   }, {});
-
   return Object.entries(routeCounts).sort((left, right) => right[1] - left[1])[0]?.[0] || null;
 }
 
-function buildDecision(id, overrides = {}, hingeData = null) {
+function buildDecision(id: string, overrides: Record<string, any> = {}, hingeData: HingeResult | null = null): RouterDecision {
   const baseEntry = getCatalogEntry(id) || {};
-  const decision = {
+  const decision: RouterDecision = {
     id: baseEntry.id || id,
     jobType: baseEntry.jobType || id,
     label: baseEntry.label || id,
@@ -149,57 +199,52 @@ function buildDecision(id, overrides = {}, hingeData = null) {
   return decision;
 }
 
-function isAdversarialRequest(text) {
+function isAdversarialRequest(text: string): boolean {
   return /\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text);
 }
 
-function isMetaQuery(text) {
+function isMetaQuery(text: string): boolean {
   return /\bhow (do|are) you|who are you|what (is|are) you|what is carlo|explain (how|what)|tell me about (yourself|you)\b/i.test(text);
 }
 
-function isSelfEvaluation(text) {
+function isSelfEvaluation(text: string): boolean {
   return /\b(self-evaluate|evaluate yourself|evaluate your architecture|self-diagnose)\b/i.test(text);
 }
 
-function getComplexityTier(text) {
+function getComplexityTier(text: string): string {
   const words = text.split(/\s+/).filter(Boolean).length;
   const questionMarks = (text.match(/\?/g) || []).length;
   const uncertaintyHits = UNCERTAINTY_TERMS.filter((term) => text.includes(term)).length;
   const score = words * 2 + questionMarks * 8 + uncertaintyHits * 10;
-
   if (score >= 40) return "high";
   if (score >= 20) return "medium";
   return "low";
 }
 
-function getHighStructureSignals(text) {
+function getHighStructureSignals(text: string): string[] {
   return HIGH_STRUCTURE_TERMS.filter((term) => text.includes(term));
 }
 
-function getStoredPreferenceForContext(text, domainName) {
+function getStoredPreferenceForContext(text: string, domainName: string): string | null {
   const storedPreference = getStoredRoutePreference();
   if (!storedPreference) {
     return null;
   }
-
-  const genericDomainSignals = {
+  const genericDomainSignals: Record<string, RegExp> = {
     "genealogy-deep-dive": /family|ancestor|record|lineage|archive|burial|marriage|census/i,
     "coding-hinge": /code|function|module|api|test|build|debug|implement/i,
     "story-architect": /story|plot|character|scene|narrative|dialogue|worldbuilding/i,
   };
-
   if (!genericDomainSignals[storedPreference]?.test(text)) {
     return null;
   }
-
   if (domainName === "assistant") {
     return storedPreference;
   }
-
   return null;
 }
 
-export function getFingerprintCatalog() {
+export function getFingerprintCatalog(): FingerprintEntry[] {
   return ROUTER_CATALOG.map((entry) => ({ ...entry }));
 }
 
@@ -209,9 +254,15 @@ export function buildRouterDecision({
   history = [],
   attachedRecord = "",
   requiresAdversarial = false,
-} = {}) {
+}: {
+  input?: string;
+  domain?: string;
+  history?: any[];
+  attachedRecord?: string;
+  requiresAdversarial?: boolean;
+} = {}): RouterDecision {
   const currentText = normalizeText([input, attachedRecord].filter(Boolean).join(" "));
-  const combinedInput = [input, attachedRecord, history?.map((message) => message?.content || "").join(" ")]
+  const combinedInput = [input, attachedRecord, history?.map((message: any) => message?.content || "").join(" ")]
     .filter(Boolean)
     .join(" ");
   const text = currentText || normalizeText(combinedInput);
@@ -234,7 +285,7 @@ export function buildRouterDecision({
         matchedTerms: [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -248,7 +299,7 @@ export function buildRouterDecision({
         matchedTerms: [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -265,7 +316,7 @@ export function buildRouterDecision({
         matchedTerms: ["self-evaluate"],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -279,7 +330,7 @@ export function buildRouterDecision({
         matchedTerms: ["adversarial"],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -293,7 +344,7 @@ export function buildRouterDecision({
         matchedTerms: catalogRoute?.matchTerms || [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -307,7 +358,7 @@ export function buildRouterDecision({
         matchedTerms: catalogRoute?.matchTerms || [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -321,7 +372,7 @@ export function buildRouterDecision({
         matchedTerms: catalogRoute?.matchTerms || [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -335,7 +386,7 @@ export function buildRouterDecision({
         matchedTerms: catalogRoute?.matchTerms || [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -353,7 +404,7 @@ export function buildRouterDecision({
         matchedTerms: catalogRoute?.matchTerms || [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -367,7 +418,7 @@ export function buildRouterDecision({
         matchedTerms: catalogRoute?.matchTerms || [],
         highStructureSignals,
         storedPreference,
-      },
+      } as RoutingSignals,
     }, hingeResult);
     persistRouteHistory(decision.id);
     return decision;
@@ -380,25 +431,34 @@ export function buildRouterDecision({
       matchedTerms: catalogRoute?.matchTerms || [],
       highStructureSignals,
       storedPreference,
-    },
+    } as RoutingSignals,
   }, hingeResult);
   persistRouteHistory(decision.id);
   return decision;
 }
 
-export function resolveRoutingModel(routerDecision) {
+export function resolveRoutingModel(routerDecision: RouterDecision | null): string {
   if (!routerDecision?.model) {
     return "deepseek-chat";
   }
-
   return routerDecision.model;
 }
 
-export function getRouterSummary(routerDecision) {
+export interface RouterSummary {
+  id: string;
+  label: string;
+  model: string;
+  maxTokens: number;
+  qualityGate: string;
+  enforce: string | null;
+  temperature: number;
+  fallbackPriority: string | null;
+}
+
+export function getRouterSummary(routerDecision: RouterDecision | null): RouterSummary | null {
   if (!routerDecision) {
     return null;
   }
-
   return {
     id: routerDecision.id,
     label: routerDecision.label,
@@ -411,8 +471,14 @@ export function getRouterSummary(routerDecision) {
   };
 }
 
-export function getRouterCosts() {
-  const models = {};
+export interface RouterCostEntry {
+  costPer1kInput: number;
+  costPer1kOutput: number;
+  label: string;
+}
+
+export function getRouterCosts(): Record<string, RouterCostEntry> {
+  const models: Record<string, RouterCostEntry> = {};
   for (const entry of ROUTER_CATALOG) {
     if (entry.model && !models[entry.model]) {
       models[entry.model] = {

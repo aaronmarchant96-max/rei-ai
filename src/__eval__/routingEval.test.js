@@ -1,4 +1,4 @@
-import { buildRouterDecision } from "../lib/nightShiftRouter.js";
+import { buildRouterDecision } from "../lib/nightShiftRouter";
 
 const CATEGORIES = {
   greeting: [

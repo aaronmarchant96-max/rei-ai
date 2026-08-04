@@ -6,7 +6,7 @@ const DEFAULT_MODEL = process.env.MODEL || null;
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
-import { buildRouterDecision, resolveRoutingModel } from "../src/lib/nightShiftRouter.js";
+import { buildRouterDecision, resolveRoutingModel } from "../src/lib/nightShiftRouter";
 
 const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH;

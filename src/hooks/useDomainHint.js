@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { detectDomain } from "../lib/nightShiftRouter.js";
+import { detectDomain } from "../lib/nightShiftRouter";
 
 export function useDomainHint(selectedDomain) {
   const [domainHint, setDomainHint] = useState(null);

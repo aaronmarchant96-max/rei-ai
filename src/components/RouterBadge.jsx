@@ -1,4 +1,4 @@
-import { getCostBadgeLabel } from "../lib/costHelpers.js";
+import { getCostBadgeLabel } from "../lib/costHelpers";
 
 // Complexity tier → token counter color
 const COMPLEXITY_COLORS = {

@@ -1,4 +1,4 @@
-import { logRoutingDecision, getLogs, clearLogs } from "./routingLog.js";
+import { logRoutingDecision, getLogs, clearLogs } from "./routingLog";
 
 function makeEntry(domain) {
   return {

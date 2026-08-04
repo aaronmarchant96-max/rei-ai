@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { getLogs, clearLogs } from "./lib/routingLog.js";
+import { getLogs, clearLogs } from "./lib/routingLog";
 
 const DOMAIN_LABELS = {
   assistant: "Generalist",

@@ -4,7 +4,7 @@ module.exports = {
   transform: {
     "^.+\\.[jt]sx?$": "babel-jest",
   },
-  moduleFileExtensions: ["js", "jsx", "json"],
+  moduleFileExtensions: ["js", "jsx", "json", "ts", "tsx"],
   testMatch: ["<rootDir>/src/**/*.test.[jt]s?(x)", "<rootDir>/api/**/*.test.[jt]s?(x)"],
   clearMocks: true,
   transformIgnorePatterns: [

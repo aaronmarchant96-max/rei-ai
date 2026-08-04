@@ -9,7 +9,7 @@
  *   Run-once: do not tune the router after seeing results.
  */
 
-import { buildRouterDecision } from "../lib/nightShiftRouter.js";
+import { buildRouterDecision } from "../lib/nightShiftRouter";
 
 const PROMPTS = [
   // ── greeting (expect: "Simple Greeting") ──
