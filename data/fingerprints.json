@@ -71,7 +71,7 @@
     "id": "coding-hinge",
     "jobType": "coding-hinge",
     "label": "Coding Hinge",
-    "model": "llama-3.3-70b-versatile",
+    "model": "gemini-flash-latest",
     "maxTokens": 1200,
     "costPer1k": 1,
     "qualityGate": "Phase 0 + HARD STOP",
@@ -117,8 +117,8 @@
     ],
     "temperature": 0.3,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0,
-    "costPer1kOutput": 0
+    "costPer1kInput": 0.0001,
+    "costPer1kOutput": 0.0004
   },
   {
     "id": "genealogy-deep-dive",
@@ -182,7 +182,9 @@
       "villain"
     ],
     "temperature": 0.5,
-    "fallbackPriority": "structured-reasoning"
+    "fallbackPriority": "structured-reasoning",
+    "costPer1kInput": 0.0001,
+    "costPer1kOutput": 0.0004
   },
   {
     "id": "adversarial-validation",
