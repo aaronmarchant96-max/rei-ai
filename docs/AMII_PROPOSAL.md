@@ -73,7 +73,7 @@ Query → Layer 0: Deterministic Engine ($0, instant)
 | Total tokens processed | 601,255,780 |
 | Total cost | $9.03 |
 | Cost per million tokens | $0.0108 |
-| Savings vs always-premium | 68% (lab), 90% (production) |
+| Savings vs always-premium | 68% (lab benchmark), ~90% (production telemetry, self-reported) |
 | Routing accuracy | 80% across 57 prompts, 9 categories |
 | Deterministic (zero-cost) queries | 5 of 57 lab, ~15-20% production |
 | Escalation rate (to premium) | 9% |
