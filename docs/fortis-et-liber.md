@@ -97,7 +97,30 @@ Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
 
+**Client-side fetch timeout — no more infinite spinner (2026-08-05):**
+- **Issue**: `fetch('/api/cfai')` had no timeout — a hung Vercel cold-start or stalled provider left the typing spinner running forever with no error and no retry affordance (same symptom class as the silent-failure bug below).
+- **Fix**: New `fetchWithTimeout(url, options, timeoutMs=120000)` helper (`src/REI.jsx`) using `AbortController` + timer cleared in `finally`. 120s ceiling is deliberately generous so legitimate slow LLM completions pass through. `AbortError` surfaces as "Request timed out after 120s…" into the existing BackendUnavailablePanel (Retry/Copy/Dismiss).
+- **Files changed**: `src/REI.jsx` (helper + both call sites: handleSendMessage, handleRetry), `src/REI.test.jsx` (+2 tests: hang → timeout message, fast resolve → passthrough)
+- **Test coverage**: 36 suites, 483 passing.
+
+**BackendUnavailablePanel — honest fallback when all backends are down (2026-08-05):**
+- **Issue**: When every provider failed, the fallback was a template-string message with no diagnostics and no recovery path. Earlier versions fabricated confidence scores ("Confidence Score: 75%", "Running simulated local evaluation") — purged in commit `ea0ec13`.
+- **Fix**: New `src/modules/rei/components/BackendUnavailablePanel.jsx` showing only real client-side data: route name/model/matched terms/hinge score (all computed by `buildRouterDecision` before the API call), collapsed error details, and Retry / Copy diagnostic / Dismiss buttons. No auto-retry loop. **No CARDO Guard math** — scenario classification requires an LLM, so applying hardcoded scenario parameters would be fabrication. REI.jsx refactored: `processApiResponse()` extracted from `handleSendMessage`; catch block now sets `backendError` state instead of pushing a fake message; `handleRetry()` re-fires the saved `retryPayloadRef`.
+- **Files changed**: `src/modules/rei/components/BackendUnavailablePanel.jsx` (+11 tests), `src/REI.jsx`, `src/REI.test.jsx`
+- **Test coverage**: 36 suites, 483 passing.
+
+**Three critical production patches (2026-08-04, PR #43 → main):**
+1. **API import crash — HTTP 500 on every request** (`2c02bb7`): `api/cfai.js` imported `buildRouterDecision, resolveRoutingModel` from `../src/lib/nightShiftRouter`, but the file was renamed to `.ts` in the TypeScript migration (`04ce867`). Vercel's Node runtime can't resolve `.ts` imports → `FUNCTION_INVOCATION_FAILED` on every request (live site returned 500). Import, `selectGroqModel`, and orphaned `DEFAULT_MODEL` were dead code (routerDecision always arrives in the POST body) — removed, 6 lines deleted.
+2. **Catch-block scoping — silent failure** (`875ef22`): `ea0ec13` introduced `${routerDecision.id}`/`${routerDecision.model}` in the catch block, but `routerDecision` was `const` inside the `try` block → `ReferenceError` on any API error killed the catch before `setMessages` ran. User saw the typing indicator flash then nothing — 0 tokens, 0 messages. Fix: hoisted `let routerDecision;` above `try`, optional chaining in the template.
+3. **CARDO export API mismatch — empty reports** (`1be20fa`): `handleExport` called `buildDecisionReport(exportData.sections, {...})` (two args) but the module signature is a single `{ sections, routerDecision, domainLabel, sourceText, createdAt }` object — the destructured `sections` defaulted to `{}`, producing empty reports. Fixed caller to normalize both call-site payload shapes (`createdAt`/`timestamp`), added print-window fallback via `report.html`, +9 unit tests.
+
+**Test repairs (2026-08-04):**
+- Un-skipped `it.skip("shows fallback text when the API call fails")` in `src/REI.test.jsx` — the "flakiness" that got it skipped in `3073138` was the scoping ReferenceError above manifesting inconsistently; also fixed `global.fetch` mock pollution with try/finally restore.
+- Fixed pre-existing flaky "pre-fills legal" test: `setTimeout` → `await waitFor`, stale textarea assertion → checks message appears in chat.
+- Added `src/lib/buildDecisionReport.test.js` (9 tests).
+
 **Adaptive Context Persistence / Hierarchical Context Memory (HCM) - Code Quality Improvements (2026-07-03):**
+
 **maxTokens bump across fingerprints (2026-08-04):**
 - **Issue**: CARDO-structured responses (Phase 0 + Hinge + multi-section analysis) routinely exceeded old token caps (800-2000), showing "⚠️ Truncated" and cutting off mid-content in coding, story, genealogy, adversarial, and legal domains.
 - **Fix**: Bumped 5 fingerprint maxTokens: structured-reasoning (800→1500), genealogy-deep-dive (1500→4000), story-architect (2000→4000), adversarial-validation (1500→3000), legal-hinge (1500→3000). Coding-hinge already bumped to 4000 in prior fix (ea0ec13).
@@ -166,16 +189,17 @@ Use Jest as the main evidence gate.
 
 ### Current Test Status
 
-- **Total tests**: 78 passing (all suites green, +11 from edge case coverage on HCM)
+- **Total tests**: 483 passing across 36 suites (was 78; +405 from session 2026-08-04/05 fixes and coverage)
 - **Key test files**:
-  - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks (15 tests)
-  - `src/lib/cardoGuard.test.js` - Core decision logic tests (16 tests including pump + SaaS scenarios)
-  - `src/lib/nightShiftRouter.test.js` - Routing logic tests (11 tests including maintenance + architecture)
-  - `src/CardoGuard.test.jsx` - UI component tests
-  - `src/REI.test.jsx` - Chat persistence and error recovery
-- **Build status**: ✅ Passing with warnings about chunk size
-- **Production status**: ✅ Live demo verified accessible
-- **Dependency status**: ESLint v8 configured with flat config, all React testing libraries installed
+  - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks
+  - `src/lib/cardoGuard.test.js` - Core decision logic tests (pump + SaaS scenarios)
+  - `src/lib/nightShiftRouter.test.js` - Routing logic tests (maintenance + architecture)
+  - `src/lib/buildDecisionReport.test.js` - CARDO report generation (9 tests)
+  - `src/modules/rei/components/BackendUnavailablePanel.test.jsx` - Fallback UI states (11 tests)
+  - `src/REI.test.jsx` - Chat persistence, error recovery, fallback text, fetch timeout
+- **Build status**: ✅ Passing
+- **Production status**: ✅ Live API responds (HTTP 200), live demo verified accessible
+- **Known pre-existing issue**: `npm run lint` is broken — `eslint.config.js` imports `@eslint/js` which is not declared in package.json / installed (`ERR_MODULE_NOT_FOUND`). Fix: `npm i -D @eslint/js`.
 
 Common commands:
 
