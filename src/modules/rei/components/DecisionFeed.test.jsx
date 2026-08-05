@@ -106,7 +106,7 @@ describe("DecisionFeed", () => {
     const { container } = render(<DecisionFeed />);
     
     // Find the delete button (trash icon labelled "Delete")
-    const deleteBtn = container.querySelector('[aria-label="Delete decision"]');
+    const deleteBtn = container.querySelector("[aria-label=\"Delete decision\"]");
     fireEvent.click(deleteBtn);
     
     expect(mockDeleteDecision).toHaveBeenCalledWith(sampleEntry.id);

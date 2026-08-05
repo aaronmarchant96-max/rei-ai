@@ -36,7 +36,7 @@ describe("DecisionDetail", () => {
     expect(screen.getByText(/A calibration certificate/)).toBeInTheDocument();
     expect(screen.getByText("Shut down the pump and perform visual inspection.")).toBeInTheDocument();
   
-});
+  });
 
   it("renders router metadata", () => {
     render(<DecisionDetail entry={fullEntry} />);

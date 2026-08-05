@@ -543,7 +543,7 @@ export default function Analytics() {
             </div>
           </>
         ))}
-      {tab === "decisions" && <DecisionFeed />}
+        {tab === "decisions" && <DecisionFeed />}
       </div>
     </div>
   );

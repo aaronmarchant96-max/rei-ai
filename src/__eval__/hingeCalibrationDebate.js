@@ -277,13 +277,13 @@ export function bucketAndCorrelate(scoredPool, debateResults = null) {
  */
 export function formatReport(bucketReport, totalPrompts) {
   const lines = [
-    `# HingeScore Calibration Report`,
-    ``,
+    "# HingeScore Calibration Report",
+    "",
     `**Total pooled prompts:** ${totalPrompts}`,
-    `**Sources:** blindDatasetV2 (50), blindV1 (27) + blindV3 (30) + blindSemantic (30) — 137 array entries, 134 unique after dedup`,
-    ``,
-    `| hs Band | n | Accuracy | Mean hs | Correct | Debate Disagree | Debate+Router | Debate+GT |`,
-    `|---------|---|----------|---------|---------|-----------------|---------------|-----------|`,
+    "**Sources:** blindDatasetV2 (50), blindV1 (27) + blindV3 (30) + blindSemantic (30) — 137 array entries, 134 unique after dedup",
+    "",
+    "| hs Band | n | Accuracy | Mean hs | Correct | Debate Disagree | Debate+Router | Debate+GT |",
+    "|---------|---|----------|---------|---------|-----------------|---------------|-----------|",
   ];
 
   for (const band of BAND_KEYS) {

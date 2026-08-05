@@ -1,4 +1,4 @@
-import { logRoutingDecision, getLogs, clearLogs } from "./routingLog";
+import { logRoutingDecision, getLogs, clearLogs, updateLatestLogEntry } from "./routingLog";
 
 function makeEntry(domain) {
   return {
@@ -82,5 +82,35 @@ describe("routingLog", () => {
     expect(entry.rationale).toBeUndefined();
     expect(Array.isArray(entry.matchedTerms)).toBe(false);
     expect(entry.routingMs).toBeUndefined();
+  });
+
+  it("updateLatestLogEntry patches the newest entry only", () => {
+    logRoutingDecision(makeEntry("old"));
+    logRoutingDecision(makeEntry("new"));
+    updateLatestLogEntry({ provider: "gemini", rescue: true, truncated: false });
+    const logs = getLogs();
+    expect(logs[0].provider).toBe("gemini");
+    expect(logs[0].rescue).toBe(true);
+    expect(logs[0].truncated).toBe(false);
+    expect(logs[1].provider).toBeUndefined();
+    expect(logs[1].routeId).toContain("old");
+  });
+
+  it("updateLatestLogEntry patches actualCost and actualTokens", () => {
+    logRoutingDecision(makeEntry("coding"));
+    updateLatestLogEntry({ actualCost: 0.00042, actualTokens: 321 });
+    const entry = getLogs()[0];
+    expect(entry.actualCost).toBe(0.00042);
+    expect(entry.actualTokens).toBe(321);
+  });
+
+  it("updateLatestLogEntry is a no-op on empty log", () => {
+    expect(() => updateLatestLogEntry({ provider: "groq" })).not.toThrow();
+    expect(getLogs()).toHaveLength(0);
+  });
+
+  it("survives corrupted storage (returns empty array)", () => {
+    localStorage.setItem("rei_routing_log", "{{not json");
+    expect(getLogs()).toEqual([]);
   });
 });
