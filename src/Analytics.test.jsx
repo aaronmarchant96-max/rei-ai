@@ -69,4 +69,19 @@ describe("Analytics", () => {
     // real savings: (0.006 - 0.0008)/0.006 = 86.67 -> 87%
     expect(screen.getByText(/87%/i)).toBeInTheDocument();
   });
+
+  it("shows em-dash instead of null% when actuals are tracked but sum to zero", () => {
+    const entries = [
+      { timestamp: "2026-08-04T01:00:00.000Z", domain: "story", model: "llama-3.3-70b-versatile (fallback)", estimatedCost: 0.002, premiumCost: 0.006, hingeScore: 0.3, rescue: true, truncated: false, actualCost: 0, actualTokens: 899 },
+    ];
+    window.localStorage.setItem("rei_routing_log", JSON.stringify(entries));
+
+    render(<Analytics />);
+
+    // estimateVsActualPct is null when totalActual === 0 -> must render "—", never "null%"
+    expect(screen.getByText(/Actual vs estimate/i)).toBeInTheDocument();
+    expect(screen.queryByText(/null%/i)).not.toBeInTheDocument();
+    // real savings = (0.006 - 0)/0.006 = 100% — genuinely zero spend via free fallback
+    expect(screen.getAllByText(/100%/i).length).toBeGreaterThanOrEqual(1);
+  });
 });

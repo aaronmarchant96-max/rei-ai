@@ -355,8 +355,8 @@ export default function Analytics() {
                 <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
                   <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Actual vs estimate</div>
                   <div style={{ fontSize: "20px", fontWeight: 800 }}>
-                    {aggregates.actualCount > 0 ? aggregates.estimateVsActualPct + "%" : "—"}
-                    {aggregates.actualCount > 0 && <span style={{ fontSize: "11px", color: colors.textDim, fontWeight: 500 }}> of estimate</span>}
+                    {aggregates.estimateVsActualPct != null ? aggregates.estimateVsActualPct + "%" : "—"}
+                    {aggregates.estimateVsActualPct != null && <span style={{ fontSize: "11px", color: colors.textDim, fontWeight: 500 }}> of estimate</span>}
                   </div>
                   <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
                     {aggregates.actualCount > 0 ? "real spend " + formatCost(aggregates.totalActual) + " vs est. " + formatCost(aggregates.totalCost) : "no actuals logged yet"}
@@ -365,8 +365,12 @@ export default function Analytics() {
                 {aggregates.actualCount > 0 && (
                   <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
                     <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Real savings</div>
-                    <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a" }}>{aggregates.actualSavingsPct}%</div>
-                    <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>actual spend vs premium baseline</div>
+                    <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a" }}>
+                      {aggregates.actualSavingsPct != null ? aggregates.actualSavingsPct + "%" : "—"}
+                    </div>
+                    <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
+                      {aggregates.actualSavingsPct != null ? "actual spend vs premium baseline" : "no actual spend tracked yet"}
+                    </div>
                   </div>
                 )}
               </div>
