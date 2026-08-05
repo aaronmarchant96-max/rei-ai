@@ -1,6 +1,6 @@
 # Testing Strategy
 
-REI.ai maintains 30 test suites with 440 tests, all passing. This document explains the testing philosophy, what each category covers, and how to write new tests.
+REI.ai maintains 36 test suites with 483 tests, all passing. This document explains the testing philosophy, what each category covers, and how to write new tests.
 
 ## Philosophy
 
