@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import REI from "./REI.jsx";
+import REI, { fetchWithTimeout } from "./REI.jsx";
 
 describe("REI", () => {
   beforeEach(() => {
@@ -168,5 +168,26 @@ describe("REI", () => {
     } finally {
       global.fetch = originalFetch;
     }
+  });
+
+  it("rejects with a timeout message when the fetch hangs", async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn((url, options) => new Promise((resolve, reject) => {
+      options.signal.addEventListener("abort", () => {
+        const err = new Error("The operation was aborted");
+        err.name = "AbortError";
+        reject(err);
+      });
+    }));
+    const assertion = expect(fetchWithTimeout("/api/cfai", {}, 1000)).rejects.toThrow(/timed out after 1s/i);
+    jest.advanceTimersByTime(1001);
+    await assertion;
+    jest.useRealTimers();
+  });
+
+  it("resolves with the response when fetch completes in time", async () => {
+    global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
+    const response = await fetchWithTimeout("/api/cfai", {}, 1000);
+    expect(response.ok).toBe(true);
   });
 });

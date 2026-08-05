@@ -73,6 +73,24 @@ function buildAssistantStyleReply(userText) {
   ].join("\n");
 }
 
+const API_TIMEOUT_MS = 120000; // generous: LLM completions can legitimately take 60-120s
+
+export async function fetchWithTimeout(url, options = {}, timeoutMs = API_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    return response;
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)}s. The backend may be cold-starting or overloaded — try again.`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function buildDomainSystemMessage(domainId, currentDomain) {
   const domainLabel = currentDomain?.label || "REI.ai";
   const domainDescription = currentDomain?.description || "reasoning assistant";
@@ -447,7 +465,7 @@ export default function REI({ initialPrompt } = {}) {
         : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`;
       retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType };
 
-      const response = await fetch("/api/cfai", {
+      const response = await fetchWithTimeout("/api/cfai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -476,7 +494,7 @@ export default function REI({ initialPrompt } = {}) {
     setBackendError(null);
     setIsTyping(true);
     try {
-      const response = await fetch("/api/cfai", {
+      const response = await fetchWithTimeout("/api/cfai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
