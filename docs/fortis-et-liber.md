@@ -110,13 +110,13 @@ Use Jest as the main evidence gate.
 - **Issue**: `fetch('/api/cfai')` had no timeout — a hung Vercel cold-start or stalled provider left the typing spinner running forever with no error and no retry affordance (same symptom class as the silent-failure bug below).
 - **Fix**: New `fetchWithTimeout(url, options, timeoutMs=120000)` helper (`src/REI.jsx`) using `AbortController` + timer cleared in `finally`. 120s ceiling is deliberately generous so legitimate slow LLM completions pass through. `AbortError` surfaces as "Request timed out after 120s…" into the existing BackendUnavailablePanel (Retry/Copy/Dismiss).
 - **Files changed**: `src/REI.jsx` (helper + both call sites: handleSendMessage, handleRetry), `src/REI.test.jsx` (+2 tests: hang → timeout message, fast resolve → passthrough)
-- **Test coverage**: 36 suites, 483 passing.
+- **Test coverage**: 38 suites, 508 passing.
 
 **BackendUnavailablePanel — honest fallback when all backends are down (2026-08-05):**
 - **Issue**: When every provider failed, the fallback was a template-string message with no diagnostics and no recovery path. Earlier versions fabricated confidence scores ("Confidence Score: 75%", "Running simulated local evaluation") — purged in commit `ea0ec13`.
 - **Fix**: New `src/modules/rei/components/BackendUnavailablePanel.jsx` showing only real client-side data: route name/model/matched terms/hinge score (all computed by `buildRouterDecision` before the API call), collapsed error details, and Retry / Copy diagnostic / Dismiss buttons. No auto-retry loop. **No CARDO Guard math** — scenario classification requires an LLM, so applying hardcoded scenario parameters would be fabrication. REI.jsx refactored: `processApiResponse()` extracted from `handleSendMessage`; catch block now sets `backendError` state instead of pushing a fake message; `handleRetry()` re-fires the saved `retryPayloadRef`.
 - **Files changed**: `src/modules/rei/components/BackendUnavailablePanel.jsx` (+11 tests), `src/REI.jsx`, `src/REI.test.jsx`
-- **Test coverage**: 36 suites, 483 passing.
+- **Test coverage**: 38 suites, 508 passing.
 
 **Three critical production patches (2026-08-04, PR #43 → main):**
 1. **API import crash — HTTP 500 on every request** (`2c02bb7`): `api/cfai.js` imported `buildRouterDecision, resolveRoutingModel` from `../src/lib/nightShiftRouter`, but the file was renamed to `.ts` in the TypeScript migration (`04ce867`). Vercel's Node runtime can't resolve `.ts` imports → `FUNCTION_INVOCATION_FAILED` on every request (live site returned 500). Import, `selectGroqModel`, and orphaned `DEFAULT_MODEL` were dead code (routerDecision always arrives in the POST body) — removed, 6 lines deleted.
@@ -198,7 +198,7 @@ Use Jest as the main evidence gate.
 
 ### Current Test Status
 
-- **Total tests**: 483 passing across 36 suites (was 78; +405 from session 2026-08-04/05 fixes and coverage)
+- **Total tests**: 508 passing across 38 suites (was 78; +430 from session 2026-08-04/05 fixes and coverage)
 - **Key test files**:
   - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks
   - `src/lib/cardoGuard.test.js` - Core decision logic tests (pump + SaaS scenarios)
@@ -228,7 +228,7 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 
 ## Session Handoff — 2026-08-05 (pick up cold from here)
 
-**State:** Feature branch = `agents/continue-previous-discussion` at `07ce889`, 7 commits ahead of main. Working tree clean. Tests 539/539 (41 suites), build passes, lint 0 errors.
+**State:** Feature branch = `agents/continue-previous-discussion` (Evidence Loop + decision-audit platform + HingeScore calibration), PR #54 open. Working tree clean. Tests 548/548 (42 suites), build passes, lint 0 errors.
 
 **This session shipped (Aug 5, part 2):**
 - **Cost claims audit** (`0744639`): 68–84% → "~68% lab benchmark", untraceable 84% removed
@@ -245,7 +245,7 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 1. **`GEMINI_API_KEY` prefix in Vercel env vars — USER action, not code.** `api/cfai.js:48` checks `key.startsWith("AQ.")`. If the stored key starts with `AIza` (old format), Gemini is silently dead — regenerate in AI Studio. If `AQ.`, it's fine. No code change needed either way.
 2. **Push branch to origin + create PR to main** (7 commits ahead, not yet merged)
 
-**Known caveats:** `docs/TESTING.md` category table (~220/~80/etc.) is approximate — headline count (41/539) is authoritative. domainLabel in decisionStore uses display labels (e.g. "The Generalist") not raw IDs — feed filter is aware and uses them for grouping.
+**Known caveats:** `docs/TESTING.md` category table is approximate — headline count (42/548) is authoritative. domainLabel in decisionStore uses display labels (e.g. "The Generalist") not raw IDs — feed filter is aware and uses them for grouping. Duplicate-root docs reconciled in PR #52 — root copies of `CLI_ENTRY.md`/`TOKEN_SAVERS.md` are canonical.
 
 ## Quick read order
 

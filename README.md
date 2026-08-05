@@ -4,7 +4,7 @@
 >
 > No CS degree. No tech background. Just a $25/month budget, an Intel Celeron J4105 with 8GB RAM, and a question: *can one person build something real in AI this year?*
 
-REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 529 passing tests across 40 suites.
+REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 548 passing tests across 42 suites.
 
 ---
 
@@ -14,7 +14,7 @@ REI.ai is the answer — a structured reasoning framework that classifies prompt
 - An explicit, testable router that saves ~98% on LLM API costs vs an always-premium (gpt-4o) baseline — lab benchmark (deterministic, reproducible via `npm test -- --testPathPatterns=routingEval`); production telemetry is self-reported
 - A reasoning shell grounded in the CARDO REI methodology: find the hinge, separate facts from assumptions, name what would change the answer
 - A portfolio of 6 specialized tools (debate pressure-testing, narrative architecture, legal precedent analysis, industrial telemetry, genealogy, and the general-purpose REI chat engine)
-- 529 passing tests across 40 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
+- 548 passing tests across 42 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
 
 **This is not:**
 - Another ChatGPT wrapper with a nice UI
@@ -90,7 +90,7 @@ Read more: [Architecture & Methodology](docs/README.md) · [ADR Log](docs/DECISI
 
 ## 👤 About the Builder
 
-I started 2026 with zero AI engineering experience. No CS degree, no bootcamp, no tech job. I learned by building.
+I started building AI systems in 2026 and learned by shipping real work.
 
 This repo represents ~4 months of work:
 
@@ -104,7 +104,7 @@ This repo represents ~4 months of work:
 | Budget | $25/month |
 | Training | Self-taught, started 2026 |
 
-The point isn't that this is the best AI system out there. It isn't. The point is that you don't need a PhD, a $10M seed round, or a team of engineers to build something real. You need to start, test everything, and not stop.
+The point is to show practical AI systems built with clear constraints, tests, and documentation.
 
 ---
 

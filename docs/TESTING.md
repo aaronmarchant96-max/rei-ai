@@ -1,6 +1,6 @@
 # Testing Strategy
 
-REI.ai maintains 36 test suites with 483 tests, all passing. This document explains the testing philosophy, what each category covers, and how to write new tests.
+REI.ai maintains 38 test suites with 508 tests, all passing. This document explains the testing philosophy, what each category covers, and how to write new tests.
 
 ## Philosophy
 
@@ -14,11 +14,11 @@ Tests are evidence gates, not checkbox exercises. Every test asserts a specific,
 
 | Category | Suites | Count | What they verify |
 |----------|--------|-------|------------------|
-| **Router & classification** | 9 | ~220 | Routing decisions, keyword matching, domain classification, cost calculation, adversarial scanning, semantic embeddings, hinge scoring |
-| **Chat & context** | 4 | ~80 | Chat history persistence, JSON corruption recovery, message compression, prompt construction, response parsing |
-| **Rendering** | 7 | ~35 | Component rendering, navigation, landing page content, chat bubble structure, domain registry |
+| **Router & classification** | 9 | ~250 | Routing decisions, keyword matching, domain classification, cost calculation, adversarial scanning, semantic embeddings, hinge scoring |
+| **Chat & context** | 4 | ~95 | Chat history persistence, JSON corruption recovery, message compression, prompt construction, response parsing |
+| **Rendering** | 7 | ~42 | Component rendering, navigation, landing page content, chat bubble structure, domain registry |
 | **API endpoints** | 2 | 16 | Auth guards, input validation, rate limit handling, method restrictions |
-| **Eval benchmarks** | 7 | ~185 | Routing accuracy across holdout sets, cost savings over premium baseline, v4 semantic router validation |
+| **Eval benchmarks** | 9 | ~205 | Routing accuracy across holdout sets, cost savings over premium baseline, v4 semantic router validation, pool integrity, replay coverage |
 
 ## Key suites
 
@@ -48,7 +48,7 @@ Tests the main API handler: placeholder key guard, input length cap, method rest
 ## Running tests
 
 ```bash
-npm test                                    # all 30 suites
+npm test                                    # all 38 suites
 npx jest src/lib/nightShiftRouter.test.js   # one suite
 npx jest --verbose                          # verbose output
 ```
