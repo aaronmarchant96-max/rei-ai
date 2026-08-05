@@ -10,6 +10,7 @@ const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH;
 
 const MAX_INPUT_CHARS = 14000;
+const PROVIDER_TIMEOUT_MS = 30000;
 
 
 // ── Backend dispatcher: model name → API provider ──
@@ -28,67 +29,95 @@ function getBackendForModel(model) {
 async function callDeepSeek(messages, maxTokens) {
   const key = process.env.DEEPSEEK_API_KEY || process.env.deepseek;
   if (!key) return null;
-  const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "deepseek-chat", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
-  });
-  if (!res.ok) {
-    const err = await res.text().catch(function () { return "(unreadable)"; });
-    console.warn("DeepSeek status " + res.status + ": " + err.slice(0, 300));
-    return null;
+  const controller = new AbortController();
+  const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+  try {
+    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "deepseek-chat", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+    });
+    if (!res.ok) {
+      const err = await res.text().catch(function () { return "(unreadable)"; });
+      console.warn("DeepSeek status " + res.status + ": " + err.slice(0, 300));
+      return null;
+    }
+    const data = await res.json();
+    var finishReason = data.choices?.[0]?.finish_reason || null;
+    return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-chat", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } finally {
+    clearTimeout(timer);
   }
-  const data = await res.json();
-  var finishReason = data.choices?.[0]?.finish_reason || null;
-  return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-chat", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
 }
 
 async function callGemini(messages, maxTokens) {
   const key = process.env.GEMINI_API_KEY;
   if (!key || !key.startsWith("AQ.")) return null;
-  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-    method: "POST",
-    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "gemini-flash-latest", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
-  });
-  if (!res.ok) {
-    console.warn("Gemini status " + res.status);
-    return null;
+  const controller = new AbortController();
+  const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+  try {
+    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "gemini-flash-latest", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+    });
+    if (!res.ok) {
+      console.warn("Gemini status " + res.status);
+      return null;
+    }
+    const data = await res.json();
+    var finishReason = data.choices?.[0]?.finish_reason || null;
+    return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-flash-latest", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } finally {
+    clearTimeout(timer);
   }
-  const data = await res.json();
-  var finishReason = data.choices?.[0]?.finish_reason || null;
-  return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-flash-latest", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
 }
 
 async function callGroq(messages, maxTokens, model) {
   const key = process.env.GROQ_API_KEY;
   if (!key || key.includes("your_groq_api_key_here")) return null;
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: model || "llama-3.3-70b-versatile", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
-  });
-  if (!res.ok) {
-    console.warn("Groq status " + res.status);
-    return null;
+  const controller = new AbortController();
+  const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: model || "llama-3.3-70b-versatile", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+    });
+    if (!res.ok) {
+      console.warn("Groq status " + res.status);
+      return null;
+    }
+    const data = await res.json();
+    var finishReason = data.choices?.[0]?.finish_reason || null;
+    return { content: data.choices?.[0]?.message?.content || "No content from Groq.", model: model || "llama-3.3-70b-versatile", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } finally {
+    clearTimeout(timer);
   }
-  const data = await res.json();
-  var finishReason = data.choices?.[0]?.finish_reason || null;
-  return { content: data.choices?.[0]?.message?.content || "No content from Groq.", model: model || "llama-3.3-70b-versatile", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
 }
 
 async function callOpenAI(messages, maxTokens) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "gpt-4o", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  var finishReason = data.choices?.[0]?.finish_reason || null;
-  return { content: data.choices?.[0]?.message?.content || "No content from OpenAI.", model: "gpt-4o", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  const controller = new AbortController();
+  const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "gpt-4o", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    var finishReason = data.choices?.[0]?.finish_reason || null;
+    return { content: data.choices?.[0]?.message?.content || "No content from OpenAI.", model: "gpt-4o", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // ── Main API router: primary backend + fallback chain ──

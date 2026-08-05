@@ -4,17 +4,17 @@
 >
 > No CS degree. No tech background. Just a $25/month budget, an Intel Celeron J4105 with 8GB RAM, and a question: *can one person build something real in AI this year?*
 
-REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 508 passing tests across 38 suites.
+REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 548 passing tests across 42 suites.
 
 ---
 
 ## 📊 What This Is (And Isn't)
 
 **This is:**
-- An explicit, testable router that saves 68–84% on LLM API costs by choosing the right model for each prompt
+- An explicit, testable router that saves ~98% on LLM API costs vs an always-premium (gpt-4o) baseline — lab benchmark (deterministic, reproducible via `npm test -- --testPathPatterns=routingEval`); production telemetry is self-reported
 - A reasoning shell grounded in the CARDO REI methodology: find the hinge, separate facts from assumptions, name what would change the answer
 - A portfolio of 6 specialized tools (debate pressure-testing, narrative architecture, legal precedent analysis, industrial telemetry, genealogy, and the general-purpose REI chat engine)
-- 508 passing tests across 38 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
+- 548 passing tests across 42 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
 
 **This is not:**
 - Another ChatGPT wrapper with a nice UI
@@ -138,4 +138,4 @@ npm test         # Run 508 tests
 
 ---
 
-*Built in 2026 by Aaron Marchant. Self-taught. One machine. $14.66.*
+*Built in 2026 by Aaron Marchant. Self-taught. One machine.*

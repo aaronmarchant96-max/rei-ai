@@ -97,6 +97,15 @@ Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
 
+**Evidence audit — claims aligned to measured reality (2026-08-05):**
+- **Retired the "92%" and "~90%" accuracy claims**: no benchmark produced them. Verified via `npm test -- --runInBand --testPathPatterns=routingEval`: deterministic router accuracy is **60–80%** (basic 60%, blind 67%, ML 66.7%, V3 80%, semantic-blind 73%).
+- **Semantic eval is NOT valid in CI**: `routingEvalBlindV2` requires ONNX + model download; without it, it measures hash-noise (12%) and the test itself prints "⛔ THIS RESULT DOES NOT VALIDATE SEMANTIC ACCURACY." Real semantic accuracy requires an environment with `@xenova/transformers` + HuggingFace access.
+- **Savings corrected to ~98%** (ceiling-based lab benchmark) — the ~68% figure predates the maxTokens bumps and is stale.
+- **`routingEvalML.test.js` name/assertion mismatch fixed**: test was *named* "accuracy >= 80%" but *asserted* ≥60% — actual 66.7% passed the assertion but contradicted the name. Renamed to match the real 60% gate.
+- All accuracy claims in `README.md`, `docs/TESTING.md` updated to the measured range. New `docs/CLAIM_LEDGER.md` maps every claim to the command that produces it.
+
+
+
 **Client-side fetch timeout — no more infinite spinner (2026-08-05):**
 - **Issue**: `fetch('/api/cfai')` had no timeout — a hung Vercel cold-start or stalled provider left the typing spinner running forever with no error and no retry affordance (same symptom class as the silent-failure bug below).
 - **Fix**: New `fetchWithTimeout(url, options, timeoutMs=120000)` helper (`src/REI.jsx`) using `AbortController` + timer cleared in `finally`. 120s ceiling is deliberately generous so legitimate slow LLM completions pass through. `AbortError` surfaces as "Request timed out after 120s…" into the existing BackendUnavailablePanel (Retry/Copy/Dismiss).
@@ -125,7 +134,7 @@ Use Jest as the main evidence gate.
 - **Issue**: CARDO-structured responses (Phase 0 + Hinge + multi-section analysis) routinely exceeded old token caps (800-2000), showing "⚠️ Truncated" and cutting off mid-content in coding, story, genealogy, adversarial, and legal domains.
 - **Fix**: Bumped 5 fingerprint maxTokens: structured-reasoning (800→1500), genealogy-deep-dive (1500→4000), story-architect (2000→4000), adversarial-validation (1500→3000), legal-hinge (1500→3000). Coding-hinge already bumped to 4000 in prior fix (ea0ec13).
 - **Files changed**: data/fingerprints.json (5 values)
-- **Test coverage**: 35 suites, 470 passing. No test changes needed (only one maxTokens assertion, coding-hinge, already at 4000).
+- **Test coverage**: 40 suites, 529 passing. No test changes needed (only one maxTokens assertion, coding-hinge, already at 4000).
 
 - **Previous issue**: HCM implementation had critical bugs and code quality issues preventing commit.
 - **Bugs fixed**:
@@ -219,26 +228,36 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 
 ## Session Handoff — 2026-08-05 (pick up cold from here)
 
-**State:** All 9 reliability fixes merged to main (`c05efff`), deployed (live API HTTP 200). Feature branch == main (0 ahead). Working tree clean. Tests 508/508 (38 suites), build passes, lint 0 errors.
+**State:** Feature branch = `agents/continue-previous-discussion` (Evidence Loop + decision-audit platform + HingeScore calibration), PR #54 open. Working tree clean. Tests 548/548 (42 suites), build passes, lint 0 errors.
 
-**This session shipped:** scoping fix (`875ef22`), export fix (`1be20fa`), API import crash (`2c02bb7`), maxTokens bumps (`f258fd1`), BackendUnavailablePanel (`20f0faa`, PR #47), fetch timeout (`6732517`, PR #48), docs (`2cf3b4a`, PR #49), lint repair (`8d74215`, PR #50), doc reconciliation (PR #52).
+**This session shipped (Aug 5, part 2):**
+- **Cost claims audit** (`0744639`): 68–84% → "~68% lab benchmark", untraceable 84% removed
+- **HingeScore calibration Steps 0-4** (`7306e0f`): pool builder (136 prompts), router scorer, bucketing, Markdown reporter — 14 tests, zero live changes
+- **Pool sync + FEYNMAN_GATE** (`57b334d`): 3 embedded copies (BLIND_CATEGORIES/V3_PROMPTS/SEMANTIC_PROMPTS) were out of sync with source files — fixed; FEYNMAN_GATE (10 tests) verifies every comment claim against computed reality
+- **Decision-audit platform Steps 1-3** (`872030e`, `87e5463`, `07ce889`):
+  - **Step 1:** `decisionStore.ts` — localStorage ring buffer capturing full CARDO trace per decision (single-write design with pendingDecision held in memory)
+  - **Step 2:** `DecisionDetail.jsx` — presentational component rendering DecisionEntry as standalone CARDO audit report (167L, 13 tests)
+  - **Step 3:** `DecisionFeed.jsx` — list/filter/export UI with domain dropdown, expandable detail, CSV/JSON export, integrated into Analytics.jsx tab bar (278L, 10 tests)
+
+**Previous session shipped (Aug 5, part 1):** scoping fix (`875ef22`), export fix (`1be20fa`), API import crash (`2c02bb7`), maxTokens bumps (`f258fd1`), BackendUnavailablePanel (`20f0faa`, PR #47), fetch timeout (`6732517`, PR #48), docs (`2cf3b4a`, PR #49), lint repair (`8d74215`, PR #50), doc reconciliation (PR #52).
 
 **Open items for next session:**
 1. **`GEMINI_API_KEY` prefix in Vercel env vars — USER action, not code.** `api/cfai.js:48` checks `key.startsWith("AQ.")`. If the stored key starts with `AIza` (old format), Gemini is silently dead — regenerate in AI Studio. If `AQ.`, it's fine. No code change needed either way.
-2. **Labeled stash in `/home/potatoking/rei-ai` main worktree:** `stale pre-TS-migration WIP` — preserved for recovery, not needed (contains zombie `.js` files renamed to `.ts`).
-3. **Scratch backup:** `/tmp/opencode/scratch-backup/` — 11 experiment files (test-*.js, tone_down*.py, etc.) moved there from the main worktree; recoverable, probably discardable.
-4. **Main worktree hygiene:** `/home/potatoking/rei-ai` now current at `c05efff`; worktrees: `debate-furnace.worktrees/agents-continue-previous-discussion` (active), `agents-greeting-in-spanish` (stale).
+2. **Push branch to origin + create PR to main** (7 commits ahead, not yet merged)
 
-**Known caveats:** `docs/TESTING.md` category table (~250/~95/etc.) is approximate — headline count (38/508) is authoritative. Duplicate-root docs reconciled in PR #52 — root copies of `CLI_ENTRY.md`/`TOKEN_SAVERS.md` are canonical.
+**Known caveats:** `docs/TESTING.md` category table is approximate — headline count (42/548) is authoritative. domainLabel in decisionStore uses display labels (e.g. "The Generalist") not raw IDs — feed filter is aware and uses them for grouping. Duplicate-root docs reconciled in PR #52 — root copies of `CLI_ENTRY.md`/`TOKEN_SAVERS.md` are canonical.
 
 ## Quick read order
 
 1. Read this file first.
 2. Open src/REI.jsx for the main experience.
 3. Open api/cfai.js for backend prompt and routing behavior.
-4. Open src/lib/nightShiftRouter.js for the router logic.
+4. Open src/lib/nightShiftRouter.ts for the router logic.
 5. Open src/lib/cardoGuard.js for the decision gate.
-6. Run npm test and npm run build before claiming the work is verified.
+6. Open src/lib/decisionStore.ts for the persistent CARDO trace store.
+7. Open src/modules/rei/components/DecisionDetail.jsx for the audit report renderer.
+8. Open src/modules/rei/components/DecisionFeed.jsx for the list/filter/export UI.
+8. Run npm test and npm run build before claiming the work is verified.
 
 ## Update Policy
 
