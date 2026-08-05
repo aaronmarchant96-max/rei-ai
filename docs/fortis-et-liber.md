@@ -98,6 +98,12 @@ Use Jest as the main evidence gate.
 ### Recent Fixes and Updates
 
 **Adaptive Context Persistence / Hierarchical Context Memory (HCM) - Code Quality Improvements (2026-07-03):**
+**maxTokens bump across fingerprints (2026-08-04):**
+- **Issue**: CARDO-structured responses (Phase 0 + Hinge + multi-section analysis) routinely exceeded old token caps (800-2000), showing "⚠️ Truncated" and cutting off mid-content in coding, story, genealogy, adversarial, and legal domains.
+- **Fix**: Bumped 5 fingerprint maxTokens: structured-reasoning (800→1500), genealogy-deep-dive (1500→4000), story-architect (2000→4000), adversarial-validation (1500→3000), legal-hinge (1500→3000). Coding-hinge already bumped to 4000 in prior fix (ea0ec13).
+- **Files changed**: data/fingerprints.json (5 values)
+- **Test coverage**: 35 suites, 470 passing. No test changes needed (only one maxTokens assertion, coding-hinge, already at 4000).
+
 - **Previous issue**: HCM implementation had critical bugs and code quality issues preventing commit.
 - **Bugs fixed**:
   1. **Unsafe object cloning** (line 93): Replaced `JSON.parse(JSON.stringify())` with `structuredClone()` fallback to preserve object types
