@@ -19,6 +19,7 @@ import PhilosophyModal from "./modules/rei/components/PhilosophyModal.jsx";
 import { useSessionTracker } from "./hooks/useSessionTracker.js";
 import InstrumentRail from "./components/InstrumentRail.jsx";
 import WelcomePanel from "./modules/rei/components/WelcomePanel.jsx";
+import BackendUnavailablePanel from "./modules/rei/components/BackendUnavailablePanel.jsx";
 import ReiContext from "./modules/rei/ReiContext.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
@@ -96,6 +97,7 @@ export default function REI({ initialPrompt } = {}) {
   const mobile = useMobile();
   const keyboardVisible = useKeyboardVisible();
   const inputRef = useRef(null);
+  const retryPayloadRef = useRef(null);
 
   // Scroll input into view when keyboard opens
   useEffect(() => {
@@ -215,6 +217,7 @@ export default function REI({ initialPrompt } = {}) {
   const chatEndRef = useRef(null);
   const [assistantPromptIndex, setAssistantPromptIndex] = useState(0);
   const [showRecap, setShowRecap] = useState(true);
+  const [backendError, setBackendError] = useState(null);
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
 
@@ -277,6 +280,79 @@ export default function REI({ initialPrompt } = {}) {
       saveChatHistoryHCM(selectedDomain, [domainSpecificMessage]);
     }
   };
+
+  async function processApiResponse(response, routerDecision, ingestedRecord, recordSourceType) {
+    const contentType = response.headers.get("content-type") || "";
+
+    if (!response.ok) {
+        let errorDetail = "";
+        try {
+          const text = await response.text();
+          errorDetail = text.startsWith("<")
+            ? "HTTP " + response.status + " — server error page (" + text.slice(0, 150).trim().replace(/\n/g, " ") + "...)"
+            : text.slice(0, 300);
+        } catch (_) {
+          errorDetail = "HTTP " + response.status;
+        }
+        throw new Error("Backend request failed: " + errorDetail);
+      }
+
+    let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        throw new Error("Backend returned non-JSON response (content-type: " + (contentType || "unknown") + ")");
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || "Server returned failure response status");
+      }
+
+    setMessages((prev) => [
+        ...prev,
+        {
+          sender: "rei",
+          text: data.result,
+          timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
+          rawJson: {
+            engine: "REI-Hinge-Core v0.3",
+            domain: selectedDomain,
+            command: "score",
+            model: data.model || "Local cfai CLI Executable",
+            timestamp: data.timestamp || new Date().toISOString(),
+            hadIngestedRecord: Boolean(ingestedRecord),
+            recordSourceType: ingestedRecord ? recordSourceType : null,
+            routerDecision: { ...(data.routerDecision || routerDecision), model: data.model || routerDecision?.model },
+            truncated: data.truncated || false,
+          }
+        }
+      ]);
+
+    const usage = data.usage;
+      const actualTokens = usage
+        ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
+        : (routerDecision?.maxTokens || 0);
+
+      const modelName = data.model || routerDecision?.model || "deepseek-chat";
+      const rates = getModelCosts(modelName);
+      const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
+
+      const actualCost = usage
+        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
+        : (routerDecision?.estimatedCost || 0);
+
+      const actualPremium = usage
+        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, PREMIUM_RATES.input, PREMIUM_RATES.output)
+        : (routerDecision?.premiumCost || 0);
+
+    trackMessage(
+        actualTokens,
+        modelName,
+        actualCost,
+        actualPremium,
+        modelName === "gpt-4o"
+      );
+  }
 
   async function handleSendMessage(e) {
     e?.preventDefault?.();
@@ -369,6 +445,8 @@ export default function REI({ initialPrompt } = {}) {
       const inputPayload = isGreeting
         ? userMsg.text
         : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`;
+      retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType };
+
       const response = await fetch("/api/cfai", {
         method: "POST",
         headers: {
@@ -383,108 +461,41 @@ export default function REI({ initialPrompt } = {}) {
         })
       });
 
-      const contentType = response.headers.get("content-type") || "";
-
-      if (!response.ok) {
-        let errorDetail = "";
-        try {
-          const text = await response.text();
-          errorDetail = text.startsWith("<")
-            ? "HTTP " + response.status + " — server error page (" + text.slice(0, 150).trim().replace(/\n/g, " ") + "...)"
-            : text.slice(0, 300);
-        } catch (_) {
-          errorDetail = "HTTP " + response.status;
-        }
-        throw new Error("Backend request failed: " + errorDetail);
-      }
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        throw new Error("Backend returned non-JSON response (content-type: " + (contentType || "unknown") + ")");
-      }
-
-      if (!data.success) {
-        throw new Error(data.error || "Server returned failure response status");
-      }
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "rei",
-          text: data.result,
-          timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
-          rawJson: {
-            engine: "REI-Hinge-Core v0.3",
-            domain: selectedDomain,
-            command: "score",
-            model: data.model || "Local cfai CLI Executable",
-            timestamp: data.timestamp || new Date().toISOString(),
-            hadIngestedRecord: Boolean(ingestedRecord),
-            recordSourceType: ingestedRecord ? recordSourceType : null,
-            routerDecision: { ...(data.routerDecision || routerDecision), model: data.model || routerDecision?.model },
-            truncated: data.truncated || false,
-          }
-        }
-      ]);
-
-      const usage = data.usage;
-      const actualTokens = usage
-        ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
-        : (routerDecision?.maxTokens || 0);
-
-      const modelName = data.model || routerDecision?.model || "deepseek-chat";
-      const rates = getModelCosts(modelName);
-      const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
-
-      const actualCost = usage
-        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
-        : (routerDecision?.estimatedCost || 0);
-
-      const actualPremium = usage
-        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, PREMIUM_RATES.input, PREMIUM_RATES.output)
-        : (routerDecision?.premiumCost || 0);
-
-      trackMessage(
-        actualTokens,
-        modelName,
-        actualCost,
-        actualPremium,
-        modelName === "gpt-4o"
-      );
+      await processApiResponse(response, routerDecision, ingestedRecord, recordSourceType);
     } catch (error) {
       console.error("REI.ai API error:", error);
-      
-      // Fallback: local evaluation if Vercel serverless function throws
-      const fallbackText = `[REI.ai — Backend Unavailable]
-
-The reasoning engine couldn't reach a backend for this request.
-
-Error: ${error.message}
-Route: ${routerDecision?.id || "unknown"}
-Model: ${routerDecision?.model || "unknown"}
-
-Try again — if the issue persists, the API backend may be temporarily unavailable.`;
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "rei",
-          text: fallbackText,
-          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          rawJson: {
-            engine: "REI-Fallback v0.3",
-            domain: selectedDomain,
-            error: error.message,
-            fallback: true
-          }
-        }
-      ]);
+      setBackendError({ routerDecision: routerDecision || null, errorMessage: error.message });
     } finally {
       setIsTyping(false);
     }
   }
+
+  const handleRetry = async () => {
+    const p = retryPayloadRef.current;
+    if (!p) return;
+    setBackendError(null);
+    setIsTyping(true);
+    try {
+      const response = await fetch("/api/cfai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          command: "score",
+          input: p.inputPayload,
+          systemPrompt: p.systemPrompt,
+          history: p.historyPayload,
+          routerDecision: p.routerDecision,
+        }),
+      });
+      await processApiResponse(response, p.routerDecision, p.ingestedRecord, p.recordSourceType);
+      retryPayloadRef.current = null;
+    } catch (error) {
+      console.error("REI.ai retry error:", error);
+      setBackendError({ routerDecision: p.routerDecision, errorMessage: error.message });
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   return (
     <ReiContext.Provider value={{
@@ -599,6 +610,15 @@ Try again — if the issue persists, the API backend may be temporarily unavaila
           </div>
         )}
         <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
+
+        {backendError && (
+          <BackendUnavailablePanel
+            routerDecision={backendError.routerDecision}
+            errorMessage={backendError.errorMessage}
+            onRetry={handleRetry}
+            onDismiss={() => setBackendError(null)}
+          />
+        )}
       </main>
       {!mobile && (
         <InstrumentRail

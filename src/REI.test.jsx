@@ -163,7 +163,7 @@ describe("REI", () => {
       }, { timeout: 3000 });
 
       await waitFor(() => {
-        expect(screen.getByText(/REI.ai.*Backend Unavailable/i)).toBeInTheDocument();
+        expect(screen.getByText(/can't reach a reasoning backend/i)).toBeInTheDocument();
       }, { timeout: 3000 });
     } finally {
       global.fetch = originalFetch;
