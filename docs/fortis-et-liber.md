@@ -97,6 +97,15 @@ Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
 
+**Evidence audit — claims aligned to measured reality (2026-08-05):**
+- **Retired the "92%" and "~90%" accuracy claims**: no benchmark produced them. Verified via `npm test -- --runInBand --testPathPatterns=routingEval`: deterministic router accuracy is **60–80%** (basic 60%, blind 67%, ML 66.7%, V3 80%, semantic-blind 73%).
+- **Semantic eval is NOT valid in CI**: `routingEvalBlindV2` requires ONNX + model download; without it, it measures hash-noise (12%) and the test itself prints "⛔ THIS RESULT DOES NOT VALIDATE SEMANTIC ACCURACY." Real semantic accuracy requires an environment with `@xenova/transformers` + HuggingFace access.
+- **Savings corrected to ~98%** (ceiling-based lab benchmark) — the ~68% figure predates the maxTokens bumps and is stale.
+- **`routingEvalML.test.js` name/assertion mismatch fixed**: test was *named* "accuracy >= 80%" but *asserted* ≥60% — actual 66.7% passed the assertion but contradicted the name. Renamed to match the real 60% gate.
+- All accuracy claims in `README.md`, `docs/TESTING.md` updated to the measured range. New `docs/CLAIM_LEDGER.md` maps every claim to the command that produces it.
+
+
+
 **Client-side fetch timeout — no more infinite spinner (2026-08-05):**
 - **Issue**: `fetch('/api/cfai')` had no timeout — a hung Vercel cold-start or stalled provider left the typing spinner running forever with no error and no retry affordance (same symptom class as the silent-failure bug below).
 - **Fix**: New `fetchWithTimeout(url, options, timeoutMs=120000)` helper (`src/REI.jsx`) using `AbortController` + timer cleared in `finally`. 120s ceiling is deliberately generous so legitimate slow LLM completions pass through. `AbortError` surfaces as "Request timed out after 120s…" into the existing BackendUnavailablePanel (Retry/Copy/Dismiss).

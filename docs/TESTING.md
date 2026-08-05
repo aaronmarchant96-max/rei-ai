@@ -55,12 +55,18 @@ npx jest --verbose                          # verbose output
 
 ## Known limitations
 
-### Adversarial routing ceiling (~90%)
+### Adversarial routing ceiling
 The v3 keyword router has a structural ceiling for adversarial prompts. Some adversarial queries ("argue against your own position", "find the weakest assumption in this argument") use natural vocabulary that doesn't contain trigger words like "red-team", "poke holes", or "prove wrong". The keyword router cannot catch these — it's a lexical ceiling, not a bug.
 
-**Two separate layers, two separate accuracy claims:**
-- The **router** operates at ~90% accuracy on measured holdouts. That number does not include prompts it structurally can't match.
-- A **system prompt clause** directs the model to treat adversarial inquiry as adversarial analysis. This catches some of what the router misses conversationally. It is not part of router accuracy and does not raise the 90% figure. The two layers should not be conflated.
+**Verified accuracy (2026-08-05, `npm test -- --runInBand --testPathPatterns=routingEval`):**
+- routingEval (57 prompts): **60%** (27/45) — 98% savings
+- routingEvalBlind (27 prompts): **67%** (18/27) — 98% savings
+- routingEvalML (27 prompts): **66.7%** (18/27) — 98% savings
+- routingEvalBlindV3 (30 prompts): **80%** (24/30)
+- routingEvalBlindSemantic (30 prompts): **73%** (22/30)
+- routingEvalBlindV2 semantic (50 prompts): **12%** — ⛔ NOT VALID in CI (ONNX unavailable, hash-noise fallback). No semantic accuracy claim can be drawn from CI runs.
+
+**The router operates at 60–80% accuracy on measured holdouts.** Earlier "~90%" and "92%" figures were not producible by any benchmark and have been retired.
 
 ### v4 semantic router (research, not production)
-A v4 semantic router exists (`src/lib/semanticHingeClassifier.js`) using 384-dim ONNX embeddings (all-MiniLM-L6-v2 via @xenova/transformers). It was evaluated at 70% on a fresh 30-prompt holdout with real embeddings. It is not wired to production at 70% accuracy versus the v3 keyword router's 90%. The architecture is documented; the evaluation results are transparent. Shipping it before it beats the v3 baseline would reduce accuracy — it is correctly marked as research-only.
+A v4 semantic router exists (`src/lib/semanticHingeClassifier.js`) using 384-dim ONNX embeddings (all-MiniLM-L6-v2 via @xenova/transformers). It was evaluated at 70-73% on fresh 30-prompt holdouts with real embeddings. It is not wired to production at 70% accuracy versus the v3 keyword router's 60-80% measured range. The architecture is documented; the evaluation results are transparent. Shipping it before it beats the v3 baseline would reduce accuracy — it is correctly marked as research-only.

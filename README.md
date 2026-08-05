@@ -11,7 +11,7 @@ REI.ai is the answer — a structured reasoning framework that classifies prompt
 ## 📊 What This Is (And Isn't)
 
 **This is:**
-- An explicit, testable router that saves ~68% on LLM API costs vs an always-premium (gpt-4o) baseline — lab benchmark (deterministic, reproducible via `npm test -- --testPathPatterns=routingEval`); production telemetry suggests ~90% but is self-reported
+- An explicit, testable router that saves ~98% on LLM API costs vs an always-premium (gpt-4o) baseline — lab benchmark (deterministic, reproducible via `npm test -- --testPathPatterns=routingEval`); production telemetry is self-reported
 - A reasoning shell grounded in the CARDO REI methodology: find the hinge, separate facts from assumptions, name what would change the answer
 - A portfolio of 6 specialized tools (debate pressure-testing, narrative architecture, legal precedent analysis, industrial telemetry, genealogy, and the general-purpose REI chat engine)
 - 529 passing tests across 40 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
