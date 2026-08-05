@@ -72,7 +72,7 @@
     "jobType": "coding-hinge",
     "label": "The Engineer",
     "model": "gemini-flash-latest",
-    "maxTokens": 2000,
+    "maxTokens": 4000,
     "costPer1k": 1,
     "qualityGate": "Phase 0 + HARD STOP",
     "enforce": "HARD_STOP",
