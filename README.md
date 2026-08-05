@@ -4,7 +4,7 @@
 >
 > No CS degree. No tech background. Just a $25/month budget, an Intel Celeron J4105 with 8GB RAM, and a question: *can one person build something real in AI this year?*
 
-REI.ai is the answer — a structured reasoning framework that automatically classifies prompts locally and routes them to the cheapest capable model. 1.35 billion tokens processed. $14.66 total API cost. Six tools shipped. 440+ tests.
+REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 529 passing tests across 40 suites.
 
 ---
 
@@ -14,7 +14,7 @@ REI.ai is the answer — a structured reasoning framework that automatically cla
 - An explicit, testable router that saves ~68% on LLM API costs vs an always-premium (gpt-4o) baseline — lab benchmark (deterministic, reproducible via `npm test -- --testPathPatterns=routingEval`); production telemetry suggests ~90% but is self-reported
 - A reasoning shell grounded in the CARDO REI methodology: find the hinge, separate facts from assumptions, name what would change the answer
 - A portfolio of 6 specialized tools (debate pressure-testing, narrative architecture, legal precedent analysis, industrial telemetry, genealogy, and the general-purpose REI chat engine)
-- 440+ tests across 31 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
+- 529 passing tests across 40 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
 
 **This is not:**
 - Another ChatGPT wrapper with a nice UI
@@ -99,7 +99,7 @@ This repo represents ~4 months of work:
 | Total API spend | **$14.66** |
 | Tokens processed | **1.35 billion** |
 | Models deployed | **6 tools** |
-| Tests written | **440+ across 31 suites** |
+| Tests written | **508 across 38 suites** |
 | Hardware | Intel Celeron J4105, 8GB RAM |
 | Budget | $25/month |
 | Training | Self-taught, started 2026 |
@@ -115,7 +115,7 @@ git clone https://github.com/aaronmarchant96-max/rei-ai
 cd rei-ai
 npm install
 npm run dev      # Start local dev server
-npm test         # Run 440+ tests
+npm test         # Run 508 tests
 ```
 
 ---
@@ -124,7 +124,7 @@ npm test         # Run 440+ tests
 
 - **[Architecture & Methodology](docs/README.md)** — Canonical doc index
 - **[Architecture Decision Records](docs/DECISIONS.md)** — Dated ADRs with trade-offs
-- **[Testing Strategy](docs/TESTING.md)** — 31 suites, testing philosophy
+- **[Testing Strategy](docs/TESTING.md)** — 38 suites, testing philosophy
 - **[Contributing](CONTRIBUTING.md)** — Setup, code style, PR checklist
 - **[Security Policy](SECURITY.md)** — Vulnerability reporting
 
@@ -132,10 +132,10 @@ npm test         # Run 440+ tests
 
 ## 🔗 Links
 
-- **Live App:** [https://debate-furnace.vercel.app](https://debate-furnace.vercel.app)
+- **Live App:** [https://debate-furnace.vercel.app/#rei](https://debate-furnace.vercel.app/#rei)
 - **Source:** [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
 - **License:** MIT
 
 ---
 
-*Built in 2026 by Aaron Marchant. Self-taught. One machine. $14.66.*
+*Built in 2026 by Aaron Marchant. Self-taught. One machine.*
