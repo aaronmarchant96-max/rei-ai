@@ -4,6 +4,7 @@ import { buildRouterDecision } from "./lib/nightShiftRouter";
 import { getModelCosts, computeActualCost } from "./lib/costHelpers";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
+import { logDecision } from "./lib/decisionStore";
 import { logRoutingDecision } from "./lib/routingLog";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
@@ -299,7 +300,7 @@ export default function REI({ initialPrompt } = {}) {
     }
   };
 
-  async function processApiResponse(response, routerDecision, ingestedRecord, recordSourceType) {
+  async function processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userText) {
     const contentType = response.headers.get("content-type") || "";
 
     if (!response.ok) {
@@ -325,6 +326,23 @@ export default function REI({ initialPrompt } = {}) {
     if (!data.success) {
       throw new Error(data.error || "Server returned failure response status");
     }
+
+    const parsedSections = parseAssistantStyleReply(data.result);
+    const pendingDecision = {
+      id: `${Date.now()}-${selectedDomain.slice(0, 8)}-${Math.random().toString(36).slice(2, 6)}`,
+      sections: parsedSections,
+      routerDecision: {
+        label: routerDecision?.label,
+        model: data.model || routerDecision?.model,
+        matchedTerms: routerDecision?.matchedTerms,
+        hingeScore: routerDecision?.hingeScore,
+      },
+      domainLabel: currentDomain?.label || "REI.ai",
+      inputPreview: (userText || "").slice(0, 200),
+      createdAt: new Date().toISOString(),
+      actualTokens: null,
+      actualCost: null,
+    };
 
     setMessages((prev) => [
       ...prev,
@@ -370,6 +388,16 @@ export default function REI({ initialPrompt } = {}) {
       actualPremium,
       modelName === "gpt-4o"
     );
+
+    try {
+      logDecision({
+        ...pendingDecision,
+        actualTokens,
+        actualCost,
+      });
+    } catch (e) {
+      console.warn("Failed to log decision:", e);
+    }
   }
 
   async function handleSendMessage(e) {
@@ -463,7 +491,7 @@ export default function REI({ initialPrompt } = {}) {
       const inputPayload = isGreeting
         ? userMsg.text
         : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`;
-      retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType };
+      retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text };
 
       const response = await fetchWithTimeout("/api/cfai", {
         method: "POST",
@@ -479,7 +507,7 @@ export default function REI({ initialPrompt } = {}) {
         })
       });
 
-      await processApiResponse(response, routerDecision, ingestedRecord, recordSourceType);
+      await processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userMsg.text);
     } catch (error) {
       console.error("REI.ai API error:", error);
       setBackendError({ routerDecision: routerDecision || null, errorMessage: error.message });
@@ -505,7 +533,7 @@ export default function REI({ initialPrompt } = {}) {
           routerDecision: p.routerDecision,
         }),
       });
-      await processApiResponse(response, p.routerDecision, p.ingestedRecord, p.recordSourceType);
+      await processApiResponse(response, p.routerDecision, p.ingestedRecord, p.recordSourceType, p.userText);
       retryPayloadRef.current = null;
     } catch (error) {
       console.error("REI.ai retry error:", error);
