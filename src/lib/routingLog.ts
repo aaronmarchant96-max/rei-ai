@@ -5,6 +5,9 @@ export interface RoutingLogEntry {
   domain?: string;
   routeId?: string;
   model?: string;
+  provider?: string;
+  rescue?: boolean;
+  truncated?: boolean;
   hingeScore?: number;
   estimatedCost?: number;
   premiumCost?: number;
@@ -30,6 +33,20 @@ export function logRoutingDecision(entry: RoutingLogEntry): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
   } catch (e) {
     console.warn("Unable to persist routing log:", e);
+  }
+}
+
+// Patch the most recent entry with post-API actuals (provider, truncated, usage).
+// The routing log is written BEFORE the API call, so actuals arrive later.
+export function updateLatestLogEntry(patch: Partial<RoutingLogEntry>): void {
+  if (typeof window === "undefined") return;
+  try {
+    const logs = getLogs();
+    if (!logs.length) return;
+    logs[0] = { ...logs[0], ...patch };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+  } catch (e) {
+    console.warn("Unable to patch routing log:", e);
   }
 }
 

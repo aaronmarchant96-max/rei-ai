@@ -5,7 +5,7 @@ import { getModelCosts, computeActualCost } from "./lib/costHelpers";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import { logDecision } from "./lib/decisionStore";
-import { logRoutingDecision } from "./lib/routingLog";
+import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
@@ -26,6 +26,17 @@ import ReiContext from "./modules/rei/ReiContext.js";
 const DOMAIN_PROFILES = getDomainProfiles();
 
 export { parseAssistantStyleReply };
+
+// Map a serving model name to its provider. A " (fallback)" suffix means a
+// non-primary provider rescued the request (cfai.js appends it on fallback).
+function deriveProvider(modelName) {
+  const base = String(modelName || "").replace(/\s*\(fallback\)\s*$/i, "").toLowerCase();
+  if (base.includes("deepseek")) return "deepseek";
+  if (base.includes("gemini")) return "gemini";
+  if (base.includes("llama") || base.includes("groq")) return "groq";
+  if (base.includes("gpt-4o") || base.includes("openai")) return "openai";
+  return "unknown";
+}
 
 const MAX_RECORD_CHARS = 12000;
 
@@ -397,6 +408,20 @@ export default function REI({ initialPrompt } = {}) {
       });
     } catch (e) {
       console.warn("Failed to log decision:", e);
+    }
+
+    // Patch the pre-API routing log entry with post-API actuals
+    // (provider, rescue flag, truncation) for the evidence dashboard.
+    try {
+      updateLatestLogEntry({
+        provider: deriveProvider(modelName),
+        rescue: String(modelName || "").includes("(fallback)"),
+        truncated: Boolean(data.truncated),
+        actualCost,
+        actualTokens,
+      });
+    } catch (e) {
+      console.warn("Failed to patch routing log:", e);
     }
   }
 

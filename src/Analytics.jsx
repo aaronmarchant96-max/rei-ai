@@ -16,7 +16,7 @@ function formatCost(n) {
 }
 
 function exportCSV(logs) {
-  const header = "timestamp,domain,routeId,model,hingeScore,estimatedCost,premiumCost,tokenCount,rationale,matchedTerms,routingMs,inputPreview";
+  const header = "timestamp,domain,routeId,model,hingeScore,estimatedCost,premiumCost,tokenCount,rationale,matchedTerms,routingMs,inputPreview,provider,rescue,truncated,actualCost,actualTokens";
   const rows = logs.map(function (e) {
     return [
       e.timestamp,
@@ -31,6 +31,11 @@ function exportCSV(logs) {
       "\"" + (e.matchedTerms || []).join(" | ") + "\"",
       e.routingMs || "",
       "\"" + (e.inputPreview || "").replace(/"/g, "\"\"") + "\"",
+      e.provider || "",
+      e.rescue ? "true" : "false",
+      e.truncated ? "true" : "false",
+      e.actualCost != null ? e.actualCost : "",
+      e.actualTokens != null ? e.actualTokens : "",
     ].join(",");
   });
   const csv = header + "\n" + rows.join("\n");
@@ -74,6 +79,11 @@ export default function Analytics() {
     var routingMsCount = 0;
     var domainCounts = {};
     var modelCounts = {};
+    var rescueCount = 0;
+    var truncatedCount = 0;
+    var hingeBands = { ">= 0.8": 0, "0.55-0.8": 0, "0.3-0.55": 0, "< 0.3": 0 };
+    var totalActual = 0;
+    var actualCount = 0;
 
     for (var i = 0; i < logs.length; i++) {
       var e = logs[i];
@@ -85,6 +95,18 @@ export default function Analytics() {
       }
       domainCounts[e.domain] = (domainCounts[e.domain] || 0) + 1;
       modelCounts[e.model] = (modelCounts[e.model] || 0) + 1;
+      if (e.rescue) rescueCount += 1;
+      if (e.truncated) truncatedCount += 1;
+      if (e.hingeScore != null) {
+        if (e.hingeScore >= 0.8) hingeBands[">= 0.8"] += 1;
+        else if (e.hingeScore >= 0.55) hingeBands["0.55-0.8"] += 1;
+        else if (e.hingeScore >= 0.3) hingeBands["0.3-0.55"] += 1;
+        else hingeBands["< 0.3"] += 1;
+      }
+      if (e.actualCost != null) {
+        totalActual += e.actualCost;
+        actualCount += 1;
+      }
     }
 
     var totalSavings = totalPremium - totalCost;
@@ -96,6 +118,13 @@ export default function Analytics() {
       .sort(function (a, b) { return b[1] - a[1]; });
     var maxDomainCount = sortedDomains[0] ? sortedDomains[0][1] : 1;
     var maxModelCount = sortedModels[0] ? sortedModels[0][1] : 1;
+
+    var actualSavingsPct = null;
+    var estimateVsActualPct = null;
+    if (actualCount > 0) {
+      actualSavingsPct = totalPremium > 0 ? Math.round(((totalPremium - totalActual) / totalPremium) * 100) : null;
+      estimateVsActualPct = totalActual > 0 ? Math.round((totalCost / totalActual) * 100) : null;
+    }
 
     return {
       totalRequests: logs.length,
@@ -109,6 +138,15 @@ export default function Analytics() {
       sortedModels: sortedModels,
       maxDomainCount: maxDomainCount,
       maxModelCount: maxModelCount,
+      rescueRate: logs.length > 0 ? Math.round((rescueCount / logs.length) * 100) : 0,
+      rescueCount: rescueCount,
+      truncationRate: logs.length > 0 ? Math.round((truncatedCount / logs.length) * 100) : 0,
+      truncatedCount: truncatedCount,
+      hingeBands: hingeBands,
+      actualCount: actualCount,
+      totalActual: totalActual,
+      actualSavingsPct: actualSavingsPct,
+      estimateVsActualPct: estimateVsActualPct,
     };
   }, [logs]);
 
@@ -294,6 +332,58 @@ export default function Analytics() {
             <p style={{ fontSize: "11px", color: colors.textDim, margin: "0 0 28px", lineHeight: "1.5" }}>
               Lifetime savings are calculated against the configured premium baseline (currently GPT-4o pricing).
             </p>
+
+            {/* ── Evidence ── */}
+            <div style={{
+              padding: "20px", borderRadius: "14px",
+              background: colors.surface, border: "1px solid " + colors.border, marginBottom: "18px",
+            }}>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: colors.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px" }}>
+                Evidence — post-response outcomes
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
+                <div style={{ ...cardStyle, textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Rescue rate</div>
+                  <div style={{ fontSize: "20px", fontWeight: 800 }}>{aggregates.rescueRate}% <span style={{ fontSize: "11px", color: colors.textDim, fontWeight: 500 }}>({aggregates.rescueCount} of {aggregates.totalRequests})</span></div>
+                  <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>served by fallback provider</div>
+                </div>
+                <div style={{ ...cardStyle, textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Truncation rate</div>
+                  <div style={{ fontSize: "20px", fontWeight: 800 }}>{aggregates.truncationRate}% <span style={{ fontSize: "11px", color: colors.textDim, fontWeight: 500 }}>({aggregates.truncatedCount} of {aggregates.totalRequests})</span></div>
+                  <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>response cut at maxTokens</div>
+                </div>
+                <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
+                  <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Actual vs estimate</div>
+                  <div style={{ fontSize: "20px", fontWeight: 800 }}>
+                    {aggregates.actualCount > 0 ? aggregates.estimateVsActualPct + "%" : "—"}
+                    {aggregates.actualCount > 0 && <span style={{ fontSize: "11px", color: colors.textDim, fontWeight: 500 }}> of estimate</span>}
+                  </div>
+                  <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
+                    {aggregates.actualCount > 0 ? "real spend " + formatCost(aggregates.totalActual) + " vs est. " + formatCost(aggregates.totalCost) : "no actuals logged yet"}
+                  </div>
+                </div>
+                {aggregates.actualCount > 0 && (
+                  <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
+                    <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Real savings</div>
+                    <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a" }}>{aggregates.actualSavingsPct}%</div>
+                    <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>actual spend vs premium baseline</div>
+                  </div>
+                )}
+              </div>
+              <div style={{ fontSize: "11px", color: colors.textDim, marginBottom: "8px" }}>HingeScore distribution</div>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {Object.entries(aggregates.hingeBands).map(function (entry) {
+                  var band = entry[0];
+                  var count = entry[1];
+                  var pct = aggregates.totalRequests > 0 ? Math.round((count / aggregates.totalRequests) * 100) : 0;
+                  return (
+                    <div key={band} style={{ fontSize: "11px", color: colors.textDim, background: colors.amberBg, borderRadius: "6px", padding: "5px 10px" }}>
+                      <b style={{ color: colors.text }}>{count}</b> {band} ({pct}%)
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* ── Domain distribution ── */}
             <div style={{
