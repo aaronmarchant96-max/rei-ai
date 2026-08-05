@@ -101,13 +101,13 @@ Use Jest as the main evidence gate.
 - **Issue**: `fetch('/api/cfai')` had no timeout — a hung Vercel cold-start or stalled provider left the typing spinner running forever with no error and no retry affordance (same symptom class as the silent-failure bug below).
 - **Fix**: New `fetchWithTimeout(url, options, timeoutMs=120000)` helper (`src/REI.jsx`) using `AbortController` + timer cleared in `finally`. 120s ceiling is deliberately generous so legitimate slow LLM completions pass through. `AbortError` surfaces as "Request timed out after 120s…" into the existing BackendUnavailablePanel (Retry/Copy/Dismiss).
 - **Files changed**: `src/REI.jsx` (helper + both call sites: handleSendMessage, handleRetry), `src/REI.test.jsx` (+2 tests: hang → timeout message, fast resolve → passthrough)
-- **Test coverage**: 36 suites, 483 passing.
+- **Test coverage**: 38 suites, 508 passing.
 
 **BackendUnavailablePanel — honest fallback when all backends are down (2026-08-05):**
 - **Issue**: When every provider failed, the fallback was a template-string message with no diagnostics and no recovery path. Earlier versions fabricated confidence scores ("Confidence Score: 75%", "Running simulated local evaluation") — purged in commit `ea0ec13`.
 - **Fix**: New `src/modules/rei/components/BackendUnavailablePanel.jsx` showing only real client-side data: route name/model/matched terms/hinge score (all computed by `buildRouterDecision` before the API call), collapsed error details, and Retry / Copy diagnostic / Dismiss buttons. No auto-retry loop. **No CARDO Guard math** — scenario classification requires an LLM, so applying hardcoded scenario parameters would be fabrication. REI.jsx refactored: `processApiResponse()` extracted from `handleSendMessage`; catch block now sets `backendError` state instead of pushing a fake message; `handleRetry()` re-fires the saved `retryPayloadRef`.
 - **Files changed**: `src/modules/rei/components/BackendUnavailablePanel.jsx` (+11 tests), `src/REI.jsx`, `src/REI.test.jsx`
-- **Test coverage**: 36 suites, 483 passing.
+- **Test coverage**: 38 suites, 508 passing.
 
 **Three critical production patches (2026-08-04, PR #43 → main):**
 1. **API import crash — HTTP 500 on every request** (`2c02bb7`): `api/cfai.js` imported `buildRouterDecision, resolveRoutingModel` from `../src/lib/nightShiftRouter`, but the file was renamed to `.ts` in the TypeScript migration (`04ce867`). Vercel's Node runtime can't resolve `.ts` imports → `FUNCTION_INVOCATION_FAILED` on every request (live site returned 500). Import, `selectGroqModel`, and orphaned `DEFAULT_MODEL` were dead code (routerDecision always arrives in the POST body) — removed, 6 lines deleted.
@@ -189,7 +189,7 @@ Use Jest as the main evidence gate.
 
 ### Current Test Status
 
-- **Total tests**: 483 passing across 36 suites (was 78; +405 from session 2026-08-04/05 fixes and coverage)
+- **Total tests**: 508 passing across 38 suites (was 78; +430 from session 2026-08-04/05 fixes and coverage)
 - **Key test files**:
   - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks
   - `src/lib/cardoGuard.test.js` - Core decision logic tests (pump + SaaS scenarios)
