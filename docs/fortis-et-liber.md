@@ -212,7 +212,7 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 ## Useful supporting docs
 
 - README.md
-- CASE_STUDY.md
+- docs/CASE_STUDY.md
 - TOKEN_SAVERS.md
 - DEVELOPMENT_SETUP.md
 - docs/REI_VIBE_MASTER_INDEX_TEMPLATE.md

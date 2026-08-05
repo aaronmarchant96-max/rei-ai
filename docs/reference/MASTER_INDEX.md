@@ -32,7 +32,7 @@
 - **Key Principle:** Find the hinge — the single point of pivot that changes the answer
 
 ### Token Efficiency
-- **File:** `docs/TOKEN_SAVERS.md`
+- **File:** `TOKEN_SAVERS.md`
 - **Purpose:** Minimize token spend across sessions
 - **Tools:** `scripts/verify-deploy.sh`, `.git/hooks/pre-commit`
 - **Rule:** Always check this index before reading source files
