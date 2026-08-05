@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { getLogs, clearLogs } from "./lib/routingLog";
+import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 
 const DOMAIN_LABELS = {
   assistant: "Generalist",
@@ -61,6 +62,7 @@ function confidenceDot(hs) {
 }
 
 export default function Analytics() {
+  const [tab, setTab] = useState("usage");
   const [logs, setLogs] = useState(function () { return getLogs(); });
 
   var aggregates = useMemo(function () {
@@ -218,7 +220,33 @@ export default function Analytics() {
           </div>
         </div>
 
-        {!aggregates ? (
+        {/* ── Tab bar ── */}
+        <div style={{
+          display: "flex", gap: "0", marginBottom: "24px",
+          borderBottom: "1px solid " + colors.border,
+        }}>
+          {[{ key: "usage", label: "Usage Dashboard" }, { key: "decisions", label: "CARDO Decisions" }].map(function (t) { return (
+            <button
+              key={t.key}
+              onClick={function () { setTab(t.key); }}
+              style={{
+                padding: "10px 20px",
+                background: "transparent",
+                border: "none",
+                borderBottom: tab === t.key ? "2px solid " + colors.amber : "2px solid transparent",
+                color: tab === t.key ? colors.amber : colors.textDim,
+                cursor: "pointer",
+                fontSize: "13px",
+                fontWeight: tab === t.key ? 700 : 500,
+                transition: "color 0.15s ease, border-color 0.15s ease",
+              }}
+            >
+              {t.label}
+            </button>
+          ); })}
+        </div>
+
+        {tab === "usage" && (!aggregates ? (
           /* ── Empty state ── */
           <div style={{
             padding: "60px 24px", textAlign: "center",
@@ -424,7 +452,8 @@ export default function Analytics() {
               </div>
             </div>
           </>
-        )}
+        ))}
+      {tab === "decisions" && <DecisionFeed />}
       </div>
     </div>
   );
