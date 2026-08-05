@@ -219,7 +219,7 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 
 ## Session Handoff — 2026-08-05 (pick up cold from here)
 
-**State:** All 9 reliability fixes merged to main (`c05efff`), deployed (live API HTTP 200). Feature branch == main (0 ahead). Working tree clean. Tests 483/483 (36 suites), build passes, lint 0 errors.
+**State:** All 9 reliability fixes merged to main (`c05efff`), deployed (live API HTTP 200). Feature branch == main (0 ahead). Working tree clean. Tests 508/508 (38 suites), build passes, lint 0 errors.
 
 **This session shipped:** scoping fix (`875ef22`), export fix (`1be20fa`), API import crash (`2c02bb7`), maxTokens bumps (`f258fd1`), BackendUnavailablePanel (`20f0faa`, PR #47), fetch timeout (`6732517`, PR #48), docs (`2cf3b4a`, PR #49), lint repair (`8d74215`, PR #50), doc reconciliation (PR #52).
 
@@ -229,7 +229,7 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 3. **Scratch backup:** `/tmp/opencode/scratch-backup/` — 11 experiment files (test-*.js, tone_down*.py, etc.) moved there from the main worktree; recoverable, probably discardable.
 4. **Main worktree hygiene:** `/home/potatoking/rei-ai` now current at `c05efff`; worktrees: `debate-furnace.worktrees/agents-continue-previous-discussion` (active), `agents-greeting-in-spanish` (stale).
 
-**Known caveats:** `docs/TESTING.md` category table (~220/~80/etc.) is approximate — headline count (36/483) is authoritative. Duplicate-root docs reconciled in PR #52 — root copies of `CLI_ENTRY.md`/`TOKEN_SAVERS.md` are canonical.
+**Known caveats:** `docs/TESTING.md` category table (~250/~95/etc.) is approximate — headline count (38/508) is authoritative. Duplicate-root docs reconciled in PR #52 — root copies of `CLI_ENTRY.md`/`TOKEN_SAVERS.md` are canonical.
 
 ## Quick read order
 
