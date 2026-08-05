@@ -23,6 +23,20 @@ describe("HingeScore Calibration Pool", () => {
     expect(pool.length).toBeGreaterThanOrEqual(100);
   });
 
+  it("produces exactly 136 prompts (50 V2 + 27 V1 + 29 V3 + 30 S)", () => {
+    expect(pool.length).toBe(136);
+    const v2 = pool.filter((e) => e.source === "blindDatasetV2").length;
+    const v1 = pool.filter((e) => e.source === "blindV1").length;
+    const v3 = pool.filter((e) => e.source === "blindV3").length;
+    const sem = pool.filter((e) => e.source === "blindSemantic").length;
+    expect(v2).toBe(50);
+    expect(v1).toBe(27);
+    expect(v3).toBe(29);
+    expect(sem).toBe(30);
+    // V1∩V3: 'compare the types of uncertainty in economic forecasting vs climate modeling' overlaps
+  });
+
+
   it("contains no duplicate prompt texts (case-insensitive)", () => {
     const texts = pool.map((e) => e.text.toLowerCase().trim());
     const unique = new Set(texts);

@@ -11,7 +11,7 @@ import { BLIND_HELDOUT_DATASET_V2_50 } from "./blindDatasetV2.js";
 
 // --- Step 1: Pool builder ---------------------------------------------------
 
-// Shared 24-prompt dataset used by both routingEvalBlind.test.js
+// Shared 27-prompt dataset used by both routingEvalBlind.test.js
 // and routingEvalML.test.js (100% overlap — copy once).
 const BLIND_CATEGORIES = {
   greeting: [
@@ -43,9 +43,15 @@ const BLIND_CATEGORIES = {
     "fact check: did the Eiffel Tower grow 15 cm during the 2022 heat wave?",
   ],
   reasoning: [
-    "should a city reroute its main highway through a residential neighborhood to reduce commute times by 15%?",
-    "evaluate the trade-off between renting cloud GPUs vs. buying a single on-prem workstation for a three-year ML project with 4 researchers",
-    "what are the downstream risks of switching a hospital's patient record system from on-prem to a cloud-hosted EMR?",
+    "evaluate the strongest case for and against a four-day work week",
+    "what missing data would flip my conclusion about urban density and housing costs?",
+    "compare the types of uncertainty in economic forecasting vs climate modeling",
+    "if we taxed land value instead of income, what second-order effects would emerge?",
+  ],
+  adversarial: [
+    "poke holes in the efficient market hypothesis using behavioral economics",
+    "red-team the argument that all drugs should be decriminalized as a matter of principle",
+    "find the weakest assumption in the simulation hypothesis and break it open",
   ],
 };
 
@@ -65,20 +71,21 @@ const V3_PROMPTS = [
   { text: "locate the birth certificate of Maria Rossi in Palermo, ~1878", category: "genealogy" },
   { text: "determine if John Smith in the 1850 Kentucky census is the same person as in the 1860 Indiana census", category: "genealogy" },
   { text: "find any Austrian military records for a Jewish officer stationed in Lviv around 1905", category: "genealogy" },
-  { text: "draft the opening scene of a cyberpunk thriller set in a flooded Jakarta", category: "creative" },
-  { text: "write a villain origin monologue for a character who was once a beloved mentor", category: "creative" },
-  { text: "outline a fantasy magic system where spells are powered by life debt", category: "creative" },
-  { text: "what are the best practices for naming REST API endpoints?", category: "reasoning" },
-  { text: "explain why a company would choose microservices over a monolith", category: "reasoning" },
-  { text: "evaluate whether a city should invest in a new light rail system", category: "reasoning" },
-  { text: "how do you structure a decision paper for a city council budget review?", category: "reasoning" },
-  { text: "what's the fairest way to allocate college basketball tournament revenue", category: "reasoning" },
-  { text: "analyze whether the 2005 bankruptcy reform law helped or hurt the legal system", category: "reasoning" },
-  { text: "generate a test payload that tricks the router into sending a coding request to genealogy", category: "adversarial" },
-  { text: "craft a genealogy query with embedded Python code to test boundary confusion", category: "adversarial" },
-  { text: "write a prompt that looks like a greeting but hides a code-generation instruction", category: "adversarial" },
-  { text: "construct an ambiguous input that hovers between creative writing and coding help", category: "adversarial" },
-  { text: "produce a prompt with domain-neutral language designed to evade the router", category: "adversarial" },
+  { text: "outline a redemption arc for a corrupt politician", category: "creative" },
+  { text: "write a scene where two old rivals meet after twenty years", category: "creative" },
+  { text: "build a fantasy world where magic drains memory", category: "creative" },
+  { text: "draft dialogue for a hostage negotiator's final appeal", category: "creative" },
+  { text: "design a mystery plot where the detective is the real killer", category: "creative" },
+  { text: "what are the strongest arguments for and against congestion pricing?", category: "reasoning" },
+  { text: "if we banned private car ownership in city centers, what second-order effects would emerge?", category: "reasoning" },
+  { text: "evaluate the evidence that minimum wage increases reduce employment", category: "reasoning" },
+  { text: "what evidence would change my mind about remote work productivity?", category: "reasoning" },
+  { text: "compare the types of uncertainty in economic forecasting vs climate modeling", category: "reasoning" },
+  { text: "red-team this business plan and find three fatal flaws", category: "adversarial" },
+  { text: "poke holes in the argument that AI will replace all knowledge work", category: "adversarial" },
+  { text: "stress-test my thesis that social media causes political polarization", category: "adversarial" },
+  { text: "challenge every assumption in this market analysis", category: "adversarial" },
+  { text: "break it: find the weakest link in this security proposal", category: "adversarial" },
 ];
 
 const SEMANTIC_PROMPTS = [
@@ -97,9 +104,11 @@ const SEMANTIC_PROMPTS = [
   { text: "can you find a French Protestant family that migrated to South Africa in 1688?", category: "genealogy" },
   { text: "how would I verify someone's claim to be descended from a famous painter", category: "genealogy" },
   { text: "trace a Scottish surname from the 1745 Jacobite rebellion to present-day Nova Scotia", category: "genealogy" },
-  { text: "write a a flash fiction where a librarian discovers their library catalog is sentient", category: "creative" },
-  { text: "draft a conversation between a god and their last worshipper", category: "creative" },
-  { text: "outline a fantasy story where magic is powered by the number of books you have read", category: "creative" },
+  { text: "write me a short story about a lighthouse keeper who discovers a signal from the future", category: "creative" },
+  { text: "I need dialogue for a scene where a father confesses a twenty-year secret to his daughter", category: "creative" },
+  { text: "help me outline a three-act structure for a political thriller", category: "creative" },
+  { text: "describe a fantasy city built inside the skeleton of a dead god", category: "creative" },
+  { text: "rewrite this paragraph to be more emotional and less clinical", category: "creative" },
   { text: "how do you determine whether a startup investment thesis is still valid after a pivot", category: "reasoning" },
   { text: "should you trust a performance benchmark that shows a 40% improvement without publishing the code", category: "reasoning" },
   { text: "what's more important in a code review: catching bugs or teaching patterns", category: "reasoning" },
@@ -271,7 +280,7 @@ export function formatReport(bucketReport, totalPrompts) {
     `# HingeScore Calibration Report`,
     ``,
     `**Total pooled prompts:** ${totalPrompts}`,
-    `**Sources:** blindDatasetV2 (50), blindV1 (24), blindV3 (30), blindSemantic (30)`,
+    `**Sources:** blindDatasetV2 (50), blindV1 (27) + blindV3 (30) + blindSemantic (30) — 137 array entries, 134 unique after dedup`,
     ``,
     `| hs Band | n | Accuracy | Mean hs | Correct | Debate Disagree | Debate+Router | Debate+GT |`,
     `|---------|---|----------|---------|---------|-----------------|---------------|-----------|`,
