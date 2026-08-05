@@ -219,24 +219,24 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 
 ## Session Handoff — 2026-08-05 (pick up cold from here)
 
-**State:** Feature branch = `agents/continue-previous-discussion` at `87e5463`, 7 commits ahead of main. Working tree clean. Tests 529/529 (40 suites), build passes, lint 0 errors.
+**State:** Feature branch = `agents/continue-previous-discussion` at `07ce889`, 7 commits ahead of main. Working tree clean. Tests 539/539 (41 suites), build passes, lint 0 errors.
 
 **This session shipped (Aug 5, part 2):**
 - **Cost claims audit** (`0744639`): 68–84% → "~68% lab benchmark", untraceable 84% removed
 - **HingeScore calibration Steps 0-4** (`7306e0f`): pool builder (136 prompts), router scorer, bucketing, Markdown reporter — 14 tests, zero live changes
 - **Pool sync + FEYNMAN_GATE** (`57b334d`): 3 embedded copies (BLIND_CATEGORIES/V3_PROMPTS/SEMANTIC_PROMPTS) were out of sync with source files — fixed; FEYNMAN_GATE (10 tests) verifies every comment claim against computed reality
-- **Decision-audit platform Steps 1-2** (`872030e`, `87e5463`):
+- **Decision-audit platform Steps 1-3** (`872030e`, `87e5463`, `07ce889`):
   - **Step 1:** `decisionStore.ts` — localStorage ring buffer capturing full CARDO trace per decision (single-write design with pendingDecision held in memory)
   - **Step 2:** `DecisionDetail.jsx` — presentational component rendering DecisionEntry as standalone CARDO audit report (167L, 13 tests)
+  - **Step 3:** `DecisionFeed.jsx` — list/filter/export UI with domain dropdown, expandable detail, CSV/JSON export, integrated into Analytics.jsx tab bar (278L, 10 tests)
 
 **Previous session shipped (Aug 5, part 1):** scoping fix (`875ef22`), export fix (`1be20fa`), API import crash (`2c02bb7`), maxTokens bumps (`f258fd1`), BackendUnavailablePanel (`20f0faa`, PR #47), fetch timeout (`6732517`, PR #48), docs (`2cf3b4a`, PR #49), lint repair (`8d74215`, PR #50), doc reconciliation (PR #52).
 
 **Open items for next session:**
-1. **Decision-audit Step 3:** wire DecisionDetail into a feed/list UI (Analytics.jsx or new component), add domain filter, CSV/JSON export
-2. **`GEMINI_API_KEY` prefix in Vercel env vars — USER action, not code.** `api/cfai.js:48` checks `key.startsWith("AQ.")`. If the stored key starts with `AIza` (old format), Gemini is silently dead — regenerate in AI Studio. If `AQ.`, it's fine. No code change needed either way.
-3. **Push branch to origin + create PR to main** (7 commits ahead, not yet merged)
+1. **`GEMINI_API_KEY` prefix in Vercel env vars — USER action, not code.** `api/cfai.js:48` checks `key.startsWith("AQ.")`. If the stored key starts with `AIza` (old format), Gemini is silently dead — regenerate in AI Studio. If `AQ.`, it's fine. No code change needed either way.
+2. **Push branch to origin + create PR to main** (7 commits ahead, not yet merged)
 
-**Known caveats:** `docs/TESTING.md` category table (~220/~80/etc.) is approximate — headline count (40/529) is authoritative. domainLabel in decisionStore uses display labels (e.g. "The Generalist") not raw IDs — feed filter should be aware.
+**Known caveats:** `docs/TESTING.md` category table (~220/~80/etc.) is approximate — headline count (41/539) is authoritative. domainLabel in decisionStore uses display labels (e.g. "The Generalist") not raw IDs — feed filter is aware and uses them for grouping.
 
 ## Quick read order
 
@@ -247,6 +247,7 @@ The repo already contains tests for routing behavior, app-shell flow, and CARDO 
 5. Open src/lib/cardoGuard.js for the decision gate.
 6. Open src/lib/decisionStore.ts for the persistent CARDO trace store.
 7. Open src/modules/rei/components/DecisionDetail.jsx for the audit report renderer.
+8. Open src/modules/rei/components/DecisionFeed.jsx for the list/filter/export UI.
 8. Run npm test and npm run build before claiming the work is verified.
 
 ## Update Policy
