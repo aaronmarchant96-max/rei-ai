@@ -199,7 +199,7 @@ Use Jest as the main evidence gate.
   - `src/REI.test.jsx` - Chat persistence, error recovery, fallback text, fetch timeout
 - **Build status**: ✅ Passing
 - **Production status**: ✅ Live API responds (HTTP 200), live demo verified accessible
-- **Known pre-existing issue**: `npm run lint` is broken — `eslint.config.js` imports `@eslint/js` which is not declared in package.json / installed (`ERR_MODULE_NOT_FOUND`). Fix: `npm i -D @eslint/js`.
+- **Lint status**: ✅ Passing — `npm run lint` returns 0 errors (195 warnings: intentional `no-console` in error paths + legacy `no-unused-vars` dead code). Repaired in commit `8d74215` (PR #50): installed `@eslint/js`, added `dist/**` + `build/**` + `coverage/**` + `.vercel/**` + `node_modules/**` to eslint ignores.
 
 Common commands:
 
