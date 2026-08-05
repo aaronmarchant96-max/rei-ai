@@ -2,21 +2,15 @@
 // Handles web requests and calls the CFai CLI tool or falls back to direct API routing.
 import "dotenv/config";
 import { REI_SYSTEM_PROMPT } from "../data/prompts/reiSystem.js";
-const DEFAULT_MODEL = process.env.MODEL || null;
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
-import { buildRouterDecision, resolveRoutingModel } from "../src/lib/nightShiftRouter";
 
 const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH;
 
 const MAX_INPUT_CHARS = 14000;
 
-function selectGroqModel(prompt, routerDecision) {
-  const decision = routerDecision || buildRouterDecision({ input: prompt });
-  return resolveRoutingModel(decision) || DEFAULT_MODEL || "deepseek-chat";
-}
 
 // ── Backend dispatcher: model name → API provider ──
 
