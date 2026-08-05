@@ -8,7 +8,7 @@ export default {
   sessionLabel: "research analysis",
   description: "Evidence-tiered genealogy and disambiguating same-name profiles.",
   rules: ["Compare parent-child age limits", "Assign evidence tiers", "Log negative search results"],
-      exemplar: "John Smith same-name disambiguation and parish register evaluation.",
+  exemplar: "John Smith same-name disambiguation and parish register evaluation.",
   systemPrompt: GENEALOGY_PROMPT,
   matchTerms: ["ancestor", "descendant", "birth", "death", "marriage", "census", "familysearch", "find a grave", "record", "pedigree", "genealogy", "lineage", "same-name", "disambiguate", "archive", "parish", "baptism", "burial", "manifest", "ship.manifest", "arrival", "ellis island", "immigr", "naturalization", "passenger", "maternal", "paternal"],
   fingerprint: {

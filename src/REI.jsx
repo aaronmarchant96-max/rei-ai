@@ -303,73 +303,73 @@ export default function REI({ initialPrompt } = {}) {
     const contentType = response.headers.get("content-type") || "";
 
     if (!response.ok) {
-        let errorDetail = "";
-        try {
-          const text = await response.text();
-          errorDetail = text.startsWith("<")
-            ? "HTTP " + response.status + " — server error page (" + text.slice(0, 150).trim().replace(/\n/g, " ") + "...)"
-            : text.slice(0, 300);
-        } catch (_) {
-          errorDetail = "HTTP " + response.status;
-        }
-        throw new Error("Backend request failed: " + errorDetail);
+      let errorDetail = "";
+      try {
+        const text = await response.text();
+        errorDetail = text.startsWith("<")
+          ? "HTTP " + response.status + " — server error page (" + text.slice(0, 150).trim().replace(/\n/g, " ") + "...)"
+          : text.slice(0, 300);
+      } catch (_) {
+        errorDetail = "HTTP " + response.status;
       }
+      throw new Error("Backend request failed: " + errorDetail);
+    }
 
     let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        throw new Error("Backend returned non-JSON response (content-type: " + (contentType || "unknown") + ")");
-      }
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      throw new Error("Backend returned non-JSON response (content-type: " + (contentType || "unknown") + ")");
+    }
 
-      if (!data.success) {
-        throw new Error(data.error || "Server returned failure response status");
-      }
+    if (!data.success) {
+      throw new Error(data.error || "Server returned failure response status");
+    }
 
     setMessages((prev) => [
-        ...prev,
-        {
-          sender: "rei",
-          text: data.result,
-          timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
-          rawJson: {
-            engine: "REI-Hinge-Core v0.3",
-            domain: selectedDomain,
-            command: "score",
-            model: data.model || "Local cfai CLI Executable",
-            timestamp: data.timestamp || new Date().toISOString(),
-            hadIngestedRecord: Boolean(ingestedRecord),
-            recordSourceType: ingestedRecord ? recordSourceType : null,
-            routerDecision: { ...(data.routerDecision || routerDecision), model: data.model || routerDecision?.model },
-            truncated: data.truncated || false,
-          }
+      ...prev,
+      {
+        sender: "rei",
+        text: data.result,
+        timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
+        rawJson: {
+          engine: "REI-Hinge-Core v0.3",
+          domain: selectedDomain,
+          command: "score",
+          model: data.model || "Local cfai CLI Executable",
+          timestamp: data.timestamp || new Date().toISOString(),
+          hadIngestedRecord: Boolean(ingestedRecord),
+          recordSourceType: ingestedRecord ? recordSourceType : null,
+          routerDecision: { ...(data.routerDecision || routerDecision), model: data.model || routerDecision?.model },
+          truncated: data.truncated || false,
         }
-      ]);
+      }
+    ]);
 
     const usage = data.usage;
-      const actualTokens = usage
-        ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
-        : (routerDecision?.maxTokens || 0);
+    const actualTokens = usage
+      ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
+      : (routerDecision?.maxTokens || 0);
 
-      const modelName = data.model || routerDecision?.model || "deepseek-chat";
-      const rates = getModelCosts(modelName);
-      const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
+    const modelName = data.model || routerDecision?.model || "deepseek-chat";
+    const rates = getModelCosts(modelName);
+    const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
 
-      const actualCost = usage
-        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
-        : (routerDecision?.estimatedCost || 0);
+    const actualCost = usage
+      ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
+      : (routerDecision?.estimatedCost || 0);
 
-      const actualPremium = usage
-        ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, PREMIUM_RATES.input, PREMIUM_RATES.output)
-        : (routerDecision?.premiumCost || 0);
+    const actualPremium = usage
+      ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, PREMIUM_RATES.input, PREMIUM_RATES.output)
+      : (routerDecision?.premiumCost || 0);
 
     trackMessage(
-        actualTokens,
-        modelName,
-        actualCost,
-        actualPremium,
-        modelName === "gpt-4o"
-      );
+      actualTokens,
+      modelName,
+      actualCost,
+      actualPremium,
+      modelName === "gpt-4o"
+    );
   }
 
   async function handleSendMessage(e) {
@@ -521,141 +521,141 @@ export default function REI({ initialPrompt } = {}) {
       handleSendMessage, inputRef, mobile, generalistPrompts: GENERALIST_PROMPTS,
       assistantPromptIndex, setAssistantPromptIndex,
     }}>
-    <div
-      data-theme={themeMode} className="mobile-container safe-area rei-shell"
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden"
-      }}
-    >
-      {/* Sticky Header with safe area top */}
-      <header className="safe-top rei-header">
-        {/* Domain selection tab strip */}
-        <div className="rei-domain-tabs">
-          {DOMAIN_PROFILES.map((dom) => (
+      <div
+        data-theme={themeMode} className="mobile-container safe-area rei-shell"
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden"
+        }}
+      >
+        {/* Sticky Header with safe area top */}
+        <header className="safe-top rei-header">
+          {/* Domain selection tab strip */}
+          <div className="rei-domain-tabs">
+            {DOMAIN_PROFILES.map((dom) => (
+              <button
+                key={dom.id}
+                type="button"
+                onClick={() => setSelectedDomain(dom.id)}
+                className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
+              >
+                <span>{dom.label}</span>
+                <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
+                  {getDomain(dom.id)?.subtitle || ""}
+                </span>
+              </button>
+            ))}
             <button
-              key={dom.id}
               type="button"
-              onClick={() => setSelectedDomain(dom.id)}
-              className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
+              onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
+              className="rei-action-btn"
+              title="Toggle light / dark theme"
             >
-              <span>{dom.label}</span>
-              <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
-                {getDomain(dom.id)?.subtitle || ""}
-              </span>
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
-            className="rei-action-btn"
-            title="Toggle light / dark theme"
-          >
               {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
-          </button>
-          <button
-            type="button"
-            onClick={handleClearHistory}
-            className="rei-action-btn rei-action-btn--danger"
-          >
+            </button>
+            <button
+              type="button"
+              onClick={handleClearHistory}
+              className="rei-action-btn rei-action-btn--danger"
+            >
               Clear Chat
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsPhilosophyOpen(true)}
-            className="rei-action-btn rei-action-btn--accent"
-          >
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPhilosophyOpen(true)}
+              className="rei-action-btn rei-action-btn--accent"
+            >
               (?) Philosophy
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedDomain("legal");
-              setInputMessage("What is the hinge in Donoghue v Stevenson?");
-            }}
-            className="rei-action-btn"
-            style={{ color: "#F59E0B", borderColor: "rgba(245, 158, 11, 0.25)" }}
-          >
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedDomain("legal");
+                setInputMessage("What is the hinge in Donoghue v Stevenson?");
+              }}
+              className="rei-action-btn"
+              style={{ color: "#F59E0B", borderColor: "rgba(245, 158, 11, 0.25)" }}
+            >
               ⚖️ Try a Case
-          </button>
-        </div>
-      </header>
-
-      {/* Scrollable Main Content with keyboard space */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-      <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
-        <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
-
-        <IngestPanel
-          selectedDomain={selectedDomain}
-          rawRecordText={rawRecordText}
-          setRawRecordText={setRawRecordText}
-          showIngest={showIngest}
-          setShowIngest={setShowIngest}
-          recordSourceType={recordSourceType}
-          setRecordSourceType={setRecordSourceType}
-          maxRecordChars={MAX_RECORD_CHARS}
-          sourceTypes={SOURCE_TYPES}
-        />
-
-        {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
-          <WelcomePanel
-            onResume={(domainId) => {
-              setSelectedDomain(domainId);
-            }}
-            onStart={(prompt) => {
-            setInputMessage(prompt);
-            handleSendMessage({ preventDefault: () => {} });
-          }} />
-        )}
-
-
-        {showRecap && sessionRecap && (
-          <div className="rei-session-recap" style={{
-            padding: "10px 14px", borderRadius: "8px",
-            background: "rgba(240, 201, 101, 0.04)", border: "1px solid rgba(240, 201, 101, 0.12)",
-            margin: "0 16px 8px", display: "flex", justifyContent: "space-between", alignItems: "center",
-            fontSize: "12px", color: "var(--text-secondary)",
-          }}>
-            <span>{sessionRecap.decisions} {sessionRecap.decisions === 1 ? "decision" : "decisions"} • saved ${savingsVsPremium.toFixed(4)} vs premium</span>
-            <button onClick={() => setShowRecap(false)} style={{
-              background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer",
-              fontSize: "16px", lineHeight: 1, padding: "0 2px",
-            }}>×</button>
+            </button>
           </div>
-        )}
-        <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
+        </header>
 
-        {backendError && (
-          <BackendUnavailablePanel
-            routerDecision={backendError.routerDecision}
-            errorMessage={backendError.errorMessage}
-            onRetry={handleRetry}
-            onDismiss={() => setBackendError(null)}
-          />
-        )}
-      </main>
-      {!mobile && (
-        <InstrumentRail
-          sessionTokens={sessionTokens}
-          sessionMessages={sessionMessages}
-          sessionCost={sessionCost}
-          savingsVsPremium={savingsVsPremium}
-          escalationCount={escalationCount}
-          modelBreakdown={modelBreakdown}
-          lifetimeCost={lifetimeCost}
-          lifetimeSavings={lifetimeSavings}
-        />
-      )}
-      </div>
+        {/* Scrollable Main Content with keyboard space */}
+        <div style={{ display: "flex", flex: 1, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
+          <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
+            <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
 
-      <ChatInput />
+            <IngestPanel
+              selectedDomain={selectedDomain}
+              rawRecordText={rawRecordText}
+              setRawRecordText={setRawRecordText}
+              showIngest={showIngest}
+              setShowIngest={setShowIngest}
+              recordSourceType={recordSourceType}
+              setRecordSourceType={setRecordSourceType}
+              maxRecordChars={MAX_RECORD_CHARS}
+              sourceTypes={SOURCE_TYPES}
+            />
+
+            {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
+              <WelcomePanel
+                onResume={(domainId) => {
+                  setSelectedDomain(domainId);
+                }}
+                onStart={(prompt) => {
+                  setInputMessage(prompt);
+                  handleSendMessage({ preventDefault: () => {} });
+                }} />
+            )}
+
+
+            {showRecap && sessionRecap && (
+              <div className="rei-session-recap" style={{
+                padding: "10px 14px", borderRadius: "8px",
+                background: "rgba(240, 201, 101, 0.04)", border: "1px solid rgba(240, 201, 101, 0.12)",
+                margin: "0 16px 8px", display: "flex", justifyContent: "space-between", alignItems: "center",
+                fontSize: "12px", color: "var(--text-secondary)",
+              }}>
+                <span>{sessionRecap.decisions} {sessionRecap.decisions === 1 ? "decision" : "decisions"} • saved ${savingsVsPremium.toFixed(4)} vs premium</span>
+                <button onClick={() => setShowRecap(false)} style={{
+                  background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer",
+                  fontSize: "16px", lineHeight: 1, padding: "0 2px",
+                }}>×</button>
+              </div>
+            )}
+            <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
+
+            {backendError && (
+              <BackendUnavailablePanel
+                routerDecision={backendError.routerDecision}
+                errorMessage={backendError.errorMessage}
+                onRetry={handleRetry}
+                onDismiss={() => setBackendError(null)}
+              />
+            )}
+          </main>
+          {!mobile && (
+            <InstrumentRail
+              sessionTokens={sessionTokens}
+              sessionMessages={sessionMessages}
+              sessionCost={sessionCost}
+              savingsVsPremium={savingsVsPremium}
+              escalationCount={escalationCount}
+              modelBreakdown={modelBreakdown}
+              lifetimeCost={lifetimeCost}
+              lifetimeSavings={lifetimeSavings}
+            />
+          )}
+        </div>
+
+        <ChatInput />
       
-      <PhilosophyModal isOpen={isPhilosophyOpen} onClose={() => setIsPhilosophyOpen(false)} />
-    </div>
+        <PhilosophyModal isOpen={isPhilosophyOpen} onClose={() => setIsPhilosophyOpen(false)} />
+      </div>
     </ReiContext.Provider>
   );
 }

@@ -70,7 +70,7 @@ describe("Routing Eval ML — Un-Contaminated Blind Set V2 Suite (50 Prompts)", 
       : `⚠️  SYNTHETIC HASH FALLBACK (${fallbackCount}/${total} prompts used fake vectors)`;
 
     console.log(`\n${"═".repeat(78)}`);
-    console.log(`  REI.ai v4.0 Semantic Router — Blind Set V2 Benchmark (50 Prompts)`);
+    console.log("  REI.ai v4.0 Semantic Router — Blind Set V2 Benchmark (50 Prompts)");
     console.log(`${"═".repeat(78)}`);
     console.log(`  EMBEDDER MODE:     ${embedderMode}`);
     console.log(`  Measured Accuracy: ${accuracy.toFixed(1)}% (${correct}/${total} correct)`);
@@ -78,12 +78,12 @@ describe("Routing Eval ML — Un-Contaminated Blind Set V2 Suite (50 Prompts)", 
     console.log(`  Real ONNX:         ${realOnnxCount}/${total}  |  Fallback: ${fallbackCount}/${total}`);
 
     if (!usedRealEmbeddings) {
-      console.log(`\n  ⛔ THIS RESULT DOES NOT VALIDATE SEMANTIC ACCURACY.`);
-      console.log(`     The accuracy number above measures hash-noise classification,`);
-      console.log(`     not real semantic embedding similarity. The v4 semantic router`);
-      console.log(`     has NOT been benchmarked until this test runs with fallback=0.`);
-      console.log(`     To get real results: run in an environment where @xenova/transformers`);
-      console.log(`     can download Xenova/all-MiniLM-L6-v2 from huggingface.co.\n`);
+      console.log("\n  ⛔ THIS RESULT DOES NOT VALIDATE SEMANTIC ACCURACY.");
+      console.log("     The accuracy number above measures hash-noise classification,");
+      console.log("     not real semantic embedding similarity. The v4 semantic router");
+      console.log("     has NOT been benchmarked until this test runs with fallback=0.");
+      console.log("     To get real results: run in an environment where @xenova/transformers");
+      console.log("     can download Xenova/all-MiniLM-L6-v2 from huggingface.co.\n");
     }
 
     console.log(`${"═".repeat(78)}\n`);

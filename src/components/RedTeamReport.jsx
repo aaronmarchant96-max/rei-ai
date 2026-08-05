@@ -15,13 +15,13 @@ export default function RedTeamReport({ report, isLoading = false }) {
   const colors = VERDICT_COLORS[verdict] || VERDICT_COLORS.clean;
 
   if (isLoading) {
+    return (
+      <div className="rei-redteam-report" aria-busy={true}>
+        <Spinner aria-label="Loading Red-Team report" />
+      </div>
+    );
+  }
   return (
-    <div className="rei-redteam-report" aria-busy={true}>
-      <Spinner aria-label="Loading Red-Team report" />
-    </div>
-  );
-}
-return (
     <div className="rei-redteam-report">
       <div className="rei-redteam-header">
         <span className={`rei-redteam-verdict ${colors.bg} ${colors.border} ${colors.text}`}>

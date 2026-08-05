@@ -22,8 +22,8 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
-        heading: ['"Space Grotesk"', "sans-serif"],
-        mono: ['"JetBrains Mono"', "monospace"],
+        heading: ["\"Space Grotesk\"", "sans-serif"],
+        mono: ["\"JetBrains Mono\"", "monospace"],
       },
       animation: {
         "pivot-slow": "spin 20s linear infinite",
@@ -32,4 +32,4 @@ export default {
   },
   presets: [relumeTailwind],
   plugins: [],
-}
+};

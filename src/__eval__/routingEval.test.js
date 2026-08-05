@@ -199,7 +199,7 @@ describe("Routing Eval — adaptive routing benchmark", () => {
     // eslint-disable-next-line no-console
     console.log(`  Routing accuracy:             ${accuracy}% (${correctRoutes} correct, ${incorrectRoutes} incorrect)`);
     // eslint-disable-next-line no-console
-    console.log(`  Pathway breakdown:`);
+    console.log("  Pathway breakdown:");
     for (const [pw, count] of Object.entries(pathwayCounts)) {
       // eslint-disable-next-line no-console
       console.log(`    ${pw}: ${count} prompts`);

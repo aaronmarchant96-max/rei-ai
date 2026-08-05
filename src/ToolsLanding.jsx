@@ -10,13 +10,13 @@ const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 function ToolIcon({ id, size = 24, className = "" }) {
   const iconProps = { size, className: `text-hinge-bright ${className}`, strokeWidth: 1.5 };
   switch (id) {
-    case "furnace": return <MessageSquare {...iconProps} />;
-    case "story-forge": return <ExternalLink {...iconProps} />;
-    case "storm-replay": return <Activity {...iconProps} />;
-    case "cardo-guard": return <ShieldCheck {...iconProps} />;
-    case "tracepoint": return <Crosshair {...iconProps} />;
-    case "rei": return <Scale {...iconProps} />;
-    default: return <Scale {...iconProps} />;
+  case "furnace": return <MessageSquare {...iconProps} />;
+  case "story-forge": return <ExternalLink {...iconProps} />;
+  case "storm-replay": return <Activity {...iconProps} />;
+  case "cardo-guard": return <ShieldCheck {...iconProps} />;
+  case "tracepoint": return <Crosshair {...iconProps} />;
+  case "rei": return <Scale {...iconProps} />;
+  default: return <Scale {...iconProps} />;
   }
 }
 
@@ -85,8 +85,8 @@ export default function ToolsLanding({ onOpenTool }) {
   const hsv = demoResult?.hingeVector || {};
   const hingeRationale = demoResult?.id === "simple-greeting" ? "Cheapest route — 50-token budget on llama-3.1-8b-instant."
     : demoResult?.id?.includes("coding") ? "Coding signals detected — gemini-flash-latest with Phase 0 + HARD STOP gate."
-    : demoResult?.id?.includes("adversarial") ? "Injection pattern detected — strictest gate, 5× cost multiplier."
-    : "Generic reasoning. Balanced cost/safety profile.";
+      : demoResult?.id?.includes("adversarial") ? "Injection pattern detected — strictest gate, 5× cost multiplier."
+        : "Generic reasoning. Balanced cost/safety profile.";
 
   // Framer Motion variants
   const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };

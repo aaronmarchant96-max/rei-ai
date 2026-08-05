@@ -71,7 +71,7 @@ function getInitialTool() {
     if (hash === "#storm-replay") return "storm-replay";
     if (hash === "#cardo-guard") return "cardo-guard";
     if (hash === "#tracepoint") return "tracepoint";
-  if (hash === "#analytics") return "analytics";
+    if (hash === "#analytics") return "analytics";
   }
   return "tools";
 }
@@ -133,11 +133,11 @@ export default function AppShell() {
               ? "PromptHound Labs | CARDO GUARD"
               : tool === "rei"
                 ? "PromptHound Labs | REI.ai"
-                  : tool === "tracepoint"
-                    ? "PromptHound Labs | Tracepoint"
-                    : tool === "analytics"
-                      ? "PromptHound Labs | Analytics"
-                      : "PromptHound Labs | The Furnace";
+                : tool === "tracepoint"
+                  ? "PromptHound Labs | Tracepoint"
+                  : tool === "analytics"
+                    ? "PromptHound Labs | Analytics"
+                    : "PromptHound Labs | The Furnace";
   }, [tool]);
 
   const currentToolLabel = getToolLabel(tool);
@@ -215,14 +215,14 @@ export default function AppShell() {
 
       <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
         <a href="/" className="flex items-center gap-3 cursor-pointer" onClick={(e) => {
-          if (window.location.pathname === '/' && !window.location.hash) {
+          if (window.location.pathname === "/" && !window.location.hash) {
             e.preventDefault();
-            setTool('tools');
+            setTool("tools");
           }
         }}>
-           <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
-               <HingeMark size={16} animated={false} color="#F59E0B" />
-           </div>
+          <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
+            <HingeMark size={16} animated={false} color="#F59E0B" />
+          </div>
           <div>
             <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>
           </div>
@@ -231,10 +231,10 @@ export default function AppShell() {
         {!mobile && (
           <nav className="flex items-center gap-6" aria-label="Primary navigation">
             <button onClick={() => {
-              if (tool !== 'tools') setTool('tools');
+              if (tool !== "tools") setTool("tools");
               setTimeout(() => {
-                const el = document.getElementById('ecosystem');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                const el = document.getElementById("ecosystem");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
               }, 100);
             }} className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">Ecosystem</button>
             <div className="w-px h-4 bg-gray-700 mx-1"></div>
@@ -246,30 +246,30 @@ export default function AppShell() {
 
       <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
         <Suspense fallback={<LoadingShell />}>
-        {tool === "tools" ? (
-          <ErrorBoundary toolName="Tools">
-            <ToolsLanding onOpenTool={({ tool: t, prompt }) => {
-              setReiInitialPrompt(prompt || null);
-              setTool(t);
-            }} />
-          </ErrorBoundary>
-        ) : tool === "story-forge" ? (
-          <ErrorBoundary toolName="Story Forge"><CreativeEngine /></ErrorBoundary>
-        ) : tool === "storm-replay" ? (
-          <ErrorBoundary toolName="Storm Replay"><StormReplay /></ErrorBoundary>
-        ) : tool === "cardo-guard" ? (
-          <ErrorBoundary toolName="CARDO GUARD"><CardoGuard /></ErrorBoundary>
-        ) : tool === "rei" ? (
-          <ErrorBoundary toolName="REI.ai"><REI initialPrompt={reiInitialPrompt} /></ErrorBoundary>
-        ) : tool === "tracepoint" ? (
-          <ErrorBoundary toolName="Tracepoint"><Tracepoint /></ErrorBoundary>
-        ) : tool === "analytics" ? (
-          <ErrorBoundary toolName="Analytics"><Analytics /></ErrorBoundary>
-        ) : tool === "cfai" ? (
-          <ErrorBoundary toolName="REI.ai"><REI initialPrompt={reiInitialPrompt} /></ErrorBoundary>
-        ) : (
-          <ErrorBoundary toolName="The Furnace"><DebateFurnace /></ErrorBoundary>
-        )}
+          {tool === "tools" ? (
+            <ErrorBoundary toolName="Tools">
+              <ToolsLanding onOpenTool={({ tool: t, prompt }) => {
+                setReiInitialPrompt(prompt || null);
+                setTool(t);
+              }} />
+            </ErrorBoundary>
+          ) : tool === "story-forge" ? (
+            <ErrorBoundary toolName="Story Forge"><CreativeEngine /></ErrorBoundary>
+          ) : tool === "storm-replay" ? (
+            <ErrorBoundary toolName="Storm Replay"><StormReplay /></ErrorBoundary>
+          ) : tool === "cardo-guard" ? (
+            <ErrorBoundary toolName="CARDO GUARD"><CardoGuard /></ErrorBoundary>
+          ) : tool === "rei" ? (
+            <ErrorBoundary toolName="REI.ai"><REI initialPrompt={reiInitialPrompt} /></ErrorBoundary>
+          ) : tool === "tracepoint" ? (
+            <ErrorBoundary toolName="Tracepoint"><Tracepoint /></ErrorBoundary>
+          ) : tool === "analytics" ? (
+            <ErrorBoundary toolName="Analytics"><Analytics /></ErrorBoundary>
+          ) : tool === "cfai" ? (
+            <ErrorBoundary toolName="REI.ai"><REI initialPrompt={reiInitialPrompt} /></ErrorBoundary>
+          ) : (
+            <ErrorBoundary toolName="The Furnace"><DebateFurnace /></ErrorBoundary>
+          )}
         </Suspense>
       </main>
     </div>

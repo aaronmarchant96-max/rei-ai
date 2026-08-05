@@ -113,7 +113,7 @@ describe("REI", () => {
     expect(screen.queryByText("SYSTEM PHILOSOPHY: R.E.I.")).not.toBeInTheDocument();
   });
 
-  it('pre-fills legal domain and input when "Try a Case" is clicked', async () => {
+  it("pre-fills legal domain and input when \"Try a Case\" is clicked", async () => {
     render(<REI />);
 
     fireEvent.click(screen.getByText(/Try a Case/i));
