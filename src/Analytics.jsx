@@ -54,13 +54,13 @@ function hingScoreColor(hs) {
   return "#c2410c";
 }
 
-function confidenceLabel(hs) {
+function complexityLabel(hs) {
   if (hs >= 0.7) return "High";
   if (hs >= 0.4) return "Medium";
   return "Low";
 }
 
-function confidenceDot(hs) {
+function complexityDot(hs) {
   if (hs >= 0.7) return "🟢";
   if (hs >= 0.4) return "🟡";
   return "🟠";
@@ -387,6 +387,9 @@ export default function Analytics() {
                   );
                 })}
               </div>
+              <p style={{ fontSize: "11px", color: colors.textDim, margin: "12px 0 0", lineHeight: "1.5", fontStyle: "italic" }}>
+              Actuals tracked only since the post-response outcomes deploy (2026-08-05). Free-tier providers (Groq llama-3.3-70b at $0/$0 per 1K tokens) mean 100% real savings is legitimate — free-tier math, not routing magic.
+              </p>
             </div>
 
             {/* ── Domain distribution ── */}
@@ -471,7 +474,7 @@ export default function Analytics() {
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Model</th>
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Why</th>
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Cost</th>
-                      <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Confidence</th>
+                      <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Complexity (non-binding)</th>
                       <th style={{ padding: "6px 10px", fontWeight: 600, fontSize: "11px", borderBottom: "1px solid " + colors.border }}>Route</th>
                     </tr>
                   </thead>
@@ -530,7 +533,7 @@ export default function Analytics() {
                                 }} />
                               </div>
                               <span style={{ fontSize: "11px", color: colors.textDim, whiteSpace: "nowrap" }}>
-                                <span>{confidenceDot(hs)}</span> {confidenceLabel(hs)}
+                                <span>{complexityDot(hs)}</span> {complexityLabel(hs)}
                                 <span style={{ fontFamily: "monospace", color: colors.textDim }}> ({hs.toFixed(2)})</span>
                               </span>
                             </div>

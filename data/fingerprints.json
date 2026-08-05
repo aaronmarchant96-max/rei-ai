@@ -16,7 +16,11 @@
       "good morning",
       "good afternoon",
       "good evening",
-      "hiya"
+      "hiya",
+      "howdy",
+      "sup",
+      "heya",
+      "greetings"
     ],
     "temperature": 0.9,
     "fallbackPriority": null,

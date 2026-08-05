@@ -123,6 +123,12 @@ function getCatalogRouteMatch(text: string): FingerprintEntry | null {
   return null;
 }
 
+function actualMatchedTerms(id: string, text: string): string[] {
+  const entry = getCatalogEntry(id);
+  const terms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
+  return terms.filter((term) => keywordMatches(text, term));
+}
+
 function domainKeywordMatches(text: string, domainId: string): boolean {
   const terms = getDomainMatchTerms(domainId);
   return terms.some((term) => {
@@ -337,11 +343,12 @@ export function buildRouterDecision({
   }
 
   if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")) {
+    const routeTerms = actualMatchedTerms("coding-hinge", text);
     const decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",
       routingSignals: {
         complexityTier,
-        matchedTerms: catalogRoute?.matchTerms || [],
+        matchedTerms: routeTerms,
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
@@ -351,11 +358,12 @@ export function buildRouterDecision({
   }
 
   if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")) {
+    const routeTerms = actualMatchedTerms("genealogy-deep-dive", text);
     const decision = buildDecision("genealogy-deep-dive", {
       rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
       routingSignals: {
         complexityTier,
-        matchedTerms: catalogRoute?.matchTerms || [],
+        matchedTerms: routeTerms,
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
@@ -365,11 +373,12 @@ export function buildRouterDecision({
   }
 
   if (domainName === "story" || catalogRoute?.id === "story-architect" || domainKeywordMatches(text, "story")) {
+    const routeTerms = actualMatchedTerms("story-architect", text);
     const decision = buildDecision("story-architect", {
       rationale: "Story or narrative language detected; route through the storytelling blueprint path.",
       routingSignals: {
         complexityTier,
-        matchedTerms: catalogRoute?.matchTerms || [],
+        matchedTerms: routeTerms,
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
@@ -379,11 +388,12 @@ export function buildRouterDecision({
   }
 
   if (domainName === "legal" || catalogRoute?.id === "legal-hinge" || domainKeywordMatches(text, "legal")) {
+    const routeTerms = actualMatchedTerms("legal-hinge", text);
     const decision = buildDecision("legal-hinge", {
       rationale: "Legal case analysis or precedent evaluation detected; enforce verified-index grounding.",
       routingSignals: {
         complexityTier,
-        matchedTerms: catalogRoute?.matchTerms || [],
+        matchedTerms: routeTerms,
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
@@ -401,7 +411,7 @@ export function buildRouterDecision({
       fallbackPriority: "adversarial-validation",
       routingSignals: {
         complexityTier,
-        matchedTerms: catalogRoute?.matchTerms || [],
+        matchedTerms: actualMatchedTerms("structured-reasoning", text),
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
@@ -415,7 +425,7 @@ export function buildRouterDecision({
       rationale: "Recent interaction history suggests this route should be preferred for the current request.",
       routingSignals: {
         complexityTier,
-        matchedTerms: catalogRoute?.matchTerms || [],
+        matchedTerms: actualMatchedTerms(storedPreference, text),
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
@@ -428,7 +438,7 @@ export function buildRouterDecision({
     rationale: "No special-case fingerprint matched; use the balanced reasoning profile.",
     routingSignals: {
       complexityTier,
-      matchedTerms: catalogRoute?.matchTerms || [],
+      matchedTerms: actualMatchedTerms("structured-reasoning", text),
       highStructureSignals,
       storedPreference,
     } as RoutingSignals,

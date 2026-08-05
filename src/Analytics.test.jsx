@@ -29,7 +29,7 @@ describe("Analytics", () => {
     // Baseline transparency: Without / With must both render (regression: totalPremium was missing from aggregates)
     expect(screen.getByText(/Without:/i)).toBeInTheDocument();
     expect(screen.getByText(/With:/i)).toBeInTheDocument();
-    // Confidence badge label + matched term chip (router logs lowercase terms)
+    // Complexity badge label + matched term chip (router logs lowercase terms)
     expect(screen.getByText("High")).toBeInTheDocument();
     expect(screen.getByText("react")).toBeInTheDocument();
     // Lifetime Saved derives from the log itself: premium 0.006 - actual (0.0005 + 0.0006) = 0.0049
@@ -53,6 +53,8 @@ describe("Analytics", () => {
     // HingeScore band chips: >= 0.8 has 0, 0.3-0.55 has 1... verify band labels exist
     expect(screen.getByText(/HingeScore distribution/i)).toBeInTheDocument();
     expect(screen.getByText(/< 0.3/i)).toBeInTheDocument();
+    // footnote explaining free-tier providers and deploy date
+    expect(screen.getByText(/free-tier math/i)).toBeInTheDocument();
   });
 
   it("shows actual-vs-estimate and real savings when actualCost is present", () => {
