@@ -2761,7 +2761,7 @@ export default function DebateFurnace() {
             {fallbackNotice}
           </div>
         )}
-{analysis ? (
+        {analysis ? (
           <AnalysisScreen
             debate={debate}
             grid={grid}

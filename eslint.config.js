@@ -5,6 +5,9 @@ import globals from "globals";
 
 export default [
   {
+    ignores: ["dist/**", "build/**", "coverage/**", ".vercel/**", "node_modules/**"],
+  },
+  {
     files: ["**/*.{js,jsx}"],
     languageOptions: {
       ecmaVersion: "latest",

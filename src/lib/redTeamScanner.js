@@ -76,8 +76,8 @@ export function scanRedTeamInput(input, context = {}) {
   } else {
     verdict = maxSeverity === "critical" ? "critical"
       : maxSeverity === "high" ? "high-risk"
-      : maxSeverity === "medium" ? "suspicious"
-      : "clean";
+        : maxSeverity === "medium" ? "suspicious"
+          : "clean";
   }
 
   return {

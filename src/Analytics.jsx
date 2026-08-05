@@ -26,10 +26,10 @@ function exportCSV(logs) {
       e.estimatedCost,
       e.premiumCost,
       e.tokenCount,
-      '"' + (e.rationale || "").replace(/"/g, '""') + '"',
-      '"' + (e.matchedTerms || []).join(" | ") + '"',
+      "\"" + (e.rationale || "").replace(/"/g, "\"\"") + "\"",
+      "\"" + (e.matchedTerms || []).join(" | ") + "\"",
       e.routingMs || "",
-      '"' + (e.inputPreview || "").replace(/"/g, '""') + '"',
+      "\"" + (e.inputPreview || "").replace(/"/g, "\"\"") + "\"",
     ].join(",");
   });
   const csv = header + "\n" + rows.join("\n");

@@ -37,8 +37,8 @@ export function resolveVerdict(findings, spanState = null) {
   } else {
     verdict = maxSeverity === "critical" ? "critical"
       : maxSeverity === "high" ? "high-risk"
-      : maxSeverity === "medium" ? "suspicious"
-      : "clean";
+        : maxSeverity === "medium" ? "suspicious"
+          : "clean";
   }
 
   const score = calculateScore(findings);

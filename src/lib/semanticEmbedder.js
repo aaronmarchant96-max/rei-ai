@@ -121,7 +121,7 @@ export async function embedText(text) {
     // is meaningless. This path exists only so the pipeline doesn't crash
     // in environments where ONNX/WASM cannot load (e.g., some CI runners).
     console.warn(
-      `[semanticEmbedder] ⚠️  ONNX model unavailable — using synthetic hash fallback. ` +
+      "[semanticEmbedder] ⚠️  ONNX model unavailable — using synthetic hash fallback. " +
       `Reason: ${err.message}. Downstream accuracy numbers are NOT real semantic measurements.`
     );
     const vector = generateSyntheticEmbedding(normalized);

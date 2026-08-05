@@ -22,7 +22,7 @@ export default function RouterBadge({ routerDecision, usage }) {
   const dimensionLabel = isRedTeam
     ? routerDecision.id === "red-team-surface" ? "D1"
       : routerDecision.id === "red-team-semantic" ? "D2"
-      : "D3"
+        : "D3"
     : null;
 
   // ── Sprint 4: Glass Box enhancements ─────────────────────────────────────
@@ -38,11 +38,11 @@ export default function RouterBadge({ routerDecision, usage }) {
 
   const domainIcon = isDeterministic ? "⚡"
     : isUltra ? "👑"
-    : isFinance ? "💰"
-    : isMeta ? "🔍"
-    : isData ? "🗃️"
-    : isSynthesis ? "🧵"
-    : "🌙";
+      : isFinance ? "💰"
+        : isMeta ? "🔍"
+          : isData ? "🗃️"
+            : isSynthesis ? "🧵"
+              : "🌙";
 
   return (
     <div className="rei-router-badge-container">

@@ -102,7 +102,7 @@ describe("Routing Eval ML — Night Shift v3 Holdout Suite", () => {
       ? ((totalPremiumCost - totalCost) / totalPremiumCost) * 100
       : 0;
 
-    console.log(`\n🎯 Night Shift v3 ML Holdout Benchmark Results (Strict Category Correctness):`);
+    console.log("\n🎯 Night Shift v3 ML Holdout Benchmark Results (Strict Category Correctness):");
     console.log(`   - Prompts Evaluated: ${totalPrompts}`);
     console.log(`   - True Category Accuracy: ${accuracy.toFixed(1)}% (${correctClassifications}/${totalPrompts} correct)`);
     console.log(`   - Cost Savings vs Premium: ${savingsPct.toFixed(1)}%`);
