@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { getLogs, clearLogs } from "./lib/routingLog";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
+import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
 import ProgressBar from "./modules/rei/components/ProgressBar.jsx";
 
@@ -178,7 +179,9 @@ export default function Analytics() {
   var isDark = themeMode === "dark";
 
   var colors = {
-    page: isDark ? "#0A0C12" : "#F8F9FA",
+    page: isDark
+      ? "radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.04) 0%, transparent 55%), #0A0C12"
+      : "radial-gradient(ellipse at 50% 0%, rgba(180,83,9,0.06) 0%, transparent 55%), #F8F9FA",
     surface: isDark ? "#111318" : "#FFFFFF",
     border: isDark ? "rgba(255,255,255,0.08)" : "#E5E5E5",
     text: isDark ? "#E2E8F0" : "#1C1917",
@@ -305,7 +308,7 @@ export default function Analytics() {
             {/* ── Summary cards ── */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "12px" }}>
               <MetricCard delay={0} label="Requests">
-                <div style={{ fontSize: "24px", fontWeight: 800 }}>{aggregates.totalRequests}</div>
+                <div style={{ fontSize: "24px", fontWeight: 800 }}><AnimatedCounter value={aggregates.totalRequests} delay={100} /></div>
               </MetricCard>
               <MetricCard delay={60} label="Session Cost">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{formatCost(aggregates.totalCost)}</div>
@@ -315,7 +318,7 @@ export default function Analytics() {
                   Without: <b style={{ color: colors.text }}>{formatCost(aggregates.totalPremium)}</b>
                   <br />With: <b style={{ color: colors.text }}>{formatCost(aggregates.totalCost)}</b>
                 </div>
-                <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a", marginTop: "4px" }}>{aggregates.savingsPct}% saved</div>
+                <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a", marginTop: "4px" }}><AnimatedCounter value={aggregates.savingsPct} delay={250} />% saved</div>
               </MetricCard>
               <MetricCard delay={180} label="Avg route decision" subtext="router decision time">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{aggregates.avgRoutingMs != null ? aggregates.avgRoutingMs + " ms" : "—"}</div>
