@@ -126,7 +126,7 @@ export default function Analytics() {
     var estimateVsActualPct = null;
     if (actualCount > 0) {
       actualSavingsPct = totalPremium > 0 ? Math.round(((totalPremium - totalActual) / totalPremium) * 100) : null;
-      estimateVsActualPct = totalActual > 0 ? Math.round((totalCost / totalActual) * 100) : null;
+      estimateVsActualPct = totalCost > 0 ? Math.round((totalActual / totalCost) * 100) : null;
     }
 
     return {
