@@ -124,6 +124,13 @@ export default function InstrumentRail({
           <span className="rei-instrument-rail__badge rei-instrument-rail__badge--accent">CARDO Guard</span>
         </div>
       </div>
+
+      <div className="rei-instrument-rail__section">
+        <a href="/#analytics" className="rei-instrument-rail__row" style={{ textDecoration: "none", color: "inherit" }}>
+          <span>Full dashboard</span>
+          <span className="rei-instrument-rail__value rei-instrument-rail__value--accent">&rarr;</span>
+        </a>
+      </div>
     </aside>
   );
 }
