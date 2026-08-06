@@ -180,7 +180,7 @@ export function buildPool() {
  */
 export function computeRouterScores(pool) {
   return pool.map((entry) => {
-    const routerDecision = buildRouterDecision({ userMsg: { text: entry.text } });
+    const routerDecision = buildRouterDecision({ input: entry.text });
     const hingeScore = routerDecision?.hingeScore ?? 0;
     // Normalize the routed label to match domain keys
     const routeId = routerDecision?.id || "unknown";
