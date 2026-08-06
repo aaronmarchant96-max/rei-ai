@@ -38,8 +38,11 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
           <span style={{ color: "var(--amber-text)", fontWeight: 700 }}>
             {msg.rawJson.routerDecision.model}
           </span>
-          {msg.rawJson.routerDecision.hingeScore != null && msg.rawJson.routerDecision.hingeScore < 0.3 && (!msg.rawJson.routerDecision.matchedTerms || msg.rawJson.routerDecision.matchedTerms.length === 0) && (
-            <span style={{ fontSize: "10px", color: "var(--amber-badge-tx)", background: "var(--amber-badge-bg)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }}>Low confidence</span>
+          {msg.rawJson.routerDecision.hingeScore != null && (
+            <span style={{ fontSize: "10px", color: "var(--amber-badge-tx)", background: "var(--amber-badge-bg)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }}
+              title={"HingeScore: " + msg.rawJson.routerDecision.hingeScore.toFixed(2)}>
+              {msg.rawJson.routerDecision.hingeScore < 0.3 ? "Low" : msg.rawJson.routerDecision.hingeScore < 0.55 ? "Med" : "High"}
+            </span>
           )}
           {msg.rawJson?.truncated && (
             <span style={{ fontSize: "10px", color: "#DC2626", background: "rgba(220,38,38,0.12)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }} title={"Response truncated by model — finish_reason: " + (msg.rawJson?.routerDecision?.finishReason || "length")}>⚠️ Truncated</span>
@@ -157,6 +160,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Max tokens:</span> {msg.rawJson.routerDecision?.maxTokens || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Quality gate:</span> {msg.rawJson.routerDecision?.qualityGate || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Enforcement:</span> {msg.rawJson.routerDecision?.enforce || "none"}</div>
+              <div class="rei-router-panel__item"><span class="rei-router-panel__label">Rationale:</span> {msg.rawJson.routerDecision?.rationale || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Est. cost:</span> ${msg.rawJson.routerDecision?.estimatedCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Premium cost:</span> ${msg.rawJson.routerDecision?.premiumCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Savings:</span> {msg.rawJson.routerDecision?.premiumCost > 0

@@ -16,7 +16,7 @@ export default {
     jobType: "genealogy-deep-dive",
     label: "Genealogy Deep Dive",
     model: "llama-3.3-70b-versatile",
-    maxTokens: 800,
+    maxTokens: 4000,
     costPer1k: 1.0,
     qualityGate: "Evidence tiers + citations",
     enforce: "EVIDENCE_TIERS",
