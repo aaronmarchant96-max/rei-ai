@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import ToolsLanding from "./ToolsLanding.jsx";
+import claimsData from "./data/claims.json";
 
 describe("ToolsLanding", () => {
   it("renders hero with REI.ai name and launch button", () => {
@@ -12,7 +13,7 @@ describe("ToolsLanding", () => {
   it("renders stats badges with accuracy and test count", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText("558+")).toBeInTheDocument();
+    expect(screen.getByText(`${claimsData.testCount}+`)).toBeInTheDocument();
     expect(screen.getByText("Passing Tests")).toBeInTheDocument();
     expect(screen.getByText("Deterministic Accuracy")).toBeInTheDocument();
   });

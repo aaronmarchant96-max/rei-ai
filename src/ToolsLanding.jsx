@@ -4,6 +4,7 @@ import { buildRouterDecision } from "./lib/nightShiftRouter";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck } from "lucide-react";
+import claimsData from "./data/claims.json";
 
 const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 
@@ -52,7 +53,7 @@ const CASE_STUDIES = [
   { id: "cardo", toolId: "cardo-guard", label: "CARDO Guard", subtitle: "Cost-Weighted Gate",
     description: "AI Risk Decision Gate",
     hinge: "Act $42k | Miss $850k → ACT",
-    badge: "✅ 558+ Tests Passing" },
+    badge: `✅ ${claimsData.testCount}+ Tests Passing` },
   { id: "trace", toolId: "tracepoint", label: "Tracepoint", subtitle: "Industrial Telemetry",
     description: "Industrial Telemetry & Handover Review",
     hinge: "P-204 Vibration +49.7% vs Baseline" },
@@ -168,7 +169,7 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-4xl mx-auto">
           {[
             { icon: "🎯", val: "60–80%", label: "Deterministic Accuracy" },
-            { icon: "✅", val: "558+", label: "Passing Tests" },
+            { icon: "✅", val: `${claimsData.testCount}+`, label: "Passing Tests" },
             { icon: "⚡", val: "~98%", label: "Cost Savings" },
           ].map((stat, index) => (
             <div
