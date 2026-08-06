@@ -52,13 +52,13 @@ const CASE_STUDIES = [
   { id: "cardo", toolId: "cardo-guard", label: "CARDO Guard", subtitle: "Cost-Weighted Gate",
     description: "AI Risk Decision Gate",
     hinge: "Act $42k | Miss $850k → ACT",
-    badge: "✅ 443+ Tests Passing" },
+    badge: "✅ 558+ Tests Passing" },
   { id: "trace", toolId: "tracepoint", label: "Tracepoint", subtitle: "Industrial Telemetry",
     description: "Industrial Telemetry & Handover Review",
     hinge: "P-204 Vibration +49.7% vs Baseline" },
-  { id: "analytics", toolId: "analytics", label: "Analytics", subtitle: "Routing Observability",
-    description: "Client-side routing pattern dashboard",
-    hinge: "Cost Log • Model Distribution • Domain Heat", badge: "NEW" },
+  { id: "analytics", toolId: "analytics", label: "Analytics", subtitle: "Routing + Evidence",
+    description: "Routing observability, evidence outcomes, CARDO decision audit",
+    hinge: "Rescue Rate • Truncation • Real-vs-Estimate Savings", badge: "NEW" },
 ];
 
 export default function ToolsLanding({ onOpenTool }) {
@@ -159,9 +159,9 @@ export default function ToolsLanding({ onOpenTool }) {
         {/* Technical Badges */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-4xl mx-auto">
           {[
-            { icon: "🎯", val: "92.0%", label: "Zero-Shot Accuracy" },
-            { icon: "✅", val: "443+", label: "Passing Tests" },
-            { icon: "⚡", val: "<5ms", label: "Latency" },
+            { icon: "🎯", val: "60–80%", label: "Deterministic Accuracy" },
+            { icon: "✅", val: "558+", label: "Passing Tests" },
+            { icon: "⚡", val: "~98%", label: "Cost Savings" },
           ].map((stat, index) => (
             <div
               key={index}
@@ -212,7 +212,7 @@ export default function ToolsLanding({ onOpenTool }) {
                   <span className="text-foreground font-semibold">{demoResult.model}</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-foreground-muted">ML Hinge Vector</span>
+                  <span className="text-foreground-muted">Complexity Vector</span>
                   <span className="text-foreground-muted">
                     ECS:{hsv.ecs?.toFixed(2)||"—"} | DAS:{hsv.das?.toFixed(2)||"—"} | APS:{hsv.aps?.toFixed(2)||"—"}
                   </span>
