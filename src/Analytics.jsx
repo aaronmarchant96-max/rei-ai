@@ -479,7 +479,7 @@ export default function Analytics() {
                       var color = hingScoreColor(hs);
                       var terms = Array.isArray(entry.matchedTerms) ? entry.matchedTerms : [];
                       return (
-                        <tr key={idx} style={{ borderBottom: "1px solid " + colors.border, animation: "slide-up 0.35s ease-out both", animationDelay: (idx * 60) + "ms" }}>
+                        <tr key={idx} style={{ borderBottom: "1px solid " + colors.border, animation: "slide-up 0.35s ease-out both", animationDelay: (idx * 100) + "ms" }}>
                           <td style={{ padding: "7px 10px", color: colors.textDim, whiteSpace: "nowrap" }}>
                             {new Date(entry.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </td>

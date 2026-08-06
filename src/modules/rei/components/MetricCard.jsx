@@ -1,19 +1,23 @@
 export default function MetricCard({ label, children, subtext, delay = 0, style }) {
   return (
-    <div style={{
+    <div className="metric-card" style={{
       padding: "18px 20px",
-      borderRadius: "12px",
-      background: "var(--surface, #111318)",
-      border: "1px solid var(--border, rgba(255,255,255,0.08))",
+      borderRadius: "14px",
+      background: "linear-gradient(135deg, rgba(17,19,24,0.95), rgba(17,19,24,0.75))",
+      backdropFilter: "blur(12px)",
+      WebkitBackdropFilter: "blur(12px)",
+      border: "1px solid rgba(255,255,255,0.06)",
+      borderImage: "linear-gradient(135deg, rgba(212,175,55,0.3), rgba(245,158,11,0.05)) 1",
       textAlign: "center",
       flex: "1 1 120px",
       minWidth: "120px",
       animation: "fade-in 0.4s ease-out both",
       animationDelay: delay + "ms",
+      transition: "border-color 0.3s ease, box-shadow 0.3s ease",
       ...(style || {}),
     }}>
       {label && (
-        <div style={{
+        <div className="metric-card" style={{
           fontSize: "11px",
           textTransform: "uppercase",
           letterSpacing: "0.06em",
@@ -25,7 +29,7 @@ export default function MetricCard({ label, children, subtext, delay = 0, style 
       )}
       {children}
       {subtext && (
-        <div style={{
+        <div className="metric-card" style={{
           fontSize: "10px",
           color: "var(--textDim, #94A3B8)",
           marginTop: "4px",

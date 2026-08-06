@@ -10,7 +10,7 @@ export default function ProgressBar({ entries, labelFn, palette = "#F59E0B", sty
             style={{
               display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px",
               animation: "slide-up 0.35s ease-out both",
-              animationDelay: (idx * 80) + "ms",
+              animationDelay: (idx * 100) + "ms",
             }}
           >
             <div style={{
@@ -25,7 +25,7 @@ export default function ProgressBar({ entries, labelFn, palette = "#F59E0B", sty
                 height: "100%",
                 width: Math.max(count * 6, 2) + "%",
                 borderRadius: "4px",
-                background: palette,
+                background: "linear-gradient(90deg, " + palette + ", #D4AF37)",
                 transition: "width 0.4s ease",
               }} />
             </div>
