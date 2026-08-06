@@ -1,6 +1,6 @@
 # Testing Strategy
 
-REI.ai maintains 38 test suites with 508 tests, all passing. This document explains the testing philosophy, what each category covers, and how to write new tests.
+REI.ai currently has 43 test suites with 558 tests passing. This document explains the testing philosophy, what each category covers, and how to write new tests.
 
 ## Philosophy
 
@@ -43,15 +43,36 @@ Tests the main API handler: placeholder key guard, input length cap, method rest
 2. **Name the assertion clearly.** `it("does not route narrative prompts with 'build' to coding")` is better than `it("tests build collision")`
 3. **Test the boundary.** If a value must be ≥ 80%, test 80 and 79
 4. **Add to the right file.** Router tests go in `nightShiftRouter.test.js`. New component tests get their own file
-5. **Run the full suite before pushing.** `npm test` runs all 30 suites
+5. **Run the full suite before pushing.** `npm test` runs all suites and is the canonical final check
 
 ## Running tests
 
 ```bash
-npm test                                    # all 38 suites
+npm test                                    # all suites
 npx jest src/lib/nightShiftRouter.test.js   # one suite
 npx jest --verbose                          # verbose output
 ```
+
+Latest verified full-suite result (2026-08-06): **43/43 suites**, **558/558 tests**.
+
+## Auditing the test system itself
+
+When you need to audit test integrity (not just pass/fail), run this sequence:
+
+```bash
+mkdir -p .artifacts
+npm test -- --runInBand --json --outputFile=.artifacts/jest-summary.json
+jq '{ totalSuites: .numTotalTestSuites, passedSuites: .numPassedTestSuites, totalTests: .numTotalTests, passedTests: .numPassedTests }' .artifacts/jest-summary.json
+npm test -- --runInBand src/__eval__/feynmanGate.test.js
+npm test -- --runInBand src/__eval__/hingeCalibrationDebate.test.js
+npm test -- --runInBand --testPathPatterns=routingEval
+```
+
+- `feynmanGate.test.js` checks that numeric claims about eval pools match computed reality.
+- `hingeCalibrationDebate.test.js` checks calibration pool construction and scoring integrity.
+- `routingEval*` reproduces router accuracy and savings claims used in public docs.
+- `docs/CLAIM_LEDGER.md` is the only place claims should be recorded as verified.
+- In environments without ONNX/HF model access, `routingEvalBlindV2` falls back to synthetic hash mode and cannot be used for semantic-accuracy claims.
 
 ## Known limitations
 

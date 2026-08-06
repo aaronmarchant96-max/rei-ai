@@ -2,9 +2,41 @@
 
 Every published claim maps to the command that produces it. If a claim has no command, it is retired or marked self-reported.
 
+## Independent audit path (tests themselves)
+
+Use this when you want to verify the **test system integrity**, not just one claim:
+
+1. Capture an objective Jest summary:
+
+```bash
+mkdir -p .artifacts
+npm test -- --runInBand --json --outputFile=.artifacts/jest-summary.json
+jq '{ totalSuites: .numTotalTestSuites, passedSuites: .numPassedTestSuites, totalTests: .numTotalTests, passedTests: .numPassedTests }' .artifacts/jest-summary.json
+```
+
+2. Run the anti-self-deception gate:
+
+```bash
+npm test -- --runInBand src/__eval__/feynmanGate.test.js
+```
+
+3. Verify calibration pool integrity:
+
+```bash
+npm test -- --runInBand src/__eval__/hingeCalibrationDebate.test.js
+```
+
+4. Reproduce benchmark claims:
+
+```bash
+npm test -- --runInBand --testPathPatterns=routingEval
+```
+
+5. Update this ledger and any public docs **only** from command output (never from memory).
+
 ## Accuracy
 
-| Claim | Producing command | Verified result (2026-08-05) |
+| Claim | Producing command | Verified result (2026-08-06) |
 |-------|-------------------|-------------------------------|
 | Router accuracy ≥ 60% (basic) | `npm test -- --runInBand src/__eval__/routingEval.test.js` | 60% (27/45) |
 | Router accuracy ≥ 60% (ML holdout) | `npm test -- --runInBand src/__eval__/routingEvalML.test.js` | 66.7% (18/27) |
@@ -17,7 +49,7 @@ Every published claim maps to the command that produces it. If a claim has no co
 
 ## Cost savings
 
-| Claim | Producing command | Verified result (2026-08-05) |
+| Claim | Producing command | Verified result (2026-08-06) |
 |-------|-------------------|-------------------------------|
 | ~98% savings vs gpt-4o baseline (ceiling-based) | `npm test -- --runInBand --testPathPatterns=routingEval` | 98% across all suites |
 | Production telemetry savings | N/A — self-reported | Not independently verifiable |
@@ -26,14 +58,14 @@ Every published claim maps to the command that produces it. If a claim has no co
 
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
-| 539 tests / 41 suites | `npm test -- --runInBand` | ✅ |
+| 558 tests / 43 suites | `npm test -- --runInBand` | ✅ |
 | Build succeeds | `npm run build` | ✅ |
 | Lint 0 errors / 195 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
 | Live API HTTP 200 | `curl https://debate-furnace.vercel.app/api/cfai` | ✅ (2026-07-01, 2026-08-05) |
 | 200-entry decision store ring buffer | `npm test -- --runInBand src/lib/decisionStore.test.ts` | ✅ 8 tests |
 | FEYNMAN_GATE verifies embedded copies | `npm test -- --runInBand src/__eval__/feynmanGate.test.js` | ✅ 10 tests |
 | BackendUnavailablePanel (11 tests) | `npm test -- --runInBand src/modules/rei/components/BackendUnavailablePanel.test.jsx` | ✅ |
-| HingeScore calibration infra (14 tests) | `npm test -- --runInBand src/__eval__/hingeCalibrationDebate.test.js` | ✅ |
+| HingeScore calibration infra (15 tests) | `npm test -- --runInBand src/__eval__/hingeCalibrationDebate.test.js` | ✅ |
 
 ## Rule
 
