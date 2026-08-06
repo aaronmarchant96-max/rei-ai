@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { getLogs, clearLogs } from "./lib/routingLog";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
+import MetricCard from "./modules/rei/components/MetricCard.jsx";
+import ProgressBar from "./modules/rei/components/ProgressBar.jsx";
 
 const DOMAIN_LABELS = {
   assistant: "Generalist",
@@ -302,32 +304,25 @@ export default function Analytics() {
           <>
             {/* ── Summary cards ── */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "12px" }}>
-              <div style={cardStyle}>
-                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Requests</div>
+              <MetricCard delay={0} label="Requests">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{aggregates.totalRequests}</div>
-              </div>
-              <div style={cardStyle}>
-                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Session Cost</div>
+              </MetricCard>
+              <MetricCard delay={60} label="Session Cost">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{formatCost(aggregates.totalCost)}</div>
-              </div>
-              <div style={{ ...cardStyle, flex: "1 1 180px" }}>
-                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Savings vs gpt-4o baseline</div>
+              </MetricCard>
+              <MetricCard delay={120} label="Savings vs gpt-4o baseline" style={{ flex: "1 1 180px" }}>
                 <div style={{ fontSize: "12px", color: colors.textDim, lineHeight: "1.6" }}>
                   Without: <b style={{ color: colors.text }}>{formatCost(aggregates.totalPremium)}</b>
                   <br />With: <b style={{ color: colors.text }}>{formatCost(aggregates.totalCost)}</b>
                 </div>
                 <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a", marginTop: "4px" }}>{aggregates.savingsPct}% saved</div>
-              </div>
-              <div style={cardStyle}>
-                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Avg route decision</div>
+              </MetricCard>
+              <MetricCard delay={180} label="Avg route decision" subtext="router decision time">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{aggregates.avgRoutingMs != null ? aggregates.avgRoutingMs + " ms" : "—"}</div>
-                <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "2px" }}>router decision time</div>
-              </div>
-              <div style={{ ...cardStyle, flex: "1 1 160px" }}>
-                <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Lifetime Saved</div>
+              </MetricCard>
+              <MetricCard delay={240} label="Lifetime Saved" subtext="vs gpt-4o baseline" style={{ flex: "1 1 160px" }}>
                 <div style={{ fontSize: "24px", fontWeight: 800, color: "#16a34a" }}>{formatCost(lifetimeSaved)}</div>
-                <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "2px" }}>vs gpt-4o baseline</div>
-              </div>
+              </MetricCard>
             </div>
             <p style={{ fontSize: "11px", color: colors.textDim, margin: "0 0 28px", lineHeight: "1.5" }}>
               Lifetime savings are calculated against the configured premium baseline (currently GPT-4o pricing).
@@ -437,12 +432,12 @@ export default function Analytics() {
                 var count = entry[1];
                 var pct = Math.round((count / aggregates.totalRequests) * 100);
                 return (
-                  <div key={model} style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
+                  <div key={model} style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px", animation: "slide-up 0.35s ease-out both", animationDelay: (aggregates.sortedModels.indexOf(entry) * 80) + "ms" }}>
                     <div style={{ fontSize: "13px", fontWeight: 600, width: "160px", flexShrink: 0, color: colors.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                       title={model}>
                       {model}
                     </div>
-                    <div style={barTrackStyle}>
+                    <div style={{ height: "8px", borderRadius: "4px", flex: 1, minWidth: "60px", overflow: "hidden" }}>
                       <div style={{
                         height: "100%", width: Math.max((count / aggregates.maxModelCount) * 100, 2) + "%",
                         borderRadius: "4px", background: colors.amber,
@@ -484,7 +479,7 @@ export default function Analytics() {
                       var color = hingScoreColor(hs);
                       var terms = Array.isArray(entry.matchedTerms) ? entry.matchedTerms : [];
                       return (
-                        <tr key={idx} style={{ borderBottom: "1px solid " + colors.border }}>
+                        <tr key={idx} style={{ borderBottom: "1px solid " + colors.border, animation: "slide-up 0.35s ease-out both", animationDelay: (idx * 60) + "ms" }}>
                           <td style={{ padding: "7px 10px", color: colors.textDim, whiteSpace: "nowrap" }}>
                             {new Date(entry.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </td>
