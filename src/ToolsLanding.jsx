@@ -134,16 +134,24 @@ export default function ToolsLanding({ onOpenTool }) {
           Find the one fact that <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F59E0B] to-[#FFD700]">changes the answer</span>.
         </h1>
         
-        <p className="relative text-[#E2E8F0] text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed font-light z-10">
+        <p className="relative text-[#E2E8F0] text-xl md:text-2xl max-w-3xl mx-auto mb-8 leading-relaxed font-light z-10">
           Structured reasoning with cost-aware AI routing. Pick a problem. Find the hinge. Make the call.
         </p>
-        
+
+        <p className="relative text-[#94A3B8] text-sm md:text-base max-w-2xl mx-auto mb-10 z-10">
+          For teams that use LLMs in production and want to know <span className="text-foreground">why</span> each request cost what it did — not just what the model said.
+        </p>
+
         <button
           onClick={() => onOpenTool({ tool: "rei" })}
           className="relative z-10 group flex items-center gap-2 bg-gradient-to-r from-[#F59E0B] to-[#FFD700] text-black px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:scale-105 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all duration-300"
         >
           LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
+
+        <p className="relative z-10 text-[#64748B] text-xs mt-5">
+          1. Pick a domain → 2. Ask your question → 3. See the reasoning, not just the answer.
+        </p>
       </motion.header>
 
       {/* ── 2. The Flagship (REI.ai) ── */}
@@ -227,6 +235,24 @@ export default function ToolsLanding({ onOpenTool }) {
             </div>
           )}
         </div>
+      </motion.section>
+
+      {/* ── 2.5. Why trust this? ── */}
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
+        className="relative z-10 max-w-3xl mx-auto py-16 text-center"
+      >
+        <p className="text-[#E2E8F0] text-lg md:text-xl leading-relaxed font-light">
+          ChatGPT gives you an answer.<br/>
+          <span className="text-hinge-bright font-bold">REI.ai gives you the reasoning, the evidence, and what would change the conclusion.</span>
+        </p>
+        <a 
+          href={`${REPO_URL}/blob/main/docs/CASE_STUDY.md`}
+          target="_blank" rel="noopener noreferrer"
+          className="inline-block mt-5 text-sm text-[#94A3B8] hover:text-hinge-bright transition-colors underline underline-offset-4"
+        >
+          See case studies →
+        </a>
       </motion.section>
 
       {/* ── 3. The True CARDO Pipeline ── */}
