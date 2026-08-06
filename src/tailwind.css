@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .metric-card {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .metric-card:hover {
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.08);
+  }
+}
+
 @layer base {
   body {
     @apply bg-background text-foreground antialiased selection:bg-hinge-bright selection:text-black;
