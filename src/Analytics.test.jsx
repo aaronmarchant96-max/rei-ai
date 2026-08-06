@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import Analytics from "./Analytics.jsx";
 
 describe("Analytics", () => {
@@ -12,7 +12,7 @@ describe("Analytics", () => {
     expect(screen.getByText(/No routing data yet/i)).toBeInTheDocument();
   });
 
-  it("renders summary cards with legacy + new-format log entries", () => {
+  it("renders summary cards with legacy + new-format log entries", async () => {
     const oldEntry = { timestamp: "2026-08-04T01:00:00.000Z", domain: "legal", model: "deepseek-chat", estimatedCost: 0.0006 };
     const newEntry = {
       timestamp: "2026-08-04T01:00:00.000Z", domain: "coding", model: "deepseek-chat",
@@ -25,7 +25,8 @@ describe("Analytics", () => {
 
     render(<Analytics />);
 
-    expect(screen.getByText("2")).toBeInTheDocument(); // Requests
+    // AnimatedCounter starts at 0 — wait for it to tick up
+    await waitFor(() => expect(screen.getByText("2")).toBeInTheDocument(), { timeout: 1200 });
     // Baseline transparency: Without / With must both render (regression: totalPremium was missing from aggregates)
     expect(screen.getByText(/Without:/i)).toBeInTheDocument();
     expect(screen.getByText(/With:/i)).toBeInTheDocument();
