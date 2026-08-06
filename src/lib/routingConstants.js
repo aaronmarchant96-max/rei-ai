@@ -13,6 +13,29 @@ export const HIGH_STRUCTURE_TERMS = [
   "what matters most",
 ];
 
+export const GREETING_TERMS = [
+  "hi",
+  "hello",
+  "hey",
+  "yo",
+  "good morning",
+  "good afternoon",
+  "good evening",
+  "hiya",
+  "howdy",
+  "sup",
+  "heya",
+  "greetings",
+];
+
 export function isSimpleGreeting(text = "") {
-  return /^(hi|hello|hey|yo|hiya|howdy|sup|heya|greetings|(good )?(morning|afternoon|evening))([\s!.?]|$)/i.test(text.trim());
+  const t = text.trim().toLowerCase();
+  for (const term of GREETING_TERMS) {
+    if (t === term) return true;
+    if (t.startsWith(term)) {
+      const nextChar = t[term.length];
+      if (nextChar === undefined || /[\s!.?]/.test(nextChar)) return true;
+    }
+  }
+  return false;
 }

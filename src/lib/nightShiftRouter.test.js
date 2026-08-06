@@ -1,4 +1,5 @@
 import { buildRouterDecision, getFingerprintCatalog, resolveRoutingModel } from "./nightShiftRouter";
+import { isSimpleGreeting } from "./routingConstants.js";
 
 describe("nightShiftRouter", () => {
   beforeEach(() => {
@@ -241,5 +242,55 @@ describe("nightShiftRouter", () => {
       const decision = buildRouterDecision({ input: "poke holes in my business plan", domain: "assistant" });
       expect(decision.id).toBe("adversarial-validation");
     });
+    it("matchedTerms reflect the chosen route, not the first catalog match (genealogy tab + story text)", () => {
+      const decision = buildRouterDecision({
+        input: "tell me a story about my ancestors",
+        domain: "genealogy",
+      });
+      expect(decision.id).toBe("genealogy-deep-dive");
+      // matchedTerms must NOT contain story-architect terms
+      const terms = decision.routingSignals?.matchedTerms || [];
+      expect(terms).not.toContain("story");
+      expect(terms).not.toContain("narrative");
+    });
+
+    it("matchedTerms reflect the chosen route, not the first catalog match (generalist + maintenance text)", () => {
+      const decision = buildRouterDecision({
+        input: "our water pump is failing and I need maintenance advice",
+        domain: "assistant",
+      });
+      expect(decision.id).toBe("structured-reasoning");
+      const terms = decision.routingSignals?.matchedTerms || [];
+      expect(terms).toContain("pump");
+      expect(terms).toContain("maintenance");
+      // story-architect terms must NOT leak
+      expect(terms).not.toContain("story");
+      expect(terms).not.toContain("narrative");
+    });
+
+    it("matchedTerms are empty when no chosen-route terms actually match (genealogy tab, non-genealogy text)", () => {
+      const decision = buildRouterDecision({
+        input: "what is the capital of France",
+        domain: "genealogy",
+      });
+      expect(decision.id).toBe("genealogy-deep-dive");
+      const terms = decision.routingSignals?.matchedTerms || [];
+      expect(terms).toEqual([]);
+    });
+
+    it("every simple-greeting fingerprint matchTerm is caught by isSimpleGreeting", () => {
+      const catalog = getFingerprintCatalog();
+      const greetingEntry = catalog.find(function (e) { return e.id === "simple-greeting"; });
+      const terms = Array.isArray(greetingEntry?.matchTerms) ? greetingEntry.matchTerms : [];
+      expect(terms.length).toBeGreaterThan(0);
+      for (var i = 0; i < terms.length; i++) {
+        expect(isSimpleGreeting(terms[i])).toBe(true);
+        expect(isSimpleGreeting(terms[i] + "!")).toBe(true);
+        expect(isSimpleGreeting(terms[i] + " there")).toBe(true);
+      }
+      expect(isSimpleGreeting("how are you")).toBe(false);
+      expect(isSimpleGreeting("")).toBe(false);
+    });
+
   });
 });
