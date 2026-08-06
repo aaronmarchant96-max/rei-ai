@@ -26,7 +26,7 @@ function getBackendForModel(model) {
 
 // ── Per-backend callers ──
 
-async function callDeepSeek(messages, maxTokens) {
+async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
   const key = process.env.DEEPSEEK_API_KEY || process.env.deepseek;
   if (!key) return null;
   const controller = new AbortController();
@@ -36,7 +36,7 @@ async function callDeepSeek(messages, maxTokens) {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "deepseek-chat", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: "deepseek-chat", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
       const err = await res.text().catch(function () { return "(unreadable)"; });
@@ -51,7 +51,7 @@ async function callDeepSeek(messages, maxTokens) {
   }
 }
 
-async function callGemini(messages, maxTokens) {
+async function callGemini(messages, maxTokens, temperature = 0.7) {
   const key = process.env.GEMINI_API_KEY;
   if (!key || !key.startsWith("AQ.")) return null;
   const controller = new AbortController();
@@ -61,7 +61,7 @@ async function callGemini(messages, maxTokens) {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "gemini-flash-latest", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: "gemini-flash-latest", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
       console.warn("Gemini status " + res.status);
@@ -75,7 +75,7 @@ async function callGemini(messages, maxTokens) {
   }
 }
 
-async function callGroq(messages, maxTokens, model) {
+async function callGroq(messages, maxTokens, model, temperature = 0.7) {
   const key = process.env.GROQ_API_KEY;
   if (!key || key.includes("your_groq_api_key_here")) return null;
   const controller = new AbortController();
@@ -85,7 +85,7 @@ async function callGroq(messages, maxTokens, model) {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: model || "llama-3.3-70b-versatile", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: model || "llama-3.3-70b-versatile", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
       console.warn("Groq status " + res.status);
@@ -99,7 +99,7 @@ async function callGroq(messages, maxTokens, model) {
   }
 }
 
-async function callOpenAI(messages, maxTokens) {
+async function callOpenAI(messages, maxTokens, temperature = 0.7) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
   const controller = new AbortController();
@@ -109,7 +109,7 @@ async function callOpenAI(messages, maxTokens) {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "gpt-4o", messages: messages, temperature: 0.7, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: "gpt-4o", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -139,13 +139,18 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
   const maxTokens = routerDecision?.maxTokens || 2048;
   const primaryModel = routerDecision?.model || "deepseek-chat";
   const primaryBackend = getBackendForModel(primaryModel);
+  const temperature = routerDecision?.temperature ?? 0.7;
+  // Only pass the routed model to Groq when Groq IS the primary backend —
+  // as a fallback it must use the default model (a non-Groq routed model
+  // like deepseek-chat would be rejected by Groq's API).
+  const groqModel = primaryBackend === "groq" ? primaryModel : null;
 
   // Map of available backends
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function () { return callDeepSeek(messages, maxTokens); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function () { return callGemini(messages, maxTokens); };
-  if (process.env.GROQ_API_KEY) backends.groq = function () { return callGroq(messages, maxTokens, null); };
-  if (process.env.OPENAI_API_KEY) backends.openai = function () { return callOpenAI(messages, maxTokens); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function () { return callDeepSeek(messages, maxTokens, temperature); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function () { return callGemini(messages, maxTokens, temperature); };
+  if (process.env.GROQ_API_KEY) backends.groq = function () { return callGroq(messages, maxTokens, groqModel, temperature); };
+  if (process.env.OPENAI_API_KEY) backends.openai = function () { return callOpenAI(messages, maxTokens, temperature); };
 
   // Try primary backend first
   if (primaryBackend && backends[primaryBackend]) {

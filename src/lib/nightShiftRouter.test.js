@@ -224,7 +224,7 @@ describe("nightShiftRouter", () => {
       expect(decision.model).toBe("llama-3.1-8b-instant");
     });
 
-    it("differentiates cost between the free 70B path and paid routes", () => {
+    it("differentiates cost between 70B, 8B, and Gemini routes", () => {
       const greeting = buildRouterDecision({ input: "hello", domain: "assistant" });
       const freeReasoning = buildRouterDecision({ input: "Help me think through a decision", domain: "assistant" });
       const coding = buildRouterDecision({ input: "evaluate tradeoffs between monorepo and polyrepo", domain: "assistant" });
@@ -232,8 +232,10 @@ describe("nightShiftRouter", () => {
       expect(greeting.model).toBe("llama-3.1-8b-instant");
       expect(freeReasoning.model).toBe("llama-3.3-70b-versatile");
       expect(coding.model).toBe("gemini-flash-latest");
-      // llama-3.3-70b is free on Groq; greeting (8b) and coding (Gemini) have nominal rates
-      expect(freeReasoning.estimatedCost).toBe(0);
+      // 70B bills at its real Groq rate (FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT = 0.00138/1k),
+      // NOT $0 — the savings dashboard must reflect honest paid-model math.
+      // estimatedCost = (maxTokens/1000) x rate, so 1500 maxTokens x 0.00138 = 0.00207.
+      expect(freeReasoning.estimatedCost).toBeCloseTo(0.00138 * (freeReasoning.maxTokens / 1000), 5);
       expect(greeting.estimatedCost).toBeGreaterThan(0);
       expect(coding.estimatedCost).toBeGreaterThan(0);
     });

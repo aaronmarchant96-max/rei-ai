@@ -27,7 +27,8 @@ MODEL_COSTS["deepseek-chat"] = { input: 0.00014, output: 0.00028, ceiling: 0.000
 export const DEFAULT_COST_MODEL = "llama-3.3-70b-versatile";
 
 export function getModelCosts(model: string): ModelCost {
-  return MODEL_COSTS[model] || MODEL_COSTS[DEFAULT_COST_MODEL];
+  const clean = String(model || "").replace(" (fallback)", "");
+  return MODEL_COSTS[clean] || MODEL_COSTS[DEFAULT_COST_MODEL];
 }
 
 export function getModelCostRate(model: string): number {
