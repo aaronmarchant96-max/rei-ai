@@ -59,7 +59,7 @@ const TOP_LEVEL = [
   {
     id: "analytics",
     label: "Analytics",
-    subtitle: "Routing patterns and cost observability."
+    subtitle: "How decisions played out — rescue rate, savings, audit."
   }
 ];
 

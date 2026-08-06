@@ -234,7 +234,7 @@ export default function Analytics() {
               Routing Analytics
             </h1>
             <p style={{ fontSize: "13px", color: colors.textDim, margin: "8px 0 0" }}>
-              Client-side routing history. Data stored in your browser — never sent to a server.
+              From router decision to model response — what actually happened and what it cost.
             </p>
           </div>
           <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
