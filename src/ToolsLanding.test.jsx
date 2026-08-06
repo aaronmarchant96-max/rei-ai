@@ -12,9 +12,9 @@ describe("ToolsLanding", () => {
   it("renders stats badges with accuracy and test count", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText("443+")).toBeInTheDocument();
+    expect(screen.getByText("558+")).toBeInTheDocument();
     expect(screen.getByText("Passing Tests")).toBeInTheDocument();
-    expect(screen.getByText("Zero-Shot Accuracy")).toBeInTheDocument();
+    expect(screen.getByText("Deterministic Accuracy")).toBeInTheDocument();
   });
 
   it("renders CARDO pipeline steps", () => {
