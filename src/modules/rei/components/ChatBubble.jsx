@@ -159,6 +159,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
               <div class="rei-router-panel__item"><span class="rei-router-panel__label">Matched terms:</span> {msg.rawJson.routerDecision?.matchedTerms?.join(", ") || "none"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Max tokens:</span> {msg.rawJson.routerDecision?.maxTokens || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Quality gate:</span> {msg.rawJson.routerDecision?.qualityGate || "n/a"}</div>
+              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Escalation:</span> {msg.rawJson.routerDecision?.escalation?.recommended ? "⚠️ Recommended — " + msg.rawJson.routerDecision.escalation.reason : "Not recommended • routing cost within threshold"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Enforcement:</span> {msg.rawJson.routerDecision?.enforce || "none"}</div>
               <div class="rei-router-panel__item"><span class="rei-router-panel__label">Rationale:</span> {msg.rawJson.routerDecision?.rationale || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Est. cost:</span> ${msg.rawJson.routerDecision?.estimatedCost?.toFixed(4) || "—"}</div>

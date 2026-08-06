@@ -6,6 +6,8 @@ import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextE
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import { logDecision } from "./lib/decisionStore";
 import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
+import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
+import { isAdversarialRequest } from "./lib/routingConstants.js";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
@@ -193,6 +195,13 @@ export default function REI({ initialPrompt } = {}) {
       }
     }
   };
+
+  function mapTierToPathway(tier) {
+    if (tier === "ultra") return "deterministic";
+    if (tier === "high") return "premium";
+    if (tier === "medium") return "medium";
+    return "cheap";
+  }
 
   // Add fade-in animation style
   const fadeInStyle = {
@@ -493,6 +502,16 @@ export default function REI({ initialPrompt } = {}) {
       });
       const routingMs = Math.round((performance.now() - routerStart) * 100) / 100;
 
+      const escalation = shouldEscalateToRemote({
+        confidence: routerDecision.hingeScore,
+        pathway: mapTierToPathway(routerDecision.hingeTier),
+        estimatedCost: routerDecision.estimatedCost,
+        premiumCost: routerDecision.premiumCost,
+        qualityGate: routerDecision.qualityGate,
+        suspicionScore: isAdversarialRequest(userMsg.text) ? 0.7 : 0,
+      });
+      routerDecision.escalation = escalation;
+
       logRoutingDecision({
         domain: selectedDomain,
         routeId: routerDecision.id,
@@ -504,6 +523,7 @@ export default function REI({ initialPrompt } = {}) {
         rationale: routerDecision.rationale,
         matchedTerms: routerDecision.routingSignals?.matchedTerms || [],
         routingMs: routingMs,
+        escalation: escalation,
         inputPreview: userMsg.text.slice(0, 80),
       });
 
