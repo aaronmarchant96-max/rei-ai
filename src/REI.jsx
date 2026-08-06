@@ -197,9 +197,9 @@ export default function REI({ initialPrompt } = {}) {
   };
 
   function mapTierToPathway(tier) {
-    if (tier === "ultra") return "deterministic";
-    if (tier === "high") return "premium";
-    if (tier === "medium") return "medium";
+    // All tiers map to "cheap" — the cheapRouteConfidence (1−hs) drives
+    // the escalation decision. Deterministic/premium pathways short-circuit
+    // to escalation=false, so we never use those here.
     return "cheap";
   }
 
@@ -503,7 +503,7 @@ export default function REI({ initialPrompt } = {}) {
       const routingMs = Math.round((performance.now() - routerStart) * 100) / 100;
 
       const escalation = shouldEscalateToRemote({
-        confidence: routerDecision.hingeScore,
+        confidence: 1 - (routerDecision.hingeScore || 0),
         pathway: mapTierToPathway(routerDecision.hingeTier),
         estimatedCost: routerDecision.estimatedCost,
         premiumCost: routerDecision.premiumCost,
