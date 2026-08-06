@@ -5,6 +5,14 @@ validated across five task domains.**
 
 ---
 
+> **⚠️ SUPERSEDED CLAIMS — see `CLAIM_LEDGER.md` for current, verified figures.**
+> This document is a historical record of what was targeted/measured at the time of writing
+> (53.6% zero-shot, 88.9% in-sample, 78% savings, 162/227/312 test counts). Those numbers
+> have since been re-baselined: deterministic accuracy is measured at 60–80% (69.1% pooled
+> claimsSync gate), savings ~92% (ceiling-based, after honest 70B pricing fix), tests 560/44
+> suites (auto-verified by `node scripts/gen-claims.mjs --check` in CI). Do not quote this
+> document's figures in proposals, pitches, or diligence — use `CLAIM_LEDGER.md`.
+
 ## Claim Stratification
 
 This paper makes claims at three levels. All are argued, but not all are proven to the same standard:

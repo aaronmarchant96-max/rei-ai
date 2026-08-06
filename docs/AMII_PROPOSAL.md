@@ -8,9 +8,9 @@
 
 ## Executive Summary
 
-REI is an AI that respects your budget as much as your time. It makes reasoning auditable by exposing the hinge point, evidence tiers, and what-would-change-the-conclusion in every response. A cost-aware routing layer (Night Shift) selects the cheapest model that meets a confidence threshold, reducing inference costs 68% below always-premium baselines. All routing decisions are deterministic and testable — zero inference dependency in the router itself.
+REI is an AI that respects your budget as much as your time. It makes reasoning auditable by exposing the hinge point, evidence tiers, and what-would-change-the-conclusion in every response. A cost-aware routing layer (Night Shift) selects the cheapest model that meets a confidence threshold, reducing inference costs ~92% below always-premium baselines (measured, ceiling-based lab benchmark — see CLAIM_LEDGER.md). All routing decisions are deterministic and testable — zero inference dependency in the router itself.
 
-The system has processed 795 million tokens across 1,854 API calls at a total cost of $9.03, demonstrating production-scale efficiency. A 57-prompt benchmark suite across 9 categories confirms 80% routing accuracy with 227 passing tests across 18 test suites and zero inference cost in the evaluation harness.
+The system has processed 795 million tokens across 1,854 API calls at a total cost of $9.03 (historical development telemetry, self-reported). A 57-prompt benchmark suite across 9 categories measures 60–80% deterministic routing accuracy (69.1% pooled claimsSync gate) with 560 passing tests across 44 suites and zero inference cost in the evaluation harness.
 
 ---
 
@@ -29,9 +29,9 @@ CARDO REI makes the reasoning structure explicit: the hinge point (falsifiable c
 **Evidence:** `api/cfai.js` — hardened assistant domain prompt enforces hinge-as-falsifiable-claim with contrapositive ("what would change my mind"). `src/lib/replyParser.js` — deterministic parser extracts structured reasoning sections from responses.
 
 ### 3. Efficient ML
-Night Shift router reduces inference cost 68% compared to always-premium routing. Layer 0 deterministic engine handles ~15-20% of queries at $0 cost. The 5-message sliding window keeps context payloads minimal. Fingerprint catalog matching costs <1ms per decision with zero inference.
+Night Shift router reduces inference cost ~92% compared to always-premium routing (ceiling-based lab benchmark). Layer 0 deterministic engine handles ~15-20% of queries at $0 cost. The 5-message sliding window keeps context payloads minimal. Fingerprint catalog matching costs <1ms per decision with zero inference.
 
-**Evidence:** 57-prompt benchmark: `$0.280 saved vs $0.410 always-premium`. Production data: 441M tokens, $3.83 total cost across 1,194 API calls.
+**Evidence:** 57-prompt benchmark: `$1.662 saved vs $1.801 always-premium (92.3%)`. Production data: 441M tokens, $3.83 total cost across 1,194 API calls (historical telemetry, self-reported).
 
 ### 4. Reproducible AI
 Identical input → identical routing decision. The fingerprint catalog is deterministic — no model inference, no embeddings, no non-deterministic hashing. Confidence thresholds are versioned in `data/fingerprints.json`. The `routingConfidence` fallback chain (catalog score → fingerprint threshold → default 0.5) is explicit and auditable.
@@ -73,12 +73,12 @@ Query → Layer 0: Deterministic Engine ($0, instant)
 | Total tokens processed | 601,255,780 |
 | Total cost | $9.03 |
 | Cost per million tokens | $0.0108 |
-| Savings vs always-premium | 68% (lab benchmark), ~90% (production telemetry, self-reported) |
-| Routing accuracy | 80% across 57 prompts, 9 categories |
+| Savings vs always-premium | ~92% (lab benchmark, ceiling-based); production telemetry self-reported |
+| Routing accuracy | 60–80% band (69.1% pooled claimsSync gate) across 57 prompts, 9 categories |
 | Deterministic (zero-cost) queries | 5 of 57 lab, ~15-20% production |
 | Escalation rate (to premium) | 9% |
-| Test suites | 15 |
-| Total tests | 162 |
+| Test suites | 44 |
+| Total tests | 560 |
 | All tests passing | Yes |
 
 ---
@@ -138,4 +138,4 @@ Query → Layer 0: Deterministic Engine ($0, instant)
 
 `https://github.com/aaronmarchant96-max/rei-ai-platform`
 
-All code, tests (162 passing), benchmarks, and documentation are publicly available. Docker containerization included. Licensed under MIT.
+All code, tests (560 passing across 44 suites), benchmarks, and documentation are publicly available. Docker containerization included. Licensed under MIT.
