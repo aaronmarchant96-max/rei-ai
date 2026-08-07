@@ -68,3 +68,44 @@ export function clearLogs(): void {
     localStorage.removeItem(STORAGE_KEY);
   } catch {}
 }
+
+interface ExportLogsOptions {
+  /** Strip prompt-bearing fields (inputPreview, rationale) from each entry. Default true. */
+  redact?: boolean;
+}
+
+const REDACTED_FIELDS = ["inputPreview", "rationale"] as const;
+
+/**
+ * Serialize routing-log entries to a JSON document with an export envelope.
+ * From here a downstream replay harness can recompute cost savings against the
+ * same route tables — the ledger's 'production savings' claim stays
+ * reproducible instead of self-reported.
+ *
+ * Redacts prompt-bearing fields by default so user prompts (inputPreview,
+ * rationale) never leave the browser unless explicitly retained by the caller.
+ */
+export function exportLogsJSON(
+  logs: RoutingLogEntry[],
+  opts: ExportLogsOptions = {}
+): string {
+  const redact = opts.redact !== false;
+  const payload = redact
+    ? logs.map((entry) => {
+        const clone: Partial<RoutingLogEntry> = { ...entry };
+        for (const field of REDACTED_FIELDS) {
+          delete clone[field];
+        }
+        return clone;
+      })
+    : logs;
+  return JSON.stringify(
+    {
+      exportedAt: new Date().toISOString(),
+      entryCount: logs.length,
+      entries: payload,
+    },
+    null,
+    2
+  );
+}

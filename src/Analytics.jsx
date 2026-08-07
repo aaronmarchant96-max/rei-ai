@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { getLogs, clearLogs } from "./lib/routingLog";
+import { getLogs, clearLogs, exportLogsJSON } from "./lib/routingLog";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
@@ -47,6 +47,17 @@ function exportCSV(logs) {
   const a = document.createElement("a");
   a.href = url;
   a.download = "rei-analytics-" + new Date().toISOString().slice(0, 10) + ".csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportJSON(logs) {
+  const json = exportLogsJSON(logs);
+  const blob = new Blob([json], { type: "application/json;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "rei-analytics-" + new Date().toISOString().slice(0, 10) + ".json";
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -297,6 +308,18 @@ export default function Analytics() {
                 }}
               >
                 Export CSV
+              </button>
+            )}
+            {logs.length > 0 && (
+              <button
+                onClick={function () { exportJSON(logs); }}
+                style={{
+                  padding: "7px 14px", borderRadius: "8px",
+                  background: "transparent", border: "1px solid " + colors.border,
+                  color: colors.textDim, cursor: "pointer", fontSize: "12px", fontWeight: 600,
+                }}
+              >
+                Export JSON
               </button>
             )}
             {[["all", "All"], ["30d", "30 days"], ["7d", "7 days"]].map(function (r) { return (
