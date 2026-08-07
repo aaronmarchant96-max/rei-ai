@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import Analytics from "./Analytics.jsx";
 
 describe("Analytics", () => {
@@ -86,5 +86,59 @@ describe("Analytics", () => {
     expect(screen.queryByText(/null%/i)).not.toBeInTheDocument();
     // real savings = (0.006 - 0)/0.006 = 100% — genuinely zero spend via free fallback
     expect(screen.getAllByText(/100%/i).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("filters logs by date range toggle", async () => {
+    const now = Date.now();
+    const oldTs = new Date(now - 40 * 24 * 60 * 60 * 1000).toISOString(); // 40 days ago
+    const recentTs = new Date(now - 2 * 24 * 60 * 60 * 1000).toISOString(); // 2 days ago
+    const entries = [
+      { timestamp: oldTs, domain: "coding", model: "deepseek-chat", estimatedCost: 0.0005, premiumCost: 0.006 },
+      { timestamp: recentTs, domain: "story", model: "llama-3.3-70b", estimatedCost: 0.0008, premiumCost: 0.006 },
+    ];
+    window.localStorage.setItem("rei_routing_log", JSON.stringify(entries));
+
+    const { getByText, getAllByText, queryAllByText } = render(<Analytics />);
+    await waitFor(() => expect(getByText("2")).toBeInTheDocument(), { timeout: 1200 });
+
+    // Switch to 7 days — the 40-day-old entry should drop out
+    fireEvent.click(getByText("7 days"));
+    // Wait for the filtered view to settle: deepseek-chat (the old entry) must vanish
+    await waitFor(() => expect(queryAllByText("deepseek-chat").length).toBe(0), { timeout: 2000 });
+    expect(getAllByText("llama-3.3-70b").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders Cost trend section with cumulative savings points", () => {
+    const entries = [
+      { timestamp: "2026-08-04T01:00:00.000Z", domain: "coding", model: "deepseek-chat", estimatedCost: 0.0005, premiumCost: 0.006 },
+      { timestamp: "2026-08-05T01:00:00.000Z", domain: "story", model: "llama-3.3-70b", estimatedCost: 0.0008, premiumCost: 0.006 },
+    ];
+    window.localStorage.setItem("rei_routing_log", JSON.stringify(entries));
+
+    render(<Analytics />);
+    expect(screen.getByText(/Cumulative Savings Trend/i)).toBeInTheDocument();
+  });
+
+  it("renders Model Health section with per-model stats", () => {
+    const entries = [
+      { timestamp: "2026-08-04T01:00:00.000Z", domain: "coding", model: "deepseek-chat", estimatedCost: 0.0005, premiumCost: 0.006, routingMs: 3.2, rescue: false },
+      { timestamp: "2026-08-04T02:00:00.000Z", domain: "coding", model: "deepseek-chat", estimatedCost: 0.0007, premiumCost: 0.006, routingMs: 4.1, rescue: false },
+      { timestamp: "2026-08-04T03:00:00.000Z", domain: "story", model: "llama-3.3-70b", estimatedCost: 0.0008, premiumCost: 0.006, routingMs: 5.0, rescue: true },
+    ];
+    window.localStorage.setItem("rei_routing_log", JSON.stringify(entries));
+
+    render(<Analytics />);
+    expect(screen.getByText(/Model Health/i)).toBeInTheDocument();
+    // deepseek-chat: 2 reqs, 0 rescues -> 100% ok
+    expect(screen.getAllByText(/deepseek-chat/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/100% ok/i)).toBeInTheDocument();
+    // llama-3.3-70b: 1 req, 1 rescue -> 0% ok
+    expect(screen.getAllByText(/llama-3.3-70b/i).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("shows No routing data yet empty state when no logs exist", () => {
+    render(<Analytics />);
+    expect(screen.getByText(/No routing data yet/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Cumulative Savings Trend/i)).not.toBeInTheDocument();
   });
 });

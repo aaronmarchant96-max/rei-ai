@@ -72,9 +72,20 @@ function complexityDot(hs) {
 export default function Analytics() {
   const [tab, setTab] = useState("usage");
   const [logs, setLogs] = useState(function () { return getLogs(); });
+  const [dateRange, setDateRange] = useState("all");
+
+  // Date-range filter: logs carry ISO timestamps; filter before aggregation.
+  var filteredLogs = useMemo(function () {
+    if (dateRange === "all") return logs;
+    var cutoff = Date.now() - (dateRange === "30d" ? 30 : 7) * 24 * 60 * 60 * 1000;
+    return logs.filter(function (e) {
+      var ts = e.timestamp ? new Date(e.timestamp).getTime() : Date.now();
+      return ts >= cutoff;
+    });
+  }, [logs, dateRange]);
 
   var aggregates = useMemo(function () {
-    if (logs.length === 0) return null;
+    if (filteredLogs.length === 0) return null;
 
     var totalCost = 0;
     var totalPremium = 0;
@@ -88,8 +99,8 @@ export default function Analytics() {
     var totalActual = 0;
     var actualCount = 0;
 
-    for (var i = 0; i < logs.length; i++) {
-      var e = logs[i];
+    for (var i = 0; i < filteredLogs.length; i++) {
+      var e = filteredLogs[i];
       totalCost += e.estimatedCost || 0;
       totalPremium += e.premiumCost || 0;
       if (e.routingMs != null) {
@@ -130,7 +141,7 @@ export default function Analytics() {
     }
 
     return {
-      totalRequests: logs.length,
+      totalRequests: filteredLogs.length,
       totalCost: totalCost,
       totalPremium: totalPremium,
       totalSavings: totalSavings,
@@ -141,9 +152,9 @@ export default function Analytics() {
       sortedModels: sortedModels,
       maxDomainCount: maxDomainCount,
       maxModelCount: maxModelCount,
-      rescueRate: logs.length > 0 ? Math.round((rescueCount / logs.length) * 100) : 0,
+      rescueRate: filteredLogs.length > 0 ? Math.round((rescueCount / filteredLogs.length) * 100) : 0,
       rescueCount: rescueCount,
-      truncationRate: logs.length > 0 ? Math.round((truncatedCount / logs.length) * 100) : 0,
+      truncationRate: filteredLogs.length > 0 ? Math.round((truncatedCount / filteredLogs.length) * 100) : 0,
       truncatedCount: truncatedCount,
       hingeBands: hingeBands,
       actualCount: actualCount,
@@ -151,7 +162,45 @@ export default function Analytics() {
       actualSavingsPct: actualSavingsPct,
       estimateVsActualPct: estimateVsActualPct,
     };
-  }, [logs]);
+  }, [filteredLogs, logs]);
+
+  // Cost trend: cumulative savings (premiumCost - estimatedCost) over time.
+  var costTrend = useMemo(function () {
+    if (filteredLogs.length === 0) return [];
+    var sorted = filteredLogs.slice().sort(function (a, b) {
+      return new Date(a.timestamp || 0) - new Date(b.timestamp || 0);
+    });
+    var points = [];
+    var running = 0;
+    for (var i = 0; i < sorted.length; i++) {
+      running += (sorted[i].premiumCost || 0) - (sorted[i].estimatedCost || 0);
+      points.push({ label: (sorted[i].timestamp || "").slice(5, 10), value: Math.round(running * 10000) / 10000 });
+    }
+    return points;
+  }, [filteredLogs]);
+
+  // Model Health: per-model success rate, avg latency, avg cost per request.
+  var modelHealth = useMemo(function () {
+    var byModel = {};
+    for (var i = 0; i < filteredLogs.length; i++) {
+      var e = filteredLogs[i];
+      var key = e.model || "unknown";
+      if (!byModel[key]) byModel[key] = { model: key, count: 0, rescueCount: 0, latencySum: 0, latencyCount: 0, costSum: 0 };
+      byModel[key].count += 1;
+      if (e.rescue) byModel[key].rescueCount += 1;
+      if (e.routingMs != null) { byModel[key].latencySum += e.routingMs; byModel[key].latencyCount += 1; }
+      byModel[key].costSum += e.estimatedCost || 0;
+    }
+    return Object.values(byModel).map(function (m) {
+      return {
+        model: m.model,
+        count: m.count,
+        successRate: m.count > 0 ? Math.round(((m.count - m.rescueCount) / m.count) * 100) : 0,
+        avgLatencyMs: m.latencyCount > 0 ? Math.round((m.latencySum / m.latencyCount) * 100) / 100 : null,
+        avgCost: m.count > 0 ? Math.round((m.costSum / m.count) * 10000) / 10000 : 0,
+      };
+    }).sort(function (a, b) { return b.count - a.count; });
+  }, [filteredLogs]);
 
   // Lifetime Saved derives from the routing log itself (sum of premiumCost
   // minus estimatedCost across all logged entries), so every number on this
@@ -250,6 +299,21 @@ export default function Analytics() {
                 Export CSV
               </button>
             )}
+            {[["all", "All"], ["30d", "30 days"], ["7d", "7 days"]].map(function (r) { return (
+              <button
+                key={r[0]}
+                onClick={function () { setDateRange(r[0]); }}
+                style={{
+                  padding: "7px 14px", borderRadius: "8px",
+                  background: dateRange === r[0] ? colors.amber : "transparent",
+                  border: "1px solid " + (dateRange === r[0] ? colors.amber : colors.border),
+                  color: dateRange === r[0] ? "#000" : colors.textDim,
+                  cursor: "pointer", fontSize: "12px", fontWeight: 600,
+                }}
+              >
+                {r[1]}
+              </button>
+            ); })}
             <button
               onClick={handleClear}
               style={{
@@ -422,6 +486,76 @@ export default function Analytics() {
               })}
             </div>
 
+            {/* ── Cost trend ── */}
+            <div style={{
+              padding: "20px", borderRadius: "14px",
+              background: colors.surface, border: "1px solid " + colors.border, marginBottom: "18px",
+            }}>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: colors.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px" }}>
+                Cumulative Savings Trend
+              </div>
+              {costTrend.length === 0 ? (
+                <div style={{ fontSize: "12px", color: colors.textDim }}>No data in range yet.</div>
+              ) : (
+                <div style={{ display: "flex", alignItems: "flex-end", gap: "2px", height: "90px", paddingTop: "8px" }}>
+                  {costTrend.map(function (p, i) {
+                    var maxVal = Math.max.apply(null, costTrend.map(function (q) { return Math.abs(q.value); })) || 1;
+                    var h = Math.max((Math.abs(p.value) / maxVal) * 80, 2);
+                    var isNeg = p.value < 0;
+                    return (
+                      <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                        <div style={{
+                          width: "100%", maxWidth: "14px", height: h + "px",
+                          borderRadius: "2px 2px 0 0",
+                          background: isNeg ? "#EF4444" : colors.amber,
+                          opacity: 0.85,
+                        }} />
+                        {costTrend.length <= 20 && (
+                          <div style={{ fontSize: "9px", color: colors.textDim, writingMode: "vertical-rl", textOverflow: "ellipsis", overflow: "hidden", maxHeight: "22px" }}>
+                            {p.label}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* ── Model Health ── */}
+            <div style={{
+              padding: "20px", borderRadius: "14px",
+              background: colors.surface, border: "1px solid " + colors.border, marginBottom: "18px",
+            }}>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: colors.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px" }}>
+                Model Health
+              </div>
+              {modelHealth.length === 0 ? (
+                <div style={{ fontSize: "12px", color: colors.textDim }}>No data in range yet.</div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {modelHealth.map(function (m) {
+                    return (
+                      <div key={m.model} style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px" }}>
+                        <div style={{ fontSize: "13px", fontWeight: 600, width: "180px", flexShrink: 0, color: colors.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={m.model}>
+                          {m.model}
+                        </div>
+                        <div style={{ width: "90px", flexShrink: 0, color: colors.textDim }}>
+                          {m.count} reqs · {m.successRate}% ok
+                        </div>
+                        <div style={{ width: "90px", flexShrink: 0, color: colors.textDim }}>
+                          {m.avgLatencyMs != null ? m.avgLatencyMs + " ms" : "—"} avg
+                        </div>
+                        <div style={{ color: colors.textDim }}>
+                          ${m.avgCost.toFixed(4)} avg
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             {/* ── Model distribution ── */}
             <div style={{
               padding: "20px", borderRadius: "14px",
@@ -477,7 +611,7 @@ export default function Analytics() {
                     </tr>
                   </thead>
                   <tbody>
-                    {logs.slice(0, 20).map(function (entry, idx) {
+                    {filteredLogs.slice(0, 20).map(function (entry, idx) {
                       var hs = entry.hingeScore || 0;
                       var color = hingScoreColor(hs);
                       var terms = Array.isArray(entry.matchedTerms) ? entry.matchedTerms : [];
