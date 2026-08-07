@@ -390,7 +390,7 @@ export default function REI({ initialPrompt } = {}) {
       ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
       : (routerDecision?.maxTokens || 0);
 
-    const modelName = data.model || routerDecision?.model || "deepseek-chat";
+    const modelName = data.model || routerDecision?.model || "deepseek-v4-flash";
     const rates = getModelCosts(modelName);
     const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
 

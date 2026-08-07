@@ -36,7 +36,7 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "deepseek-chat", messages: messages, temperature: temperature, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: "deepseek-v4-flash", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
       const err = await res.text().catch(function () { return "(unreadable)"; });
@@ -45,7 +45,7 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
     }
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
-    return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-chat", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+    return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-v4-flash", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
   } finally {
     clearTimeout(timer);
   }
@@ -137,12 +137,12 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
   ];
 
   const maxTokens = routerDecision?.maxTokens || 2048;
-  const primaryModel = routerDecision?.model || "deepseek-chat";
+  const primaryModel = routerDecision?.model || "deepseek-v4-flash";
   const primaryBackend = getBackendForModel(primaryModel);
   const temperature = routerDecision?.temperature ?? 0.7;
   // Only pass the routed model to Groq when Groq IS the primary backend —
   // as a fallback it must use the default model (a non-Groq routed model
-  // like deepseek-chat would be rejected by Groq's API).
+  // like deepseek-v4-flash would be rejected by Groq's API).
   const groqModel = primaryBackend === "groq" ? primaryModel : null;
 
   // Map of available backends

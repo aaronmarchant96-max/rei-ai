@@ -1,11 +1,11 @@
 import { defineClaim } from "../lib/claimGateway";
 import { getLogs } from "../lib/routingLog";
 
-// ── 1. Model Health: deepseek-chat success rate ≥ 80% ──
+// ── 1. Model Health: deepseek-v4-flash success rate ≥ 80% ──
 defineClaim({
   id: "model-health-deepseek-success",
-  title: "deepseek-chat success rate ≥ 80%",
-  description: "At least 80% of deepseek-chat requests complete without rescue-fallback.",
+  title: "deepseek-v4-flash success rate ≥ 80%",
+  description: "At least 80% of deepseek-v4-flash requests complete without rescue-fallback.",
   category: "dashboard",
   compute: () => {
     const logs = getLogs();
@@ -16,7 +16,7 @@ defineClaim({
   },
   source: "src/lib/routingLog.ts",
   verify: (computed) => {
-    if (computed === null) return { pass: true, severity: "info", reason: "no deepseek-chat requests logged yet" };
+    if (computed === null) return { pass: true, severity: "info", reason: "no deepseek-v4-flash requests logged yet" };
     if (computed >= 80) return { pass: true, severity: "info", reason: `${computed}% success rate — within threshold` };
     if (computed >= 70) return { pass: false, severity: "warn", reason: `${computed}% success rate — below 80% threshold, investigate` };
     return { pass: false, severity: "error", reason: `${computed}% success rate — collapsed below 70%, provider failure likely` };
