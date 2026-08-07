@@ -342,7 +342,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "coding" || catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")) {
+  if (domainName === "coding" || (domainName === "assistant" && (catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")))) {
     const routeTerms = actualMatchedTerms("coding-hinge", text);
     const decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",
@@ -357,7 +357,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "genealogy" || catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")) {
+  if (domainName === "genealogy" || (domainName === "assistant" && (catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")))) {
     const routeTerms = actualMatchedTerms("genealogy-deep-dive", text);
     const decision = buildDecision("genealogy-deep-dive", {
       rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
@@ -372,7 +372,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "story" || catalogRoute?.id === "story-architect" || domainKeywordMatches(text, "story")) {
+  if (domainName === "story" || (domainName === "assistant" && (catalogRoute?.id === "story-architect" || domainKeywordMatches(text, "story")))) {
     const routeTerms = actualMatchedTerms("story-architect", text);
     const decision = buildDecision("story-architect", {
       rationale: "Story or narrative language detected; route through the storytelling blueprint path.",
@@ -387,7 +387,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "legal" || catalogRoute?.id === "legal-hinge" || domainKeywordMatches(text, "legal")) {
+  if (domainName === "legal" || (domainName === "assistant" && (catalogRoute?.id === "legal-hinge" || domainKeywordMatches(text, "legal")))) {
     const routeTerms = actualMatchedTerms("legal-hinge", text);
     const decision = buildDecision("legal-hinge", {
       rationale: "Legal case analysis or precedent evaluation detected; enforce verified-index grounding.",

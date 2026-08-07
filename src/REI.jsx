@@ -348,6 +348,7 @@ export default function REI({ initialPrompt } = {}) {
     }
 
     const parsedSections = parseAssistantStyleReply(data.result);
+    const isStructured = Object.keys(parsedSections).some((k) => k !== "intro" && parsedSections[k].trim());
     const pendingDecision = {
       id: `${Date.now()}-${selectedDomain.slice(0, 8)}-${Math.random().toString(36).slice(2, 6)}`,
       sections: parsedSections,
@@ -426,6 +427,7 @@ export default function REI({ initialPrompt } = {}) {
         provider: deriveProvider(modelName),
         rescue: String(modelName || "").includes("(fallback)"),
         truncated: Boolean(data.truncated),
+        structured: isStructured,
         actualCost,
         actualTokens,
       });
