@@ -54,8 +54,25 @@ describe("Analytics", () => {
     // HingeScore band chips: >= 0.8 has 0, 0.3-0.55 has 1... verify band labels exist
     expect(screen.getByText(/HingeScore distribution/i)).toBeInTheDocument();
     expect(screen.getByText(/< 0.3/i)).toBeInTheDocument();
-    // footnote explaining free-tier providers and deploy date
-    expect(screen.getByText(/free-tier math/i)).toBeInTheDocument();
+    // footnote explaining free-tier providers + paid-only routing savings split
+    expect(screen.getByText(/not free-tier cost avoidance/i)).toBeInTheDocument();
+  });
+
+  it("renders Routing savings (paid-only) excluding free-tier cost avoidance", () => {
+    // One free-tier (llama) + one genuinely paid (deepseek-v4-flash) request.
+    const entries = [
+      { timestamp: "2026-08-04T01:00:00.000Z", domain: "coding", model: "llama-3.3-70b-versatile", estimatedCost: 0.0, premiumCost: 0.006 },
+      { timestamp: "2026-08-04T02:00:00.000Z", domain: "legal", model: "deepseek-v4-flash", estimatedCost: 0.0004, premiumCost: 0.006 },
+    ];
+    window.localStorage.setItem("rei_routing_log", JSON.stringify(entries));
+
+    render(<Analytics />);
+
+    // paid-only card surfaces the paid rows: card label + footnote both mention
+    // it. With provider-based classification the llama (Groq/free-tier) row is
+    // EXCLUDED and only the deepseek (paid) row is counted → exactly 1 paid.
+    expect(screen.getAllByText(/Routing savings \(paid-only\)/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("1 paid requests · non-free providers only")).toBeInTheDocument();
   });
 
   it("shows actual-vs-estimate and real savings when actualCost is present", () => {

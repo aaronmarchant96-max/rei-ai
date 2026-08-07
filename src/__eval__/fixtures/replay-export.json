@@ -1,0 +1,126 @@
+{
+  "exportedAt": "2026-08-07T00:00:00.000Z",
+  "entryCount": 10,
+  "entries": [
+    {
+      "domain": "generalist",
+      "routeId": "generalist-balanced",
+      "model": "gpt-4o",
+      "hingeScore": 0.31,
+      "estimatedCost": 0.00245,
+      "premiumCost": 0.00245,
+      "tokenCount": 196,
+      "routingMs": 36.2,
+      "truncated": false,
+      "rescue": false
+    },
+    {
+      "domain": "coding",
+      "routeId": "coding-hinge",
+      "model": "deepseek-v4-flash",
+      "hingeScore": 0.48,
+      "estimatedCost": 0.00027,
+      "premiumCost": 0.00245,
+      "tokenCount": 216,
+      "routingMs": 26.6,
+      "truncated": false,
+      "rescue": false
+    },
+    {
+      "domain": "coding",
+      "routeId": "coding-hinge",
+      "model": "deepseek-v4-flash",
+      "hingeScore": 0.52,
+      "estimatedCost": 0.00022,
+      "premiumCost": 0.00245,
+      "tokenCount": 176,
+      "routingMs": 19.7,
+      "truncated": false,
+      "rescue": false
+    },
+    {
+      "domain": "story",
+      "routeId": "story-blueprint",
+      "model": "deepseek-v4-flash",
+      "hingeScore": 0.3,
+      "estimatedCost": 0.00019,
+      "premiumCost": 0.00245,
+      "tokenCount": 152,
+      "routingMs": 22.7,
+      "truncated": false,
+      "rescue": false
+    },
+    {
+      "domain": "genealogy",
+      "routeId": "genealogy-deep-dive",
+      "model": "gemini-flash-latest",
+      "hingeScore": 0.83,
+      "estimatedCost": 0.00082,
+      "premiumCost": 0.0065,
+      "tokenCount": 524,
+      "routingMs": 41.3,
+      "truncated": true,
+      "rescue": false
+    },
+    {
+      "domain": "legal",
+      "routeId": "legal-hinge",
+      "model": "deepseek-v4-flash",
+      "hingeScore": 0.77,
+      "estimatedCost": 0.00031,
+      "premiumCost": 0.0065,
+      "tokenCount": 248,
+      "routingMs": 33.9,
+      "truncated": false,
+      "rescue": false
+    },
+    {
+      "domain": "generalist",
+      "routeId": "generalist-balanced",
+      "model": "gpt-4o",
+      "hingeScore": 0.28,
+      "estimatedCost": 0.00245,
+      "premiumCost": 0.00245,
+      "tokenCount": 196,
+      "routingMs": 24.9,
+      "truncated": false,
+      "rescue": true
+    },
+    {
+      "domain": "coding",
+      "routeId": "coding-hinge",
+      "model": "llama-3.1-8b-instant",
+      "hingeScore": 0.36,
+      "estimatedCost": 0.00003,
+      "premiumCost": 0.00245,
+      "tokenCount": 120,
+      "routingMs": 8.3,
+      "truncated": false,
+      "rescue": false
+    },
+    {
+      "domain": "story",
+      "routeId": "story-blueprint",
+      "model": "deepseek-v4-flash",
+      "hingeScore": 0.44,
+      "estimatedCost": 0.00026,
+      "premiumCost": 0.00245,
+      "tokenCount": 208,
+      "routingMs": 26.1,
+      "truncated": false,
+      "rescue": false
+    },
+    {
+      "domain": "generalist",
+      "routeId": "generalist-balanced",
+      "model": "llama-3.3-70b-versatile",
+      "hingeScore": 0.33,
+      "estimatedCost": 0.0,
+      "premiumCost": 0.00245,
+      "tokenCount": 130,
+      "routingMs": 163.9,
+      "truncated": false,
+      "rescue": false
+    }
+  ]
+}

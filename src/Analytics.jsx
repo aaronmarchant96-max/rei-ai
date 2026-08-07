@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { getLogs, clearLogs } from "./lib/routingLog";
+import { getLogs, clearLogs, exportLogsJSON } from "./lib/routingLog";
+import { deriveProvider } from "./lib/provider";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
@@ -51,6 +52,17 @@ function exportCSV(logs) {
   URL.revokeObjectURL(url);
 }
 
+function exportJSON(logs) {
+  const json = exportLogsJSON(logs);
+  const blob = new Blob([json], { type: "application/json;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "rei-analytics-" + new Date().toISOString().slice(0, 10) + ".json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function hingScoreColor(hs) {
   if (hs >= 0.7) return "#16a34a";
   if (hs >= 0.4) return "#ca8a04";
@@ -98,11 +110,20 @@ export default function Analytics() {
     var hingeBands = { ">= 0.8": 0, "0.55-0.8": 0, "0.3-0.55": 0, "< 0.3": 0 };
     var totalActual = 0;
     var actualCount = 0;
+    var paidCount = 0;
+    var paidEstimated = 0;
+    var paidPremium = 0;
 
     for (var i = 0; i < filteredLogs.length; i++) {
       var e = filteredLogs[i];
       totalCost += e.estimatedCost || 0;
       totalPremium += e.premiumCost || 0;
+      var isFreeTier = deriveProvider(e.model) === "groq";
+      if (!isFreeTier) {
+        paidCount += 1;
+        paidEstimated += e.estimatedCost || 0;
+        paidPremium += e.premiumCost || 0;
+      }
       if (e.routingMs != null) {
         totalRoutingMs += e.routingMs;
         routingMsCount += 1;
@@ -140,6 +161,8 @@ export default function Analytics() {
       estimateVsActualPct = totalCost > 0 ? Math.round((totalActual / totalCost) * 100) : null;
     }
 
+    var paidSavingsPct = paidPremium > 0 ? Math.round(((paidPremium - paidEstimated) / paidPremium) * 100) : null;
+
     return {
       totalRequests: filteredLogs.length,
       totalCost: totalCost,
@@ -161,6 +184,10 @@ export default function Analytics() {
       totalActual: totalActual,
       actualSavingsPct: actualSavingsPct,
       estimateVsActualPct: estimateVsActualPct,
+      paidCount: paidCount,
+      paidEstimated: paidEstimated,
+      paidPremium: paidPremium,
+      paidSavingsPct: paidSavingsPct,
     };
   }, [filteredLogs, logs]);
 
@@ -299,6 +326,18 @@ export default function Analytics() {
                 Export CSV
               </button>
             )}
+            {logs.length > 0 && (
+              <button
+                onClick={function () { exportJSON(logs); }}
+                style={{
+                  padding: "7px 14px", borderRadius: "8px",
+                  background: "transparent", border: "1px solid " + colors.border,
+                  color: colors.textDim, cursor: "pointer", fontSize: "12px", fontWeight: 600,
+                }}
+              >
+                Export JSON
+              </button>
+            )}
             {[["all", "All"], ["30d", "30 days"], ["7d", "7 days"]].map(function (r) { return (
               <button
                 key={r[0]}
@@ -435,6 +474,17 @@ export default function Analytics() {
                     </div>
                   </div>
                 )}
+                {aggregates.paidCount > 0 && (
+                  <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
+                    <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Routing savings (paid-only)</div>
+                    <div style={{ fontSize: "20px", fontWeight: 800, color: "#0ea5e9" }}>
+                      {aggregates.paidSavingsPct != null ? aggregates.paidSavingsPct + "%" : "—"}
+                    </div>
+                    <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
+                      {aggregates.paidCount + " paid requests · non-free providers only"}
+                    </div>
+                  </div>
+                )}
               </div>
               <div style={{ fontSize: "11px", color: colors.textDim, marginBottom: "8px" }}>HingeScore distribution</div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -450,7 +500,7 @@ export default function Analytics() {
                 })}
               </div>
               <p style={{ fontSize: "11px", color: colors.textDim, margin: "12px 0 0", lineHeight: "1.5", fontStyle: "italic" }}>
-              Actuals tracked only since the post-response outcomes deploy (2026-08-05). Free-tier providers (Groq llama-3.3-70b at $0/$0 per 1K tokens) mean 100% real savings is legitimate — free-tier math, not routing magic.
+              Actuals tracked only since the post-response outcomes deploy (2026-08-05). Free-tier providers (Groq llama-3.3-70b at $0/$0 per 1K tokens) mean pooled savings can overstate routing — <b>Routing savings (paid-only)</b> isolates the non-free requests to show savings attributable to routing itself, not free-tier cost avoidance.
               </p>
             </div>
 

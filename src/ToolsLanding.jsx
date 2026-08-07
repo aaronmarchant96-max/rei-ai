@@ -5,6 +5,7 @@ import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck } from "lucide-react";
 import claimsData from "./data/claims.json";
+import ClaimsGate from "./components/ClaimsGate.jsx";
 
 const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 
@@ -183,6 +184,11 @@ export default function ToolsLanding({ onOpenTool }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Live Claims Gate */}
+        <div className="max-w-4xl mx-auto mb-12">
+          <ClaimsGate />
         </div>
 
         {/* Live Router Demo */}

@@ -22,7 +22,7 @@ describe("costHelpers", () => {
 
     it("has ceiling === input + output, NOT (input + output) / 2", () => {
       // Use a paid model for the non-average invariant; the free model is all zeros
-      const costs = getModelCosts("deepseek-chat");
+      const costs = getModelCosts("deepseek-v4-flash");
       expect(costs.ceiling).toBeCloseTo(costs.input + costs.output, 10);
       expect(costs.ceiling).not.toBeCloseTo((costs.input + costs.output) / 2, 10);
     });

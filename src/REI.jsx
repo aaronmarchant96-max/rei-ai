@@ -8,6 +8,9 @@ import { logDecision } from "./lib/decisionStore";
 import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
 import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
 import { isAdversarialRequest } from "./lib/nightShiftRouter";
+import { buildSelfAuditContext } from "./lib/selfAuditContext";
+import { deriveProvider } from "./lib/provider";
+import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
@@ -27,18 +30,26 @@ import ReiContext from "./modules/rei/ReiContext.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
 
-export { parseAssistantStyleReply };
+// Forgiving-but-bounded self-improvement intent gate (cheap string match, not a
+// classifier). Only queries matching these trigger injecting the live self-audit
+// block. Keep short — the block is a targeted signal, not a universal footer.
+const SELF_IMPROVE_HINTS = [
+  "improve",
+  "get better",
+  "do better",
+  "be better",
+  "better at",
+  "self improve",
+  "self-improve",
+  "prioritize development",
+  "what should i work on",
+  "work on next",
+  "make me better",
+  "how can i improve",
+  "how could i improve",
+];
 
-// Map a serving model name to its provider. A " (fallback)" suffix means a
-// non-primary provider rescued the request (cfai.js appends it on fallback).
-function deriveProvider(modelName) {
-  const base = String(modelName || "").replace(/\s*\(fallback\)\s*$/i, "").toLowerCase();
-  if (base.includes("deepseek")) return "deepseek";
-  if (base.includes("gemini")) return "gemini";
-  if (base.includes("llama") || base.includes("groq")) return "groq";
-  if (base.includes("gpt-4o") || base.includes("openai")) return "openai";
-  return "unknown";
-}
+export { parseAssistantStyleReply };
 
 const MAX_RECORD_CHARS = 12000;
 
@@ -390,7 +401,7 @@ export default function REI({ initialPrompt } = {}) {
       ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
       : (routerDecision?.maxTokens || 0);
 
-    const modelName = data.model || routerDecision?.model || "deepseek-chat";
+    const modelName = data.model || routerDecision?.model || "deepseek-v4-flash";
     const rates = getModelCosts(modelName);
     const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
 
@@ -535,9 +546,22 @@ export default function REI({ initialPrompt } = {}) {
       const systemPrompt = isGreeting
         ? "You are REI. Reply in one short, friendly sentence."
         : systemContext;
+      // Inject the live claims-gate self-audit block ONLY for self-improvement
+      // intent in the generalist channel, so the engine reasons over its own
+      // gate output instead of generic ML advice. Self-informed, not
+      // self-modifying — output is still just a proposal for human review.
+      const isSelfImprovementIntent =
+        !isGreeting &&
+        selectedDomain === "assistant" &&
+        SELF_IMPROVE_HINTS.some((kw) => userMsg.text.toLowerCase().includes(kw));
+
+      const selfAuditBlock = isSelfImprovementIntent
+        ? `\n\n${buildSelfAuditContext()}`
+        : "";
+
       const inputPayload = isGreeting
         ? userMsg.text
-        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`;
+        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${selfAuditBlock}\n\nUser Query: ${userMsg.text}`;
       retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text };
 
       const response = await fetchWithTimeout("/api/cfai", {

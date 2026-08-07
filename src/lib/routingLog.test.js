@@ -1,4 +1,4 @@
-import { logRoutingDecision, getLogs, clearLogs, updateLatestLogEntry } from "./routingLog";
+import { logRoutingDecision, getLogs, clearLogs, updateLatestLogEntry, exportLogsJSON } from "./routingLog";
 
 function makeEntry(domain) {
   return {
@@ -112,5 +112,24 @@ describe("routingLog", () => {
   it("survives corrupted storage (returns empty array)", () => {
     localStorage.setItem("rei_routing_log", "{{not json");
     expect(getLogs()).toEqual([]);
+  });
+
+  it("exportLogsJSON emits an envelope with redacted entries by default", () => {
+    logRoutingDecision(makeEntry("coding"));
+    const doc = JSON.parse(exportLogsJSON(getLogs()));
+    expect(doc.exportedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(doc.entryCount).toBe(1);
+    expect(doc.entries).toHaveLength(1);
+    expect(doc.entries[0].inputPreview).toBeUndefined();
+    expect(doc.entries[0].rationale).toBeUndefined();
+    expect(doc.entries[0].domain).toBe("coding");
+    expect(doc.entries[0].estimatedCost).toBe(0.0005);
+  });
+
+  it("exportLogsJSON retains prompt fields on explicit redact:false", () => {
+    logRoutingDecision(makeEntry("story"));
+    const doc = JSON.parse(exportLogsJSON(getLogs(), { redact: false }));
+    expect(doc.entries[0].inputPreview).toBe("Test input story");
+    expect(doc.entries[0].rationale).toBe("Test rationale for story");
   });
 });

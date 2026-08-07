@@ -69,7 +69,7 @@ const PREMIUM_OUTPUT_RATE = 0.0100;
 
 function getModelCeilingRate(model: string): number {
   if (model === "gpt-4o") return PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE;
-  if (model === "deepseek-chat") return 0.00014 + 0.00028;
+  if (model === "deepseek-v4-flash") return 0.00014 + 0.00028;
   if (model === "llama-3.1-8b-instant") return 0.00005 + 0.00008;
   if (model === "llama-3.3-70b-versatile") return FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT;
 
@@ -184,7 +184,7 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
     id: baseEntry.id || id,
     jobType: baseEntry.jobType || id,
     label: baseEntry.label || id,
-    model: baseEntry.model || "deepseek-chat",
+    model: baseEntry.model || "deepseek-v4-flash",
     maxTokens: baseEntry.maxTokens || 400,
     costPer1k: baseEntry.costPer1k ?? 1.0,
     qualityGate: baseEntry.qualityGate || "Default reasoning gate",
@@ -449,7 +449,7 @@ export function buildRouterDecision({
 
 export function resolveRoutingModel(routerDecision: RouterDecision | null): string {
   if (!routerDecision?.model) {
-    return "deepseek-chat";
+    return "deepseek-v4-flash";
   }
   return routerDecision.model;
 }
