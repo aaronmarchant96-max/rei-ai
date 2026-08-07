@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { getLogs, clearLogs, exportLogsJSON } from "./lib/routingLog";
+import { deriveProvider } from "./lib/provider";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
@@ -109,11 +110,20 @@ export default function Analytics() {
     var hingeBands = { ">= 0.8": 0, "0.55-0.8": 0, "0.3-0.55": 0, "< 0.3": 0 };
     var totalActual = 0;
     var actualCount = 0;
+    var paidCount = 0;
+    var paidEstimated = 0;
+    var paidPremium = 0;
 
     for (var i = 0; i < filteredLogs.length; i++) {
       var e = filteredLogs[i];
       totalCost += e.estimatedCost || 0;
       totalPremium += e.premiumCost || 0;
+      var isFreeTier = deriveProvider(e.model) === "groq";
+      if (!isFreeTier) {
+        paidCount += 1;
+        paidEstimated += e.estimatedCost || 0;
+        paidPremium += e.premiumCost || 0;
+      }
       if (e.routingMs != null) {
         totalRoutingMs += e.routingMs;
         routingMsCount += 1;
@@ -151,6 +161,8 @@ export default function Analytics() {
       estimateVsActualPct = totalCost > 0 ? Math.round((totalActual / totalCost) * 100) : null;
     }
 
+    var paidSavingsPct = paidPremium > 0 ? Math.round(((paidPremium - paidEstimated) / paidPremium) * 100) : null;
+
     return {
       totalRequests: filteredLogs.length,
       totalCost: totalCost,
@@ -172,6 +184,10 @@ export default function Analytics() {
       totalActual: totalActual,
       actualSavingsPct: actualSavingsPct,
       estimateVsActualPct: estimateVsActualPct,
+      paidCount: paidCount,
+      paidEstimated: paidEstimated,
+      paidPremium: paidPremium,
+      paidSavingsPct: paidSavingsPct,
     };
   }, [filteredLogs, logs]);
 
@@ -458,6 +474,17 @@ export default function Analytics() {
                     </div>
                   </div>
                 )}
+                {aggregates.paidCount > 0 && (
+                  <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
+                    <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Routing savings (paid-only)</div>
+                    <div style={{ fontSize: "20px", fontWeight: 800, color: "#0ea5e9" }}>
+                      {aggregates.paidSavingsPct != null ? aggregates.paidSavingsPct + "%" : "—"}
+                    </div>
+                    <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
+                      {aggregates.paidCount + " paid requests · non-free providers only"}
+                    </div>
+                  </div>
+                )}
               </div>
               <div style={{ fontSize: "11px", color: colors.textDim, marginBottom: "8px" }}>HingeScore distribution</div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
@@ -473,7 +500,7 @@ export default function Analytics() {
                 })}
               </div>
               <p style={{ fontSize: "11px", color: colors.textDim, margin: "12px 0 0", lineHeight: "1.5", fontStyle: "italic" }}>
-              Actuals tracked only since the post-response outcomes deploy (2026-08-05). Free-tier providers (Groq llama-3.3-70b at $0/$0 per 1K tokens) mean 100% real savings is legitimate — free-tier math, not routing magic.
+              Actuals tracked only since the post-response outcomes deploy (2026-08-05). Free-tier providers (Groq llama-3.3-70b at $0/$0 per 1K tokens) mean pooled savings can overstate routing — <b>Routing savings (paid-only)</b> isolates the non-free requests to show savings attributable to routing itself, not free-tier cost avoidance.
               </p>
             </div>
 

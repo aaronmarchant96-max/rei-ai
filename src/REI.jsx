@@ -9,6 +9,7 @@ import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
 import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
 import { isAdversarialRequest } from "./lib/nightShiftRouter";
 import { buildSelfAuditContext } from "./lib/selfAuditContext";
+import { deriveProvider } from "./lib/provider";
 import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
@@ -49,17 +50,6 @@ const SELF_IMPROVE_HINTS = [
 ];
 
 export { parseAssistantStyleReply };
-
-// Map a serving model name to its provider. A " (fallback)" suffix means a
-// non-primary provider rescued the request (cfai.js appends it on fallback).
-function deriveProvider(modelName) {
-  const base = String(modelName || "").replace(/\s*\(fallback\)\s*$/i, "").toLowerCase();
-  if (base.includes("deepseek")) return "deepseek";
-  if (base.includes("gemini")) return "gemini";
-  if (base.includes("llama") || base.includes("groq")) return "groq";
-  if (base.includes("gpt-4o") || base.includes("openai")) return "openai";
-  return "unknown";
-}
 
 const MAX_RECORD_CHARS = 12000;
 
