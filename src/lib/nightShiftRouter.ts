@@ -205,7 +205,7 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
   return decision;
 }
 
-function isAdversarialRequest(text: string): boolean {
+export function isAdversarialRequest(text: string): boolean {
   return /\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text);
 }
 

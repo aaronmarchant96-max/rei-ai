@@ -7,7 +7,7 @@ import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import { logDecision } from "./lib/decisionStore";
 import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
 import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
-import { isAdversarialRequest } from "./lib/routingConstants.js";
+import { isAdversarialRequest } from "./lib/nightShiftRouter";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
