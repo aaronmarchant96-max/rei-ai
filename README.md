@@ -4,7 +4,7 @@
 >
 > No CS degree. No tech background. Just a $25/month budget, an Intel Celeron J4105 with 8GB RAM, and a question: *can one person build something real in AI this year?*
 
-REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 548 passing tests across 42 suites.
+REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 558 passing tests across 43 suites.
 
 ---
 
@@ -14,7 +14,7 @@ REI.ai is the answer — a structured reasoning framework that classifies prompt
 - An explicit, testable router that saves ~98% on LLM API costs vs an always-premium (gpt-4o) baseline — lab benchmark (deterministic, reproducible via `npm test -- --testPathPatterns=routingEval`); production telemetry is self-reported
 - A reasoning shell grounded in the CARDO REI methodology: find the hinge, separate facts from assumptions, name what would change the answer
 - A portfolio of 6 specialized tools (debate pressure-testing, narrative architecture, legal precedent analysis, industrial telemetry, genealogy, and the general-purpose REI chat engine)
-- 548 passing tests across 42 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
+- 558 passing tests across 43 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
 
 **This is not:**
 - Another ChatGPT wrapper with a nice UI
@@ -99,7 +99,7 @@ This repo represents ~4 months of work:
 | Total API spend | **$14.66** |
 | Tokens processed | **1.35 billion** |
 | Models deployed | **6 tools** |
-| Tests written | **508 across 38 suites** |
+| Tests written | **558 across 43 suites** |
 | Hardware | Intel Celeron J4105, 8GB RAM |
 | Budget | $25/month |
 | Training | Self-taught, started 2026 |
@@ -115,7 +115,7 @@ git clone https://github.com/aaronmarchant96-max/rei-ai
 cd rei-ai
 npm install
 npm run dev      # Start local dev server
-npm test         # Run 508 tests
+npm test         # Run 558 tests
 ```
 
 ---
@@ -124,7 +124,7 @@ npm test         # Run 508 tests
 
 - **[Architecture & Methodology](docs/README.md)** — Canonical doc index
 - **[Architecture Decision Records](docs/DECISIONS.md)** — Dated ADRs with trade-offs
-- **[Testing Strategy](docs/TESTING.md)** — 38 suites, testing philosophy
+- **[Testing Strategy](docs/TESTING.md)** — 43 suites, testing philosophy
 - **[Contributing](CONTRIBUTING.md)** — Setup, code style, PR checklist
 - **[Security Policy](SECURITY.md)** — Vulnerability reporting
 

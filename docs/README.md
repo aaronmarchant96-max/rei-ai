@@ -10,7 +10,8 @@
 | :--- | :--- | :--- |
 | [**Information-Theoretic Architecture**](INFORMATION_THEORETIC_ARCHITECTURE.md) | **Authoritative.** Formal spec: CARDO REI 8-phase loop, complexity index, CARDO GUARD equation, claim stratification, testable hypotheses | Canonical |
 | [**Architecture Decision Records**](DECISIONS.md) | **Authoritative.** Dated ADRs with trade-offs, alternatives, and code references | Canonical |
-| [**Testing Strategy**](TESTING.md) | 38 suites, 508 tests, testing philosophy, how to write new tests | Active |
+| [**Testing Strategy**](TESTING.md) | 43 suites, 558 tests, testing philosophy, how to write new tests | Active |
+| [**Claim Ledger**](CLAIM_LEDGER.md) | Reproducible evidence map: every public metric tied to a command | Active |
 
 ## 📋 Detailed references
 
