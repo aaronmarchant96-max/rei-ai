@@ -107,6 +107,37 @@ describe("REI", () => {
     }, { timeout: 3000 });
   });
 
+  it("injects the live claims-gate self-audit block for a self-improvement query (assistant, non-greeting)", async () => {
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "how can I improve myself?" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const calls = global.fetch.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      const body = JSON.parse(lastCall[1].body);
+      // Injection must carry the self-audit evidence block, NOT the no-claims fallback
+      expect(body.input).toContain("## Self-Audit (from our own claims gate");
+    }, { timeout: 3000 });
+  });
+
+  it("does NOT inject the self-audit block for an unrelated assistant query", async () => {
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "explain the water cycle" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const calls = global.fetch.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      const body = JSON.parse(lastCall[1].body);
+      expect(body.input).not.toContain("## Self-Audit");
+    }, { timeout: 3000 });
+  });
+
   it("switches domain when clicking a domain tab", async () => {
     render(<REI />);
 

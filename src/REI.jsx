@@ -8,6 +8,8 @@ import { logDecision } from "./lib/decisionStore";
 import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
 import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
 import { isAdversarialRequest } from "./lib/nightShiftRouter";
+import { buildSelfAuditContext } from "./lib/selfAuditContext";
+import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
@@ -26,6 +28,25 @@ import BackendUnavailablePanel from "./modules/rei/components/BackendUnavailable
 import ReiContext from "./modules/rei/ReiContext.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
+
+// Forgiving-but-bounded self-improvement intent gate (cheap string match, not a
+// classifier). Only queries matching these trigger injecting the live self-audit
+// block. Keep short — the block is a targeted signal, not a universal footer.
+const SELF_IMPROVE_HINTS = [
+  "improve",
+  "get better",
+  "do better",
+  "be better",
+  "better at",
+  "self improve",
+  "self-improve",
+  "prioritize development",
+  "what should i work on",
+  "work on next",
+  "make me better",
+  "how can i improve",
+  "how could i improve",
+];
 
 export { parseAssistantStyleReply };
 
@@ -535,9 +556,22 @@ export default function REI({ initialPrompt } = {}) {
       const systemPrompt = isGreeting
         ? "You are REI. Reply in one short, friendly sentence."
         : systemContext;
+      // Inject the live claims-gate self-audit block ONLY for self-improvement
+      // intent in the generalist channel, so the engine reasons over its own
+      // gate output instead of generic ML advice. Self-informed, not
+      // self-modifying — output is still just a proposal for human review.
+      const isSelfImprovementIntent =
+        !isGreeting &&
+        selectedDomain === "assistant" &&
+        SELF_IMPROVE_HINTS.some((kw) => userMsg.text.toLowerCase().includes(kw));
+
+      const selfAuditBlock = isSelfImprovementIntent
+        ? `\n\n${buildSelfAuditContext()}`
+        : "";
+
       const inputPayload = isGreeting
         ? userMsg.text
-        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}\n\nUser Query: ${userMsg.text}`;
+        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${selfAuditBlock}\n\nUser Query: ${userMsg.text}`;
       retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text };
 
       const response = await fetchWithTimeout("/api/cfai", {
