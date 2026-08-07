@@ -33,7 +33,6 @@
     "label": "Structured Reasoning",
     "model": "llama-3.3-70b-versatile",
     "maxTokens": 1500,
-    "costPer1k": 1,
     "qualityGate": "Hinge + Facts + Move",
     "enforce": null,
     "description": "Default routing for general decision support and analysis.",
@@ -68,8 +67,8 @@
     ],
     "temperature": 0.6,
     "fallbackPriority": "adversarial-validation",
-    "costPer1kInput": 0,
-    "costPer1kOutput": 0
+    "costPer1kInput": 0.00059,
+    "costPer1kOutput": 0.00079
   },
   {
     "id": "coding-hinge",
@@ -130,7 +129,6 @@
     "label": "Genealogy Deep Dive",
     "model": "llama-3.3-70b-versatile",
     "maxTokens": 4000,
-    "costPer1k": 1,
     "qualityGate": "Evidence tiers + citations",
     "enforce": "EVIDENCE_TIERS",
     "description": "Genealogy, archival record analysis, and evidence-tiered reasoning.",
@@ -158,8 +156,8 @@
     ],
     "temperature": 0.2,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0,
-    "costPer1kOutput": 0
+    "costPer1kInput": 0.00059,
+    "costPer1kOutput": 0.00079
   },
   {
     "id": "story-architect",
@@ -196,7 +194,6 @@
     "label": "Adversarial Validation",
     "model": "llama-3.3-70b-versatile",
     "maxTokens": 3000,
-    "costPer1k": 5,
     "qualityGate": "Red-team validation",
     "enforce": "RED_TEAM",
     "description": "High-stakes critique, adversarial review, or stress-testing.",
@@ -214,8 +211,8 @@
     ],
     "temperature": 0.1,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0,
-    "costPer1kOutput": 0
+    "costPer1kInput": 0.00059,
+    "costPer1kOutput": 0.00079
   },
   {
     "id": "legal-hinge",
@@ -223,7 +220,6 @@
     "label": "Legal Hinge",
     "model": "llama-3.3-70b-versatile",
     "maxTokens": 3000,
-    "costPer1k": 1,
     "qualityGate": "Verified-index check + hinge-before-holding",
     "enforce": null,
     "description": "Case analysis grounded in the verified precedent index \u2014 flags anything outside it as unverified.",
@@ -252,7 +248,7 @@
     ],
     "temperature": 0.2,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0,
-    "costPer1kOutput": 0
+    "costPer1kInput": 0.00059,
+    "costPer1kOutput": 0.00079
   }
 ]

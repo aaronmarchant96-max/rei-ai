@@ -18,4 +18,9 @@ jobs:
       - run: npm ci --legacy-peer-deps
       - run: npm run lint
       - run: npm test
+      # Claims freshness gate: landing-page test-count badge is generated from
+      # the live suite by scripts/gen-claims.mjs. If a PR changes the test
+      # count without regenerating src/data/claims.json, this step fails —
+      # the badge can never drift stale again.
+      - run: node scripts/gen-claims.mjs --check
       - run: npm run build

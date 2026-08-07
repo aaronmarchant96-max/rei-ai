@@ -39,10 +39,10 @@ npm test -- --runInBand --testPathPatterns=routingEval
 | Claim | Producing command | Verified result (2026-08-06) |
 |-------|-------------------|-------------------------------|
 | Router accuracy ≥ 60% (basic) | `npm test -- --runInBand src/__eval__/routingEval.test.js` | 60% (27/45) |
-| Router accuracy ≥ 60% (ML holdout) | `npm test -- --runInBand src/__eval__/routingEvalML.test.js` | 66.7% (18/27) |
-| Router accuracy (blind) | `npm test -- --runInBand src/__eval__/routingEvalBlind.test.js` | 67% (18/27) |
+| Router accuracy ≥ 60% (ML holdout) | `npm test -- --runInBand src/__eval__/routingEvalML.test.js` | 63.0% (17/27) |
+| Router accuracy (blind) | `npm test -- --runInBand src/__eval__/routingEvalBlind.test.js` | 63% (17/27) |
 | Router accuracy (V3) | `npm test -- --runInBand src/__eval__/routingEvalBlindV3.test.js` | 80% (24/30) |
-| Semantic-blind accuracy | `npm test -- --runInBand src/__eval__/routingEvalBlindSemantic.test.js` | 73% (22/30) |
+| Semantic-blind accuracy | `npm test -- --runInBand src/__eval__/routingEvalBlindSemantic.test.js` | 73% (22/30) — NOT CI-measurable, ONNX-only |
 | Semantic accuracy (v4, real ONNX) | `npm test -- --runInBand src/__eval__/routingEvalBlindV2.test.js` **with** `@xenova/transformers` + HF access | ⛔ NOT valid in CI (hash-noise 12%) |
 | ~~"92% zero-shot accuracy"~~ | — | **Retired**: no benchmark produced it |
 | ~~"~90% router accuracy"~~ | — | **Retired**: contradicted by 60–80% measured range |
@@ -51,21 +51,23 @@ npm test -- --runInBand --testPathPatterns=routingEval
 
 | Claim | Producing command | Verified result (2026-08-06) |
 |-------|-------------------|-------------------------------|
-| ~98% savings vs gpt-4o baseline (ceiling-based) | `npm test -- --runInBand --testPathPatterns=routingEval` | 98% across all suites |
+| ~92% savings vs gpt-4o baseline (ceiling-based) | `npm test -- --runInBand --testPathPatterns=routingEval` | 92.3% (routingEval 57), 92.5% (ML 27) — after honest 70B pricing fix |
 | Production telemetry savings | N/A — self-reported | Not independently verifiable |
 
 ## Other claims
 
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
-| 558 tests / 43 suites | `npm test -- --runInBand` | ✅ |
+| 560 tests / 44 suites | `npm test -- --runInBand` | ✅ (auto-verified: `node scripts/gen-claims.mjs --check` in CI) |
 | Build succeeds | `npm run build` | ✅ |
-| Lint 0 errors / 195 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
+| Lint 0 errors / 199 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
 | Live API HTTP 200 | `curl https://debate-furnace.vercel.app/api/cfai` | ✅ (2026-07-01, 2026-08-05) |
 | 200-entry decision store ring buffer | `npm test -- --runInBand src/lib/decisionStore.test.ts` | ✅ 8 tests |
 | FEYNMAN_GATE verifies embedded copies | `npm test -- --runInBand src/__eval__/feynmanGate.test.js` | ✅ 10 tests |
 | BackendUnavailablePanel (11 tests) | `npm test -- --runInBand src/modules/rei/components/BackendUnavailablePanel.test.jsx` | ✅ |
 | HingeScore calibration infra (15 tests) | `npm test -- --runInBand src/__eval__/hingeCalibrationDebate.test.js` | ✅ |
+| Pooled accuracy in claimed 60–80% range | `npm test -- --runInBand src/__eval__/claimsSync.test.js` | ✅ 69.1% (94/136) |
+| Test-count badge auto-generated | `node scripts/gen-claims.mjs` + CI `--check` | ✅ never hand-edited again |
 
 ## Rule
 

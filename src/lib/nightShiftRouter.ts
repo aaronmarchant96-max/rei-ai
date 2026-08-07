@@ -71,7 +71,7 @@ function getModelCeilingRate(model: string): number {
   if (model === "gpt-4o") return PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE;
   if (model === "deepseek-chat") return 0.00014 + 0.00028;
   if (model === "llama-3.1-8b-instant") return 0.00005 + 0.00008;
-  if (model === "llama-3.3-70b-versatile") return 0;
+  if (model === "llama-3.3-70b-versatile") return FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT;
 
   const entry = ROUTER_CATALOG.find((e) => e.model === model);
   if (entry) {
@@ -205,7 +205,7 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
   return decision;
 }
 
-function isAdversarialRequest(text: string): boolean {
+export function isAdversarialRequest(text: string): boolean {
   return /\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text);
 }
 
