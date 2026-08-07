@@ -16,9 +16,9 @@ defineClaim({
   },
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no deepseek-chat requests logged yet" };
-    if (computed >= 80) return { pass: true, severity: "info", reason: \`\${computed}% success rate — within threshold\` };
-    if (computed >= 70) return { pass: false, severity: "warn", reason: \`\${computed}% success rate — below 80% threshold, investigate\` };
-    return { pass: false, severity: "error", reason: \`\${computed}% success rate — collapsed below 70%, provider failure likely\` };
+    if (computed >= 80) return { pass: true, severity: "info", reason: `${computed}% success rate — within threshold` };
+    if (computed >= 70) return { pass: false, severity: "warn", reason: `${computed}% success rate — below 80% threshold, investigate` };
+    return { pass: false, severity: "error", reason: `${computed}% success rate — collapsed below 70%, provider failure likely` };
   },
 });
 
@@ -38,9 +38,9 @@ defineClaim({
   },
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no data — can't compute savings" };
-    if (computed >= 90) return { pass: true, severity: "info", reason: \`\${computed}% savings vs gpt-4o ceiling — within claimed range\` };
-    if (computed >= 80) return { pass: false, severity: "warn", reason: \`\${computed}% savings — drifted below 90% target\` };
-    return { pass: false, severity: "error", reason: \`\${computed}% savings — collapsed below 80%\` };
+    if (computed >= 90) return { pass: true, severity: "info", reason: `${computed}% savings vs gpt-4o ceiling — within claimed range` };
+    if (computed >= 80) return { pass: false, severity: "warn", reason: `${computed}% savings — drifted below 90% target` };
+    return { pass: false, severity: "error", reason: `${computed}% savings — collapsed below 80%` };
   },
 });
 
@@ -60,8 +60,8 @@ defineClaim({
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no greeting-routed requests yet" };
     if (computed === 0) return { pass: true, severity: "info", reason: "0% injection rate in greeting path" };
-    if (computed <= 1) return { pass: false, severity: "warn", reason: \`\${computed}% injection rate — investigate matched terms\` };
-    return { pass: false, severity: "error", reason: \`\${computed}% injection rate — greeting path compromised\` };
+    if (computed <= 1) return { pass: false, severity: "warn", reason: `${computed}% injection rate — investigate matched terms` };
+    return { pass: false, severity: "error", reason: `${computed}% injection rate — greeting path compromised` };
   },
 });
 
@@ -82,7 +82,7 @@ defineClaim({
   },
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no decisions stored yet" };
-    if (computed <= 200) return { pass: true, severity: "info", reason: \`\${computed} entries stored — within 200 cap\` };
-    return { pass: false, severity: "error", reason: \`\${computed} entries — exceeded 200-entry cap, ring buffer broken\` };
+    if (computed <= 200) return { pass: true, severity: "info", reason: `${computed} entries stored — within 200 cap` };
+    return { pass: false, severity: "error", reason: `${computed} entries — exceeded 200-entry cap, ring buffer broken` };
   },
 });

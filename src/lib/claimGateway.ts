@@ -23,7 +23,7 @@ const CLAIMS: ClaimDefinition[] = [];
 
 export function defineClaim(c: ClaimDefinition): ClaimDefinition {
   const exists = CLAIMS.find((e) => e.id === c.id);
-  if (exists) throw new Error(`Claim "\${c.id}" already registered.`);
+  if (exists) throw new Error(`Claim "${c.id}" already registered.`);
   CLAIMS.push(c);
   return c;
 }
@@ -49,7 +49,7 @@ export function verifyAll(dataSource?: never): ClaimReport[] {
       return { claimId: c.id, title: c.title, category: c.category, pass: false, severity: "error", computed: null, reason: "compute threw: " + (err instanceof Error ? err.message : String(err)) };
     }
     if (computed !== null && !isFinite(computed)) {
-      return { claimId: c.id, title: c.title, category: c.category, pass: false, severity: "error", computed: null, reason: "compute returned NaN or Infinity — corrupt data" };
+      return { claimId: c.id, title: c.title, category: c.category, pass: false, severity: "error", computed, reason: "compute returned NaN or Infinity — corrupt data" };
     }
     const verdict = c.verify(computed);
     return { claimId: c.id, title: c.title, category: c.category, pass: verdict.pass, severity: verdict.severity, computed, reason: verdict.reason };

@@ -43,7 +43,7 @@ describe("claimGateway", () => {
     const results = verifyAll();
     expect(results[0].pass).toBe(false);
     expect(results[0].severity).toBe("error");
-    expect(results[0].computed).toBe(null);
+    expect(results[0].computed).toBeNaN();
   });
 
   it("verifyAll returns multiple results for multiple claims", () => {
@@ -56,7 +56,7 @@ describe("claimGateway", () => {
   });
 
   it("verifyAll sets severity warn when claim returns warn", () => {
-    defineClaim({ id: "warn", title: "W", description: "w", category: "test", compute: () => 85, verify: (v) => ({ pass: false, severity: "warn", reason: v < 90 ? "dropped below 90%" : "ok" }) });
+    defineClaim({ id: "warn", title: "W", description: "w", category: "test", compute: () => 85, verify: (v) => ({ pass: false, severity: "warn", reason: (v ?? 0) < 90 ? "dropped below 90%" : "ok" }) });
     const results = verifyAll();
     expect(results[0].pass).toBe(false);
     expect(results[0].severity).toBe("warn");
