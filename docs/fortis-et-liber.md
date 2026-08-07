@@ -91,6 +91,11 @@ CARDO GUARD is deterministic and cost-aware. It evaluates whether acting is wort
 
 The app shell keeps the experience structured and reviewable rather than leaving everything inside a single chat flow.
 
+### Known limitations
+
+- **CARDO schema is decision-analysis-shaped.** The Hinge/Facts/Assumptions/Evaluation/ChangeMind/Move structure is designed for decisions that can be graded before they are made. The Story domain (story-architect) stretches this: the Evaluation and What Would Change The Outcome sections are semantically awkward for fiction — you grade a narrative before it is finished. The hinge concept still works for stories (the pivot where the character's trajectory changes), and STORY_PROMPT's Phase 0 (genre/tone, character driver want+fear, setting) narrows the space, but a narrative-specific CARDO variant (e.g. Stakes/Reversal replacing Evaluation/ChangeMind) is explicitly deferred until user feedback demonstrates the need.
+- **Domain-aware escalation thresholds deferred.** shouldEscalateToRemote (cardoGuard.js) currently uses confidence thresholds (cheap <0.5, medium <0.3, +0.2 under moderate suspicion) that are not tuned per domain. A Story request and a Legal request have different risk profiles, but per-domain thresholds cannot be calibrated until per-domain telemetry volume exists (training set is 73 samples). Logging `structured: true/false` per routing entry is the first step toward that calibration data.
+
 ## Evidence and testing
 
 Use Jest as the main evidence gate.

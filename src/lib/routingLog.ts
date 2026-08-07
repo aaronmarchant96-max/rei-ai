@@ -17,6 +17,7 @@ export interface RoutingLogEntry {
   matchedTerms?: string[];
   routingMs?: number;
   escalation?: { escalate: boolean; reason: string };
+  structured?: boolean;
   timestamp?: string;
 }
 
