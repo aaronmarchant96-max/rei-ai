@@ -33,7 +33,7 @@ describe("ToolsLanding", () => {
 
     expect(screen.getByText(/cost-aware llm router/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /coding task/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /greeting/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Greeting" })).toBeInTheDocument();
   });
 
   it("renders domain experiments section", () => {

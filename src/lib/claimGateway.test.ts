@@ -1,7 +1,9 @@
 import { defineClaim, getClaims, getAllClaims, verifyAll, resetClaims } from "./claimGateway";
+import { clearClaimHistory, getClaimHistory } from "./claimHistory";
 
 beforeEach(() => {
   resetClaims();
+  clearClaimHistory();
 });
 
 describe("claimGateway", () => {
@@ -60,5 +62,31 @@ describe("claimGateway", () => {
     const results = verifyAll();
     expect(results[0].pass).toBe(false);
     expect(results[0].severity).toBe("warn");
+  });
+
+  it("verifyAll persists each claim verdict to claim history", () => {
+    defineClaim({ id: "passing", title: "P", description: "p", category: "test", compute: () => 100, verify: (v) => v === 100 ? { pass: true, severity: "info", reason: "matches" } : { pass: false, severity: "error", reason: "no" } });
+    verifyAll();
+    const history = getClaimHistory("passing");
+    expect(history).toHaveLength(1);
+    expect(history[0].claimId).toBe("passing");
+    expect(history[0].value).toBe(100);
+    expect(history[0].severity).toBe("info");
+    expect(history[0].ts).toEqual(expect.any(Number));
+  });
+
+  it("verifyAll persists a thrown compute as error with null value", () => {
+    defineClaim({ id: "crasher", title: "C", description: "c", category: "test", compute: () => { throw new Error("boom"); }, verify: () => ({ pass: false, severity: "error", reason: "never reached" }) });
+    verifyAll();
+    const history = getClaimHistory("crasher");
+    expect(history).toHaveLength(1);
+    expect(history[0].value).toBeNull();
+    expect(history[0].severity).toBe("error");
+  });
+
+  it("propagates the claim source onto the report", () => {
+    defineClaim({ id: "src", title: "S", description: "s", category: "test", source: "src/lib/foo.ts", compute: () => 1, verify: () => ({ pass: true, severity: "info", reason: "ok" }) });
+    const results = verifyAll();
+    expect(results[0].source).toBe("src/lib/foo.ts");
   });
 });

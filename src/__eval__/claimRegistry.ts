@@ -14,6 +14,7 @@ defineClaim({
     const success = entries.filter((e) => !e.rescue).length;
     return Math.round((success / entries.length) * 100);
   },
+  source: "src/lib/routingLog.ts",
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no deepseek-chat requests logged yet" };
     if (computed >= 80) return { pass: true, severity: "info", reason: `${computed}% success rate — within threshold` };
@@ -36,6 +37,7 @@ defineClaim({
     if (totalPremium === 0) return null;
     return Math.round(((totalPremium - totalCost) / totalPremium) * 100);
   },
+  source: "src/lib/routingLog.ts",
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no data — can't compute savings" };
     if (computed >= 90) return { pass: true, severity: "info", reason: `${computed}% savings vs gpt-4o ceiling — within claimed range` };
@@ -57,6 +59,7 @@ defineClaim({
     const injections = greetings.filter((e) => (e.matchedTerms || []).some((t) => ["bypass", "ignore", "reveal", "override", "system"].some((kw) => t.toLowerCase().includes(kw))));
     return Math.round((injections.length / greetings.length) * 100);
   },
+  source: "src/lib/nightShiftRouter.ts",
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no greeting-routed requests yet" };
     if (computed === 0) return { pass: true, severity: "info", reason: "0% injection rate in greeting path" };
@@ -80,6 +83,7 @@ defineClaim({
       return Math.min(parsed.length, 200);
     } catch { return null; }
   },
+  source: "src/lib/decisionStore.ts",
   verify: (computed) => {
     if (computed === null) return { pass: true, severity: "info", reason: "no decisions stored yet" };
     if (computed <= 200) return { pass: true, severity: "info", reason: `${computed} entries stored — within 200 cap` };
