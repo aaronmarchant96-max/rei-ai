@@ -58,7 +58,7 @@ npm test -- --runInBand --testPathPatterns=routingEval
 
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
-| 560 tests / 44 suites | `npm test -- --runInBand` | ✅ (auto-verified: `node scripts/gen-claims.mjs --check` in CI) |
+| 606 tests / 50 suites | `npm test -- --runInBand` | ✅ (auto-verified: `node scripts/gen-claims.mjs --check` in CI) |
 | Build succeeds | `npm run build` | ✅ |
 | Lint 0 errors / 199 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
 | Live API HTTP 200 | `curl https://debate-furnace.vercel.app/api/cfai` | ✅ (2026-07-01, 2026-08-05) |
