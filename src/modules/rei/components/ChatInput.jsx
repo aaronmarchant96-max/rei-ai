@@ -1,7 +1,11 @@
+import { useRef } from "react";
+import { Paperclip, X } from "lucide-react";
 import { useRei } from "../ReiContext.js";
+import { readTextFile, MAX_FILE_SIZE, MAX_FILE_COUNT, MAX_COMBINED_SIZE } from "../../../lib/fileExtractor.js";
 
 export default function ChatInput() {
-  const { inputMessage, setInputMessage, selectedDomain, handleSendMessage, inputRef, mobile, generalistPrompts, assistantPromptIndex, setAssistantPromptIndex } = useRei();
+  const { inputMessage, setInputMessage, selectedDomain, handleSendMessage, inputRef, mobile, generalistPrompts, assistantPromptIndex, setAssistantPromptIndex, attachedFiles, setAttachedFiles } = useRei();
+  const fileInputRef = useRef(null);
 
   const quickPrompts = [
     { label: "💡 Sort out a problem", text: "Help me sort this out" },
@@ -28,6 +32,29 @@ export default function ChatInput() {
           </div>
         )}
 
+        {attachedFiles && attachedFiles.length > 0 && (
+          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", paddingBottom: "8px" }}>
+            {attachedFiles.map((f, i) => (
+              <span
+                key={i}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "4px",
+                  padding: "2px 8px", borderRadius: "6px", fontSize: "11px",
+                  background: "var(--cardo-bg, #1e293b)", color: "var(--foreground-muted, #94a3b8)",
+                  border: "1px solid var(--border, #334155)", maxWidth: "200px",
+                }}
+              >
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                <X
+                  size={12}
+                  style={{ cursor: "pointer", flexShrink: 0, color: "var(--foreground-muted, #64748b)" }}
+                  onClick={() => setAttachedFiles((prev) => prev.filter((_, j) => j !== i))}
+                />
+              </span>
+            ))}
+          </div>
+        )}
+
         <form
           className="rei-input-form"
           onSubmit={(e) => {
@@ -36,6 +63,49 @@ export default function ChatInput() {
           }}
         >
           <div className="rei-input-row">
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              style={{ display: "none" }}
+              onChange={async (e) => {
+                const selectedFiles = Array.from(e.target.files || []);
+                if (attachedFiles.length + selectedFiles.length > MAX_FILE_COUNT) {
+                  console.warn(`Cannot attach more than ${MAX_FILE_COUNT} files at once.`);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                  return;
+                }
+                const combinedExisting = (attachedFiles || []).reduce((sum, f) => sum + (f.size || 0), 0);
+                const combinedNew = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+                if (combinedExisting + combinedNew > MAX_COMBINED_SIZE) {
+                  console.warn(`Combined file size exceeds ${(MAX_COMBINED_SIZE / 1024).toFixed(0)} KB limit.`);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                  return;
+                }
+                const results = [];
+                for (const file of selectedFiles) {
+                  try {
+                    const result = await readTextFile(file);
+                    results.push(result);
+                  } catch (err) {
+                    console.warn(err.message);
+                  }
+                }
+                if (results.length) {
+                  setAttachedFiles((prev) => [...(prev || []), ...results]);
+                }
+                if (fileInputRef.current) fileInputRef.current.value = "";
+              }}
+            />
+            <button
+              type="button"
+              className="rei-touch-button"
+              style={{ minWidth: "36px", padding: "6px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border)", borderRadius: "8px" }}
+              onClick={() => fileInputRef.current?.click()}
+              title="Attach text/code files"
+            >
+              <Paperclip size={16} style={{ color: "var(--foreground-muted, #94a3b8)" }} />
+            </button>
             <textarea
               ref={inputRef}
               className="rei-input-area"

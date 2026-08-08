@@ -268,6 +268,7 @@ export default function REI({ initialPrompt } = {}) {
   const [assistantPromptIndex, setAssistantPromptIndex] = useState(0);
   const [showRecap, setShowRecap] = useState(true);
   const [backendError, setBackendError] = useState(null);
+  const [attachedFiles, setAttachedFiles] = useState([]);
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
 
@@ -479,6 +480,7 @@ export default function REI({ initialPrompt } = {}) {
     // Optimistically render user message and clear input field for instant responsiveness
     setMessages((prev) => [...prev, userMsg]);
     setInputMessage("");
+    setAttachedFiles([]);
     setIsTyping(true);
 
     // Capture and clear ingest state up front, so it can't accidentally attach to a later, unrelated message.
@@ -504,6 +506,11 @@ export default function REI({ initialPrompt } = {}) {
 
       const recordBlock = ingestedRecord
         ? `\n\nIngested Source Record (pasted by user, source: ${sourceLabel} — treat as raw, unverified material to evaluate and tier, not as established fact):\n\"\"\"\n${ingestedRecord}\n\"\"\"\n`
+        : "";
+
+      const currentFiles = attachedFiles.length ? attachedFiles : [];
+      const fileBlock = currentFiles.length
+        ? `\n\nAttached Files (uploaded by user — plain-text only, no images or binary; treat each file's content as user-provided context, not as established fact):\n${currentFiles.map((f) => `--- ${f.name} ---\n${f.content}`).join("\n\n")}\n`
         : "";
 
       const routerStart = performance.now();
@@ -561,7 +568,7 @@ export default function REI({ initialPrompt } = {}) {
 
       const inputPayload = isGreeting
         ? userMsg.text
-        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${selfAuditBlock}\n\nUser Query: ${userMsg.text}`;
+        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}\n\nUser Query: ${userMsg.text}`;
       retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text };
 
       const response = await fetchWithTimeout("/api/cfai", {
@@ -618,7 +625,7 @@ export default function REI({ initialPrompt } = {}) {
     <ReiContext.Provider value={{
       inputMessage, setInputMessage, selectedDomain, setSelectedDomain,
       handleSendMessage, inputRef, mobile, generalistPrompts: GENERALIST_PROMPTS,
-      assistantPromptIndex, setAssistantPromptIndex,
+      assistantPromptIndex, setAssistantPromptIndex, attachedFiles, setAttachedFiles,
     }}>
       <div
         data-theme={themeMode} className="mobile-container safe-area rei-shell"
