@@ -18,6 +18,7 @@ yarn-error.log*
 
 .patches/
 .vercel
+src/data/sourceIndex.json
 .env*
 
 # Local documentation with potential secrets

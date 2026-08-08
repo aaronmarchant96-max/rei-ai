@@ -1,6 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import REI, { fetchWithTimeout } from "./REI.jsx";
 
+jest.mock("./lib/sourceContext", () => ({
+  buildSourceContext: jest.fn(),
+}));
+
+const { buildSourceContext } = require("./lib/sourceContext");
+
 describe("REI", () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -135,6 +141,51 @@ describe("REI", () => {
       const lastCall = calls[calls.length - 1];
       const body = JSON.parse(lastCall[1].body);
       expect(body.input).not.toContain("## Self-Audit");
+    }, { timeout: 3000 });
+  });
+
+  it("injects a source-code block for a self-improvement query", async () => {
+    buildSourceContext.mockResolvedValue("## Source Code\n--- cfai.js ---\ntest\n--- end cfai.js ---");
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "how can I improve the router?" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const calls = global.fetch.mock.calls;
+      const body = JSON.parse(calls[calls.length - 1][1].body);
+      expect(body.input).toContain("## Source Code");
+    }, { timeout: 3000 });
+  });
+
+  it("injects a source-code block for a file-analysis query with a path reference", async () => {
+    buildSourceContext.mockResolvedValue("## Source Code\n--- nightShiftRouter.ts ---\nexport function route() {}\n--- end nightShiftRouter.ts ---");
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "analyze the router code in nightShiftRouter.ts" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const calls = global.fetch.mock.calls;
+      const body = JSON.parse(calls[calls.length - 1][1].body);
+      expect(body.input).toContain("## Source Code");
+    }, { timeout: 3000 });
+  });
+
+  it("does NOT inject the source-code block for an unrelated query", async () => {
+    buildSourceContext.mockResolvedValue("");
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "tell me a joke" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const calls = global.fetch.mock.calls;
+      const body = JSON.parse(calls[calls.length - 1][1].body);
+      expect(body.input).not.toContain("## Source Code");
     }, { timeout: 3000 });
   });
 
