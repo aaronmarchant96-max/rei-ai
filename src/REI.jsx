@@ -9,6 +9,7 @@ import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
 import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
 import { isAdversarialRequest } from "./lib/nightShiftRouter";
 import { buildSelfAuditContext } from "./lib/selfAuditContext";
+import { buildSourceContext } from "./lib/sourceContext";
 import { deriveProvider } from "./lib/provider";
 import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
@@ -568,9 +569,34 @@ export default function REI({ initialPrompt } = {}) {
         ? `\n\n${buildSelfAuditContext()}`
         : "";
 
+      // Inject the deployed source index when the user asks to analyze specific
+      // code or when self-improvement intent is detected — same static
+      // sourceIndex.json for both paths.  Dynamic import (code-split, only
+      // loaded when triggered).
+      const FILE_ANALYSIS_VERBS = [
+        "analyze", "review", "check", "inspect", "examine",
+        "look at", "audit", "read", "show me",
+      ];
+      const hasFileRef =
+        /\.(?:ts|js|jsx|tsx|css|json|md)\b|\b(?:code|file|source|module|router|gate|guard|handler|store|log)\b/i.test(
+          userMsg.text,
+        );
+      const isFileAnalysisIntent =
+        !isGreeting &&
+        selectedDomain === "assistant" &&
+        FILE_ANALYSIS_VERBS.some((v) =>
+          userMsg.text.toLowerCase().includes(v),
+        ) &&
+        hasFileRef;
+
+      const wantsSourceContext = isSelfImprovementIntent || isFileAnalysisIntent;
+      const sourceBlock = wantsSourceContext
+        ? `\n\n${await buildSourceContext(userMsg.text)}`
+        : "";
+
       const inputPayload = isGreeting
         ? userMsg.text
-        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}\n\nUser Query: ${userMsg.text}`;
+        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`;
       retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text };
 
       const response = await fetchWithTimeout("/api/cfai", {
