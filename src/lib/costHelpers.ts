@@ -1,4 +1,5 @@
 import { getRouterCosts } from "./nightShiftRouter";
+import modelRates from "../data/modelRates.json" with { type: "json" };
 
 interface ModelCost {
   input: number;
@@ -21,8 +22,7 @@ const MODEL_COSTS: Record<string, ModelCost> = Object.fromEntries(
 
 MODEL_COSTS.mock = { input: 0, output: 0, ceiling: 0 };
 MODEL_COSTS["rate-limited"] = { input: 0, output: 0, ceiling: 0 };
-MODEL_COSTS["gpt-4o"] = { input: 0.0025, output: 0.0100, ceiling: 0.0125 };
-MODEL_COSTS["deepseek-v4-flash"] = { input: 0.00014, output: 0.00028, ceiling: 0.00042 };
+Object.assign(MODEL_COSTS, modelRates as Record<string, { input: number; output: number; ceiling: number }>);
 
 export const DEFAULT_COST_MODEL = "llama-3.3-70b-versatile";
 
