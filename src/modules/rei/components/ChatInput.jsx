@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Paperclip, X } from "lucide-react";
 import { useRei } from "../ReiContext.js";
 import { readTextFile, MAX_FILE_SIZE, MAX_FILE_COUNT, MAX_COMBINED_SIZE } from "../../../lib/fileExtractor.js";
@@ -6,6 +6,7 @@ import { readTextFile, MAX_FILE_SIZE, MAX_FILE_COUNT, MAX_COMBINED_SIZE } from "
 export default function ChatInput() {
   const { inputMessage, setInputMessage, selectedDomain, handleSendMessage, inputRef, mobile, generalistPrompts, assistantPromptIndex, setAssistantPromptIndex, attachedFiles, setAttachedFiles } = useRei();
   const fileInputRef = useRef(null);
+  const [fileErrors, setFileErrors] = useState([]);
 
   const quickPrompts = [
     { label: "💡 Sort out a problem", text: "Help me sort this out" },
@@ -48,9 +49,22 @@ export default function ChatInput() {
                 <X
                   size={12}
                   style={{ cursor: "pointer", flexShrink: 0, color: "var(--foreground-muted, #64748b)" }}
-                  onClick={() => setAttachedFiles((prev) => prev.filter((_, j) => j !== i))}
+                  onClick={() => {
+                    setAttachedFiles((prev) => prev.filter((_, j) => j !== i));
+                    setFileErrors([]);
+                  }}
                 />
               </span>
+            ))}
+          </div>
+        )}
+
+        {fileErrors.length > 0 && (
+          <div style={{ paddingBottom: "8px" }}>
+            {fileErrors.map((msg, i) => (
+              <div key={i} style={{ fontSize: "11px", color: "#ef4444", lineHeight: 1.5, fontFamily: "monospace" }}>
+                {msg}
+              </div>
             ))}
           </div>
         )}
@@ -69,28 +83,31 @@ export default function ChatInput() {
               multiple
               style={{ display: "none" }}
               onChange={async (e) => {
+                setFileErrors([]);
                 const selectedFiles = Array.from(e.target.files || []);
                 if (attachedFiles.length + selectedFiles.length > MAX_FILE_COUNT) {
-                  console.warn(`Cannot attach more than ${MAX_FILE_COUNT} files at once.`);
+                  setFileErrors([`Cannot attach more than ${MAX_FILE_COUNT} files at once.`]);
                   if (fileInputRef.current) fileInputRef.current.value = "";
                   return;
                 }
                 const combinedExisting = (attachedFiles || []).reduce((sum, f) => sum + (f.size || 0), 0);
                 const combinedNew = selectedFiles.reduce((sum, f) => sum + f.size, 0);
                 if (combinedExisting + combinedNew > MAX_COMBINED_SIZE) {
-                  console.warn(`Combined file size exceeds ${(MAX_COMBINED_SIZE / 1024).toFixed(0)} KB limit.`);
+                  setFileErrors([`Combined file size exceeds ${(MAX_COMBINED_SIZE / 1024).toFixed(0)} KB limit.`]);
                   if (fileInputRef.current) fileInputRef.current.value = "";
                   return;
                 }
                 const results = [];
+                const errors = [];
                 for (const file of selectedFiles) {
                   try {
                     const result = await readTextFile(file);
                     results.push(result);
                   } catch (err) {
-                    console.warn(err.message);
+                    errors.push(err.message);
                   }
                 }
+                if (errors.length) setFileErrors(errors);
                 if (results.length) {
                   setAttachedFiles((prev) => [...(prev || []), ...results]);
                 }
@@ -106,6 +123,9 @@ export default function ChatInput() {
             >
               <Paperclip size={16} style={{ color: "var(--foreground-muted, #94a3b8)" }} />
             </button>
+            <span style={{ fontSize: "10px", color: "var(--foreground-muted, #64748b)", display: "inline-flex", alignItems: "center", whiteSpace: "nowrap" }}>
+              Up to 4 text/code files (500KB each)
+            </span>
             <textarea
               ref={inputRef}
               className="rei-input-area"
