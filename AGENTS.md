@@ -169,6 +169,21 @@ Before any agent claims a task is complete:
 
 ---
 
+## Error-Gap Tagging
+
+When documenting an error in a commit message, tag it with what caught it — short suffix, no ceremony:
+
+| Tag | Meaning |
+|-----|---------|
+| `[caught: manual]` | Spotted by a human reading output / dashboard / dashboard. |
+| `[caught: ai-cross-check]` | Caught by one model family cross-checking another's output. |
+| `[caught: test]` | Caught by the test suite (ci or local). |
+| `[caught: claim-gate]` | Caught by the FEYNMAN GATE / claimRegistry `verifyAll()`. |
+
+This adds almost no cost at commit time and over months produces a dataset showing which class of errors the test suite actually catches vs. which require human or multi-model intervention.
+
+---
+
 ## Token Budget
 
 | Path | Budget | When |
@@ -192,4 +207,4 @@ If a task exceeds its budget, compress the conversation and continue.
 
 ---
 
-*Last reviewed: 2026-07-31. Stale after: 2026-08-01. Verify rules before executing.*
+*Last reviewed: 2026-08-08. Stale after: 2026-08-09. Verify rules before executing.*
