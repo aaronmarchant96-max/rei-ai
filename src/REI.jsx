@@ -406,8 +406,10 @@ export default function REI({ initialPrompt } = {}) {
     const rates = getModelCosts(modelName);
     const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
 
+    const isGroqFreeTier = deriveProvider(modelName) === "groq";
+
     const actualCost = usage
-      ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
+      ? isGroqFreeTier ? 0 : computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
       : (routerDecision?.estimatedCost || 0);
 
     const actualPremium = usage
