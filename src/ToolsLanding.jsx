@@ -5,6 +5,8 @@ import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck } from "lucide-react";
 import claimsData from "./data/claims.json";
+import { verifyAll } from "./lib/claimGateway";
+import "./__eval__/claimRegistry";
 import ClaimsGate from "./components/ClaimsGate.jsx";
 
 const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
@@ -69,6 +71,15 @@ export default function ToolsLanding({ onOpenTool }) {
   });
   const [expandedCardo, setExpandedCardo] = useState(null);
   const [demoScenario, setDemoScenario] = useState("coding");
+  const [gateSavingsPct, setGateSavingsPct] = useState(null);
+
+  useEffect(() => {
+    const reports = verifyAll();
+    const savings = reports.find((r) => r.claimId === "cost-savings-ceiling");
+    if (savings && typeof savings.computed === "number") {
+      setGateSavingsPct(savings.computed);
+    }
+  }, []);
   
   const domains = useMemo(() => getDomainProfiles(), []);
 
@@ -171,7 +182,7 @@ export default function ToolsLanding({ onOpenTool }) {
           {[
             { icon: "🎯", val: "60–80%", label: "Deterministic Accuracy" },
             { icon: "✅", val: `${claimsData.testCount}+`, label: "Passing Tests" },
-            { icon: "⚡", val: "~98%", label: "Cost Savings" },
+            { icon: "⚡", val: gateSavingsPct !== null ? `~${gateSavingsPct}%` : "~92%", label: "Cost Savings" },
           ].map((stat, index) => (
             <div
               key={index}
