@@ -58,7 +58,7 @@ npm test -- --runInBand --testPathPatterns=routingEval
 
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
-| 606 tests / 50 suites | `npm test -- --runInBand` | ✅ (auto-verified: `node scripts/gen-claims.mjs --check` in CI) |
+| 649 tests / 55 suites | `npm test -- --runInBand` | ✅ (auto-verified: `node scripts/gen-claims.mjs --check` in CI) |
 | Build succeeds | `npm run build` | ✅ |
 | Lint 0 errors / 199 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
 | Live API HTTP 200 | `curl https://debate-furnace.vercel.app/api/cfai` | ✅ (2026-07-01, 2026-08-05) |
@@ -68,6 +68,9 @@ npm test -- --runInBand --testPathPatterns=routingEval
 | HingeScore calibration infra (15 tests) | `npm test -- --runInBand src/__eval__/hingeCalibrationDebate.test.js` | ✅ |
 | Pooled accuracy in claimed 60–80% range | `npm test -- --runInBand src/__eval__/claimsSync.test.js` | ✅ 69.1% (94/136) |
 | Test-count badge auto-generated | `node scripts/gen-claims.mjs` + CI `--check` | ✅ never hand-edited again |
+| Cost replay (per-category, real corpus) | `npm test -- --runInBand src/__eval__/costSavingsReplay.test.js` | ✅ pooled 79% on 10-entry fixture (stratified by category) |
+| Route-adherence replay (eval corpus) | `npm test -- --runInBand src/__eval__/evalReplay.test.js` | ✅ pooled 75% (4 escalated / 3 hits / 1 miss) on 5-entry fixture |
+| Adversarial-route adherence ≥ 80% | live — claimRegistry `adversarial-route-accuracy` from `rei_eval_log` | ⏳ self-reported telemetry until real 500-entry post-fix corpus replayed |
 
 ## Rule
 
