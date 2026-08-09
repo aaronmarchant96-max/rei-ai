@@ -11,6 +11,7 @@ const REI = lazy(() => import("./REI.jsx"));
 const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
 const ToolsLanding = lazy(() => import("./ToolsLanding.jsx"));
 const Analytics = lazy(() => import("./Analytics.jsx"));
+const RedTeam = lazy(() => import("./RedTeam.jsx"));
 
 function LoadingShell() {
   return (
@@ -60,6 +61,11 @@ const TOP_LEVEL = [
     id: "analytics",
     label: "Analytics",
     subtitle: "How decisions played out — rescue rate, savings, audit."
+  },
+  {
+    id: "red-team",
+    label: "Red Team",
+    subtitle: "Adversarial prompt scanner — D1 keyword surface analysis."
   }
 ];
 
@@ -72,6 +78,7 @@ function getInitialTool() {
     if (hash === "#cardo-guard") return "cardo-guard";
     if (hash === "#tracepoint") return "tracepoint";
     if (hash === "#analytics") return "analytics";
+    if (hash === "#red-team") return "red-team";
   }
   return "tools";
 }
@@ -84,6 +91,7 @@ function getToolPath(tool) {
   if (tool === "rei") return "/#rei";
   if (tool === "tracepoint") return "/#tracepoint";
   if (tool === "analytics") return "/#analytics";
+  if (tool === "red-team") return "/#red-team";
   return "/";
 }
 
@@ -95,6 +103,7 @@ function getToolLabel(tool) {
   if (tool === "rei" || tool === "cfai") return "REI.ai";
   if (tool === "tracepoint") return "Tracepoint";
   if (tool === "analytics") return "Analytics";
+  if (tool === "red-team") return "Red Team";
   return "The Furnace";
 }
 
@@ -135,8 +144,10 @@ export default function AppShell() {
                 ? "PromptHound Labs | REI.ai"
                 : tool === "tracepoint"
                   ? "PromptHound Labs | Tracepoint"
-                  : tool === "analytics"
-                    ? "PromptHound Labs | Analytics"
+                : tool === "analytics"
+                  ? "PromptHound Labs | Analytics"
+                  : tool === "red-team"
+                    ? "PromptHound Labs | Red Team"
                     : "PromptHound Labs | The Furnace";
   }, [tool]);
 
@@ -265,6 +276,8 @@ export default function AppShell() {
             <ErrorBoundary toolName="Tracepoint"><Tracepoint /></ErrorBoundary>
           ) : tool === "analytics" ? (
             <ErrorBoundary toolName="Analytics"><Analytics /></ErrorBoundary>
+          ) : tool === "red-team" ? (
+            <ErrorBoundary toolName="Red Team"><RedTeam /></ErrorBoundary>
           ) : tool === "cfai" ? (
             <ErrorBoundary toolName="REI.ai"><REI initialPrompt={reiInitialPrompt} /></ErrorBoundary>
           ) : (

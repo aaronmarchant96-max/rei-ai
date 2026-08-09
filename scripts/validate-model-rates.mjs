@@ -63,5 +63,41 @@ for (const [key, val] of Object.entries(rates)) {
   }
 }
 
+// Cross-reference against fingerprints.json: if the same model appears in both
+// files with differing rates, modelRates.json silently overrides via Object.assign
+// in costHelpers.ts — a latent drift risk. Flag it here.
+const fingerprintsPath = join(root, "data", "fingerprints.json");
+if (existsSync(fingerprintsPath)) {
+  let fingerprints;
+  try {
+    fingerprints = JSON.parse(readFileSync(fingerprintsPath, "utf-8"));
+  } catch (e) {
+    console.warn(`modelRates.json: cannot parse fingerprints.json for cross-check: ${e.message}`);
+    fingerprints = [];
+  }
+  if (Array.isArray(fingerprints)) {
+    const fpRates = {};
+    for (const entry of fingerprints) {
+      const model = entry.model;
+      if (!model) continue;
+      fpRates[model] = {
+        input: entry.costPer1kInput,
+        output: entry.costPer1kOutput,
+      };
+    }
+    for (const [key, val] of Object.entries(rates)) {
+      if (key === "_premium") continue;
+      const fp = fpRates[key];
+      if (!fp) continue;
+      if (val.input !== fp.input) {
+        fail(`model "${key}" input ${val.input} in modelRates.json but ${fp.input} in fingerprints.json — drift detected`);
+      }
+      if (val.output !== fp.output) {
+        fail(`model "${key}" output ${val.output} in modelRates.json but ${fp.output} in fingerprints.json — drift detected`);
+      }
+    }
+  }
+}
+
 console.log("modelRates.json: valid");
 process.exit(0);

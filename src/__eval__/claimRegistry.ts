@@ -1,5 +1,6 @@
 import { defineClaim } from "../lib/claimGateway";
 import { getLogs } from "../lib/routingLog";
+import { getEvals } from "../lib/evalLog";
 
 // ── 1. Model Health: deepseek-v4-flash success rate ≥ 80% ──
 defineClaim({
@@ -76,7 +77,7 @@ defineClaim({
   category: "dashboard",
   compute: () => {
     try {
-      const raw = window.localStorage.getItem("rei_decisions_v1");
+      const raw = window.localStorage.getItem("rei_decision_store");
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed)) return null;
@@ -88,5 +89,30 @@ defineClaim({
     if (computed === null) return { pass: true, severity: "info", reason: "no decisions stored yet" };
     if (computed <= 200) return { pass: true, severity: "info", reason: `${computed} entries stored — within 200 cap` };
     return { pass: false, severity: "error", reason: `${computed} entries — exceeded 200-entry cap, ring buffer broken` };
+  },
+});
+
+// ── 5. Adversarial route adherence: escalated inputs reach the premium path ──
+// Policy-adherence metric, NOT "AI accuracy". Measures whether inputs the D1
+// scanner escalates (escalateToD2 → routeExpected) actually landed on the
+// adversarial-validation route. Reads the deterministic eval log.
+defineClaim({
+  id: "adversarial-route-accuracy",
+  title: "adversarial-route adherence ≥ 80%",
+  description: "% of scanner-escalated live requests that reached the adversarial-validation route.",
+  category: "dashboard",
+  compute: () => {
+    const evals = getEvals({ evaluator: "deterministic" });
+    const escalated = evals.filter((e) => e.evaluation.routeExpected === true);
+    if (escalated.length === 0) return null;
+    const hit = escalated.filter((e) => e.evaluation.routeCorrect === true).length;
+    return Math.round((hit / escalated.length) * 100);
+  },
+  source: "src/lib/evalLog.ts",
+  verify: (computed) => {
+    if (computed === null) return { pass: true, severity: "info", reason: "no escalated requests evaluated yet" };
+    if (computed >= 80) return { pass: true, severity: "info", reason: `${computed}% of escalated requests hit the adversarial route — within threshold` };
+    if (computed >= 70) return { pass: false, severity: "warn", reason: `${computed}% of escalated requests hit the adversarial route — below 80%, review routing regex` };
+    return { pass: false, severity: "error", reason: `${computed}% of escalated requests hit the adversarial route — collapses below 70%, missed escalations systemic` };
   },
 });
