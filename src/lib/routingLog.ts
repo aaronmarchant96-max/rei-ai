@@ -2,6 +2,9 @@ const STORAGE_KEY = "rei_routing_log";
 const MAX_ENTRIES = 500;
 
 export interface RoutingLogEntry {
+  /** Stable correlation key joining the pre-API routing decision, post-API
+   * usage/outcome patch, and any downstream evaluation events for one request. */
+  requestId?: string;
   domain?: string;
   routeId?: string;
   model?: string;
@@ -40,12 +43,27 @@ export function logRoutingDecision(entry: RoutingLogEntry): void {
 
 // Patch the most recent entry with post-API actuals (provider, truncated, usage).
 // The routing log is written BEFORE the API call, so actuals arrive later.
-export function updateLatestLogEntry(patch: Partial<RoutingLogEntry>): void {
+//
+// requestId is the preferred correlation key: when present, the matching entry is
+// patched. When absent (legacy entries written before request correlation landed),
+// fall back to patching logs[0] so older flows keep working during migration.
+export function updateLatestLogEntry(patch: Partial<RoutingLogEntry>, requestId?: string): void {
   if (typeof window === "undefined") return;
   try {
     const logs = getLogs();
     if (!logs.length) return;
-    logs[0] = { ...logs[0], ...patch };
+    const target = requestId
+      ? logs.find((e) => e.requestId === requestId)
+      : undefined;
+    if (requestId && !target) {
+      // Correlated patch failed to match — surface it instead of silently
+      // falling back, otherwise a broken correlation looks like a successful
+      // telemetry update.
+      console.warn(`routingLog: no entry found for requestId ${requestId}; patch dropped`);
+      return;
+    }
+    const idx = target ? logs.indexOf(target) : 0;
+    logs[idx] = { ...logs[idx], ...patch };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
   } catch (e) {
     console.warn("Unable to patch routing log:", e);

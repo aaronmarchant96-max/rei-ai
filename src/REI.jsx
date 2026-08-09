@@ -11,6 +11,8 @@ import { isAdversarialRequest } from "./lib/nightShiftRouter";
 import { buildSelfAuditContext } from "./lib/selfAuditContext";
 import { buildSourceContext } from "./lib/sourceContext";
 import { deriveProvider } from "./lib/provider";
+import { scanRedTeamInput } from "./lib/redTeamScanner";
+import { logEval } from "./lib/evalLog";
 import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
@@ -30,6 +32,17 @@ import BackendUnavailablePanel from "./modules/rei/components/BackendUnavailable
 import ReiContext from "./modules/rei/ReiContext.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
+
+// Stable per-request correlation key. crypto.randomUUID when available; a
+// timestamp+random fallback for non-secure contexts.
+function generateRequestId() {
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+  } catch (_) {}
+  return `req-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 // Forgiving-but-bounded self-improvement intent gate (cheap string match, not a
 // classifier). Only queries matching these trigger injecting the live self-audit
@@ -333,7 +346,7 @@ export default function REI({ initialPrompt } = {}) {
     }
   };
 
-  async function processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userText) {
+  async function processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userText, requestId, inputScan) {
     const contentType = response.headers.get("content-type") || "";
 
     if (!response.ok) {
@@ -364,6 +377,7 @@ export default function REI({ initialPrompt } = {}) {
     const isStructured = Object.keys(parsedSections).some((k) => k !== "intro" && parsedSections[k].trim());
     const pendingDecision = {
       id: `${Date.now()}-${selectedDomain.slice(0, 8)}-${Math.random().toString(36).slice(2, 6)}`,
+      requestId,
       sections: parsedSections,
       routerDecision: {
         label: routerDecision?.label,
@@ -445,15 +459,48 @@ export default function REI({ initialPrompt } = {}) {
         structured: isStructured,
         actualCost,
         actualTokens,
-      });
+      }, requestId);
     } catch (e) {
       console.warn("Failed to patch routing log:", e);
+    }
+
+    // Deterministic evaluation of the live request: response-side safety scan
+    // plus routing-policy adherence. Stored separately from the routing event
+    // so the log keeps "what happened" distinct from "what we judged about it".
+    try {
+      const responseText = data?.result || "";
+      const responseScan = responseText ? scanRedTeamInput(responseText) : null;
+      const wasAdversarialRoute = routerDecision?.id === "adversarial-validation";
+      const routeExpected = Boolean(inputScan?.escalateToD2);
+      const routeCorrect = routeExpected === wasAdversarialRoute;
+      logEval({
+        requestId,
+        domain: selectedDomain,
+        routeId: routerDecision?.id,
+        model: modelName,
+        evaluator: "deterministic",
+        evaluatorVersion: "red-team-v1",
+        evaluation: {
+          qualityScore: inputScan?.score ?? null,
+          safetyVerdict: responseScan?.verdict,
+          routeExpected,
+          routeCorrect,
+          notes: responseScan?.findings?.length
+            ? responseScan.findings.map((f) => `${f.severity}: ${f.finding} (${f.category})`)
+            : [],
+          evaluatedAt: new Date().toISOString(),
+        },
+      });
+    } catch (e) {
+      console.warn("Failed to write eval log:", e);
     }
   }
 
   async function handleSendMessage(e) {
     e?.preventDefault?.();
     if (!inputMessage.trim()) return;
+
+    const requestId = generateRequestId();
 
     const ingestedRecord = rawRecordText.trim();
 
@@ -525,6 +572,10 @@ export default function REI({ initialPrompt } = {}) {
       });
       const routingMs = Math.round((performance.now() - routerStart) * 100) / 100;
 
+      // Deterministic input-side security signal (D1 scan). Policy-derived
+      // expectation for route-correctness, not ground truth.
+      const inputScan = scanRedTeamInput(userMsg.text);
+
       const escalation = shouldEscalateToRemote({
         confidence: 1 - (routerDecision.hingeScore || 0),
         pathway: mapTierToPathway(routerDecision.hingeTier),
@@ -536,6 +587,7 @@ export default function REI({ initialPrompt } = {}) {
       routerDecision.escalation = escalation;
 
       logRoutingDecision({
+        requestId,
         domain: selectedDomain,
         routeId: routerDecision.id,
         model: routerDecision.model,
@@ -548,6 +600,9 @@ export default function REI({ initialPrompt } = {}) {
         routingMs: routingMs,
         escalation: escalation,
         inputPreview: userMsg.text.slice(0, 80),
+        inputRedTeamScore: inputScan?.score ?? null,
+        inputRedTeamVerdict: inputScan?.verdict ?? null,
+        inputRedTeamEscalate: inputScan?.escalateToD2 ?? false,
       });
 
 
@@ -597,7 +652,7 @@ export default function REI({ initialPrompt } = {}) {
       const inputPayload = isGreeting
         ? userMsg.text
         : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`;
-      retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text };
+      retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text, inputScan };
 
       const response = await fetchWithTimeout("/api/cfai", {
         method: "POST",
@@ -613,7 +668,7 @@ export default function REI({ initialPrompt } = {}) {
         })
       });
 
-      await processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userMsg.text);
+      await processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userMsg.text, requestId, inputScan);
     } catch (error) {
       console.error("REI.ai API error:", error);
       setBackendError({ routerDecision: routerDecision || null, errorMessage: error.message });
@@ -639,7 +694,7 @@ export default function REI({ initialPrompt } = {}) {
           routerDecision: p.routerDecision,
         }),
       });
-      await processApiResponse(response, p.routerDecision, p.ingestedRecord, p.recordSourceType, p.userText);
+      await processApiResponse(response, p.routerDecision, p.ingestedRecord, p.recordSourceType, p.userText, generateRequestId(), p.inputScan);
       retryPayloadRef.current = null;
     } catch (error) {
       console.error("REI.ai retry error:", error);

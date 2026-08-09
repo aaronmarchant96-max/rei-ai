@@ -104,6 +104,37 @@ describe("routingLog", () => {
     expect(entry.actualTokens).toBe(321);
   });
 
+  it("updateLatestLogEntry patches the entry matching requestId, not the newest", () => {
+    const idA = "req-aaaa";
+    const idB = "req-bbbb";
+    logRoutingDecision({ ...makeEntry("old"), requestId: idA });
+    logRoutingDecision({ ...makeEntry("new"), requestId: idB });
+    // Patch the OLDER entry by id — newest stays untouched.
+    updateLatestLogEntry({ provider: "gemini", rescue: true }, idA);
+    const logs = getLogs();
+    expect(logs[1].requestId).toBe(idA);
+    expect(logs[1].provider).toBe("gemini");
+    expect(logs[1].rescue).toBe(true);
+    expect(logs[0].provider).toBeUndefined();
+  });
+
+  it("updateLatestLogEntry preserves requestId through write/read", () => {
+    logRoutingDecision({ ...makeEntry("coding"), requestId: "req-123" });
+    expect(getLogs()[0].requestId).toBe("req-123");
+  });
+
+  it("updateLatestLogEntry drops the patch when requestId has no match", () => {
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
+    logRoutingDecision(makeEntry("coding"));
+    updateLatestLogEntry({ provider: "gemini" }, "req-does-not-exist");
+    const entry = getLogs()[0];
+    expect(entry.provider).toBeUndefined();
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("no entry found for requestId")
+    );
+    warn.mockRestore();
+  });
+
   it("updateLatestLogEntry is a no-op on empty log", () => {
     expect(() => updateLatestLogEntry({ provider: "groq" })).not.toThrow();
     expect(getLogs()).toHaveLength(0);

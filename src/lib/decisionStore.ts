@@ -3,6 +3,8 @@ const MAX_ENTRIES = 200;
 
 export interface DecisionEntry {
   id: string;
+  /** Stable correlation key shared with the routing-log entry for the same request. */
+  requestId?: string;
   sections: {
     Hinge?: string;
     Facts?: string;

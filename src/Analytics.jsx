@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { getLogs, clearLogs, exportLogsJSON } from "./lib/routingLog";
+import { getEvals } from "./lib/evalLog";
 import { deriveProvider } from "./lib/provider";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
@@ -190,6 +191,27 @@ export default function Analytics() {
       paidSavingsPct: paidSavingsPct,
     };
   }, [filteredLogs, logs]);
+
+  // Deterministic evaluation aggregates: route-correctness from the eval log.
+  var evalAggregates = useMemo(function () {
+    var evals = getEvals({ evaluator: "deterministic" });
+    if (evals.length === 0) return null;
+
+    var escalated = evals.filter(function (e) { return e.evaluation.routeExpected === true; });
+    var hits = escalated.filter(function (e) { return e.evaluation.routeCorrect === true; }).length;
+    var misses = escalated.length - hits;
+    var safetyFailures = evals.filter(function (e) {
+      return e.evaluation.safetyVerdict && e.evaluation.safetyVerdict !== "clean";
+    }).length;
+
+    return {
+      totalEvaluated: evals.length,
+      escalatedCount: escalated.length,
+      missedEscalations: misses,
+      adherencePct: escalated.length > 0 ? Math.round((hits / escalated.length) * 100) : null,
+      safetyFailures: safetyFailures,
+    };
+  }, [filteredLogs]);
 
   // Cost trend: cumulative savings (premiumCost - estimatedCost) over time.
   var costTrend = useMemo(function () {
@@ -482,6 +504,17 @@ export default function Analytics() {
                     </div>
                     <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
                       {aggregates.paidCount + " paid requests · non-free providers only"}
+                    </div>
+                  </div>
+                )}
+                {evalAggregates && evalAggregates.escalatedCount > 0 && (
+                  <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
+                    <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Adversarial route adherence</div>
+                    <div style={{ fontSize: "20px", fontWeight: 800, color: evalAggregates.adherencePct != null && evalAggregates.adherencePct >= 80 ? "#16a34a" : "#e11d48" }}>
+                      {evalAggregates.adherencePct != null ? evalAggregates.adherencePct + "%" : "—"}
+                    </div>
+                    <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
+                      {evalAggregates.missedEscalations} missed of {evalAggregates.escalatedCount} escalated · {evalAggregates.safetyFailures} response flag(s)
                     </div>
                   </div>
                 )}

@@ -75,6 +75,31 @@ describe("Analytics", () => {
     expect(screen.getByText("1 paid requests · non-free providers only")).toBeInTheDocument();
   });
 
+  it("renders adversarial route adherence from the deterministic eval log", async () => {
+    // 2 escalated requests, 1 reached the adversarial route → 50% adherence.
+    window.localStorage.setItem("rei_routing_log", JSON.stringify([
+      { timestamp: "2026-08-04T01:00:00.000Z", domain: "assistant", model: "llama-3.3-70b-versatile", estimatedCost: 0.0005, premiumCost: 0.006 },
+    ]));
+    window.localStorage.setItem("rei_eval_log", JSON.stringify([
+      {
+        requestId: "a", domain: "assistant", routeId: "adversarial-validation", model: "deepseek-v4-flash",
+        evaluator: "deterministic", evaluation: { routeExpected: true, routeCorrect: true, safetyVerdict: "clean", evaluatedAt: "2026-08-04T01:00:00.000Z" },
+      },
+      {
+        requestId: "b", domain: "assistant", routeId: "structured-reasoning", model: "llama-3.3-70b-versatile",
+        evaluator: "deterministic", evaluation: { routeExpected: true, routeCorrect: false, safetyVerdict: "high-risk", evaluatedAt: "2026-08-04T01:00:00.000Z" },
+      },
+    ]));
+
+    render(<Analytics />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Adversarial route adherence/i)).toBeInTheDocument();
+    }, { timeout: 1200 });
+    expect(screen.getByText("50%")).toBeInTheDocument();
+    expect(screen.getByText(/1 missed of 2 escalated/i)).toBeInTheDocument();
+  });
+
   it("shows actual-vs-estimate and real savings when actualCost is present", () => {
     const entries = [
       { timestamp: "2026-08-04T01:00:00.000Z", domain: "coding", model: "deepseek-chat", estimatedCost: 0.001, premiumCost: 0.006, hingeScore: 0.9, actualCost: 0.0008, actualTokens: 300 },
