@@ -3,6 +3,7 @@ import modelRates from "../data/modelRates.json" with { type: "json" };
 import { computeHingeScore } from "./hingeClassifier";
 import { HIGH_STRUCTURE_TERMS, UNCERTAINTY_TERMS, isSimpleGreeting } from "./routingConstants.js";
 import { getDomainMatchTerms } from "../domains/_index.js";
+import { scanRedTeamInput } from "./redTeamScanner.js";
 
 interface FingerprintEntry {
   id?: string;
@@ -203,7 +204,20 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
 }
 
 export function isAdversarialRequest(text: string): boolean {
-  return /\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text);
+  if (/\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text)) {
+    return true;
+  }
+  // Align with the red-team scanner taxonomy: any input the D1 scan escalates
+  // must reach the adversarial-validation path, not slip through to a cheaper
+  // route. Keeps the router's own keyword regex as a first pass (task phrasing
+  // like "poke holes" that the taxonomy may not flag) and the scanner as the
+  // taxonomy-aligned backstop (injection phrases like "ignore previous
+  // instructions" that the regex misses).
+  try {
+    return scanRedTeamInput(text).escalateToD2;
+  } catch {
+    return false;
+  }
 }
 
 function isMetaQuery(text: string): boolean {
