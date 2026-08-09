@@ -1,4 +1,5 @@
 import fingerprintCatalog from "../../data/fingerprints.json" with { type: "json" };
+import modelRates from "../data/modelRates.json" with { type: "json" };
 import { computeHingeScore } from "./hingeClassifier";
 import { HIGH_STRUCTURE_TERMS, UNCERTAINTY_TERMS, isSimpleGreeting } from "./routingConstants.js";
 import { getDomainMatchTerms } from "../domains/_index.js";
@@ -64,14 +65,10 @@ const ROUTER_CATALOG: FingerprintEntry[] = Array.isArray(fingerprintCatalog) ? f
 const FALLBACK_COST_INPUT = 0.00059;
 const FALLBACK_COST_OUTPUT = 0.00079;
 const STORAGE_KEY = "night-shift-user-fingerprint";
-const PREMIUM_INPUT_RATE = 0.0025;
-const PREMIUM_OUTPUT_RATE = 0.0100;
 
 function getModelCeilingRate(model: string): number {
-  if (model === "gpt-4o") return PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE;
-  if (model === "deepseek-v4-flash") return 0.00014 + 0.00028;
-  if (model === "llama-3.1-8b-instant") return 0.00005 + 0.00008;
-  if (model === "llama-3.3-70b-versatile") return FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT;
+  const explicit = (modelRates as unknown as Record<string, { ceiling: number }>)[model];
+  if (explicit) return explicit.ceiling;
 
   const entry = ROUTER_CATALOG.find((e) => e.model === model);
   if (entry) {
@@ -200,7 +197,7 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
     decision.hingeVector = hingeData.hingeVector;
     decision.hingeTier = hingeData.tier;
     decision.estimatedCost = ((decision.maxTokens || 400) / 1000) * getModelCeilingRate(decision.model);
-    decision.premiumCost = ((decision.maxTokens || 400) / 1000) * (PREMIUM_INPUT_RATE + PREMIUM_OUTPUT_RATE);
+    decision.premiumCost = ((decision.maxTokens || 400) / 1000) * (modelRates as unknown as Record<string, { ceiling: number }>)[modelRates._premium].ceiling;
   }
   return decision;
 }
