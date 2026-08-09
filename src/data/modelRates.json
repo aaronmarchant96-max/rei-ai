@@ -1,4 +1,5 @@
 {
+  "_premium": "gpt-4o",
   "gpt-4o": {
     "input": 0.0025,
     "output": 0.0100,

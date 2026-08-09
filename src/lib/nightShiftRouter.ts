@@ -67,7 +67,7 @@ const FALLBACK_COST_OUTPUT = 0.00079;
 const STORAGE_KEY = "night-shift-user-fingerprint";
 
 function getModelCeilingRate(model: string): number {
-  const explicit = (modelRates as Record<string, { ceiling: number }>)[model];
+  const explicit = (modelRates as unknown as Record<string, { ceiling: number }>)[model];
   if (explicit) return explicit.ceiling;
 
   const entry = ROUTER_CATALOG.find((e) => e.model === model);
@@ -197,7 +197,7 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
     decision.hingeVector = hingeData.hingeVector;
     decision.hingeTier = hingeData.tier;
     decision.estimatedCost = ((decision.maxTokens || 400) / 1000) * getModelCeilingRate(decision.model);
-    decision.premiumCost = ((decision.maxTokens || 400) / 1000) * modelRates["gpt-4o"].ceiling;
+    decision.premiumCost = ((decision.maxTokens || 400) / 1000) * (modelRates as unknown as Record<string, { ceiling: number }>)[modelRates._premium].ceiling;
   }
   return decision;
 }

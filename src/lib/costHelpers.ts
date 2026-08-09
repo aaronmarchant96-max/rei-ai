@@ -22,13 +22,22 @@ const MODEL_COSTS: Record<string, ModelCost> = Object.fromEntries(
 
 MODEL_COSTS.mock = { input: 0, output: 0, ceiling: 0 };
 MODEL_COSTS["rate-limited"] = { input: 0, output: 0, ceiling: 0 };
-Object.assign(MODEL_COSTS, modelRates as Record<string, { input: number; output: number; ceiling: number }>);
+Object.assign(MODEL_COSTS, modelRates as unknown as Record<string, { input: number; output: number; ceiling: number }>);
 
 export const DEFAULT_COST_MODEL = "llama-3.3-70b-versatile";
 
 export function getModelCosts(model: string): ModelCost {
   const clean = String(model || "").replace(" (fallback)", "");
   return MODEL_COSTS[clean] || MODEL_COSTS[DEFAULT_COST_MODEL];
+}
+
+/**
+ * Returns the fully merged model→rate dictionary (fingerprints.json catalog +
+ * modelRates.json overrides) so callers can query all rates without knowing
+ * which file contributed which entry.
+ */
+export function getAllModelRates(): Record<string, ModelCost> {
+  return { ...MODEL_COSTS };
 }
 
 export function getModelCostRate(model: string): number {
