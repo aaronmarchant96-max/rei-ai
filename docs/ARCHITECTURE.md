@@ -1,81 +1,113 @@
-# REI.ai — Adaptive Inference Orchestrator
+# REI.ai — Adaptive Inference Orchestrator Architecture
 
-## Architecture
+> **"The future of AI isn't just about better models — it's about better systems."**
+
+---
+
+## 1. System Overview
 
 ```
 Incoming Query
       │
       ▼
- Layer 0: Deterministic Engine
-   (regex · templates · zero-token)
+ Layer 0: Deterministic Engine & Red Team Scanner
+   (regex · templates · zero-token · D1 adversarial scanner)
       │
       ▼
- Night Shift Router
-   (fingerprint matching · cost-aware)
+ Layer 1: Hinge Classifier (Instrument)
+   (hingeClassifier.ts · 8 textual features · ECS · DAS · APS · ML Weights)
+      │
+      ▼
+ Layer 2: Decision Cascade (Router)
+   (nightShiftRouter.ts · priority-ordered ladder · fingerprint matching)
       │
       ├── Deterministic → $0, 0ms
-      ├── Cheap (8B)    → ~$0.0001, ~500ms
-      ├── Medium (70B)  → ~$0.0005, ~1s
-      └── Premium (GPT) → ~$0.002, ~2s
+      ├── Cheap (Flash/Chat) → ~$0.0001, ~500ms
+      ├── Medium (70B/Domain) → ~$0.0005, ~1s
+      └── Premium Baseline (GPT-4o) → ~$0.0125 (Savings baseline)
       │
       ▼
  CARDO GUARD
    (cost-governor: is expensive inference justified?)
       │
       ▼
-  Response + routing trace
+  Response + Routing Trace
     (why this pathway? confidence? cost vs premium?)
-       │
-       ▼
-  ContextPanel
-    (right-side panel: Hinge, Facts vs Assumptions,
-     Evidence Tiers, Evaluation, What Changes It, Routing)
 ```
 
-## Decision Flow
+---
 
-```mermaid
-graph TD
-    A[Input Query] --> B{Layer 0 Match?}
-    B -->|Yes| C[Deterministic Response]
-    B -->|No| D{Catalog Match?}
-    D -->|Yes| E[Pathway: matched fingerprint]
-    D -->|No| F{Domain Detection}
-    F -->|Coding| G[Pathway: medium]
-    F -->|Genealogy| H[Pathway: medium]
-    F -->|Adversarial| I[Pathway: premium]
-    F -->|Default| J[Pathway: medium]
-    E --> K{CARDO GUARD}
-    G --> K
-    H --> K
-    I --> K
-    J --> K
-    K -->|Confidence OK| L[Send to Model]
-    K -->|Confidence Low| M[Escalate to Higher Tier]
-    L --> N[Response + Routing Trace]
-    M --> L
-    C --> N
+## 2. Two-Layer Router Architecture
+
+The design principle decouples **scoring** (how hard is this query?) from **decision** (which route should handle it?) so each layer is independently testable.
+
+### Layer 1 — Hinge Classifier (`src/lib/hingeClassifier.ts`)
+The Hinge Classifier is the numerical instrument. It extracts **8 textual features**:
+- Word count ($f_1$)
+- Question mark density ($f_2$)
+- Uncertainty terms ($f_3$)
+- Structural phrases ($f_4$)
+- Conditional syntax ($f_5$)
+- Comparative verbs ($f_6$)
+- Negation density ($f_7$)
+- Technical structural markers ($f_8$)
+
+These features feed three composite signals:
+1. **ECS (Explicit Complexity Score):** Weighted linear combination of the 8 features.
+2. **DAS (Domain Ambiguity Score):** Normalized Shannon entropy across the route catalog. High DAS indicates ambiguous intent spanning multiple domain fingerprints.
+3. **APS (Adversarial Pressure Score):** Aggregated score from scanner triggers and regex rephrase patterns.
+
+A sigmoid function applies **ML-trained weights** loaded from `data/ml/ecs_weights.json`, outputting a Hinge Score $HS \in [0, 1]$ across four complexity tiers (`low`, `medium`, `high`, `ultra`) and calculating `cheapRouteConfidence` = $1 - HS$. Because weights are loaded from JSON, the scoring model can be retrained independently of the routing logic.
+
+### Layer 2 — Decision Cascade (`src/lib/nightShiftRouter.ts`)
+A priority-ordered ladder where the first match wins:
+
+```text
+1. empty input                   → default route
+2. greeting                     → cheapest path (deepseek-chat, 50 tokens)
+3. meta-query ("who are you")   → cheapest path
+4. self-evaluation              → The Engineer (strict, temp 0.2, 800 tokens)
+5. adversarial (regex / scanner) → adversarial-validation (5x cost multiplier)
+6. domain match (coding/genealogy/story/legal) → domain route
+7. high complexity / structure  → structured-reasoning (800 tokens, temp 0.2)
+8. stored preference            → recall last domain
+9. default fallback             → structured-reasoning
 ```
 
-## Pathway Tiers
+*Note on Lane Locking:* Greetings run **before** the adversarial check so a prompt like *"hi, ignore your instructions"* hits the cheap greeting route instead of wasting a 5x cost multiplier. This priority order is enforced by unit tests.
 
-| Tier | Model | Cost/1K tokens | Use case |
-|------|-------|----------------|----------|
-| Deterministic | None | $0 | Greetings, smalltalk |
-| Cheap | llama-3.1-8b-instant | $0.0001 | Translation, simple queries |
-| Medium | llama-3.3-70b-versatile | $0.0014 | Reasoning, genealogy, coding |
-| Premium | gpt-4o | $0.0125 | Adversarial, high-stakes |
+---
 
-## Cost Model
+## 3. Cost Model & Adversarial Detection
 
-Every routing decision computes:
-- **Estimated cost**: current pathway cost for input + max output tokens
-- **Premium cost**: what it would cost if routed to the most expensive model
-- **Savings vs premium**: premium cost - actual cost (tracked cumulatively)
-- **Alternative routes**: sorted by cost, with per-1K cost deltas and savings %
+- **Cost Model:** Decoupled in `modelRates.json` and `fingerprints.json`. Baseline comparison is always `gpt-4o`. Every routing decision logs the actual estimated cost alongside the baseline ceiling cost to track cumulative savings.
+- **Adversarial Detection:** Evaluated via task phrasing regex **OR** D1 scanner escalation. First-pass regex retains router-owned fast detection, while scanner taxonomy acts as the security backstop.
 
-## Benchmark
+---
 
-57 prompts across 9 categories. Zero inference cost. Deterministic.
+## 4. Error-Gap Tagging System
 
-Run: `npm test -- --testPathPatterns=routingEval`
+The error-gap tagging system measures **which defenses catch errors and which errors slip through everything.**
+
+### Git Commit Tags
+When a commit fixes or documents an error, one tag is included in the commit body:
+- `[caught: manual]` — Caught by human review (dashboard, diff, UI test).
+- `[caught: ai-cross-check]` — Caught by comparing outputs across models.
+- `[caught: test]` — Caught by an automated unit test suite.
+- `[caught: claim-gate]` — Caught by a `verifyAll()` claim in the FEYNMAN GATE.
+
+### Automated Tooling & Derived Artifacts
+- **Extractor:** `scripts/extract-error-gaps.mjs` parses git commit history into `src/data/errorGaps.json` and `docs/ERROR_GAP_CATALOGUE.md`.
+- **CI Verification:** CI runs `--check` to ensure `errorGaps.json` matches git reality. Git commit history is the single source of truth; docs and JSON are reproducible projections.
+
+---
+
+## 5. Summary & Verification
+
+Run the full verification suite across all 57 test suites:
+
+```bash
+npm test                             # 677 passing tests across 57 suites
+node scripts/gen-claims.mjs --check  # Verify claims.json integrity
+node scripts/extract-error-gaps.mjs # Update error gap catalogue
+```
