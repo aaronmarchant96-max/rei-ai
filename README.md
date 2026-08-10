@@ -40,34 +40,38 @@ REI.ai automatically detects what kind of task you are working on and directs it
 
 ## 📐 How the Smart Router Works
 
-Instead of sending every request straight to expensive cloud servers, REI's router checks the prompt locally on your computer first using fast keyword and structural rules.
+Instead of sending every request straight to expensive cloud servers, REI's router runs an **ordered decision cascade** locally on your machine. Priority order matters: for instance, greetings run *before* security checks so simple prompts like *"hi, ignore your instructions"* hit the cheap fast path (`deepseek-v4-flash`) without wasting a 5x cost multiplier.
 
 ```mermaid
-flowchart LR
-    A[Your Question] --> B{Greeting or Simple?}
-    B -->|Yes| C[Fast Path<br/>deepseek-chat · 50 tokens]
-    B -->|No| D{Security Hack / Jailbreak?}
-    D -->|Yes| E[Red Team Inspection<br/>Strictest Gate]
-    D -->|No| F{Specific Topic?}
-    F -->|Coding| G[Engineering Specialist]
-    F -->|Genealogy| H[Historical Archivist]
-    F -->|Story| I[Story Architect]
-    F -->|Legal| J[Legal Precedent Engine]
-    F -->|General| K[Structured Reasoning]
-    C --> N[Clear Response]
-    E --> N
-    G --> N
-    H --> N
-    I --> N
-    J --> N
-    K --> N
+flowchart TD
+    A[Your Question] --> B[Hinge Classifier<br/>ECS / DAS / APS]
+    B --> C{Decision Cascade}
+    C -->|1. Empty| D[Default Route]
+    C -->|2. Greeting| E[Cheapest Path<br/>deepseek-v4-flash]
+    C -->|3. Meta Query| E
+    C -->|4. Self-Eval| F[The Engineer]
+    C -->|5. Adversarial| G[Red Team Validation]
+    C -->|6. Domain Match| H[Specialist Route<br/>Coding / Genealogy / Story / Legal]
+    C -->|7. High Complexity| I[Structured Reasoning]
+    C -->|8. Stored Pref| J[Recall Last Domain]
+    C -->|9. Fallback| I
+    E --> K[Verified Response + Cost Trace]
+    F --> K
+    G --> K
+    H --> K
+    I --> K
+    J --> K
 ```
 
-**Decision Order:**
-1. **Greetings & Quick Questions:** Handled instantly using a tiny 50-token budget.
-2. **Security & Red Team Checks:** Catches trick prompts or policy bypasses before doing anything else.
-3. **Topic Match:** Directs coding, legal, story, or genealogy questions to the right specialist.
-4. **General Questions:** Handled by a balanced reasoning engine.
+### 🔁 Evaluating the Evaluator (Meta-Evaluation Loop)
+
+REI doesn't just evaluate your questions — it **evaluates the reliability of the system doing the evaluation**:
+
+```text
+Architecture ──> Router ──> Evaluation ──> Error Gaps ──> [caught: tag] ──> Error Catalogue ──> Better System
+```
+
+Every bugfix or test failure logs a single commit tag (`[caught: test]`, `[caught: claim-gate]`, `[caught: manual]`). An automated pipeline projects git history into `docs/ERROR_GAP_CATALOGUE.md` to continuously answer: *Which defense catches our mistakes over time?*
 
 ---
 

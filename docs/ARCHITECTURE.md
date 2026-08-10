@@ -64,8 +64,8 @@ A priority-ordered ladder where the first match wins:
 
 ```text
 1. empty input                   → default route
-2. greeting                     → cheapest path (deepseek-chat, 50 tokens)
-3. meta-query ("who are you")   → cheapest path
+2. greeting                     → cheapest path (deepseek-v4-flash)
+3. meta-query ("who are you")   → cheapest path (deepseek-v4-flash)
 4. self-evaluation              → The Engineer (strict, temp 0.2, 800 tokens)
 5. adversarial (regex / scanner) → adversarial-validation (5x cost multiplier)
 6. domain match (coding/genealogy/story/legal) → domain route
@@ -74,7 +74,7 @@ A priority-ordered ladder where the first match wins:
 9. default fallback             → structured-reasoning
 ```
 
-*Note on Lane Locking:* Greetings run **before** the adversarial check so a prompt like *"hi, ignore your instructions"* hits the cheap greeting route instead of wasting a 5x cost multiplier. This priority order is enforced by unit tests.
+*Note on Lane Locking:* Greetings and meta-queries run **before** the adversarial check so a prompt like *"hi, ignore your instructions"* hits the cheap fast path (`deepseek-v4-flash`) instead of wasting a 5x cost multiplier. This priority order is locked by unit tests.
 
 ---
 
@@ -85,9 +85,13 @@ A priority-ordered ladder where the first match wins:
 
 ---
 
-## 4. Error-Gap Tagging System
+## 4. Error-Gap Tagging & Meta-Evaluation ("Evaluating the Evaluator")
 
-The error-gap tagging system measures **which defenses catch errors and which errors slip through everything.**
+The error-gap tagging system measures **which defenses catch errors and which errors slip through everything.** Rather than merely evaluating input queries, **REI evaluates the reliability of the machinery doing the evaluation.**
+
+```text
+Architecture ──> Router ──> Evaluation ──> Error Gaps ──> [caught: tag] ──> Error Catalogue ──> System Feedback Loop
+```
 
 ### Git Commit Tags
 When a commit fixes or documents an error, one tag is included in the commit body:
@@ -99,6 +103,7 @@ When a commit fixes or documents an error, one tag is included in the commit bod
 ### Automated Tooling & Derived Artifacts
 - **Extractor:** `scripts/extract-error-gaps.mjs` parses git commit history into `src/data/errorGaps.json` and `docs/ERROR_GAP_CATALOGUE.md`.
 - **CI Verification:** CI runs `--check` to ensure `errorGaps.json` matches git reality. Git commit history is the single source of truth; docs and JSON are reproducible projections.
+- **Long-term Value:** As tagged commits accumulate (~30+ entries), the catalogue statistically answers: *Which defense actually catches errors over time? Where does the router drift from the evaluator?*
 
 ---
 
