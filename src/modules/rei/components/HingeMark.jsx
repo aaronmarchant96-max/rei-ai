@@ -12,7 +12,7 @@ export default function HingeMark({ size = 36, animated = false, color = "#E2A33
           transformOrigin: "8px center",
           transition: "transform 0.5s cubic-bezier(.22,1.36,.36,1)",
         }}
-        aria-label="CARDO hinge mark"
+        aria-hidden="true"
       >
         <path
           d="M15 5H10C8.9 5 8 5.9 8 7V17C8 18.1 8.9 19 10 19H15"

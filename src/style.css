@@ -4874,3 +4874,47 @@ input:focus:not(:focus-visible) {
   box-shadow: 0 12px 24px rgba(0,0,0,0.4), 0 0 16px rgba(240, 201, 101, 0.1);
   border-color: rgba(240, 201, 101, 0.4) !important;
 }
+
+/* ── REI Brand (global — AppShell header on every page) ── */
+.rei-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+}
+.rei-brand .rei-cardo-mark {
+  perspective: 200px;
+}
+.rei-brand:hover .rei-cardo-mark svg {
+  transform: rotateY(-48deg);
+}
+.rei-brand__wordmark {
+  font-family: "Fraunces", serif;
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  color: #EDEFF5;
+  line-height: 1;
+}
+.rei-brand__suffix {
+  color: #7D8299;
+  font-weight: 400;
+}
+.rei-header-nav__link {
+  font-size: 13px;
+  font-weight: 500;
+  color: #7D8299;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.rei-header-nav__link:hover {
+  color: #EDEFF5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rei-brand:hover .rei-cardo-mark svg {
+    transform: none !important;
+  }
+}

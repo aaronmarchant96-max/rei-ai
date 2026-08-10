@@ -235,7 +235,7 @@ export default function AppShell() {
             <HingeMark size={16} animated={false} color="#E2A33D" />
           </div>
           <div>
-            <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>
+            <div className="rei-brand__wordmark">REI<span className="rei-brand__suffix">.ai</span></div>
           </div>
         </a>
 
@@ -247,10 +247,10 @@ export default function AppShell() {
                 const el = document.getElementById("ecosystem");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }, 100);
-            }} className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">Ecosystem</button>
+            }} className="rei-header-nav__link">Ecosystem</button>
             <div className="w-px h-4 bg-gray-700 mx-1"></div>
-            <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
-            <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="text-sm font-medium text-gray-400 hover:text-[#F59E0B] transition-colors">GitHub</a>
+            <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="rei-header-nav__link">X (Twitter)</a>
+            <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="rei-header-nav__link">GitHub</a>
           </nav>
         )}
       </header>

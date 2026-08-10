@@ -20,6 +20,14 @@
   0%, 100% { transform: rotate(0deg); }
   50% { transform: rotate(-18deg); }
 }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes drawUnderline {
+  from { background-size: 0% 2px; }
+  to   { background-size: 100% 2px; }
+}
 
 /* ── Light Theme (scoped under data-theme="light") ── */
 [data-theme="light"] {
@@ -1057,24 +1065,8 @@
 
 /* ── REI Chat Surface (new design system, scoped to chat UI) ── */
 
-/* Brand / logo */
-.rei-brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  cursor: pointer;
-}
-.rei-brand .rei-cardo-mark {
-  perspective: 200px;
-}
-.rei-brand:hover .rei-cardo-mark svg {
-  transform: rotateY(-48deg);
-}
-@media (prefers-reduced-motion: reduce) {
-  .rei-brand:hover .rei-cardo-mark svg {
-    transform: none !important;
-  }
-}
+/* Brand / logo CSS (`.rei-brand`, `.rei-cardo-mark`) lives in src/style.css
+   so the hinge-swing works on every page, not just the REI chat bundle. */
 
 /* Clip button */
 .rei-clip-btn {
@@ -1119,6 +1111,9 @@
   margin: 0 0 10px;
   letter-spacing: -0.01em;
   color: #EDEFF5;
+  opacity: 0;
+  animation: rise 0.5s cubic-bezier(.2,.7,.3,1) forwards;
+  animation-delay: 0.02s;
 }
 .rei-chat-intro__suffix {
   color: #7D8299;
@@ -1131,6 +1126,9 @@
   line-height: 1.55;
   max-width: 480px;
   margin: 0 auto;
+  opacity: 0;
+  animation: rise 0.5s cubic-bezier(.2,.7,.3,1) forwards;
+  animation-delay: 0.10s;
 }
 .rei-chat-intro__hinge {
   color: #E2A33D;
@@ -1139,8 +1137,10 @@
   background-image: linear-gradient(#E2A33D, #E2A33D);
   background-repeat: no-repeat;
   background-position: 0 100%;
-  background-size: 100% 1.5px;
+  background-size: 0% 1.5px;
   padding-bottom: 1px;
+  animation: drawUnderline 0.4s ease-out forwards;
+  animation-delay: 0.55s;
 }
 
 .rei-chat-intro__trust {
@@ -1191,6 +1191,9 @@
   color: #565B72;
   margin-bottom: 12px;
   font-weight: 600;
+  opacity: 0;
+  animation: rise 0.5s cubic-bezier(.2,.7,.3,1) forwards;
+  animation-delay: 0.24s;
 }
 .rei-starter-row {
   display: flex;
@@ -1205,6 +1208,9 @@
   background: #0A0C12;
   width: 100%;
   text-align: left;
+  opacity: 0;
+  animation: rise 0.45s cubic-bezier(.2,.7,.3,1) forwards;
+  will-change: transform;
 }
 .rei-starter-row:last-child {
   margin-bottom: 0;
@@ -1217,6 +1223,10 @@
 .rei-starter-row:active {
   transform: translateY(0px) scale(0.995);
 }
+.rei-starter-row:nth-child(2) { animation-delay: 0.30s; }
+.rei-starter-row:nth-child(3) { animation-delay: 0.36s; }
+.rei-starter-row:nth-child(4) { animation-delay: 0.42s; }
+.rei-starter-row:nth-child(5) { animation-delay: 0.48s; }
 .rei-starter-row__glyph {
   width: 30px;
   height: 30px;
@@ -1394,4 +1404,18 @@
   [style*="var(--cardo-evaluation)"] { color: #6D28D9 !important; }
   [style*="var(--cardo-change)"] { color: #7C3AED !important; }
   [style*="var(--cardo-move)"] { color: #059669 !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rei-chat-intro__headline,
+  .rei-chat-intro__text,
+  .rei-starters__label,
+  .rei-starter-row,
+  .rei-chat-intro__hinge {
+    animation: none !important;
+    opacity: 1 !important;
+    background-size: 100% 1.5px !important;
+  }
+  .rei-starter-row:hover,
+  .rei-touch-button--send:active { transform: none !important; }
 }

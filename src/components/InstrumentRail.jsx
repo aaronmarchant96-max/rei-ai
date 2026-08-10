@@ -53,8 +53,8 @@ export default function InstrumentRail({
         {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
           <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
             Routing will select the cheapest capable model for each query.
-            Typical savings vs. calling GPT-4o directly: ~80%+. Numbers appear
-            here after your first response.
+            Typical savings vs. calling GPT-4o directly: ~90%+ (ceiling-based).
+            Numbers appear here after your first response.
           </div>
         ) : (
           <>
