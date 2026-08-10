@@ -36,16 +36,26 @@ npm test -- --runInBand --testPathPatterns=routingEval
 
 ## Accuracy
 
-| Claim | Producing command | Verified result (2026-08-06) |
+> **Measurement correction (2026-08-10) [caught: test]**
+> The previous 60–80% routing accuracy figures were contaminated by stale labels and fixtures for an unimplemented route. The `Coding Hinge` display label was renamed to `The Engineer` (data/fingerprints.json), but every eval `normalizeLabel()` map still keyed on the old name — the router correctly chose `coding-hinge`, yet the harness scored it wrong. Separately, eval fixtures for a `Fact Check` route scored as failures even though no such fingerprint exists in the catalog (status: excluded, reason: route_not_implemented). After excluding those measurement artifacts, the corrected numbers below reflect implemented-route accuracy only, with genuine routing failures listed explicitly. This measures the evaluator's correctness as much as the router's.
+
+| Claim | Producing command | Verified result (2026-08-10) |
 |-------|-------------------|-------------------------------|
-| Router accuracy ≥ 60% (basic) | `npm test -- --runInBand src/__eval__/routingEval.test.js` | 60% (27/45) |
-| Router accuracy ≥ 60% (ML holdout) | `npm test -- --runInBand src/__eval__/routingEvalML.test.js` | 63.0% (17/27) |
-| Router accuracy (blind) | `npm test -- --runInBand src/__eval__/routingEvalBlind.test.js` | 63% (17/27) |
-| Router accuracy (V3) | `npm test -- --runInBand src/__eval__/routingEvalBlindV3.test.js` | 80% (24/30) |
+| Router accuracy (basic, implemented routes) | `npm test -- --runInBand src/__eval__/routingEval.test.js` | **90%** (35 correct, 4 incorrect) — 6 excluded (factCheck) |
+| Router accuracy (ML holdout, implemented routes) | `npm test -- --runInBand src/__eval__/routingEvalML.test.js` | **95.7%** (22/23) — 4 excluded (factCheck) |
+| Router accuracy (blind, implemented routes) | `npm test -- --runInBand src/__eval__/routingEvalBlind.test.js` | **96%** (22 correct, 1 incorrect) — 4 excluded (factCheck) |
+| Router accuracy (V3 single-author holdout) | `npm test -- --runInBand src/__eval__/routingEvalBlindV3.test.js` | **90%** (27/30) |
+| Router accuracy (v3 Final holdout) | `npm test -- --runInBand src/__eval__/routingEvalFinal.test.js` | **93%** (28/30) |
 | Semantic-blind accuracy | `npm test -- --runInBand src/__eval__/routingEvalBlindSemantic.test.js` | 73% (22/30) — NOT CI-measurable, ONNX-only |
 | Semantic accuracy (v4, real ONNX) | `npm test -- --runInBand src/__eval__/routingEvalBlindV2.test.js` **with** `@xenova/transformers` + HF access | ⛔ NOT valid in CI (hash-noise 12%) |
 | ~~"92% zero-shot accuracy"~~ | — | **Retired**: no benchmark produced it |
-| ~~"~90% router accuracy"~~ | — | **Retired**: contradicted by 60–80% measured range |
+| ~~"~90% router accuracy"~~ | — | **Retired**: contradicted by measured range |
+
+**Known genuine routing failures** (outside the harness, listed for PR 2):
+1. `"what's up"` → routed to Structured Reasoning, not Simple Greeting (not in `GREETING_TERMS`).
+2. `"verify the ancestry transcript for Charles Dyer"` → routed to The Engineer (coding); should be genealogy.
+3. `"what evidence supports Josiah Ramsey's pay voucher"` → routed to Structured Reasoning; should be genealogy.
+4. `"validate this source about climate change statistics"` → routed to genealogy because `"source"` is in genealogy matchTerms; should be fact-check/reasoning (generic term collision).
 
 ## Cost savings
 
@@ -66,7 +76,7 @@ npm test -- --runInBand --testPathPatterns=routingEval
 | FEYNMAN_GATE verifies embedded copies | `npm test -- --runInBand src/__eval__/feynmanGate.test.js` | ✅ 10 tests |
 | BackendUnavailablePanel (11 tests) | `npm test -- --runInBand src/modules/rei/components/BackendUnavailablePanel.test.jsx` | ✅ |
 | HingeScore calibration infra (15 tests) | `npm test -- --runInBand src/__eval__/hingeCalibrationDebate.test.js` | ✅ |
-| Pooled accuracy in claimed 60–80% range | `npm test -- --runInBand src/__eval__/claimsSync.test.js` | ✅ 69.1% (94/136) |
+| Pooled accuracy in claimed 60–80% range | `npm test -- --runInBand src/__eval__/claimsSync.test.js` | ✅ 72.8% (99/136) |
 | Test-count badge auto-generated | `node scripts/gen-claims.mjs` + CI `--check` | ✅ never hand-edited again |
 | Cost replay (per-category, real corpus) | `npm test -- --runInBand src/__eval__/costSavingsReplay.test.js` | ✅ pooled 79% on 10-entry fixture (stratified by category) |
 | Route-adherence replay (eval corpus) | `npm test -- --runInBand src/__eval__/evalReplay.test.js` | ✅ pooled 75% (4 escalated / 3 hits / 1 miss) on 5-entry fixture |

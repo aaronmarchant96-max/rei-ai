@@ -53,6 +53,7 @@ const PROMPTS = [
 const LABEL_MAP = {
   "Simple Greeting": "greeting",
   "Coding Hinge": "coding",
+  "The Engineer": "coding",
   "Genealogy Deep Dive": "genealogy",
   "Story Architect": "story",
   "Structured Reasoning": "reasoning",

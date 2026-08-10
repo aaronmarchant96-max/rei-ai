@@ -19,7 +19,7 @@ const PROMPTS = [
   { text: "yo", category: "greeting" },
   { text: "hi everyone", category: "greeting" },
 
-  // ── coding (expect: "Coding Hinge") ──
+  // ── coding (expect: "The Engineer") ──
   { text: "write a Python function to merge two sorted lists", category: "coding" },
   { text: "how do I set up a Next.js project with Tailwind?", category: "coding" },
   { text: "debug this Rust borrow checker error", category: "coding" },
@@ -58,6 +58,7 @@ const PROMPTS = [
 const LABEL_MAP = {
   "Simple Greeting": "greeting",
   "Coding Hinge": "coding",
+  "The Engineer": "coding",
   "Genealogy Deep Dive": "genealogy",
   "Story Architect": "story",
   "Structured Reasoning": "reasoning",

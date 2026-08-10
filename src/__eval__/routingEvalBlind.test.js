@@ -50,6 +50,7 @@ describe("Routing Eval — blind held-out set", () => {
   let totalPremiumCost = 0;
   let correctRoutes = 0;
   let incorrectRoutes = 0;
+  let excludedCount = 0;
   let escalationCount = 0;
   let deterministicCount = 0;
 
@@ -80,6 +81,7 @@ describe("Routing Eval — blind held-out set", () => {
           const labelMap = {
             "Simple Greeting": "greeting",
             "Coding Hinge": "coding",
+            "The Engineer": "coding",
             "Genealogy Deep Dive": "genealogy",
             "Story Architect": "creative",
             "Creative Prose": "creative",
@@ -92,7 +94,13 @@ describe("Routing Eval — blind held-out set", () => {
           };
           const actualLabel = labelMap[decision.label] || "unknown";
 
-          if (actualLabel === category) {
+          // factCheck fixtures are EXCLUDED from accuracy: the route does not
+          // exist in the fingerprint catalog (status: excluded,
+          // reason: route_not_implemented). Counting them as failures would
+          // produce a systematically false denominator.
+          if (category === "factCheck") {
+            excludedCount++;
+          } else if (actualLabel === category) {
             correctRoutes++;
           } else {
             incorrectRoutes++;
@@ -134,7 +142,8 @@ describe("Routing Eval — blind held-out set", () => {
   BLIND EVAL BENCHMARK REPORT
 ═══════════════════════════════════════════
   Total prompts:              ${total}
-  Routing accuracy:           ${accuracy}% (${correctRoutes} correct, ${incorrectRoutes} incorrect)
+  Implemented-route accuracy: ${accuracy}% (${correctRoutes} correct, ${incorrectRoutes} incorrect)
+  Excluded fixtures:          ${excludedCount} (factCheck — route_not_implemented)
   Pathway breakdown:
     deterministic: ${pathwayCounts.deterministic} prompts
     cheap: ${pathwayCounts.cheap} prompts
