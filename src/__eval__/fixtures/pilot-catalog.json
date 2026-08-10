@@ -1,5 +1,9 @@
 {
   "label": "Acme demo tenant (synthetic)",
+  "provenance": {
+    "source": "synthetic",
+    "note": "Synthetic demo traffic — NOT production telemetry. Savings figures below are a replay estimate, not measured live spend."
+  },
   "models": {
     "gpt-4o": { "input": 0.0025, "output": 0.01 },
     "gpt-4o-mini": { "input": 0.00015, "output": 0.0006 },

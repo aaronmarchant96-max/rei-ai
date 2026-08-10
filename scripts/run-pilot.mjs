@@ -11,6 +11,12 @@
  * routing policy over a customer's exported traffic, costed against their
  * own model catalog, and prints the honest numbers.
  *
+ * Honesty contract: the report labels savings as "measured" ONLY when the
+ * catalog declares provenance.source === "production". Otherwise it prints
+ * "REPLAY ESTIMATE" — the numbers are a replay of REI policy over the given
+ * traffic, not measured live spend. Never present the fixture numbers as
+ * measured telemetry.
+ *
  * Usage:
  *   node scripts/run-pilot.mjs \
  *     --traffic src/__eval__/fixtures/pilot-traffic.json \
@@ -41,9 +47,21 @@ const report = evaluatePilotTraffic(traffic, catalog);
 
 const pct = (n) => (typeof n === "number" && isFinite(n) ? `${n.toFixed(1)}%` : "—");
 
+const prov = report.provenance;
+const isProduction = prov?.source === "production";
+const savingsLabel = isProduction ? "Measured savings:" : "Est. savings (replay):";
+
 console.log("\n════════════════════════════════════════════════════════");
 console.log("  REI PILOT — ROUTING SAVINGS REPORT");
 console.log(`  ${catalog.label || "single-customer pilot"}`);
+if (prov?.source === "synthetic") {
+  console.log("  ⚠ REPLAY ESTIMATE — synthetic demo traffic, not production telemetry");
+} else if (!isProduction) {
+  console.log(`  ⚠ Source: ${prov?.source || "unknown"} — treat savings as a replay estimate`);
+}
+if (prov?.note) {
+  console.log(`  ${prov.note}`);
+}
 console.log("════════════════════════════════════════════════════════");
 console.log(`  Requests evaluated:      ${report.totalEntries}`);
 console.log(`  Measured:                ${report.measured}`);
@@ -54,7 +72,7 @@ for (const [reason, count] of Object.entries(report.excludedReasons)) {
 console.log("  ─────────────────────────────────────────────");
 console.log(`  Customer's baseline:     $${report.baselineCost.toFixed(5)}`);
 console.log(`  REI-routed cost:         $${report.reiCost.toFixed(5)}`);
-console.log(`  Savings:                 $${report.savings.toFixed(5)}  (${pct(report.savingsPercent)})`);
+console.log(`  ${savingsLabel}  $${report.savings.toFixed(5)}  (${pct(report.savingsPercent)})`);
 console.log("  ─────────────────────────────────────────────");
 console.log(`  Escalated (premium/quality-sensitive): ${report.escalated}`);
 console.log("  Route distribution:");

@@ -41,6 +41,13 @@ export interface PilotModelRate {
   output: number;
 }
 
+export interface PilotProvenance {
+  /** Where the traffic actually came from. 'synthetic' vs 'production' vs unknown. */
+  source?: string;
+  /** Human-readable caveat about the data's origin. */
+  note?: string;
+}
+
 export interface PilotCatalog {
   /** The customer's own model → rate table. */
   models: Record<string, PilotModelRate>;
@@ -50,6 +57,8 @@ export interface PilotCatalog {
   defaultModel?: string;
   /** Optional label for the report. */
   label?: string;
+  /** Origin of the traffic being evaluated — determines how savings are worded. */
+  provenance?: PilotProvenance;
 }
 
 export interface PilotRouteStat {
@@ -76,6 +85,12 @@ export interface PilotReport {
   /** Requests routed to adversarial-validation (quality-sensitive). */
   escalated: number;
   byRoute: Record<string, PilotRouteStat>;
+  /**
+   * Origin of the evaluated traffic. When source is NOT 'production', savings
+   * is a REPLAY ESTIMATE over the given traffic, not measured live spend —
+   * the report must never present it as measured telemetry.
+   */
+  provenance: PilotProvenance | null;
 }
 
 const num = (n: unknown): number => (typeof n === "number" && isFinite(n) ? n : 0);
@@ -185,5 +200,6 @@ export function evaluatePilotTraffic(
     routeDistribution,
     escalated,
     byRoute,
+    provenance: catalog?.provenance ?? null,
   };
 }

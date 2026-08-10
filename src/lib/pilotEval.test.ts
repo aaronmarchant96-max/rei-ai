@@ -2,6 +2,7 @@ import { evaluatePilotTraffic, type PilotCatalog } from "./pilotEval";
 
 const CATALOG: PilotCatalog = {
   label: "Acme demo",
+  provenance: { source: "synthetic", note: "demo" },
   models: {
     "gpt-4o": { input: 0.0025, output: 0.01 },
     "gpt-4o-mini": { input: 0.00015, output: 0.0006 },
@@ -108,5 +109,22 @@ describe("pilotEval — single-customer pilot evaluator", () => {
     expect(report.savings).toBeGreaterThanOrEqual(-1e-9);
     // reiCost at gpt-4o-mini 500 tok = (500/1000)*0.00075 = 0.000375
     expect(report.reiCost).toBeCloseTo(0.000375, 12);
+  });
+
+  it("carries provenance through the report so savings can be labeled measured vs replay", () => {
+    const synthetic = evaluatePilotTraffic([{ prompt: "hi", tokens: 100, actualCost: 0.001 }], CATALOG);
+    expect(synthetic.provenance?.source).toBe("synthetic");
+
+    const production = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001 }],
+      { ...CATALOG, provenance: { source: "production" } }
+    );
+    expect(production.provenance?.source).toBe("production");
+
+    const none = evaluatePilotTraffic([{ prompt: "hi", tokens: 100, actualCost: 0.001 }], {
+      ...CATALOG,
+      provenance: undefined,
+    });
+    expect(none.provenance).toBeNull();
   });
 });
