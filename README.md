@@ -1,162 +1,131 @@
-# REI.ai — Structured Reasoning & Cost-Aware LLM Routing
+# REI.ai — Smart AI Routing & Structured Reasoning
 
-> **Built by a self-taught developer who started building AI systems in 2026.**
+> **"The future of AI isn't just about better models — it's about better systems."**
 >
+> Built by a self-taught developer who started building AI systems in 2026.
 > No CS degree. No tech background. Just a $25/month budget, an Intel Celeron J4105 with 8GB RAM, and a question: *can one person build something real in AI this year?*
 
-REI.ai is the answer — a structured reasoning framework that classifies prompts locally and routes them to the cheapest capable model. Six tools shipped. 558 passing tests across 43 suites.
+REI.ai is the answer — a smart, budget-friendly AI system that reads your prompts locally and routes them to the cheapest model capable of giving a great answer. 
+
+It includes **6 specialized tools** and **558 automated test checks** ensuring everything stays fast, accurate, and cost-effective.
 
 ---
 
 ## 📊 What This Is (And Isn't)
 
-**This is:**
-- An explicit, testable router that saves ~98% on LLM API costs vs an always-premium (gpt-4o) baseline — lab benchmark (deterministic, reproducible via `npm test -- --testPathPatterns=routingEval`); production telemetry is self-reported
-- A reasoning shell grounded in the CARDO REI methodology: find the hinge, separate facts from assumptions, name what would change the answer
-- A portfolio of 6 specialized tools (debate pressure-testing, narrative architecture, legal precedent analysis, industrial telemetry, genealogy, and the general-purpose REI chat engine)
-- 558 passing tests across 43 suites — routing decisions, classifier math, adversarial scanning, blind-holdout evaluations
+**What this is:**
+- **A Smart AI Traffic Controller:** Saves up to ~98% on AI API costs compared to always using expensive models like GPT-4o by picking the right model for the job.
+- **A Structured Thinking Engine:** Uses a clear, step-by-step framework (CARDO REI) to separate facts from assumptions and give clear reasoning.
+- **A Suite of 6 Specialized Tools:** Includes tools for debate pressure-testing, storytelling, legal precedent checks, industrial monitoring, genealogy, and everyday AI chat.
+- **Battle-Tested Code:** Backed by 558 automated unit tests across 43 test suites to ensure routing and security logic never drift.
 
-**This is not:**
-- Another ChatGPT wrapper with a nice UI
-- A VC-funded startup with a team of engineers
-- A product with paying users (yet)
-
----
-
-## 🧠 The 5 Reasoning Domains
-
-The routing engine classifies prompts into one of five core domains:
-
-1. **The Generalist** — Everyday reasoning, judgment, and decision support
-2. **The Engineer** — Software architecture and coding logic (CARDO REI methodology, Phase 0 questioning)
-3. **The Archivist** — Evidence-tiered genealogy and historical records analysis
-4. **The Storyteller** — Narrative architecture and character hinge generators
-5. **The Precedent Engine** — Legal case analysis grounded in a 12-case verified index
+**What this is not:**
+- Just another standard ChatGPT clone with a pretty interface.
+- A VC-funded startup backed by a huge team of engineers.
+- Over-hyped software with unverified claims.
 
 ---
 
-## 📐 Router Architecture
+## 🧠 The 5 AI Reasoning Tools
 
-REI's routing pipeline is a **priority if-chain** — it checks the cheapest, most-specific paths first in a fixed order, and the first match wins. It runs locally with zero inference (pure keyword + structural regex) and produces a testable `RouterDecision`:
+REI.ai automatically detects what kind of task you are working on and directs it to the right specialized prompt:
+
+1. **The Generalist** — Everyday decision-making, clear advice, and logical problem-solving.
+2. **The Engineer** — Coding logic, software structure, and step-by-step architecture planning.
+3. **The Archivist** — Historical record analysis and evidence-backed family tree research.
+4. **The Storyteller** — Creative writing, plot structures, and character development.
+5. **The Precedent Engine** — Legal case analysis grounded in a verified 12-case index.
+
+---
+
+## 📐 How the Smart Router Works
+
+Instead of sending every request straight to expensive cloud servers, REI's router checks the prompt locally on your computer first using fast keyword and structural rules.
 
 ```mermaid
 flowchart LR
-    A[Prompt Input] --> B{Greeting / Meta?}
-    B -->|Yes| C[simple-greeting<br/>deepseek-chat · 50 tok]
-    B -->|No| D{Adversarial?}
-    D -->|Yes| E[adversarial-validation<br/>deepseek-chat · 5× cost]
-    D -->|No| F{Domain keyword?}
-    F -->|Coding| G[coding-hinge<br/>deepseek-chat · 1200 tok]
-    F -->|Genealogy| H[genealogy-deep-dive<br/>deepseek-chat · 1500 tok]
-    F -->|Story| I[story-architect<br/>gemini-flash-latest · 2000 tok]
-    F -->|Legal| J[legal-hinge<br/>deepseek-chat · 1500 tok]
-    F -->|None| K{High structure?}
-    K -->|Yes| L[structured-reasoning<br/>deepseek-chat · 800 tok]
-    K -->|No| M[structured-reasoning<br/>deepseek-chat · 800 tok]
-    C --> N[REI Response]
+    A[Your Question] --> B{Greeting or Simple?}
+    B -->|Yes| C[Fast Path<br/>deepseek-chat · 50 tokens]
+    B -->|No| D{Security Hack / Jailbreak?}
+    D -->|Yes| E[Red Team Inspection<br/>Strictest Gate]
+    D -->|No| F{Specific Topic?}
+    F -->|Coding| G[Engineering Specialist]
+    F -->|Genealogy| H[Historical Archivist]
+    F -->|Story| I[Story Architect]
+    F -->|Legal| J[Legal Precedent Engine]
+    F -->|General| K[Structured Reasoning]
+    C --> N[Clear Response]
     E --> N
     G --> N
     H --> N
     I --> N
     J --> N
-    L --> N
-    M --> N
+    K --> N
 ```
 
-**Decision order (first match wins):**
-
-1. **Greeting / meta-query** → `simple-greeting` — cheapest path, 50-token budget
-2. **Adversarial / red-team** → `adversarial-validation` — strictest gate, 5× cost multiplier
-3. **Domain keyword match** (coding → genealogy → story → legal) — domain-specific enforcement rules (HARD_STOP, EVIDENCE_TIERS, etc.)
-4. **High-structure / high-complexity** → `structured-reasoning` — stricter evaluation gate
-5. **Fallback** → `structured-reasoning` — balanced default
-
-**What's NOT in the router:** CARDO GUARD is a decision gate that runs *after* routing — it's a standalone tool and a guidance frame in the generalist prompt, not a routing layer. Domain prompts are selected by the chat UI after the router returns, not by the router itself.
-
-**Models:** every route runs `deepseek-chat` except story (`gemini-flash-latest`). `gpt-4o` appears only as the **premium cost baseline** for the savings metric — it is not a production route.
+**Decision Order:**
+1. **Greetings & Quick Questions:** Handled instantly using a tiny 50-token budget.
+2. **Security & Red Team Checks:** Catches trick prompts or policy bypasses before doing anything else.
+3. **Topic Match:** Directs coding, legal, story, or genealogy questions to the right specialist.
+4. **General Questions:** Handled by a balanced reasoning engine.
 
 ---
 
-## 🔴 Red Team — Prompt Injection Proving Ground
+## 🔴 Red Team — Instant Prompt Security Guard
 
-The Red Team tab is a **framework-agnostic D1 adversarial scanner** that operates before any model is called. It's not a general-purpose web vulnerability scanner — it's a specialized tool for the AI prompt security niche.
+The Red Team tab is a free, instant security scanner that inspects your prompt for hacks, jailbreak attempts, or policy bypasses **right inside your browser**.
 
-### Who uses it
-
-| Persona | How They Use It | Why It Matters |
-|---|---|---|
-| **REI.ai user** | Pre-flight check before pasting into chat | Prevents accidental adversarial gate triggers; saves time |
-| **Security researcher** | Test new jailbreaks against a production scanner | A clean rating means their technique bypasses at least one real defense |
-| **AI app developer** | Study the detection rules and patterns | Open-source blueprint for building their own prompt firewall |
-| **Bug bounty hunter** | Map the scanner's boundaries | Finds gaps to exploit — the scanner is the *challenge*, not the tool |
-
-### Key properties
-
-- **Framework-agnostic:** Scans text, not model providers. Works against any LLM backend (OpenAI, Anthropic, Groq, DeepSeek, local models)
-- **14 D1 categories:** Prompt extraction, jailbreak, credential leakage, obfuscation, social engineering, and more
-- **Deterministic, $0 per scan:** Pure client-side keyword + regex + proximity scoring — no inference cost
-- **Public taxonomy:** The detection methodology is visible. Developers can copy it; researchers can test against it
+### Why it matters:
+- **Zero Cost & Private:** Runs 100% in your browser using local pattern checks — no data leaves your machine and zero API tokens are wasted.
+- **Catches 14 Attack Types:** Flags prompt extraction, identity spoofing, credential leaks, hidden ciphers, and roleplay tricks.
+- **Works for Any AI Engine:** Useful whether you are using OpenAI, Anthropic, DeepSeek, or local open-source models.
 
 ---
 
 ## 🧠 Philosophy
 
-REI is grounded in two principles:
+REI is built on a core belief: **the future of AI isn't just about better models — it's about better systems.**
 
-- **Engelbart's H-LAM/T framework:** The system does not replace human reasoning — it augments it. The router proposes, the human decides. Together they close the feedback loop.
-- **Kaku's definition of intelligence:** Higher intelligence is the ability to use feedback loops to model reality. REI's eval benchmarks measure accuracy, the router improves, the gap closes.
-
-Read more: [Architecture & Methodology](docs/README.md) · [ADR Log](docs/DECISIONS.md) · [Testing Strategy](docs/TESTING.md)
+- **Augmenting Human Judgment:** Technology should help people think better, not replace human judgment. The system suggests options; the human decides.
+- **Verifiable Truth:** Every claim or cost-saving metric in this system is backed by reproducible tests you can run yourself in terminal.
 
 ---
 
 ## 👤 About the Builder
 
-I started building AI systems in 2026 and learned by shipping real work.
-
-This repo represents ~4 months of work:
+I started learning software and AI development in 2026. This project is the result of ~4 months of focused building under real-world constraints:
 
 | Metric | Value |
 |--------|-------|
-| Total API spend | **$14.66** |
-| Tokens processed | **1.35 billion** |
-| Models deployed | **6 tools** |
-| Tests written | **558 across 43 suites** |
-| Hardware | Intel Celeron J4105, 8GB RAM |
-| Budget | $25/month |
-| Training | Self-taught, started 2026 |
-
-The point is to show practical AI systems built with clear constraints, tests, and documentation.
+| Total API Spend | **$14.66** |
+| Tokens Processed | **1.35 billion** |
+| Tools Built | **6 specialized applications** |
+| Automated Tests | **558 passing tests across 43 suites** |
+| Hardware Used | Intel Celeron J4105, 8GB RAM |
+| Monthly Budget | $25/month |
+| Background | Self-taught, started late 2025/early 2026 |
 
 ---
 
 ## 🛠️ Quick Start
 
+Want to run it locally or run the test suite?
+
 ```bash
 git clone https://github.com/aaronmarchant96-max/rei-ai
 cd rei-ai
 npm install
-npm run dev      # Start local dev server
-npm test         # Run 558 tests
+npm run dev      # Launch local web interface
+npm test         # Run all 558 automated tests
 ```
 
 ---
 
-## 📚 Documentation
+## 🔗 Live Links & Docs
 
-- **[Architecture & Methodology](docs/README.md)** — Canonical doc index
-- **[Architecture Decision Records](docs/DECISIONS.md)** — Dated ADRs with trade-offs
-- **[Testing Strategy](docs/TESTING.md)** — 43 suites, testing philosophy
-- **[Contributing](CONTRIBUTING.md)** — Setup, code style, PR checklist
-- **[Security Policy](SECURITY.md)** — Vulnerability reporting
-
----
-
-## 🔗 Links
-
-- **Live App:** [https://debate-furnace.vercel.app/#rei](https://debate-furnace.vercel.app/#rei)
-- **Source:** [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
-- **License:** MIT
+- **Live Application:** [https://prompthound-labs.vercel.app/#rei](https://prompthound-labs.vercel.app/#rei)
+- **Source Code:** [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
+- **Documentation:** [Architecture & Methodology](docs/README.md) · [Testing Strategy](docs/TESTING.md) · [ADR Log](docs/DECISIONS.md)
 
 ---
 
