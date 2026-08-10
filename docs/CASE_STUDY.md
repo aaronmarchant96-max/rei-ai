@@ -1,8 +1,10 @@
 # Case Study: Building a testable, cost-aware AI reasoning system
 
-Live system: https://rei-ai.prompthound-s-projects.vercel.app/#rei
+Live system: https://prompthound-labs.vercel.app
 
-Repository: https://github.com/aaronmarchant96-max/rei-ai-platform
+Repository: https://github.com/aaronmarchant96-max/rei-ai
+
+**Evaluation-integrity incident:** See `INCIDENT-001-ROUTING-MEASUREMENT.md` for the full investigation, corrected measurements, and resulting integrity controls.
 
 The problem
 
@@ -14,7 +16,7 @@ The project now has a REI experience with a structured reasoning shell, a Night 
 
 How the routing works
 
-The Night Shift router reads the incoming prompt and selects a path from a catalog. Simple greetings route to a cheap fast path. Coding, genealogy, and story prompts route to more structured profiles. Adversarial or red-team prompts route to a more expensive validation path. The routing rules are explicit and testable in src/lib/nightShiftRouter.js and data/fingerprints.json.
+The Night Shift router reads the incoming prompt and selects a path from a catalog. Simple greetings route to a cheap fast path. Coding, genealogy, and story prompts route to more structured profiles. Adversarial or red-team prompts route to a more expensive validation path. The routing rules are explicit and testable in src/lib/nightShiftRouter.ts and data/fingerprints.json.
 
 How I handled failure modes
 
@@ -30,7 +32,7 @@ This project is not just a prompt demo. It shows a workflow for building an AI s
 
 Evidence and references
 
-The main implementation files are src/REI.jsx, api/cfai.js, src/lib/nightShiftRouter.js, src/lib/cardoGuard.js, and src/AppShell.jsx.
+The main implementation files are src/REI.jsx, api/cfai.js, src/lib/nightShiftRouter.ts, src/lib/cardoGuard.js, and src/AppShell.jsx.
 
 The main test files are src/lib/nightShiftRouter.test.js and src/lib/cardoGuard.test.js.
 
