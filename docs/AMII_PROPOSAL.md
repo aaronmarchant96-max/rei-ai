@@ -136,6 +136,6 @@ Query → Layer 0: Deterministic Engine ($0, instant)
 
 ## Repository
 
-`https://github.com/aaronmarchant96-max/rei-ai-platform`
+`https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai`
 
 All code, tests (560 passing across 44 suites), benchmarks, and documentation are publicly available. Docker containerization included. Licensed under MIT.

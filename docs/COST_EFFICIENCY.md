@@ -72,7 +72,7 @@ npm test -- --testPathPatterns=routingEval
 The benchmark is **deterministic and reproducible**. Any third party can clone the repository and run:
 
 ```bash
-git clone https://github.com/aaronmarchant96-max/rei-ai-platform
+git clone https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
 npm ci --legacy-peer-deps
 npm test -- --testPathPatterns=routingEval
 ```

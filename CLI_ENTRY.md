@@ -11,7 +11,7 @@
 REI.ai is a reasoning-first web app for structured decision support. It uses cost-aware routing (Night Shift), a deterministic decision gate (CARDO GUARD), and domain-specific reasoning modes.
 
 - **Live:** https://debate-furnace.vercel.app/#rei
-- **Repo:** https://github.com/aaronmarchant96-max/rei-ai-platform
+- **Repo:** https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
 - **Goal:** Build AI systems that are testable, reviewable, and cost-conscious
 
 ---

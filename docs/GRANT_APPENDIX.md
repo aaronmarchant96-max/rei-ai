@@ -203,7 +203,7 @@ Documents:      6 updated/created
 
 ## 9. REI.ai Active Development Window
 
-**Anchor commit:** [`ef4b1a3fd4078ed5f5b817b511ad3c83cb841174`](https://github.com/aaronmarchant96-max/rei-ai-platform/commit/ef4b1a3fd4078ed5f5b817b511ad3c83cb841174)  
+**Anchor commit:** [`ef4b1a3fd4078ed5f5b817b511ad3c83cb841174`](https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai/commit/ef4b1a3fd4078ed5f5b817b511ad3c83cb841174)  
 *"feat: integrate REI split workspace dashboard, Hinge Meter force visualizer, and API route handler"*
 
 | Metric | Value |

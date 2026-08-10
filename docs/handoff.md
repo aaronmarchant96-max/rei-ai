@@ -40,7 +40,7 @@ PromptHound Labs is an applied AI engineering lab. Everything in this repo is an
 - **Test count:** 95 tests, 13 suites — all passing.
 - **Build:** Produces `dist/` successfully — 339 kB initial, 48 modules.
 - **Lint:** Pre-existing — ESLint v10 requires flat config but `.eslintrc.json` exists.
-- **Deployment:** https://rei-ai.prompthound-s-projects.vercel.app
+- **Deployment:** https://prompthound-labs.vercel.app.vercel.app
 - **Monthly operating cost:** ~$20/month (GitHub Copilot + OpenRouter API)
 - **Research framing:** README reframed as PromptHound Labs — Applied AI Engineering. Lab report template in `docs/lab-report-template.md`.
 

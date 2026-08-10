@@ -14,7 +14,7 @@ This handbook is designed specifically for **Vibe CLI** to pick up, evaluate, an
 
 - **Vercel Project Name:** `debate-furnace`
 - **Vercel Team Scope:** `prompthound-s-projects`
-- **Live App URL:** `https://rei-ai.prompthound-s-projects.vercel.app`
+- **Live App URL:** `https://prompthound-labs.vercel.app.vercel.app`
 - **Hash Route Targets:** `#rei` (REI.AI Chatbot), `#hinge-meter` (SVG Pivot Visualizer)
 
 ---

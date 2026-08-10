@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-10T03:39:07.183Z
-> Span: 2026-08-08 → 2026-08-09 (6 tagged commits, 9 total tags)
+> Last updated: 2026-08-10T20:38:39.384Z
+> Span: 2026-08-08 → 2026-08-10 (9 tagged commits, 12 total tags)
 
 ## Tag Taxonomy
 
@@ -17,8 +17,8 @@
 
 | Tag | Count |
 |---|---|
-| `claim-gate` | 4 |
-| `manual` | 3 |
+| `manual` | 5 |
+| `claim-gate` | 5 |
 | `ai-cross-check` | 1 |
 | `test` | 1 |
 
@@ -26,6 +26,9 @@
 
 | Commit | Date | Subject | Tags & Context |
 |---|---|---|---|
+| `f08c916` | 2026-08-10 | feat(eval): red team corpus → scanner → router → routeCorrect regression suite | `claim-gate` — the scanner escalation gate fix (ab7856f) is |
+| `edeece1` | 2026-08-10 | fix(landing): add Red Team card to ecosystem grid | `manual` — Red Team was invisible from desktop because no card existed |
+| `0327f40` | 2026-08-10 | fix(story): HARD STOP now honors explicit "just make the story" overrides | `manual` |
 | `ce40543` | 2026-08-09 | fix(ci): cross-reference modelRates.json against fingerprints.json in prebuild g... | `manual` |
 | `b300358` | 2026-08-09 | feat(red-team): add Red Team tab with D1 adversarial prompt scanner | `manual` — dimensionsTriggered was showing D1 on clean scans — fixed |
 | `ab7856f` | 2026-08-09 | fix(router): align adversarial detection with scanner taxonomy — before/after | `claim-gate` — escalation by the live eval loop. |
@@ -35,11 +38,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 6 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 9 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **6 tagged commits** across 1 month(s).
+- **9 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 

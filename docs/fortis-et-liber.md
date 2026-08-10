@@ -44,7 +44,7 @@ Live demo: https://debate-furnace.vercel.app/#rei
 - **Status**: ✅ Verified accessible (2026-07-01)
 - **Purpose**: Production deployment of REI.ai reasoning interface
 
-Repository: https://github.com/aaronmarchant96-max/rei-ai-platform
+Repository: https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
 
 ## Repository Portfolio
 

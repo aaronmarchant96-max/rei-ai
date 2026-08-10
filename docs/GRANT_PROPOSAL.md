@@ -19,7 +19,7 @@ Our methods are designed for teams that cannot afford premium AI infrastructure:
 
 Between April 7 and July 3, 2026, PromptHound Labs completed 25 engineering experiments across 6 repositories. The lab was started from a non-technical background (construction trades) with no prior programming experience, using commodity hardware and free-tier AI tools.
 
-**AI Engineering & Evaluation (rei-ai-platform):** State extraction hooks, code splitting (60% bundle reduction), deterministic decision gates, fingerprint-based routing, structured documentation workflows, a 95-test evidence suite, a prompt evaluation harness that caught 2 production regressions, and cost-aware routing with live token budget tracking.
+**AI Engineering & Evaluation (aaronmarchant96-max/rei-ai):** State extraction hooks, code splitting (60% bundle reduction), deterministic decision gates, fingerprint-based routing, structured documentation workflows, a 95-test evidence suite, a prompt evaluation harness that caught 2 production regressions, and cost-aware routing with live token budget tracking.
 
 **LLM Evaluation (llm-adversarial-testing):** A local evaluation harness for instruction adherence, structured output integrity, and adversarial pressure testing. Includes 9 case studies covering file injection, roleplay jailbreaks, multi-turn continuity, and dual-axis (control vs. pressure) comparisons. CI pipeline runs automated red-team scenarios.
 
@@ -164,13 +164,13 @@ The requested $10,000–$25,000 would close the gap between prototype validation
 - **Research index:** [RESEARCH_INDEX.md](RESEARCH_INDEX.md)
 - **Published lab reports:** `docs/experiments/night-shift-routing.md`, `docs/experiments/prompt-eval-suite.md`
 - **Lab report template:** `docs/lab-report-template.md`
-- **Primary repository (REI.ai):** https://github.com/aaronmarchant96-max/rei-ai-platform
+- **Primary repository (REI.ai):** https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
 - **LLM evaluation harness:** https://github.com/aaronmarchant96-max/llm-adversarial-testing
 - **Family archive:** https://github.com/aaronmarchant96-max/family-archive
 - **UAP footage analyzer:** https://github.com/aaronmarchant96-max/uap-footage-analyzer
 - **Satellite anomaly monitor:** https://github.com/aaronmarchant96-max/goes-anomaly-hunter
 - **Motion zone detector:** https://github.com/aaronmarchant96-max/local-video-motion-zone-detector
-- **Live portfolio:** https://rei-ai.prompthound-s-projects.vercel.app
+- **Live portfolio:** https://prompthound-labs.vercel.app.vercel.app
 
 ---
 

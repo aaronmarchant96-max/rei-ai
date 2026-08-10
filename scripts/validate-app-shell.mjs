@@ -9,7 +9,6 @@ const appShellPath = path.join(repoRoot, "src", "AppShell.jsx");
 
 const expectedStrings = [
   "PromptHound Labs",
-  "Structured outputs for messy input.",
 ];
 
 const expectedTabs = [
@@ -20,7 +19,7 @@ const expectedTabs = [
   },
   {
     id: "furnace",
-    label: "Debate Furnace",
+    label: "The Furnace",
     subtitle: "Arguments get pressure-tested here.",
   },
   {
@@ -47,6 +46,16 @@ const expectedTabs = [
     id: "tracepoint",
     label: "Tracepoint",
     subtitle: "Industrial signals stay evidence-first.",
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    subtitle: "How decisions played out — rescue rate, savings, audit.",
+  },
+  {
+    id: "red-team",
+    label: "Red Team",
+    subtitle: "Adversarial prompt scanner — D1 keyword surface analysis.",
   },
 ];
 
