@@ -42,26 +42,27 @@ export function scanRedTeamInput(input, context = {}) {
       context_poisoning: "Isolate this prompt from previous context — evaluate it standalone before merging into conversation history. Long, structured prompts with embedded contradictions are a classic poisoning vector.",
     };
 
-    const suggestedFixes = [
-      "Review the input for legitimate use cases",
-      "Consider whether the detected pattern is intentional or accidental",
-      "If this is a test, ensure it's within authorized scope"
-    ];
+    const suggestedFixes = [];
 
     if (CATEGORY_FIXES[match.category]) {
-      suggestedFixes.unshift(CATEGORY_FIXES[match.category]);
+      suggestedFixes.push(CATEGORY_FIXES[match.category]);
     }
     if (match.matchType === "regex") {
-      suggestedFixes.unshift("Detected obfuscation attempt — review for encoded instructions");
+      suggestedFixes.push("Detected obfuscation attempt — review for encoded instructions");
     }
     if (match.matchType === "proximity") {
-      suggestedFixes.unshift("Detected phrase proximity pattern — related terms found near each other");
+      suggestedFixes.push("Detected phrase proximity pattern — related terms found near each other");
     }
     if (match.combinationBoost) {
-      suggestedFixes.unshift("Multiple attack categories detected — elevated risk due to combination");
+      suggestedFixes.push("Multiple attack categories detected — elevated risk due to combination");
     }
     if (match.positionSuspicion) {
-      suggestedFixes.unshift("Injection detected at end of long prompt — classic prompt injection pattern");
+      suggestedFixes.push("Injection detected at end of long prompt — classic prompt injection pattern");
+    }
+    if (suggestedFixes.length === 0) {
+      suggestedFixes.push("Review the input for legitimate use cases");
+      suggestedFixes.push("Consider whether the detected pattern is intentional or accidental");
+      suggestedFixes.push("If this is a test, ensure it's within authorized scope");
     }
 
     return {
