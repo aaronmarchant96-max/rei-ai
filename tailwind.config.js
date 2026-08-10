@@ -1,5 +1,3 @@
-import relumeTailwind from "@relume_io/relume-tailwind";
-
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -52,6 +50,5 @@ export default {
       },
     },
   },
-  presets: [relumeTailwind],
   plugins: [],
 };
