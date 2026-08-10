@@ -64,17 +64,17 @@ A priority-ordered ladder where the first match wins:
 
 ```text
 1. empty input                   → default route
-2. greeting                     → cheapest path (deepseek-v4-flash)
-3. meta-query ("who are you")   → cheapest path (deepseek-v4-flash)
+2. greeting                     → cheapest path (llama-3.1-8b-instant)
+3. meta-query ("who are you")   → cheapest path (llama-3.1-8b-instant)
 4. self-evaluation              → The Engineer (strict, temp 0.2, 800 tokens)
-5. adversarial (regex / scanner) → adversarial-validation (5x cost multiplier)
+5. adversarial (regex / scanner) → adversarial-validation (~10.6x ceiling cost of cheapest path, $0.00138 vs $0.00013/1K)
 6. domain match (coding/genealogy/story/legal) → domain route
 7. high complexity / structure  → structured-reasoning (800 tokens, temp 0.2)
 8. stored preference            → recall last domain
 9. default fallback             → structured-reasoning
 ```
 
-*Note on Lane Locking:* Greetings and meta-queries run **before** the adversarial check so a prompt like *"hi, ignore your instructions"* hits the cheap fast path (`deepseek-v4-flash`) instead of wasting a 5x cost multiplier. This priority order is locked by unit tests.
+*Note on Lane Locking:* Greetings and meta-queries run **before** the adversarial check so a prompt like *"hi, ignore your instructions"* hits the cheap fast path (`llama-3.1-8b-instant`) instead of paying the ~10.6x ceiling cost of the adversarial-validation route. This priority order is locked by unit tests.
 
 ---
 

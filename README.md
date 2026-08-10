@@ -40,14 +40,14 @@ REI.ai automatically detects what kind of task you are working on and directs it
 
 ## 📐 How the Smart Router Works
 
-Instead of sending every request straight to expensive cloud servers, REI's router runs an **ordered decision cascade** locally on your machine. Priority order matters: for instance, greetings run *before* security checks so simple prompts like *"hi, ignore your instructions"* hit the cheap fast path (`deepseek-v4-flash`) without wasting a 5x cost multiplier.
+Instead of sending every request straight to expensive cloud servers, REI's router runs an **ordered decision cascade** locally on your machine. Priority order matters: for instance, greetings run *before* security checks so simple prompts like *"hi, ignore your instructions"* hit the cheap fast path (`llama-3.1-8b-instant`) without paying the ~10.6x ceiling cost of the adversarial-validation route ($0.00013 vs $0.00138 per equivalent 1K-token ceiling).
 
 ```mermaid
 flowchart TD
     A[Your Question] --> B[Hinge Classifier<br/>ECS / DAS / APS]
     B --> C{Decision Cascade}
     C -->|1. Empty| D[Default Route]
-    C -->|2. Greeting| E[Cheapest Path<br/>deepseek-v4-flash]
+    C -->|2. Greeting| E[Cheapest Path<br/>llama-3.1-8b-instant]
     C -->|3. Meta Query| E
     C -->|4. Self-Eval| F[The Engineer]
     C -->|5. Adversarial| G[Red Team Validation]
