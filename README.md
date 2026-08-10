@@ -77,6 +77,28 @@ flowchart LR
 
 ---
 
+## 🔴 Red Team — Prompt Injection Proving Ground
+
+The Red Team tab is a **framework-agnostic D1 adversarial scanner** that operates before any model is called. It's not a general-purpose web vulnerability scanner — it's a specialized tool for the AI prompt security niche.
+
+### Who uses it
+
+| Persona | How They Use It | Why It Matters |
+|---|---|---|
+| **REI.ai user** | Pre-flight check before pasting into chat | Prevents accidental adversarial gate triggers; saves time |
+| **Security researcher** | Test new jailbreaks against a production scanner | A clean rating means their technique bypasses at least one real defense |
+| **AI app developer** | Study the detection rules and patterns | Open-source blueprint for building their own prompt firewall |
+| **Bug bounty hunter** | Map the scanner's boundaries | Finds gaps to exploit — the scanner is the *challenge*, not the tool |
+
+### Key properties
+
+- **Framework-agnostic:** Scans text, not model providers. Works against any LLM backend (OpenAI, Anthropic, Groq, DeepSeek, local models)
+- **14 D1 categories:** Prompt extraction, jailbreak, credential leakage, obfuscation, social engineering, and more
+- **Deterministic, $0 per scan:** Pure client-side keyword + regex + proximity scoring — no inference cost
+- **Public taxonomy:** The detection methodology is visible. Developers can copy it; researchers can test against it
+
+---
+
 ## 🧠 Philosophy
 
 REI is grounded in two principles:

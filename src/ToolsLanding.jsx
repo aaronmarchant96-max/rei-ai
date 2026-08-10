@@ -63,9 +63,9 @@ const CASE_STUDIES = [
   { id: "analytics", toolId: "analytics", label: "Analytics", subtitle: "Routing + Evidence",
     description: "Routing observability, evidence outcomes, CARDO decision audit",
     hinge: "Rescue Rate • Truncation • Real-vs-Estimate Savings", badge: "NEW" },
-  { id: "red-team", toolId: "red-team", label: "Red Team", subtitle: "Adversarial Scanner",
-    description: "Adversarial prompt scanner — D1 keyword surface analysis",
-    hinge: "Deterministic taxonomy scan • $0 per scan", badge: "NEW" },
+  { id: "red-team", toolId: "red-team", label: "Red Team", subtitle: "Prompt Injection Proving Ground",
+    description: "Framework-agnostic adversarial scanner — pre-flight checks, jailbreak validation, open-source detection blueprint",
+    hinge: "14 D1 categories • $0 per scan • public taxonomy", badge: "NEW" },
 ];
 
 export default function ToolsLanding({ onOpenTool }) {
