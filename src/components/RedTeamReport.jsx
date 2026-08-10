@@ -55,7 +55,7 @@ export default function RedTeamReport({ report, isLoading = false }) {
               </div>
               <div className="rei-redteam-finding-meta">
                 <span>Category: {finding.category}</span>
-                <span>Confidence: {Math.round((finding.confidence || 0) * 100)}%</span>
+                <span>Match strength: {Math.round((finding.confidence || 0) * 100)}%</span>
               </div>
               {finding.evidence && finding.evidence.length > 0 && (
                 <div className="rei-redteam-evidence">
@@ -90,7 +90,7 @@ export default function RedTeamReport({ report, isLoading = false }) {
           {routingTrace.d1 && (
             <div className="rei-redteam-trace-entry">
               <span className="rei-redteam-trace-dim">D1</span>
-              <span>Confidence: {Math.round((routingTrace.d1.confidence || 0) * 100)}%</span>
+              <span>Match strength: {Math.round((routingTrace.d1.confidence || 0) * 100)}%</span>
               <span>Escalated: {routingTrace.d1.escalated ? "Yes" : "No"}</span>
             </div>
           )}
