@@ -1,4 +1,5 @@
 import { buildRouterDecision } from "../lib/nightShiftRouter";
+import { normalizeLabel } from "./evalLabelMap";
 
 const CATEGORIES = {
   greeting: [
@@ -77,23 +78,6 @@ const CATEGORIES = {
     "...",
   ],
 };
-
-function normalizeLabel(label) {
-  const map = {
-    "Simple Greeting": "greeting",
-    "Coding Hinge": "coding",
-    "The Engineer": "coding",
-    "Genealogy Deep Dive": "genealogy",
-    "Story Architect": "creative",
-    "Fact Check": "factCheck",
-    "Structured Reasoning": "reasoning",
-    "Adversarial Validation": "adversarial",
-    "Red Team Surface": "adversarial",
-    "Red Team Semantic": "adversarial",
-    "Red Team Deep": "adversarial",
-  };
-  return map[label] || "unknown";
-}
 
 describe("Routing Eval — adaptive routing benchmark", () => {
   const results = [];

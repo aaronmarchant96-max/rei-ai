@@ -1,4 +1,5 @@
 import { buildRouterDecision } from "../lib/nightShiftRouter";
+import { normalizeLabel } from "./evalLabelMap";
 
 const BLIND_CATEGORIES = {
   greeting: [
@@ -78,21 +79,7 @@ describe("Routing Eval — blind held-out set", () => {
           if (pathway === "deterministic") deterministicCount++;
           if (pathway === "premium") escalationCount++;
 
-          const labelMap = {
-            "Simple Greeting": "greeting",
-            "Coding Hinge": "coding",
-            "The Engineer": "coding",
-            "Genealogy Deep Dive": "genealogy",
-            "Story Architect": "creative",
-            "Creative Prose": "creative",
-            "Fact Check": "factCheck",
-            "Structured Reasoning": "reasoning",
-            "Adversarial Validation": "adversarial",
-            "Red Team Surface": "adversarial",
-            "Red Team Semantic": "adversarial",
-            "Red Team Deep": "adversarial",
-          };
-          const actualLabel = labelMap[decision.label] || "unknown";
+          const actualLabel = normalizeLabel(decision.label);
 
           // factCheck fixtures are EXCLUDED from accuracy: the route does not
           // exist in the fingerprint catalog (status: excluded,

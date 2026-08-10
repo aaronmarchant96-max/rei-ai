@@ -1,5 +1,6 @@
 import { buildRouterDecision } from "../lib/nightShiftRouter";
 import { computeHingeScore } from "../lib/hingeClassifier";
+import { normalizeLabel } from "./evalLabelMap";
 
 // Frozen 26-prompt blind held-out dataset (STRICT DATA ISOLATION GUARANTEED)
 const BLIND_HELDOUT_DATASET = {
@@ -41,24 +42,6 @@ const BLIND_HELDOUT_DATASET = {
     "find the weakest assumption in the simulation hypothesis and break it open",
   ],
 };
-
-function normalizeLabel(label) {
-  const map = {
-    "Simple Greeting": "greeting",
-    "Coding Hinge": "coding",
-    "The Engineer": "coding",
-    "Genealogy Deep Dive": "genealogy",
-    "Story Architect": "creative",
-    "Creative Prose": "creative",
-    "Fact Check": "factCheck",
-    "Structured Reasoning": "reasoning",
-    "Adversarial Validation": "adversarial",
-    "Red Team Surface": "adversarial",
-    "Red Team Semantic": "adversarial",
-    "Red Team Deep": "adversarial",
-  };
-  return map[label] || "unknown";
-}
 
 describe("Routing Eval ML — Night Shift v3 Holdout Suite", () => {
   let correctClassifications = 0;

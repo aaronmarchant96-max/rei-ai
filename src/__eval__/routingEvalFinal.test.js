@@ -5,6 +5,7 @@
  */
 
 import { buildRouterDecision } from "../lib/nightShiftRouter";
+import { normalizeLabel } from "./evalLabelMap";
 
 const PROMPTS = [
   // ── greeting ──
@@ -29,11 +30,11 @@ const PROMPTS = [
   { text: "my ancestor changed his surname — how do I trace across the name change?", category: "genealogy" },
 
   // ── story ──
-  { text: "describe a chase scene through a crowded market at midnight", category: "story" },
-  { text: "write the opening paragraph of a gothic horror novel", category: "story" },
-  { text: "I need a character arc for a mentor who betrays their student", category: "story" },
-  { text: "what are good tropes for an enemies-to-allies arc?", category: "story" },
-  { text: "how do I make my dialogue sound more natural and less scripted?", category: "story" },
+  { text: "describe a chase scene through a crowded market at midnight", category: "creative" },
+  { text: "write the opening paragraph of a gothic horror novel", category: "creative" },
+  { text: "I need a character arc for a mentor who betrays their student", category: "creative" },
+  { text: "what are good tropes for an enemies-to-allies arc?", category: "creative" },
+  { text: "how do I make my dialogue sound more natural and less scripted?", category: "creative" },
 
   // ── reasoning ──
   { text: "what evidence do we have that 4-day work weeks improve productivity?", category: "reasoning" },
@@ -50,23 +51,13 @@ const PROMPTS = [
   { text: "tear down this argument: we should ban all single-use plastics immediately", category: "adversarial" },
 ];
 
-const LABEL_MAP = {
-  "Simple Greeting": "greeting",
-  "Coding Hinge": "coding",
-  "The Engineer": "coding",
-  "Genealogy Deep Dive": "genealogy",
-  "Story Architect": "story",
-  "Structured Reasoning": "reasoning",
-  "Adversarial Validation": "adversarial",
-};
-
 describe("v3 Final Holdout (fresh prompts, n=30, one-shot)", () => {
   const results = [];
 
   for (const { text, category } of PROMPTS) {
     test(`"${text}" → expects "${category}"`, () => {
       const decision = buildRouterDecision({ input: text, domain: "assistant" });
-      const actual = LABEL_MAP[decision.label] || "unknown";
+      const actual = normalizeLabel(decision.label);
       const match = actual === category;
       results.push({ prompt: text, expected: category, actual, match });
 
