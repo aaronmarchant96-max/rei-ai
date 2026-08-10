@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-08-10T03:39:07.183Z",
+  "entries": [
+    {
+      "hash": "ce40543",
+      "date": "2026-08-09",
+      "subject": "fix(ci): cross-reference modelRates.json against fingerprints.json in prebuild gate",
+      "tags": [
+        "manual"
+      ],
+      "context": ""
+    },
+    {
+      "hash": "b300358",
+      "date": "2026-08-09",
+      "subject": "feat(red-team): add Red Team tab with D1 adversarial prompt scanner",
+      "tags": [
+        "manual"
+      ],
+      "context": "dimensionsTriggered was showing D1 on clean scans — fixed"
+    },
+    {
+      "hash": "ab7856f",
+      "date": "2026-08-09",
+      "subject": "fix(router): align adversarial detection with scanner taxonomy — before/after",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "escalation by the live eval loop."
+    },
+    {
+      "hash": "423a961",
+      "date": "2026-08-09",
+      "subject": "feat(eval): live evaluation loop — requestId correlation, eval event store, deterministic route-adherence signals, adversarial-route claim + replay",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "Preserved finding : \"ignore previous instructions and"
+    },
+    {
+      "hash": "2b0fbbf",
+      "date": "2026-08-09",
+      "subject": "chore(claims): sync claims.json (649/55) + ledger rows for replay harnesses and adversarial-route claim",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "eval loop added 21 tests; claims.json badge drifted 606/50 -> 649/55. Regenerated and pinned new adversarial-route-adherence + replay claims in the ledger."
+    },
+    {
+      "hash": "02a0076",
+      "date": "2026-08-08",
+      "subject": "docs(agents): add error-gap tagging practice + refresh stale date",
+      "tags": [
+        "manual",
+        "ai-cross-check",
+        "test",
+        "claim-gate"
+      ],
+      "context": "what caught them"
+    }
+  ],
+  "summary": {
+    "totalEntries": 6,
+    "totalTags": 9,
+    "byTag": {
+      "claim-gate": 4,
+      "manual": 3,
+      "ai-cross-check": 1,
+      "test": 1
+    },
+    "byMonth": {
+      "2026-08": 6
+    }
+  }
+}
