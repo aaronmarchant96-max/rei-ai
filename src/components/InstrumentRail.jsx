@@ -26,7 +26,7 @@ export default function InstrumentRail({
           aria-label="Expand sidebar"
           title="Expand sidebar"
         >
-          ‹
+          &#8249;
         </button>
         <div className="rei-instrument-rail__collapsed-hero" title={`Rate Advantage: ${savingsPercent}%`}>
           <div className="rei-instrument-rail__collapsed-hero-value">
@@ -45,92 +45,89 @@ export default function InstrumentRail({
         aria-label="Collapse sidebar"
         title="Collapse sidebar"
       >
-        ›
+        &#8250;
       </button>
 
-      {/* ── 2×2 Metric Grid ── */}
-      <div className="rei-instrument-rail__grid">
-        <div className="rei-instrument-rail__card rei-instrument-rail__card--hero">
-          <div className="rei-instrument-rail__card-label">Rate Advantage</div>
-          <div className="rei-instrument-rail__card-value">
-            {totalPremiumCost > 0 ? `${savingsPercent}%` : "\u2014"}
-          </div>
+      <div className="rei-side-card">
+        <div className="rei-side-card__heading">This Session</div>
+        <div className="rei-side-stat">
+          <span className="rei-side-stat__label">Cost</span>
+          <span className={`rei-side-stat__value mono${sessionCost === 0 ? " zero" : ""}`}>
+            {sessionCost === 0 ? "\u2014" : sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
+          </span>
         </div>
-        <div className="rei-instrument-rail__card">
-          <div className="rei-instrument-rail__card-label">Session Cost</div>
-          <div className="rei-instrument-rail__card-value">
-            {sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
-          </div>
+        <div className="rei-side-stat">
+          <span className="rei-side-stat__label">Tokens</span>
+          <span className={`rei-side-stat__value mono${sessionTokens === 0 ? " zero" : ""}`}>
+            {sessionTokens === 0 ? "\u2014" : sessionTokens.toLocaleString()}
+          </span>
         </div>
-        <div className="rei-instrument-rail__card">
-          <div className="rei-instrument-rail__card-label">Tokens</div>
-          <div className="rei-instrument-rail__card-value">
-            {sessionTokens.toLocaleString()}
-          </div>
+        <div className="rei-side-stat">
+          <span className="rei-side-stat__label">Messages</span>
+          <span className={`rei-side-stat__value mono${sessionMessages === 0 ? " zero" : ""}`}>
+            {sessionMessages === 0 ? "\u2014" : sessionMessages}
+          </span>
         </div>
-        <div className="rei-instrument-rail__card">
-          <div className="rei-instrument-rail__card-label">Messages</div>
-          <div className="rei-instrument-rail__card-value">{sessionMessages}</div>
-        </div>
-      </div>
-
-      {/* ── Savings + Escalations row ── */}
-      <div className="rei-instrument-rail__section">
-        <div className="rei-instrument-rail__row">
-          <span>Saved</span>
-          <span className="rei-instrument-rail__value rei-instrument-rail__value--success">
+        <div className="rei-side-stat">
+          <span className="rei-side-stat__label">Saved vs. premium</span>
+          <span className="rei-side-stat__value verified mono">
             ${savingsVsPremium.toFixed(4)}
           </span>
         </div>
-        {lifetimeCost > 0 && (
-          <div className="rei-instrument-rail__row">
-            <span>Lifetime</span>
-            <span className="rei-instrument-rail__value">
-              ${lifetimeCost.toFixed(4)} / ${lifetimeSavings.toFixed(2)} saved
-            </span>
+      </div>
+
+      <div className="rei-side-card">
+        <div className="rei-side-card__heading">Models</div>
+        {Object.keys(modelBreakdown).length === 0 ? (
+          <div className="rei-side-empty">
+            No model calls yet.<br/>Routing shows up here after your first message.
           </div>
-        )}
-        {escalationCount > 0 && (
-          <div className="rei-instrument-rail__row">
-            <span>Escalations</span>
-            <span className="rei-instrument-rail__value rei-instrument-rail__value--accent">
-              {escalationCount}
-            </span>
-          </div>
+        ) : (
+          Object.entries(modelBreakdown).map(([model, tokens]) => (
+            <div key={model} className="rei-side-stat">
+              <span title={model} className="rei-side-stat__label">
+                {model.length > 22 ? model.slice(0, 19) + "..." : model}
+              </span>
+              <span className="rei-side-stat__value mono">
+                {tokens.toLocaleString()} tok
+              </span>
+            </div>
+          ))
         )}
       </div>
 
-      {/* ── Model Breakdown ── */}
-      <div className="rei-instrument-rail__section">
-        <div className="rei-instrument-rail__label">Models</div>
-        {Object.entries(modelBreakdown).map(([model, tokens]) => (
-          <div key={model} className="rei-instrument-rail__row">
-            <span title={model}>
-              {model.length > 22 ? model.slice(0, 19) + "..." : model}
-            </span>
-            <span className="rei-instrument-rail__value">
-              {tokens.toLocaleString()} tok
-            </span>
+      {lifetimeCost > 0 && (
+        <div className="rei-side-card">
+          <div className="rei-side-card__heading">Lifetime</div>
+          <div className="rei-side-stat">
+            <span className="rei-side-stat__label">Total cost</span>
+            <span className="rei-side-stat__value mono">${lifetimeCost.toFixed(4)}</span>
           </div>
-        ))}
-      </div>
+          <div className="rei-side-stat">
+            <span className="rei-side-stat__label">Total saved</span>
+            <span className="rei-side-stat__value verified mono">${lifetimeSavings.toFixed(2)}</span>
+          </div>
+          {escalationCount > 0 && (
+            <div className="rei-side-stat">
+              <span className="rei-side-stat__label">Escalations</span>
+              <span className="rei-side-stat__value mono">{escalationCount}</span>
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* ── Build Info — pill badges ── */}
-      <div className="rei-instrument-rail__section">
-        <div className="rei-instrument-rail__label">Build</div>
-        <div className="rei-instrument-rail__badges">
-          <span className="rei-instrument-rail__badge">v3.0</span>
-          <span className="rei-instrument-rail__badge">v3 Keyword</span>
-          <span className="rei-instrument-rail__badge rei-instrument-rail__badge--accent">CARDO Guard</span>
+      <div className="rei-side-card">
+        <div className="rei-side-card__heading">Build</div>
+        <div className="rei-side-chips">
+          <span className="rei-side-chip">v3.0</span>
+          <span className="rei-side-chip">v3 Keyword</span>
+          <span className="rei-side-chip">CARDO Guard</span>
         </div>
       </div>
 
-      <div className="rei-instrument-rail__section">
-        <a href="/#analytics" className="rei-instrument-rail__row" style={{ textDecoration: "none", color: "inherit" }}>
-          <span>Full dashboard</span>
-          <span className="rei-instrument-rail__value rei-instrument-rail__value--accent">&rarr;</span>
-        </a>
-      </div>
+      <a href="/#analytics" className="rei-side-dash-link">
+        Full dashboard <span className="rei-side-dash-link__arrow">&rarr;</span>
+      </a>
     </aside>
   );
 }

@@ -225,14 +225,14 @@ export default function AppShell() {
       )}
 
       <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
-        <a href="/" className="flex items-center gap-3 cursor-pointer" onClick={(e) => {
+        <a href="/" className="flex items-center gap-3 cursor-pointer rei-brand" onClick={(e) => {
           if (window.location.pathname === "/" && !window.location.hash) {
             e.preventDefault();
             setTool("tools");
           }
         }}>
-          <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center">
-            <HingeMark size={16} animated={false} color="#F59E0B" />
+          <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center rei-cardo-mark">
+            <HingeMark size={16} animated={false} color="#E2A33D" />
           </div>
           <div>
             <div className="font-heading font-bold text-white text-lg tracking-wide">REI.ai</div>

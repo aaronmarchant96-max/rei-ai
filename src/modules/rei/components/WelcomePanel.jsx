@@ -21,31 +21,31 @@ const ICON_MAP = {
 
 const DOMAIN_STARTERS = {
   legal: [
-    { label: "Find the hinge in a case", prompt: "What is the hinge in Donoghue v Stevenson?", icon: "\u2696\ufe0f" },
-    { label: "Compare two precedents", prompt: "Compare Brown v Board with Plessy v Ferguson", icon: "\U0001f4dc" },
-    { label: "Find the decisive fact", prompt: "What fact gave Marbury v Madison judicial review?", icon: "\U0001f50d" },
+    { label: "Find the hinge in a case", sub: "Donoghue v Stevenson", prompt: "What is the hinge in Donoghue v Stevenson?", icon: "\u2696\ufe0f" },
+    { label: "Compare two precedents", sub: "Brown v Board vs Plessy", prompt: "Compare Brown v Board with Plessy v Ferguson", icon: "\U0001f4dc" },
+    { label: "Find the decisive fact", sub: "Marbury v Madison", prompt: "What fact gave Marbury v Madison judicial review?", icon: "\U0001f50d" },
   ],
   coding: [
-    { label: "Debug an error", prompt: "Debug this TypeScript type error in my component", icon: "\U0001f41b" },
-    { label: "Write a component", prompt: "Write a React hook for form validation", icon: "\u269b\ufe0f" },
-    { label: "Refactor code", prompt: "Refactor this function to be more readable and testable", icon: "\U0001f527" },
+    { label: "Debug an error", sub: "Find & fix the root cause", prompt: "Debug this TypeScript type error in my component", icon: "\U0001f41b" },
+    { label: "Write a component", sub: "Production-quality React", prompt: "Write a React hook for form validation", icon: "\u269b\ufe0f" },
+    { label: "Refactor code", sub: "Cleaner, testable, idiomatic", prompt: "Refactor this function to be more readable and testable", icon: "\U0001f527" },
   ],
   genealogy: [
-    { label: "Find a census record", prompt: "Find the 1910 census record for my ancestor in Ohio", icon: "\U0001f4cb" },
-    { label: "Evaluate evidence", prompt: "Tier this marriage record as evidence", icon: "\U0001f52c" },
-    { label: "Disambiguate names", prompt: "Disambiguate two ancestors with the same name in 1850", icon: "\U0001faaa" },
+    { label: "Find a census record", sub: "1910 census, Ohio", prompt: "Find the 1910 census record for my ancestor in Ohio", icon: "\U0001f4cb" },
+    { label: "Evaluate evidence", sub: "Tier this marriage record", prompt: "Tier this marriage record as evidence", icon: "\U0001f52c" },
+    { label: "Disambiguate names", sub: "Same name, 1850", prompt: "Disambiguate two ancestors with the same name in 1850", icon: "\U0001faaa" },
   ],
   story: [
-    { label: "Outline a character arc", prompt: "Outline a redemption arc for a reluctant hero", icon: "\U0001f4d6" },
-    { label: "Write a scene", prompt: "Write a scene where two rivals meet after twenty years", icon: "\u270d\ufe0f" },
-    { label: "Build a world", prompt: "Build a fantasy world where magic drains memory", icon: "\U0001f30d" },
+    { label: "Outline a character arc", sub: "Redemption arc for a reluctant hero", prompt: "Outline a redemption arc for a reluctant hero", icon: "\U0001f4d6" },
+    { label: "Write a scene", sub: "Two rivals, twenty years apart", prompt: "Write a scene where two rivals meet after twenty years", icon: "\u270d\ufe0f" },
+    { label: "Build a world", sub: "Magic that costs memory", prompt: "Build a fantasy world where magic drains memory", icon: "\U0001f30d" },
   ],
 };
 
 const GENERIC_STARTERS = [
-  { label: "Sort out a decision", prompt: "Help me sort this out", icon: "\U0001f4a1" },
-  { label: "Analyze a debate", prompt: "Separate facts from assumptions in this argument", icon: "\u2694\ufe0f" },
-  { label: "Test an argument", prompt: "What would change my mind about this?", icon: "\U0001f9ea" },
+  { label: "Sort out a decision", sub: "Weigh options against what you actually know", prompt: "Help me sort this out", icon: "\U0001f4a1" },
+  { label: "Analyze a debate", sub: "See where two sides genuinely disagree", prompt: "Separate facts from assumptions in this argument", icon: "\u2694\ufe0f" },
+  { label: "Test an argument", sub: "Find the assumption it depends on", prompt: "What would change my mind about this?", icon: "\U0001f9ea" },
 ];
 
 export default function WelcomePanel({ onStart, onResume }) {
@@ -89,54 +89,27 @@ export default function WelcomePanel({ onStart, onResume }) {
   const starters = activeDomain ? (DOMAIN_STARTERS[activeDomain] || GENERIC_STARTERS) : GENERIC_STARTERS;
 
   return (
-    <div style={{
-      padding: "24px", borderRadius: "14px",
-      background: "linear-gradient(150deg, var(--surface) 0%, var(--surface-lift) 100%)",
-      border: "1px solid var(--border)",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(245,158,11,0.08)",
-      position: "relative",
-      overflow: "hidden",
-      textAlign: "center",
-    }}>
-      <div style={{
-        position: "absolute", inset: 0, zIndex: -1, pointerEvents: "none",
-        background: "radial-gradient(circle at 85% -10%, rgba(245,158,11,0.10), transparent 60%)",
-      }} />
-      <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--amber-text)", marginBottom: "6px" }}>
-        REI.ai — {activeDomain ? "The " + (activeDomain.charAt(0).toUpperCase() + activeDomain.slice(1) + " Specialist") : "The Generalist"}
-      </div>
-      <div style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: "1.6", marginBottom: "18px", maxWidth: "400px", margin: "0 auto 18px" }}>
-        I use the CARDO framework to find the <b style={{ color: "var(--amber-text)" }}>hinge</b> — the single factor that changes the answer.
-        {activeDomain ? " Looks like you've been using the " + activeDomain + " domain — here are some relevant starters:" : " Pick a starting point:"}
+    <div className="rei-chat-card">
+      <div className="rei-chat-intro">
+        <h1 className="rei-chat-intro__headline">
+          REI<span className="rei-chat-intro__suffix">.ai</span> &mdash; {activeDomain ? "The " + (activeDomain.charAt(0).toUpperCase() + activeDomain.slice(1) + " Specialist") : "The Generalist"}
+        </h1>
+        <p className="rei-chat-intro__text">
+          I use the CARDO framework to find the <span className="rei-chat-intro__hinge">hinge</span> &mdash; the single factor that changes the answer.
+        </p>
       </div>
 
       {recentTopics.length > 0 && (
-        <div style={{ marginBottom: "14px" }}>
-          <div style={{ fontSize: "11px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
-            Resume recent session
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        <div className="rei-recent-section">
+          <div className="rei-recent-section__label">Resume recent session</div>
+          <div className="rei-recent-section__rows">
             {recentTopics.map(function (t, i) {
               return (
                 <button
                   key={i}
                   type="button"
                   onClick={function () { return onResume && onResume(t.domain); }}
-                  style={{
-                    padding: "10px 14px", borderRadius: "8px",
-                    background: "rgba(240, 201, 101, 0.04)", border: "1px solid rgba(240, 201, 101, 0.08)",
-                    color: "var(--text-secondary)", cursor: "pointer",
-                    textAlign: "left", fontSize: "12px",
-                    transition: "all 0.15s ease",
-                  }}
-                  onMouseEnter={function (e) {
-                    e.currentTarget.style.borderColor = "rgba(240, 201, 101, 0.25)";
-                    e.currentTarget.style.background = "rgba(240, 201, 101, 0.08)";
-                  }}
-                  onMouseLeave={function (e) {
-                    e.currentTarget.style.borderColor = "rgba(240, 201, 101, 0.08)";
-                    e.currentTarget.style.background = "rgba(240, 201, 101, 0.04)";
-                  }}
+                  className="rei-recent-row"
                 >
                   {t.text}
                 </button>
@@ -146,7 +119,8 @@ export default function WelcomePanel({ onStart, onResume }) {
         </div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <div className="rei-starters">
+        <div className="rei-starters__label">Pick a starting point</div>
         {starters.map(function (s) {
           var Icon = ICON_MAP[s.icon];
           return (
@@ -154,25 +128,13 @@ export default function WelcomePanel({ onStart, onResume }) {
               key={s.label}
               type="button"
               onClick={function () { return onStart(s.prompt); }}
-              style={{
-                padding: "12px 16px", borderRadius: "10px",
-                background: "var(--page)", border: "1px solid rgba(240, 201, 101, 0.12)",
-                color: "var(--text)", cursor: "pointer",
-                textAlign: "left", fontSize: "13px",
-                transition: "all 0.15s ease",
-                display: "flex", alignItems: "center", gap: "10px",
-              }}
-              onMouseEnter={function (e) {
-                e.currentTarget.style.borderColor = "rgba(240, 201, 101, 0.35)";
-                e.currentTarget.style.background = "rgba(240, 201, 101, 0.06)";
-              }}
-              onMouseLeave={function (e) {
-                e.currentTarget.style.borderColor = "rgba(240, 201, 101, 0.12)";
-                e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
-              }}
+              className="rei-starter-row"
             >
-              {Icon && <Icon size={16} style={{ flexShrink: 0 }} />}
-              <span>{s.label}</span>
+              <div className="rei-starter-row__glyph">{Icon && <Icon size={15} />}</div>
+              <div className="rei-starter-row__body">
+                <div className="rei-starter-row__txt">{s.label}</div>
+                <div className="rei-starter-row__sub">{s.sub}</div>
+              </div>
             </button>
           );
         })}

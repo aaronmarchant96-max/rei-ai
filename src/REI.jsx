@@ -17,7 +17,6 @@ import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply } from "./lib/replyParser.js";
-import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { isSimpleGreeting } from "./lib/routingConstants.js";
 import { getDomainProfiles, getDomainPrompt, getDomain } from "./domains/_index.js";
 import IngestPanel from "./modules/rei/components/IngestPanel.jsx";
@@ -755,9 +754,9 @@ export default function REI({ initialPrompt } = {}) {
             <button
               type="button"
               onClick={() => setIsPhilosophyOpen(true)}
-              className="rei-action-btn rei-action-btn--accent"
+              className="rei-action-btn"
             >
-              (?) Philosophy
+              Philosophy
             </button>
             <button
               type="button"
@@ -765,10 +764,9 @@ export default function REI({ initialPrompt } = {}) {
                 setSelectedDomain("legal");
                 setInputMessage("What is the hinge in Donoghue v Stevenson?");
               }}
-              className="rei-action-btn"
-              style={{ color: "#F59E0B", borderColor: "rgba(245, 158, 11, 0.25)" }}
+              className="rei-action-btn rei-action-btn--accent"
             >
-              ⚖️ Try a Case
+              Try a Case
             </button>
           </div>
         </header>

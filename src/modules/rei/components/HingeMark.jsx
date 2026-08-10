@@ -1,62 +1,41 @@
-export default function HingeMark({ size = 36, animated = false, color = "#F59E0B" }) {
+export default function HingeMark({ size = 36, animated = false, color = "#E2A33D" }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 36 36"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Pivot pin */}
-      <circle cx="18" cy="18" r="2.2" fill="#ffffff" />
-
-      {/* Fixed arm */}
-      <path
-        d="M18 18 L18 6"
-        stroke={color}
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <path
-        d="M18 6 L26 6"
-        stroke={color}
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-
-      {/* Swinging arm */}
-      <g
-        style={
-          animated
-            ? {
-              transformOrigin: "18px 18px",
-              animation: "rei-hinge-swing 1.1s ease-in-out infinite",
-            }
-            : undefined
-        }
+    <>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{
+          transformStyle: "preserve-3d",
+          transformOrigin: "8px center",
+          transition: "transform 0.5s cubic-bezier(.22,1.36,.36,1)",
+        }}
+        aria-label="CARDO hinge mark"
       >
         <path
-          d="M18 18 L18 30"
+          d="M15 5H10C8.9 5 8 5.9 8 7V17C8 18.1 8.9 19 10 19H15"
           stroke={color}
-          strokeWidth="3"
+          strokeWidth="2.2"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
-        <path
-          d="M18 30 L26 30"
-          stroke={color}
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-      </g>
-
+      </svg>
       {animated && (
         <style>{`
-          @keyframes rei-hinge-swing {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(-18deg); }
+          @keyframes rei-cardo-swing {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(-48deg); }
+            100% { transform: rotateY(0deg); }
+          }
+          @media (prefers-reduced-motion: no-preference) {
+            .rei-brand .rei-cardo-mark svg {
+              animation: rei-cardo-swing 0.9s cubic-bezier(.22,1.36,.36,1) 1;
+            }
           }
         `}</style>
       )}
-    </svg>
+    </>
   );
 }

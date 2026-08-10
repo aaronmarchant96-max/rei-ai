@@ -180,25 +180,23 @@
 
 /* Light: touch button */
 [data-theme="light"] .rei-touch-button {
-  color: var(--amber-text) !important;
-  border-color: var(--amber-border);
+  color: var(--text) !important;
+  border-color: var(--border);
+  background: transparent !important;
 }
 [data-theme="light"] .rei-touch-button:hover {
-  background: var(--amber-badge-bg) !important;
-  border-color: var(--amber-fill);
-  color: var(--amber-badge-tx) !important;
+  background: var(--surface-lift) !important;
+  border-color: var(--border);
+  color: var(--text) !important;
 }
-
-/* Light: quick prompts */
-[data-theme="light"] .rei-quick-prompt {
-  background: rgba(245,158,11,0.06) !important;
-  color: var(--amber-text) !important;
-  border-color: rgba(245,158,11,0.25) !important;
-}
-[data-theme="light"] .rei-quick-prompt:hover {
+[data-theme="light"] .rei-touch-button--send {
+  background: var(--amber-fill) !important;
+  color: #1A1300 !important;
   border-color: var(--amber-fill) !important;
-  background: rgba(245,158,11,0.2) !important;
-  box-shadow: 0 4px 12px rgba(245,158,11,0.15);
+}
+[data-theme="light"] .rei-touch-button--send:hover {
+  background: #EFAE4C !important;
+  color: #1A1300 !important;
 }
 
 /* Light: Philosophy Modal */
@@ -662,8 +660,8 @@
 
 .rei-touch-button {
   background: transparent !important;
-  color: #F59E0B !important;
-  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   font-weight: 700;
   font-size: 13px;
@@ -675,28 +673,26 @@
 }
 
 .rei-touch-button:hover {
-  background: rgba(245, 158, 11, 0.1) !important;
-  border-color: #F59E0B;
-  color: #F59E0B !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #e2e8f0 !important;
 }
 
-.rei-quick-prompt {
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: rgba(245, 158, 11, 0.08) !important;
-  color: #F59E0B !important;
-  border: 1px solid rgba(245, 158, 11, 0.25) !important;
-  cursor: pointer;
-  font-size: 12.5px;
-  font-weight: 600;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+.rei-touch-button--send {
+  background: #E2A33D !important;
+  color: #1A1300 !important;
+  border: 1px solid #E2A33D !important;
+  min-width: 64px;
 }
 
-.rei-quick-prompt:hover {
-  border-color: #F59E0B !important;
-  background: rgba(245, 158, 11, 0.2) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+.rei-touch-button--send:hover {
+  background: #EFAE4C !important;
+  border-color: #EFAE4C !important;
+  color: #1A1300 !important;
+}
+
+.rei-touch-button--send:active {
+  transform: scale(0.96);
 }
 
 /* Philosophy Modal Styles */
@@ -1059,6 +1055,280 @@
   text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
 }
 
+/* ── REI Chat Surface (new design system, scoped to chat UI) ── */
+
+/* Brand / logo */
+.rei-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+}
+.rei-brand .rei-cardo-mark {
+  perspective: 200px;
+}
+.rei-brand:hover .rei-cardo-mark svg {
+  transform: rotateY(-48deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rei-brand:hover .rei-cardo-mark svg {
+    transform: none !important;
+  }
+}
+
+/* Clip button */
+.rei-clip-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.15s ease;
+}
+.rei-clip-btn:hover {
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.rei-file-hint {
+  font-size: 10px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Chat intro */
+.rei-chat-card {
+  background: #12151F;
+  border: 1px solid #232838;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.rei-chat-intro {
+  padding: 34px 34px 30px;
+  text-align: center;
+  border-bottom: 1px solid #1A1E2C;
+}
+.rei-chat-intro__headline {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 26px;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+  color: #EDEFF5;
+}
+.rei-chat-intro__suffix {
+  color: #7D8299;
+  font-weight: 400;
+}
+.rei-chat-intro__text {
+  margin: 0;
+  color: #7D8299;
+  font-size: 14.5px;
+  line-height: 1.55;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.rei-chat-intro__hinge {
+  color: #E2A33D;
+  font-style: italic;
+  font-family: 'Fraunces', serif;
+  background-image: linear-gradient(#E2A33D, #E2A33D);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1.5px;
+  padding-bottom: 1px;
+}
+
+/* Recent sessions */
+.rei-recent-section {
+  padding: 14px 26px;
+}
+.rei-recent-section__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #565B72;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.rei-recent-row {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(226, 163, 61, 0.04);
+  border: 1px solid rgba(226, 163, 61, 0.08);
+  color: #cbd5e1;
+  cursor: pointer;
+  text-align: left;
+  font-size: 12px;
+  width: 100%;
+  margin-bottom: 6px;
+  transition: all 0.15s ease;
+}
+.rei-recent-row:hover {
+  border-color: rgba(226, 163, 61, 0.25);
+  background: rgba(226, 163, 61, 0.08);
+}
+
+/* Starters */
+.rei-starters {
+  padding: 22px 26px 26px;
+}
+.rei-starters__label {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #565B72;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.rei-starter-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px 16px;
+  border: 1px solid #232838;
+  border-radius: 10px;
+  margin-bottom: 9px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .15s;
+  background: #0A0C12;
+  width: 100%;
+  text-align: left;
+}
+.rei-starter-row:last-child {
+  margin-bottom: 0;
+}
+.rei-starter-row:hover {
+  border-color: #E2A33D;
+  background: rgba(226, 163, 61, 0.12);
+  transform: translateY(-1px);
+}
+.rei-starter-row:active {
+  transform: translateY(0px) scale(0.995);
+}
+.rei-starter-row__glyph {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #171B28;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #7D8299;
+}
+.rei-starter-row:hover .rei-starter-row__glyph {
+  color: #E2A33D;
+}
+.rei-starter-row__body {
+  min-width: 0;
+}
+.rei-starter-row__txt {
+  font-size: 14px;
+  color: #EDEFF5;
+}
+.rei-starter-row__sub {
+  font-size: 12px;
+  color: #565B72;
+  margin-top: 1px;
+}
+
+/* Side cards */
+.rei-side-card {
+  background: #12151F;
+  border: 1px solid #232838;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rei-side-card__heading {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #565B72;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.rei-side-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+.rei-side-stat + .rei-side-stat {
+  border-top: 1px solid #1A1E2C;
+}
+.rei-side-stat__label {
+  font-size: 12.5px;
+  color: #7D8299;
+}
+.rei-side-stat__value {
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: -0.01em;
+  color: #f8fafc;
+}
+.rei-side-stat__value.zero {
+  color: #565B72;
+}
+.rei-side-stat__value.verified {
+  color: #6FCF97;
+}
+
+.rei-side-empty {
+  text-align: center;
+  padding: 18px 10px;
+  color: #565B72;
+  font-size: 12.5px;
+  line-height: 1.5;
+  border: 1px dashed #232838;
+  border-radius: 8px;
+}
+
+.rei-side-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.rei-side-chip {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #7D8299;
+  border: 1px solid #232838;
+  padding: 4px 9px;
+  border-radius: 6px;
+}
+
+.rei-side-dash-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: #7D8299;
+  padding: 8px 4px;
+  text-decoration: none;
+  transition: color .15s;
+}
+.rei-side-dash-link:hover {
+  color: #EDEFF5;
+}
+.rei-side-dash-link__arrow {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Mono font utility */
+.mono {
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: -0.01em;
+}
+
 
 @keyframes fadeInStep {
   from { opacity: 0; transform: translateY(4px); }
@@ -1075,7 +1345,7 @@
   .rei-header, .rei-domain-tabs, .rei-action-btn, .rei-input-shell,
   .rei-instrument-rail, .rei-instrument-rail__toggle-btn,
   .rei-domain-banner__steps, .rei-domain-banner[style*="cursor"],
-  .rei-copy-btn, .rei-quick-prompt, .TypingPipeline,
+  .rei-copy-btn, .TypingPipeline,
   .rei-modal-overlay, .rei-instrument-rail__collapsed-hero,
   .mobile-nav, .rei-shell > header, nav, button[aria-label] {
     display: none !important;

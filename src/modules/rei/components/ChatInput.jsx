@@ -8,30 +8,9 @@ export default function ChatInput() {
   const fileInputRef = useRef(null);
   const [fileErrors, setFileErrors] = useState([]);
 
-  const quickPrompts = [
-    { label: "💡 Sort out a problem", text: "Help me sort this out" },
-    { label: "⚡ Find the hinge", text: "What is the real hinge?" },
-    { label: "❓ Check assumptions", text: "Separate facts from assumptions" },
-    { label: "⚖️ What changes it?", text: "What would change my mind?" },
-  ];
-
   return (
     <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: "12px 16px 16px", background: "var(--surface)", backdropFilter: "blur(12px)", borderTop: "1px solid var(--border)" }}>
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
-        {selectedDomain === "assistant" && (
-          <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "10px" }}>
-            {quickPrompts.map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                className="rei-quick-prompt"
-                onClick={() => setInputMessage(item.text)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        )}
 
         {attachedFiles && attachedFiles.length > 0 && (
           <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", paddingBottom: "8px" }}>
@@ -116,14 +95,13 @@ export default function ChatInput() {
             />
             <button
               type="button"
-              className="rei-touch-button"
-              style={{ minWidth: "36px", padding: "6px", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "1px solid var(--border)", borderRadius: "8px" }}
+              className="rei-clip-btn"
               onClick={() => fileInputRef.current?.click()}
               title="Attach text/code files"
             >
-              <Paperclip size={16} style={{ color: "var(--foreground-muted, #94a3b8)" }} />
+              <Paperclip size={16} />
             </button>
-            <span style={{ fontSize: "10px", color: "var(--foreground-muted, #64748b)", display: "inline-flex", alignItems: "center", whiteSpace: "nowrap" }}>
+            <span className="rei-file-hint">
               Up to 4 text/code files (500KB each)
             </span>
             <textarea
@@ -156,7 +134,7 @@ export default function ChatInput() {
                           : "What are you trying to think through?"
               }
             />
-            <button type="submit" className="rei-touch-button touch-target" style={{ minWidth: "64px" }}>
+            <button type="submit" className="rei-touch-button rei-touch-button--send">
               Send
             </button>
           </div>
