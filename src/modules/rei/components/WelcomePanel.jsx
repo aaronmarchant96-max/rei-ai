@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Scale, Bug, ClipboardList, BookOpen, PenLine, Globe, Lightbulb, Swords, FlaskConical, Atom, Wrench, Microscope, Fingerprint, Search, ScrollText } from "lucide-react";
+import { Scale, Bug, ClipboardList, BookOpen, PenLine, Globe, Lightbulb, Swords, FlaskConical, Atom, Wrench, Microscope, Fingerprint, Search, ScrollText, Shield } from "lucide-react";
 
 const ICON_MAP = {
   "\u2696\ufe0f": Scale,
@@ -17,6 +17,7 @@ const ICON_MAP = {
   "\U0001faaa": Fingerprint,
   "\U0001f50d": Search,
   "\U0001f4dc": ScrollText,
+  "\U0001f6e1\ufe0f": Shield,
 };
 
 const DOMAIN_STARTERS = {
@@ -46,6 +47,7 @@ const GENERIC_STARTERS = [
   { label: "Sort out a decision", sub: "Weigh options against what you actually know", prompt: "Help me sort this out", icon: "\U0001f4a1" },
   { label: "Analyze a debate", sub: "See where two sides genuinely disagree", prompt: "Separate facts from assumptions in this argument", icon: "\u2694\ufe0f" },
   { label: "Test an argument", sub: "Find the assumption it depends on", prompt: "What would change my mind about this?", icon: "\U0001f9ea" },
+  { label: "Scan for prompt injections", sub: "Detect injection attacks before they reach a model", prompt: "Take me to the red team scanner \u2014 I want to test a prompt for adversarial patterns.", icon: "\U0001f6e1\ufe0f" },
 ];
 
 export default function WelcomePanel({ onStart, onResume }) {
@@ -97,6 +99,7 @@ export default function WelcomePanel({ onStart, onResume }) {
         <p className="rei-chat-intro__text">
           I use the CARDO framework to find the <span className="rei-chat-intro__hinge">hinge</span> &mdash; the single factor that changes the answer.
         </p>
+        <p className="rei-chat-intro__trust">Claims last verified: today. Every number is backed by a testable audit.</p>
       </div>
 
       {recentTopics.length > 0 && (

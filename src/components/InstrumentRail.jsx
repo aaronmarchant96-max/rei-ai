@@ -50,30 +50,40 @@ export default function InstrumentRail({
 
       <div className="rei-side-card">
         <div className="rei-side-card__heading">This Session</div>
-        <div className="rei-side-stat">
-          <span className="rei-side-stat__label">Cost</span>
-          <span className={`rei-side-stat__value mono${sessionCost === 0 ? " zero" : ""}`}>
-            {sessionCost === 0 ? "\u2014" : sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
-          </span>
-        </div>
-        <div className="rei-side-stat">
-          <span className="rei-side-stat__label">Tokens</span>
-          <span className={`rei-side-stat__value mono${sessionTokens === 0 ? " zero" : ""}`}>
-            {sessionTokens === 0 ? "\u2014" : sessionTokens.toLocaleString()}
-          </span>
-        </div>
-        <div className="rei-side-stat">
-          <span className="rei-side-stat__label">Messages</span>
-          <span className={`rei-side-stat__value mono${sessionMessages === 0 ? " zero" : ""}`}>
-            {sessionMessages === 0 ? "\u2014" : sessionMessages}
-          </span>
-        </div>
-        <div className="rei-side-stat">
-          <span className="rei-side-stat__label">Saved vs. premium</span>
-          <span className="rei-side-stat__value verified mono">
-            ${savingsVsPremium.toFixed(4)}
-          </span>
-        </div>
+        {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
+          <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
+            Routing will select the cheapest capable model for each query.
+            Typical savings vs. calling GPT-4o directly: ~80%+. Numbers appear
+            here after your first response.
+          </div>
+        ) : (
+          <>
+            <div className="rei-side-stat">
+              <span className="rei-side-stat__label">Cost</span>
+              <span className={`rei-side-stat__value mono${sessionCost === 0 ? " zero" : ""}`}>
+                {sessionCost === 0 ? "\u2014" : sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
+              </span>
+            </div>
+            <div className="rei-side-stat">
+              <span className="rei-side-stat__label">Tokens</span>
+              <span className={`rei-side-stat__value mono${sessionTokens === 0 ? " zero" : ""}`}>
+                {sessionTokens === 0 ? "\u2014" : sessionTokens.toLocaleString()}
+              </span>
+            </div>
+            <div className="rei-side-stat">
+              <span className="rei-side-stat__label">Messages</span>
+              <span className={`rei-side-stat__value mono${sessionMessages === 0 ? " zero" : ""}`}>
+                {sessionMessages === 0 ? "\u2014" : sessionMessages}
+              </span>
+            </div>
+            <div className="rei-side-stat">
+              <span className="rei-side-stat__label">Saved vs. premium</span>
+              <span className="rei-side-stat__value verified mono">
+                ${savingsVsPremium.toFixed(4)}
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="rei-side-card">

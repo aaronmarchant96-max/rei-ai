@@ -1143,6 +1143,13 @@
   padding-bottom: 1px;
 }
 
+.rei-chat-intro__trust {
+  margin: 6px 0 0 0;
+  font-size: 11px;
+  color: #565B72;
+  line-height: 1.4;
+}
+
 /* Recent sessions */
 .rei-recent-section {
   padding: 14px 26px;

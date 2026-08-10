@@ -64,7 +64,7 @@ describe("InstrumentRail", () => {
       />
     );
 
-    expect(screen.getAllByText("—").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Routing will select the cheapest capable model/)).toBeTruthy();
     expect(screen.queryByText("Escalations")).not.toBeInTheDocument();
   });
 });
