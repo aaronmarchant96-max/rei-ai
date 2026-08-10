@@ -71,6 +71,7 @@ export function scanRedTeamInput(input, context = {}) {
       category: match.category,
       evidence: match.matchedKeywords,
       impact: `Detected ${match.matchedKeywords.length} keyword(s) matching ${match.label} pattern${match.matchType ? ` via ${match.matchType}` : ""}`,
+      riskImpact: match.riskImpact || null,
       suggestedFix: suggestedFixes,
       confidence
     };

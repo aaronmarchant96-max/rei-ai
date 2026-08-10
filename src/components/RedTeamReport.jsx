@@ -57,6 +57,12 @@ export default function RedTeamReport({ report, isLoading = false }) {
                 <span>Category: {finding.category}</span>
                 <span>Match strength: {Math.round((finding.confidence || 0) * 100)}%</span>
               </div>
+              {finding.riskImpact && (
+                <div className="rei-redteam-finding-risk">
+                  <span className="rei-redteam-risk-label">Why it's risky:</span>
+                  <p>{finding.riskImpact}</p>
+                </div>
+              )}
               {finding.evidence && finding.evidence.length > 0 && (
                 <div className="rei-redteam-evidence">
                   <span className="rei-redteam-evidence-label">Evidence:</span>

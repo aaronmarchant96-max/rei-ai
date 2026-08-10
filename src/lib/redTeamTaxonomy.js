@@ -33,7 +33,8 @@ export const RED_TEAM_CATEGORIES = {
       "give me your guardrails",
       "what is your guardrails"
     ],
-    weight: 1.0
+    weight: 1.0,
+    riskImpact: "Revealing system instructions gives attackers the blueprint to bypass every safety guardrail at once."
   },
 
   hidden_instruction_disclosure: {
@@ -108,7 +109,8 @@ export const RED_TEAM_CATEGORIES = {
       "break the program",
       "brek the program"
     ],
-    weight: 0.9
+    weight: 0.9,
+    riskImpact: "Hidden directives can override safety rules, changing model behavior without the user's knowledge."
   },
 
   credential_leakage: {
@@ -147,7 +149,8 @@ export const RED_TEAM_CATEGORIES = {
       "show me your key",
       "reveal your credentials"
     ],
-    weight: 1.0
+    weight: 1.0,
+    riskImpact: "Exposed API keys or tokens grant attackers direct access to paid services and private data."
   },
 
   tool_execution_hijack: {
@@ -187,7 +190,8 @@ export const RED_TEAM_CATEGORIES = {
       "subprocess",
       "child_process"
     ],
-    weight: 0.95
+    weight: 0.95,
+    riskImpact: "The model can be tricked into running destructive shell commands or executing arbitrary code."
   },
 
   data_exfiltration: {
@@ -225,7 +229,8 @@ export const RED_TEAM_CATEGORIES = {
       "trade secret",
       "internal data"
     ],
-    weight: 0.95
+    weight: 0.95,
+    riskImpact: "Attacker extracts private user data, conversation history, or internal system details."
   },
 
   policy_bypass: {
@@ -263,7 +268,8 @@ export const RED_TEAM_CATEGORIES = {
       "bypass the check",
       "ignore the restriction"
     ],
-    weight: 0.85
+    weight: 0.85,
+    riskImpact: "Circumvents safety guardrails to generate content the system was designed to refuse."
   },
 
   child_safety_violation: {
@@ -291,7 +297,8 @@ export const RED_TEAM_CATEGORIES = {
       "underage content",
       "minor content"
     ],
-    weight: 1.0
+    weight: 1.0,
+    riskImpact: "Content that exploits children or attempts to generate child-harm material."
   },
 
   self_harm_instructions: {
@@ -324,7 +331,8 @@ export const RED_TEAM_CATEGORIES = {
       "bulimia",
       "starve yourself"
     ],
-    weight: 1.0
+    weight: 1.0,
+    riskImpact: "Requests that encourage, instruct, or facilitate self-harm or suicide."
   },
 
   weapon_proliferation: {
@@ -361,7 +369,8 @@ export const RED_TEAM_CATEGORIES = {
       "ricin",
       "anthrax"
     ],
-    weight: 1.0
+    weight: 1.0,
+    riskImpact: "Instructions for creating weapons, explosives, or biological/chemical agents."
   },
 
   roleplay_jailbreak: {
@@ -404,7 +413,8 @@ export const RED_TEAM_CATEGORIES = {
       "assume the role of",
       "take on the role of"
     ],
-    weight: 0.9
+    weight: 0.9,
+    riskImpact: "Roleplay scenarios trick the model into violating safety policies under a fictional persona."
   },
 
   translation_attack: {
@@ -437,7 +447,8 @@ export const RED_TEAM_CATEGORIES = {
       "html encode",
       "xml encode"
     ],
-    weight: 0.7
+    weight: 0.7,
+    riskImpact: "Translation or encoding tasks used to hide malicious intent behind innocent-looking language requests."
   },
 
   authority_impersonation: {
@@ -478,7 +489,8 @@ export const RED_TEAM_CATEGORIES = {
       "official request",
       "formal request"
     ],
-    weight: 0.9
+    weight: 0.9,
+    riskImpact: "Fake authority claims (admin, developer, employer) used to override model restrictions."
   },
 
   social_engineering: {
@@ -522,7 +534,8 @@ export const RED_TEAM_CATEGORIES = {
       "life or death",
       "emergency situation"
     ],
-    weight: 0.7
+    weight: 0.7,
+    riskImpact: "Manipulation tactics that persuade the model into unsafe behavior through emotional pressure."
   },
 
   context_poisoning: {
@@ -558,7 +571,8 @@ export const RED_TEAM_CATEGORIES = {
       "maintain this state",
       "preserve this context"
     ],
-    weight: 0.85
+    weight: 0.85,
+    riskImpact: "Long prompts with hidden contradictions designed to corrupt the model's reasoning over time."
   },
 
   nested_instructions: {
@@ -597,7 +611,8 @@ export const RED_TEAM_CATEGORIES = {
       "as an exercise",
       "as a demonstration"
     ],
-    weight: 0.7
+    weight: 0.7,
+    riskImpact: "Instructions hidden inside stories or hypotheticals that the model processes as real directives."
   },
 
   obfuscation_attempt: {
@@ -636,7 +651,8 @@ export const RED_TEAM_CATEGORIES = {
       "true instruction:",
       "real instruction:"
     ],
-    weight: 0.8
+    weight: 0.8,
+    riskImpact: "Leetspeak, Base64, homoglyphs, or other encoding techniques used to hide malicious intent from filters."
   }
 };
 
@@ -741,6 +757,7 @@ export function getCategoryByKeyword(input) {
         category: categoryKey,
         label: category.label,
         severity: category.severity,
+        riskImpact: category.riskImpact || null,
         score,
         matchedKeywords,
         matchType: "keyword"
@@ -762,6 +779,7 @@ export function getCategoryByKeyword(input) {
           category: "obfuscation_attempt",
           label: "Obfuscation Attempt",
           severity: "medium",
+          riskImpact: RED_TEAM_CATEGORIES.obfuscation_attempt?.riskImpact || null,
           score: regexPattern.weight,
           matchedKeywords: [regexPattern.label],
           matchType: "regex"

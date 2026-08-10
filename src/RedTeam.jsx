@@ -21,6 +21,7 @@ export default function RedTeam() {
   const [results, setResults] = useState(null);
   const [history, setHistory] = useState([]);
   const [activeTab, setActiveTab] = useState("scan");
+  const [historyFilter, setHistoryFilter] = useState("all");
   const textareaRef = useRef(null);
 
   function handleScan() {
@@ -190,8 +191,26 @@ export default function RedTeam() {
               <p className="text-sm mt-2">Run a scan to build a history of tested prompts.</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {history.map((entry, idx) => (
+            <>
+              <div className="flex items-center gap-3 mb-4">
+                <label htmlFor="history-filter" className="text-sm text-gray-400">Filter:</label>
+                <select
+                  id="history-filter"
+                  value={historyFilter}
+                  onChange={(e) => setHistoryFilter(e.target.value)}
+                  className="bg-[#1a1a2e] border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-200 focus:outline-none focus:border-hinge-bright/50"
+                >
+                  <option value="all">All ({history.length})</option>
+                  <option value="clean">Clean ({summaryStats.clean})</option>
+                  <option value="suspicious">Suspicious ({summaryStats.suspicious})</option>
+                  <option value="high-risk">High Risk ({summaryStats.highRisk})</option>
+                  <option value="critical">Critical ({summaryStats.critical})</option>
+                </select>
+              </div>
+              <div className="space-y-4">
+              {history
+                .filter(entry => historyFilter === "all" || entry.report.verdict === historyFilter)
+                .map((entry, idx) => (
                 <div key={idx} className="bg-[#1a1a2e] border border-gray-700 rounded-lg overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
                     <div className="flex items-center gap-3">
@@ -223,6 +242,7 @@ export default function RedTeam() {
                 </div>
               ))}
             </div>
+            </>
           )}
         </div>
       )}
