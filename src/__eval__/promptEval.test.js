@@ -1,4 +1,5 @@
 import { parseAssistantStyleReply, buildDomainSystemMessage, getAssistantWelcomeCopy } from "../REI.jsx";
+import { STORY_PROMPT, CODING_PROMPT, GENERALIST_PROMPT } from "../systemPrompts.js";
 
 const DOMAIN_PROFILES = [
   { id: "assistant", label: "The Generalist", description: "Everyday reasoning, judgment, and decision support.", rules: ["Short sentences", "Hinge first", "Facts with sources", "Flag uncertainty"] },
@@ -46,6 +47,21 @@ describe("Prompt Eval — domain system messages", () => {
     const fallbackProfile = { id: "unknown", label: "Fallback", description: "generic" };
     const msg = buildDomainSystemMessage("unknown", fallbackProfile);
     expect(msg).toContain("System initialized");
+  });
+
+  test("every HARD STOP prompt that allows creative output carries a Direct Instructions Override escape valve", () => {
+    // A domain with a HARD STOP but no override can dead-end a user who
+    // explicitly asks to proceed anyway (e.g. "just make the story"). Each
+    // prompt that forbids proceeding without input must also honor an explicit
+    // override — this test guards that class of failure.
+    // NOTE: genealogy is intentionally excluded — its HARD STOP is an
+    // evidence-integrity guard (never fabricate family history), so honoring
+    // "just make it up" there would be wrong.
+    const prompts = [STORY_PROMPT, CODING_PROMPT, GENERALIST_PROMPT];
+    for (const prompt of prompts) {
+      expect(prompt).toContain("HARD STOP");
+      expect(prompt).toMatch(/Direct Instructions Override|comply directly and plainly/i);
+    }
   });
 });
 
