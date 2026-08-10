@@ -1,0 +1,18 @@
+{
+  "label": "Acme demo tenant (synthetic)",
+  "models": {
+    "gpt-4o": { "input": 0.0025, "output": 0.01 },
+    "gpt-4o-mini": { "input": 0.00015, "output": 0.0006 },
+    "deepseek-v4-flash": { "input": 0.00014, "output": 0.00028 }
+  },
+  "routeModels": {
+    "simple-greeting": "gpt-4o-mini",
+    "structured-reasoning": "gpt-4o-mini",
+    "coding-hinge": "gpt-4o-mini",
+    "genealogy-deep-dive": "gpt-4o-mini",
+    "story-architect": "gpt-4o-mini",
+    "legal-hinge": "gpt-4o-mini",
+    "adversarial-validation": "gpt-4o"
+  },
+  "defaultModel": "gpt-4o-mini"
+}
