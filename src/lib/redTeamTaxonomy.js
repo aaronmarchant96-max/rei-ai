@@ -855,3 +855,100 @@ export function isAlwaysHighRisk(category) {
 export function shouldEscalateToD2(score) {
   return score >= D1_ESCALATION_THRESHOLD;
 }
+
+// ── Auto-decode obfuscated payloads ─────────────────────────────────────────
+
+/**
+ * Extract and decode Base64 strings found in the input text.
+ * Only attempts strings ≥20 chars (real payloads, not short tokens).
+ * Returns an array of successfully decoded strings.
+ */
+export function decodeEmbeddedBase64(text) {
+  const decoded = [];
+  const base64Re = /[A-Za-z0-9+/]{20,}={0,2}/g;
+  const matches = text.match(base64Re) || [];
+  for (const m of matches) {
+    try {
+      const raw = atob(m);
+      if (/[\x20-\x7e]{4,}/.test(raw)) {
+        decoded.push(raw);
+      }
+    } catch { /* not valid base64 */ }
+  }
+  return decoded;
+}
+
+/**
+ * Decode URL-encoded hex strings (%XX%XX...) from the input.
+ */
+export function decodeEmbeddedUrl(text) {
+  try {
+    const decoded = decodeURIComponent(text.replace(/\+/g, " "));
+    if (decoded !== text) return [decoded];
+  } catch { /* not valid URL-encoded */ }
+  return [];
+}
+
+/**
+ * Decode hex strings (continuous hex of 8+ chars prefixed with 0x or raw).
+ */
+export function decodeEmbeddedHex(text) {
+  const decoded = [];
+  const hexRe = /(?:0x)?([0-9a-fA-F]{8,})/g;
+  let m;
+  while ((m = hexRe.exec(text)) !== null) {
+    try {
+      const hex = m[1];
+      if (hex.length % 2 !== 0) continue;
+      const bytes = [];
+      for (let i = 0; i < hex.length; i += 2) {
+        bytes.push(parseInt(hex.slice(i, i + 2), 16));
+      }
+      const raw = String.fromCharCode(...bytes);
+      if (/[\x20-\x7e]{4,}/.test(raw)) {
+        decoded.push(raw);
+      }
+    } catch { /* not valid hex */ }
+  }
+  return decoded;
+}
+
+/**
+ * Extract all obfuscated content from a prompt — Base64, hex, URL-encoded
+ * strings — decode them, and return the original text concatenated with all
+ * decoded fragments. This allows one extra pass of keyword/proximity matching
+ * against the decoded payload without modifying the original scanner pipeline.
+ */
+export function normalizeObfuscatedInput(input) {
+  const decoded = [
+    ...decodeEmbeddedBase64(input),
+    ...decodeEmbeddedUrl(input),
+    ...decodeEmbeddedHex(input),
+  ];
+  if (decoded.length === 0) return input;
+  return [input, ...decoded].join("\n");
+}
+
+// ── Educational / benign context detection ───────────────────────────────────
+
+const QUESTION_STARTERS = /^(how|what|why|when|where|who|can you explain|explain|describe|define|tell me about)\b/i;
+const EDUCATIONAL_FRAMING = /\b(?:research|researcher|security team|pentest|pen.?test|protect against|defend against|defense|learn about|study of|understand how|education|academic|paper|article|documentation|prevent|mitigat|best practice|technique|curious|for learning|for class|for school|for research)\b/i;
+const IMPERATIVE_ATTACK = /\b(?:ignore|disregard|forget|override|bypass|pretend|act as|you are now|new instruction|roleplay as|from now on|do anything now)\b/i;
+
+/**
+ * Heuristic to detect when a prompt is asking *about* security concepts
+ * educationally rather than attempting to exploit them. Looks for question
+ * starters, educational framing keywords, and absence of imperative attack
+ * language.
+ *
+ * This is a heuristic — not a classifier. It will occasionally mislabel
+ * sophisticated attacks as educational or flag genuine research questions as
+ * suspicious. Treat it as a signal to reduce confidence, not a binary gate.
+ */
+export function isEducationalFraming(input) {
+  const text = input.trim();
+  const hasQuestion = QUESTION_STARTERS.test(text);
+  const hasEducational = EDUCATIONAL_FRAMING.test(text.toLowerCase());
+  const hasImperative = IMPERATIVE_ATTACK.test(text.toLowerCase());
+  return (hasQuestion && hasEducational && !hasImperative);
+}

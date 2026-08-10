@@ -1,4 +1,4 @@
-import { getCategoryByKeyword, isAlwaysHighRisk, shouldEscalateToD2 } from "./redTeamTaxonomy.js";
+import { getCategoryByKeyword, isAlwaysHighRisk, shouldEscalateToD2, normalizeObfuscatedInput, isEducationalFraming } from "./redTeamTaxonomy.js";
 import { d1SpanConfidence } from "./redTeamConfidence.js";
 
 export function scanRedTeamInput(input, context = {}) {
@@ -15,6 +15,37 @@ export function scanRedTeamInput(input, context = {}) {
 
   const matches = getCategoryByKeyword(input);
 
+  // Auto-decode obfuscated payloads: if the original input contains encoding
+  // patterns (Base64, hex, URL), decode them and run a second pass. This
+  // catches double-encoded payloads and hidden instructions inside encoded
+  // blocks that the original keyword match would miss.
+  let decodedFindings = [];
+  const hasObfuscation = matches.some(m =>
+    m.category === "obfuscation_attempt" ||
+    m.matchedKeywords.some(k => ["base64_encoded", "hex_encoded", "url_encoded"].includes(k))
+  );
+  if (hasObfuscation) {
+    const decoded = normalizeObfuscatedInput(input);
+    if (decoded !== input) {
+      decodedFindings = getCategoryByKeyword(decoded);
+    }
+  }
+
+  // Merge decoded findings into the original match list (deduplicate by
+  // category — keep the higher-scoring version).
+  for (const df of decodedFindings) {
+    const existing = matches.find(m => m.category === df.category);
+    if (existing) {
+      if (df.score > existing.score) {
+        // Replace lower-scoring original with higher-scoring decoded variant
+        Object.assign(existing, { score: df.score, matchedKeywords: df.matchedKeywords });
+      }
+    } else {
+      df.decodedSource = true;
+      matches.push(df);
+    }
+  }
+
   if (matches.length === 0) {
     return {
       verdict: "clean",
@@ -26,8 +57,13 @@ export function scanRedTeamInput(input, context = {}) {
     };
   }
 
+  const educationalFraming = isEducationalFraming(input);
+
   const findings = matches.map(match => {
-    const confidence = d1SpanConfidence(match);
+    let confidence = d1SpanConfidence(match);
+    if (educationalFraming) {
+      confidence *= 0.5;
+    }
 
     // Context-aware suggested fixes based on match type and category
     const CATEGORY_FIXES = {
@@ -74,7 +110,8 @@ export function scanRedTeamInput(input, context = {}) {
       impact: `Detected ${match.matchedKeywords.length} keyword(s) matching ${match.label} pattern${match.matchType ? ` via ${match.matchType}` : ""}`,
       riskImpact: match.riskImpact || null,
       suggestedFix: suggestedFixes,
-      confidence
+      confidence,
+      educationalFraming: educationalFraming || undefined,
     };
   });
 

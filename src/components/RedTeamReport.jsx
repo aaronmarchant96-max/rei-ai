@@ -56,6 +56,9 @@ export default function RedTeamReport({ report, isLoading = false }) {
               <div className="rei-redteam-finding-meta">
                 <span>Category: {finding.category}</span>
                 <span>Match strength: {Math.round((finding.confidence || 0) * 100)}%</span>
+                {finding.educationalFraming && (
+                  <span className="text-amber-400 text-xs ml-2">(Reduced — possible educational context)</span>
+                )}
               </div>
               {finding.riskImpact && (
                 <div className="rei-redteam-finding-risk">
