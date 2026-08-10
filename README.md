@@ -7,7 +7,7 @@
 
 REI.ai is the answer — a smart, budget-friendly AI system that reads your prompts locally and routes them to the cheapest model capable of giving a great answer. 
 
-It includes **6 specialized tools** and **558 automated test checks** ensuring everything stays fast, accurate, and cost-effective.
+It includes **6 specialized tools** and **677 automated test checks** ensuring everything stays fast, accurate, and cost-effective.
 
 ---
 
@@ -17,7 +17,7 @@ It includes **6 specialized tools** and **558 automated test checks** ensuring e
 - **A Smart AI Traffic Controller:** Saves up to ~98% on AI API costs compared to always using expensive models like GPT-4o by picking the right model for the job.
 - **A Structured Thinking Engine:** Uses a clear, step-by-step framework (CARDO REI) to separate facts from assumptions and give clear reasoning.
 - **A Suite of 6 Specialized Tools:** Includes tools for debate pressure-testing, storytelling, legal precedent checks, industrial monitoring, genealogy, and everyday AI chat.
-- **Battle-Tested Code:** Backed by 558 automated unit tests across 43 test suites to ensure routing and security logic never drift.
+- **Battle-Tested Code:** Backed by 677 automated unit tests across 57 test suites to ensure routing and security logic never drift.
 
 **What this is not:**
 - Just another standard ChatGPT clone with a pretty interface.
@@ -100,7 +100,7 @@ I started learning software and AI development in 2026. This project is the resu
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.35 billion** |
 | Tools Built | **6 specialized applications** |
-| Automated Tests | **558 passing tests across 43 suites** |
+| Automated Tests | **677 passing tests across 57 suites** |
 | Hardware Used | Intel Celeron J4105, 8GB RAM |
 | Monthly Budget | $25/month |
 | Background | Self-taught, started late 2025/early 2026 |
@@ -116,7 +116,7 @@ git clone https://github.com/aaronmarchant96-max/rei-ai
 cd rei-ai
 npm install
 npm run dev      # Launch local web interface
-npm test         # Run all 558 automated tests
+npm test         # Run all 677 automated tests
 ```
 
 ---
