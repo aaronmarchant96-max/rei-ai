@@ -105,6 +105,7 @@ I started learning software and AI development in 2026. This project is the resu
 | Tokens Processed | **1.35 billion** |
 | Tools Built | **6 specialized applications** |
 | Automated Tests | **677 passing tests across 57 suites** |
+| Delivery | **979 Vercel deployments** — production is live on Vercel with full deploy history |
 | Hardware Used | Intel Celeron J4105, 8GB RAM |
 | Monthly Budget | $25/month |
 | Background | Self-taught, started late 2025/early 2026 |

@@ -59,7 +59,7 @@
 5. **#rei deep-link doesn't route** — getInitialTool at AppShell.jsx:66-77 missing #rei
 6. **slide-up keyframe defined nowhere** — animations never run
 7. **2 known-failing CI jobs on main** — app_build (stale AppShell validator) + Azure Static Web Apps (dead resource)
-8. **GitHub Actions billing lock** — intermittent but transient; merge with `--admin` if needed
+8. **GitHub Actions billing lock (ACTIVE — verified 2026-08-11)** — NOT intermittent anymore: every run on all 5 workflows (CI, TypeScript check, App Build Drift, Seed Harness, Verify Vercel Deploy) has failed since 2026-08-06 (~5 days). Signature: run completes in ~4s, job `duration_ms: 0` (runner never provisioned), logs purged (`BlobNotFound`). Repo-level Actions permissions are enabled — this is account-level minute exhaustion. Consequence: deploys since Aug 6 shipped with NO CI gate (Vercel auto-deploys via webhook regardless). Fix: GitHub → Settings → Billing and plans → add payment method or resolve the lock; then re-run the workflows. Do NOT claim tests gate deploys while this is down.
 9. **Stale docs not yet swept:** REI_V4_SEMANTIC_ROUTER_PLAN.md, INFORMATION_THEORETIC_ARCHITECTURE.md (superseded headers added, bodies still carry retired numbers)
 10. **CLAIM_LEDGER.md** needs re-running after any router change (rule: re-run within 24h)
 
