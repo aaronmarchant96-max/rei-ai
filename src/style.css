@@ -4883,6 +4883,9 @@ input:focus:not(:focus-visible) {
   cursor: pointer;
 }
 .rei-brand .rei-cardo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   perspective: 200px;
 }
 .rei-brand:hover .rei-cardo-mark svg {

@@ -29,6 +29,13 @@
   to   { background-size: 100% 2px; }
 }
 
+/* ── Brand accent (single source of truth) ── */
+:root {
+  --amber: #E2A33D;
+  --amber-hover: #EFAE4C;
+  --amber-tint: #FFC964;
+}
+
 /* ── Light Theme (scoped under data-theme="light") ── */
 [data-theme="light"] {
   --page:              #F8F9FA;
@@ -41,10 +48,10 @@
   --text-dim:          #9CA3AF;
 
   --amber-text:        #B45309;
-  --amber-fill:        #F59E0B;
+  --amber-fill:        #E2A33D;
   --amber-badge-bg:    #FEF3C7;
   --amber-badge-tx:    #92400E;
-  --amber-border:      #F59E0B;
+  --amber-border:      #E2A33D;
 
   --cardo-hinge:       #B45309;
   --cardo-facts:       #0369A1;
@@ -80,7 +87,7 @@
   box-shadow: 0 0 16px rgba(245,158,11,0.12);
 }
 [data-theme="light"] .rei-logo-title {
-  background: linear-gradient(90deg, #B45309, #F59E0B);
+  background: linear-gradient(90deg, #B45309, var(--amber-fill));
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -303,7 +310,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), transparent 55%);
+  background: linear-gradient(135deg, rgba(226, 163, 61, 0.08), transparent 55%);
   pointer-events: none;
 }
 
@@ -314,7 +321,7 @@
   right: -20%;
   width: 60%;
   height: 60%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.12), transparent 70%);
+  background: radial-gradient(circle, rgba(226, 163, 61, 0.12), transparent 70%);
   pointer-events: none;
 }
 
@@ -324,11 +331,11 @@
   height: 36px;
   border-radius: 8px;
   background: transparent !important;
-  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  border: 1px solid rgba(226, 163, 61, 0.5) !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 20px rgba(226, 163, 61, 0.2);
   flex-shrink: 0;
   position: relative;
 }
@@ -340,7 +347,7 @@
   font-family: 'Space Grotesk', sans-serif;
   font-size: 22px;
   letter-spacing: -0.01em;
-  background: linear-gradient(90deg, #F59E0B, #FFD700);
+  background: linear-gradient(90deg, var(--amber), var(--amber-tint));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -391,7 +398,7 @@
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex: 1 1 auto;
 }
 
@@ -458,8 +465,8 @@
 }
 
 .rei-action-btn:hover {
-  border-color: rgba(245, 158, 11, 0.4);
-  color: #F59E0B;
+  border-color: rgba(226, 163, 61, 0.4);
+  color: var(--amber);
   transform: translateY(-1px);
 }
 
@@ -469,9 +476,15 @@
 }
 
 .rei-action-btn--accent {
-  color: #F59E0B;
-  border-color: rgba(245, 158, 11, 0.35);
-  background: rgba(245, 158, 11, 0.1);
+  color: var(--amber);
+  border-color: rgba(226, 163, 61, 0.35);
+  background: rgba(226, 163, 61, 0.1);
+}
+
+@media (max-width: 900px) {
+  .rei-domain-tab__sub {
+    display: none;
+  }
 }
 
 /* Active Voice Glassmorphism Banner */
@@ -483,14 +496,14 @@
   border-radius: 14px;
   padding: 16px 18px;
   margin-bottom: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(245, 158, 11, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(226, 163, 61, 0.1);
 }
 
 .rei-domain-banner__eyebrow {
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #F59E0B;
+  color: var(--amber);
   margin-bottom: 10px;
   font-weight: 800;
 }
@@ -515,7 +528,7 @@
 }
 
 .rei-domain-banner__label {
-  color: #F59E0B;
+  color: var(--amber);
   font-weight: 700;
 }
 
@@ -529,9 +542,9 @@
 .rei-domain-banner__step {
   padding: 5px 12px;
   border-radius: 999px;
-  background: rgba(245, 158, 11, 0.12) !important;
+  background: rgba(226, 163, 61, 0.12) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #F59E0B !important;
+  color: var(--amber) !important;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -556,12 +569,12 @@
 }
 
 .rei-reasoning-loop__step:hover {
-  border-color: rgba(245, 158, 11, 0.4) !important;
-  background: rgba(245, 158, 11, 0.06) !important;
+  border-color: rgba(226, 163, 61, 0.4) !important;
+  background: rgba(226, 163, 61, 0.06) !important;
 }
 
 .rei-reasoning-loop__label {
-  color: #F59E0B;
+  color: var(--amber);
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -658,9 +671,9 @@
 
 .rei-copy-btn:hover {
   opacity: 1;
-  color: #F59E0B;
-  border-color: rgba(245, 158, 11, 0.3);
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.08);
+  color: var(--amber);
+  border-color: rgba(226, 163, 61, 0.3);
+  box-shadow: 0 0 15px rgba(226, 163, 61, 0.08);
 }
 
 /* Bubble action buttons: flex row anchored top-right (no manual offsets) */
@@ -723,8 +736,8 @@
 }
 
 .rei-input-area:focus {
-  border-color: #F59E0B;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+  border-color: var(--amber);
+  box-shadow: 0 0 0 2px rgba(226, 163, 61, 0.25);
 }
 
 .rei-touch-button {
@@ -793,7 +806,7 @@
   width: 90% !important;
   color: #e2e8f0 !important;
   font-family: inherit !important;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(245, 158, 11, 0.15) !important;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(226, 163, 61, 0.15) !important;
 }
 
 .rei-modal-header {
@@ -809,7 +822,7 @@
   margin: 0;
   font-size: 18px;
   letter-spacing: 0.05em;
-  color: #F59E0B;
+  color: var(--amber);
   font-weight: 800;
 }
 
@@ -833,9 +846,9 @@
 
 .rei-concept-layer h3 {
   font-size: 14px;
-  color: #F59E0B;
+  color: var(--amber);
   margin: 0 0 6px 0;
-  border-left: 3px solid #F59E0B;
+  border-left: 3px solid var(--amber);
   padding-left: 8px;
   font-weight: 700;
 }
@@ -850,7 +863,7 @@
 
 .rei-tagline {
   font-style: italic;
-  color: #F59E0B;
+  color: var(--amber);
   opacity: 0.85;
   font-size: 11.5px;
   margin-top: 4px;
@@ -912,7 +925,7 @@
   border-radius: 50%;
   background: rgba(17, 17, 17, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #F59E0B !important;
+  color: var(--amber) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -926,9 +939,9 @@
 }
 
 .rei-instrument-rail__toggle-btn:hover {
-  background: #F59E0B !important;
+  background: var(--amber) !important;
   color: #07090d !important;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 10px rgba(226, 163, 61, 0.5);
 }
 
 .rei-instrument-rail__section {
@@ -940,7 +953,7 @@
 }
 
 .rei-instrument-rail__section--hero {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%) !important;
+  background: linear-gradient(135deg, rgba(226, 163, 61, 0.1) 0%, rgba(226, 163, 61, 0.02) 100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
   border-radius: 12px;
   padding: 16px;
@@ -960,10 +973,10 @@
 .rei-instrument-rail__hero-value {
   font-size: 32px;
   font-weight: 800;
-  color: #F59E0B;
+  color: var(--amber);
   font-family: monospace;
   margin-top: 4px;
-  text-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+  text-shadow: 0 0 15px rgba(226, 163, 61, 0.3);
 }
 
 .rei-instrument-rail__row {
@@ -1027,8 +1040,8 @@
   gap: 4px;
 }
 .rei-instrument-rail__card--hero {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%);
-  border-color: rgba(245, 158, 11, 0.3);
+  background: linear-gradient(135deg, rgba(226, 163, 61, 0.1) 0%, rgba(226, 163, 61, 0.02) 100%);
+  border-color: rgba(226, 163, 61, 0.3);
 }
 .rei-instrument-rail__card-label {
   font-size: 10.5px;
@@ -1045,9 +1058,9 @@
   font-family: monospace;
 }
 .rei-instrument-rail__card--hero .rei-instrument-rail__card-value {
-  color: #F59E0B;
+  color: var(--amber);
   font-size: 22px;
-  text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  text-shadow: 0 0 10px rgba(226, 163, 61, 0.3);
 }
 
 /* Light: 2×2 grid overrides */
@@ -1082,16 +1095,16 @@
 .rei-instrument-rail__badge {
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(245, 158, 11, 0.08);
-  border: 1px solid rgba(245, 158, 11, 0.25);
-  color: #F59E0B;
+  background: rgba(226, 163, 61, 0.08);
+  border: 1px solid rgba(226, 163, 61, 0.25);
+  color: var(--amber);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
 .rei-instrument-rail__badge--accent {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(226, 163, 61, 0.12);
+  border-color: rgba(226, 163, 61, 0.4);
 }
 
 /* Light: badge overrides */
@@ -1116,12 +1129,12 @@
 .rei-instrument-rail__collapsed-hero-value {
   font-size: 14px;
   font-weight: 800;
-  color: #F59E0B;
+  color: var(--amber);
   font-family: monospace;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   letter-spacing: 0.05em;
-  text-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+  text-shadow: 0 0 10px rgba(226, 163, 61, 0.4);
 }
 
 /* ── REI Chat Surface (new design system, scoped to chat UI) ── */
@@ -1324,6 +1337,9 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+.rei-instrument-rail .rei-side-card:first-of-type {
+  padding-left: 34px;
 }
 .rei-side-card__heading {
   font-size: 11px;

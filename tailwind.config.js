@@ -10,8 +10,8 @@ export default {
         background: "#0A0A0A",
         surface: "#111111",
         hinge: {
-          DEFAULT: "#D4AF37", // Brass
-          bright: "#F59E0B",  // Gold
+          DEFAULT: "#E2A33D", // Amber (single brand accent)
+          bright: "#E2A33D",  // Amber
         },
         slate: {
           900: "#0F172A",

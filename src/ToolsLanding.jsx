@@ -114,7 +114,7 @@ export default function ToolsLanding({ onOpenTool }) {
       <style>{`
         [data-theme="light"] .bg-background { background-color: #F8F9FA !important; }
         [data-theme="light"] .bg-surface { background-color: #FFFFFF !important; }
-        [data-theme="light"] .bg-hinge { background-color: #F59E0B !important; }
+        [data-theme="light"] .bg-hinge { background-color: var(--amber) !important; }
         [data-theme="light"] .text-foreground { color: #1C1917 !important; }
         [data-theme="light"] .text-foreground-muted { color: #767676 !important; }
         [data-theme="light"] .text-hinge-bright { color: #B45309 !important; }
@@ -122,8 +122,8 @@ export default function ToolsLanding({ onOpenTool }) {
         [data-theme="light"] .border-hinge { border-color: #B45309 !important; }
         [data-theme="light"] .hover\\:border-hinge:hover { border-color: #B45309 !important; }
         [data-theme="light"] .hover\\:text-hinge-bright:hover { color: #B45309 !important; }
-        [data-theme="light"] .from-hinge-bright { --tw-gradient-from: #F59E0B; }
-        [data-theme="light"] .to-hinge-bright { --tw-gradient-to: #D4AF37; }
+        [data-theme="light"] .from-hinge-bright { --tw-gradient-from: var(--amber); }
+        [data-theme="light"] .to-hinge-bright { --tw-gradient-to: var(--amber-tint); }
       `}</style>
       
       {/* ── 1. Premium Hero ── */}
@@ -137,12 +137,12 @@ export default function ToolsLanding({ onOpenTool }) {
         <motion.div 
           whileHover={{ rotate: 90 }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          className="relative w-16 h-16 rounded-xl bg-surface border border-[#E2A33D]/30 flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(226,163,61,0.2)] cursor-crosshair z-10"
+          className="relative w-16 h-16 rounded-xl bg-surface border border-[var(--amber)]/30 flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(226,163,61,0.2)] cursor-crosshair z-10"
         >
           <HingeMark size={32} animated={false} color="#E2A33D" />
         </motion.div>
         
-        <div className="relative font-mono text-xs font-bold tracking-widest uppercase text-[#E2A33D] mb-4 z-10">
+        <div className="relative font-mono text-xs font-bold tracking-widest uppercase text-[var(--amber)] mb-4 z-10">
           REI.ai by PromptHound Labs
         </div>
         
@@ -150,7 +150,7 @@ export default function ToolsLanding({ onOpenTool }) {
           className="relative text-5xl md:text-7xl font-medium leading-[1.05] mb-6 z-10"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
-          Find the one fact that <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E2A33D] to-[#FFC964]">changes the answer</span>.
+          Find the one fact that <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">changes the answer</span>.
         </h1>
         
         <p className="relative text-[#EDEFF5] text-xl md:text-2xl max-w-3xl mx-auto mb-8 leading-relaxed font-light z-10">
@@ -163,7 +163,7 @@ export default function ToolsLanding({ onOpenTool }) {
 
         <button
           onClick={() => onOpenTool({ tool: "rei" })}
-          className="relative z-10 group flex items-center gap-2 bg-[#E2A33D] text-[#1A1300] px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[#EFAE4C] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300"
+          className="relative z-10 group flex items-center gap-2 bg-[var(--amber)] text-[#1A1300] px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300"
         >
           LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
@@ -192,7 +192,7 @@ export default function ToolsLanding({ onOpenTool }) {
           ].map((stat, index) => (
             <div
               key={index}
-              className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-8 text-center hover:border-[#F59E0B] transition-all"
+              className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-8 text-center hover:border-hinge-bright/60 transition-all"
             >
               <div className="text-4xl mb-4">{stat.icon}</div>
               <div className="text-4xl font-bold text-white mb-2">{stat.val}</div>
@@ -363,7 +363,7 @@ export default function ToolsLanding({ onOpenTool }) {
       {/* ── Footer ── */}
       <footer className="relative z-10 max-w-6xl mx-auto py-12 border-t-2 border-border text-center">
         <div className="w-10 h-10 mx-auto border border-hinge/30 rounded flex items-center justify-center mb-4">
-          <HingeMark size={20} animated={false} color="#D4AF37" />
+          <HingeMark size={20} animated={false} color="#E2A33D" />
         </div>
         <div className="font-heading font-bold tracking-widest uppercase text-sm mb-2">
           REI.ai <span className="text-foreground-muted">by PromptHound</span>
@@ -375,9 +375,9 @@ export default function ToolsLanding({ onOpenTool }) {
           {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
         </button>
         <div className="font-mono text-xs text-foreground-muted flex flex-wrap items-center justify-center gap-4 mt-2">
-          <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">X (Twitter)</a>
+          <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="hover:text-hinge-bright transition-colors">X (Twitter)</a>
           <span>|</span>
-          <a href={REPO_URL} target="_blank" rel="noreferrer" className="hover:text-[#F59E0B] transition-colors">GitHub</a>
+          <a href={REPO_URL} target="_blank" rel="noreferrer" className="hover:text-hinge-bright transition-colors">GitHub</a>
         </div>
       </footer>
     </div>

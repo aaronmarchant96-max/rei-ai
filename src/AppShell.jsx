@@ -231,8 +231,8 @@ export default function AppShell() {
             setTool("tools");
           }
         }}>
-          <div className="w-8 h-8 rounded border border-hinge-bright/50 flex items-center justify-center rei-cardo-mark">
-            <HingeMark size={16} animated={false} color="#E2A33D" />
+          <div className="rei-cardo-mark">
+            <HingeMark size={20} animated={false} color="#E2A33D" />
           </div>
           <div>
             <div className="rei-brand__wordmark">REI<span className="rei-brand__suffix">.ai</span></div>
