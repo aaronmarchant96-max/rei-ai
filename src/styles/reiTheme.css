@@ -618,6 +618,22 @@
   box-shadow: 0 0 15px rgba(245, 158, 11, 0.08);
 }
 
+/* Bubble action buttons: flex row anchored top-right (no manual offsets) */
+.rei-bubble-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+}
+.rei-bubble-actions .rei-copy-btn {
+  position: static;
+  margin: 0;
+  white-space: nowrap;
+}
+
 /* Input Shell */
 .rei-input-shell {
   width: 100%;

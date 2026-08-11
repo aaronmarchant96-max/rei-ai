@@ -171,70 +171,71 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
           </details>
         )}
 
-        {onExport && isStructured && (
+        <div className="rei-bubble-actions">
+          {onExport && isStructured && (
+            <button
+              type="button"
+              onClick={() => onExport(exportPayload)}
+              className="rei-copy-btn touch-target"
+              aria-label="Export Report decision"
+              onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+              onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+              title="Export Report decision"
+            >
+              Export Report
+            </button>
+          )}
+
           <button
-            type="button"
-            onClick={() => onExport(exportPayload)}
+            onClick={() => onCopy(msg.text)}
             className="rei-copy-btn touch-target"
-            aria-label="Export Report decision"
+            aria-label="Copy message"
             onMouseOver={(e) => e.currentTarget.style.opacity = 1}
             onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-            title="Export Report decision"
-            style={{ marginRight: "8px" }}
+            title="Copy message"
           >
-            Export Report
+            Copy
           </button>
-        )}
-
-        <button
-          onClick={() => onCopy(msg.text)}
-          className="rei-copy-btn touch-target"
-          aria-label="Copy message"
-          onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-          onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-          title="Copy message"
-        >
-          Copy
-        </button>
-        {msg.sender === "rei" && (() => {
-          const s = parseAssistantStyleReply(msg.text);
-          if (!s.Hinge && !s.Facts) return null;
-          const report = [
-            "## CARDO Analysis",
-            s.Hinge && `**Hinge:** ${s.Hinge}`,
-            s.Facts && `**Facts:** ${s.Facts}`,
-            s.Assumptions && `**Assumptions:** ${s.Assumptions}`,
-            s.Evaluation && `**Evaluation:** ${s.Evaluation}`,
-            s.ChangeMind && `**What would change my mind:** ${s.ChangeMind}`,
-            s.Move && `**Move:** ${s.Move}`,
-          ].filter(Boolean).join("\n\n");
-          return (
-            <>
-              <button
-                onClick={() => onCopy(report)}
-                className="rei-copy-btn touch-target"
-                aria-label="Copy report"
-                style={{ right: "56px", fontSize: "9px" }}
-                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-                title="Copy CARDO report"
-              >
-                Report
-              </button>
-              <button
-                onClick={() => onExport && onExport({ sections: s, routerDecision: msg.rawJson?.routerDecision, timestamp: msg.timestamp })}
-                className="rei-copy-btn touch-target"
-                aria-label="Export Report decision document"
-                style={{ right: "100px", fontSize: "9px" }}
-                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-                title="Download CARDO decision report"
-              >
-                📄 Export Report
-              </button>
-            </>
-          );
-        })()}
+          {msg.sender === "rei" && (() => {
+            const s = parseAssistantStyleReply(msg.text);
+            if (!s.Hinge && !s.Facts) return null;
+            const report = [
+              "## CARDO Analysis",
+              s.Hinge && `**Hinge:** ${s.Hinge}`,
+              s.Facts && `**Facts:** ${s.Facts}`,
+              s.Assumptions && `**Assumptions:** ${s.Assumptions}`,
+              s.Evaluation && `**Evaluation:** ${s.Evaluation}`,
+              s.ChangeMind && `**What would change my mind:** ${s.ChangeMind}`,
+              s.Move && `**Move:** ${s.Move}`,
+            ].filter(Boolean).join("\n\n");
+            return (
+              <>
+                <button
+                  onClick={() => onCopy(report)}
+                  className="rei-copy-btn touch-target"
+                  aria-label="Copy report"
+                  style={{ fontSize: "9px" }}
+                  onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                  onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+                  title="Copy CARDO report"
+                >
+                  Report
+                </button>
+                <button
+                  onClick={() => onExport && onExport({ sections: s, routerDecision: msg.rawJson?.routerDecision, timestamp: msg.timestamp })}
+                  className="rei-copy-btn touch-target"
+                  aria-label="Export Report decision document"
+                  style={{ fontSize: "9px" }}
+                  onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                  onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+                  title="Download CARDO decision report"
+                >
+                  📄 Export Report
+                </button>
+              </>
+            );
+          })()}
+        </div>
       </div>
 
       <span className="rei-chat-meta">
