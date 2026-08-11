@@ -4876,6 +4876,11 @@ input:focus:not(:focus-visible) {
 }
 
 /* ── REI Brand (global — AppShell header on every page) ── */
+:root {
+  --amber: #E2A33D;
+  --amber-hover: #EFAE4C;
+  --amber-tint: #FFC964;
+}
 .rei-brand {
   display: flex;
   align-items: center;
