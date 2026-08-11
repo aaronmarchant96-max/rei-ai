@@ -345,11 +345,18 @@ export function buildRouterDecision({
   }
 
   if (requiresAdversarial || isAdversarialRequest(text)) {
+    // matchedTerms are REAL here, not a hardcoded label: fingerprint terms
+    // actually present in the input (red team / stress test / ...). When the
+    // route was chosen by the scanner escalation gate, no fingerprint term
+    // matches — matchedTerms is empty, which is itself the diagnosis
+    // ("scanner-gated, not a literal keyword"). This makes the Analytics
+    // Why column able to distinguish regex hits from scanner escalations.
+    const routeTerms = actualMatchedTerms("adversarial-validation", text);
     const decision = buildDecision("adversarial-validation", {
       rationale: "Adversarial or red-team request detected; use the premium validation path.",
       routingSignals: {
         complexityTier,
-        matchedTerms: ["adversarial"],
+        matchedTerms: routeTerms,
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
