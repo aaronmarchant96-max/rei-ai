@@ -721,6 +721,7 @@ export default function REI({ initialPrompt } = {}) {
       >
         {/* Sticky Header with safe area top */}
         <header className="safe-top rei-header">
+          <span className="rei-header__version" title="CARDO REI protocol version">CARDO v3.4</span>
           {/* Domain selection tab strip */}
           <div className="rei-domain-tabs">
             {DOMAIN_PROFILES.map((dom) => (
@@ -730,12 +731,12 @@ export default function REI({ initialPrompt } = {}) {
                 onClick={() => setSelectedDomain(dom.id)}
                 className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
               >
-                <span>{dom.label}</span>
-                <span style={{ fontSize: "10px", fontWeight: 400, opacity: 0.7, textTransform: "none", marginTop: "1px" }}>
-                  {getDomain(dom.id)?.subtitle || ""}
-                </span>
+                <span className="rei-domain-tab__label">{dom.label}</span>
+                <span className="rei-domain-tab__sub">{getDomain(dom.id)?.subtitle || ""}</span>
               </button>
             ))}
+          </div>
+          <div className="rei-header__actions">
             <button
               type="button"
               onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}

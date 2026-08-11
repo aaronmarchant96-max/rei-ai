@@ -94,10 +94,18 @@
 
 /* Light: domain tabs */
 [data-theme="light"] .rei-domain-tab { color: var(--text-muted); }
-[data-theme="light"] .rei-domain-tab:hover { color: var(--amber-text); }
+[data-theme="light"] .rei-domain-tab:hover { color: var(--text); border-color: var(--border); }
 [data-theme="light"] .rei-domain-tab.is-active {
-  border-bottom-color: var(--amber-border) !important;
+  border-color: var(--amber-border) !important;
+  background: var(--amber-badge-bg) !important;
   color: var(--amber-text) !important;
+}
+[data-theme="light"] .rei-header__version {
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+[data-theme="light"] .rei-header__actions {
+  border-left-color: var(--border);
 }
 
 /* Light: action buttons */
@@ -351,7 +359,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
-  gap: 12px;
+  gap: 16px;
   padding: 8px 24px;
   background: rgba(10, 10, 10, 0.6);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -365,39 +373,76 @@
   min-width: 0;
 }
 
+.rei-header__version {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: #565b72;
+  border: 1px solid #232838;
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
 .rei-domain-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 6px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   flex: 1 1 auto;
 }
 
 .rei-domain-tab {
-  padding: 6px 4px;
-  border: none;
+  padding: 6px 12px;
+  border: 1px solid transparent;
   background: transparent;
   color: #94a3b8;
   font-size: 13px;
   font-weight: 500;
+  border-radius: 999px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: 1px;
   transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.rei-domain-tab__label {
+  line-height: 1.1;
+}
+
+.rei-domain-tab__sub {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.7;
+  text-transform: none;
+  line-height: 1.1;
 }
 
 .rei-domain-tab:hover {
-  color: #F59E0B;
+  color: #EDEFF5;
+  border-color: rgba(226, 163, 61, 0.3);
 }
 
 .rei-domain-tab.is-active {
-  background: transparent !important;
-  border-bottom: 2px solid #F59E0B !important;
-  color: #F59E0B !important;
+  background: rgba(226, 163, 61, 0.12) !important;
+  border: 1px solid rgba(226, 163, 61, 0.35) !important;
+  color: #E2A33D !important;
   box-shadow: none !important;
-  border-radius: 0;
+  border-radius: 999px;
+}
+
+.rei-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding-left: 16px;
+  margin-left: auto;
 }
 
 .rei-action-btn {

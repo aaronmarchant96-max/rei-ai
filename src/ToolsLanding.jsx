@@ -132,40 +132,43 @@ export default function ToolsLanding({ onOpenTool }) {
         className="relative z-10 max-w-4xl mx-auto pt-24 pb-32 text-center flex flex-col items-center overflow-hidden"
       >
         {/* Subtle Radial Gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(245,158,11,0.1),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(226,163,61,0.08),transparent_50%)] pointer-events-none"></div>
 
         <motion.div 
           whileHover={{ rotate: 90 }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          className="relative w-16 h-16 rounded-lg bg-surface border-2 border-hinge flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(245,158,11,0.3)] cursor-crosshair z-10"
+          className="relative w-16 h-16 rounded-xl bg-surface border border-[#E2A33D]/30 flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(226,163,61,0.2)] cursor-crosshair z-10"
         >
-          <HingeMark size={32} animated={false} color="#F59E0B" />
+          <HingeMark size={32} animated={false} color="#E2A33D" />
         </motion.div>
         
-        <div className="relative font-mono text-xs font-bold tracking-widest uppercase text-[#F59E0B] mb-4 z-10">
+        <div className="relative font-mono text-xs font-bold tracking-widest uppercase text-[#E2A33D] mb-4 z-10">
           REI.ai by PromptHound Labs
         </div>
         
-        <h1 className="relative font-heading text-6xl md:text-8xl font-black leading-tight mb-6 z-10">
-          Find the one fact that <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F59E0B] to-[#FFD700]">changes the answer</span>.
+        <h1 
+          className="relative text-5xl md:text-7xl font-medium leading-[1.05] mb-6 z-10"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          Find the one fact that <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E2A33D] to-[#FFC964]">changes the answer</span>.
         </h1>
         
-        <p className="relative text-[#E2E8F0] text-xl md:text-2xl max-w-3xl mx-auto mb-8 leading-relaxed font-light z-10">
+        <p className="relative text-[#EDEFF5] text-xl md:text-2xl max-w-3xl mx-auto mb-8 leading-relaxed font-light z-10">
           Structured reasoning with cost-aware AI routing. Pick a problem. Find the hinge. Make the call.
         </p>
 
-        <p className="relative text-[#94A3B8] text-sm md:text-base max-w-2xl mx-auto mb-10 z-10">
-          For teams that use LLMs in production and want to know <span className="text-foreground">why</span> each request cost what it did — not just what the model said.
+        <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-10 z-10">
+          For teams that use LLMs in production and want to know <span className="text-[#EDEFF5]">why</span> each request cost what it did — not just what the model said.
         </p>
 
         <button
           onClick={() => onOpenTool({ tool: "rei" })}
-          className="relative z-10 group flex items-center gap-2 bg-gradient-to-r from-[#F59E0B] to-[#FFD700] text-black px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:scale-105 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all duration-300"
+          className="relative z-10 group flex items-center gap-2 bg-[#E2A33D] text-[#1A1300] px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[#EFAE4C] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300"
         >
           LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
 
-        <p className="relative z-10 text-[#64748B] text-xs mt-5">
+        <p className="relative z-10 text-[#565B72] text-xs mt-5">
           1. Pick a domain → 2. Ask your question → 3. See the reasoning, not just the answer.
         </p>
       </motion.header>
