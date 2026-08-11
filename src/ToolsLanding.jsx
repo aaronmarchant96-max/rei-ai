@@ -105,7 +105,7 @@ export default function ToolsLanding({ onOpenTool }) {
         : "Generic reasoning. Balanced cost/safety profile.";
 
   // Framer Motion variants
-  const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
+  const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } } };
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
 
   return (
@@ -135,7 +135,8 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(226,163,61,0.08),transparent_50%)] pointer-events-none"></div>
 
         <motion.div 
-          whileHover={{ rotate: 90 }}
+          whileHover={{ rotateY: -48 }}
+          style={{ transformPerspective: 200 }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
           className="relative w-16 h-16 rounded-xl bg-surface border border-[var(--amber)]/30 flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(226,163,61,0.2)] cursor-crosshair z-10"
         >
