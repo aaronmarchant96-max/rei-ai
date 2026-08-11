@@ -334,6 +334,11 @@ export default function Analytics() {
             <p style={{ fontSize: "13px", color: colors.textDim, margin: "8px 0 0" }}>
               From router decision to model response — what actually happened and what it cost.
             </p>
+            {filteredLogs.length > 0 && (
+              <p style={{ fontSize: "11px", color: colors.textDim, margin: "6px 0 0", fontFamily: "monospace" }}>
+                Data as of {new Date(filteredLogs[0].timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {filteredLogs.length} requests · last {dateRange === "30d" ? "30 days" : dateRange === "7d" ? "7 days" : "all time"}
+              </p>
+            )}
           </div>
           <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
             {logs.length > 0 && (
@@ -435,15 +440,15 @@ export default function Analytics() {
               <MetricCard delay={0} label="Requests">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}><AnimatedCounter value={aggregates.totalRequests} delay={100} /></div>
               </MetricCard>
-              <MetricCard delay={60} label="Session Cost">
+              <MetricCard delay={60} label="Estimated Session Cost" title="Ceiling-based estimate at decision time (maxTokens × ceiling rate). Real spend may be much lower — see Actual vs estimate.">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{formatCost(aggregates.totalCost)}</div>
               </MetricCard>
-              <MetricCard delay={120} label="Savings vs gpt-4o baseline" style={{ flex: "1 1 180px" }}>
+              <MetricCard delay={120} label="Estimated savings vs gpt-4o baseline" title="Estimated = ceiling pricing (maxTokens/1000 × ceiling rate). This is the router's estimate at decision time, before real usage is known." style={{ flex: "1 1 180px" }}>
                 <div style={{ fontSize: "12px", color: colors.textDim, lineHeight: "1.6" }}>
                   Without: <b style={{ color: colors.text }}>{formatCost(aggregates.totalPremium)}</b>
                   <br />With: <b style={{ color: colors.text }}>{formatCost(aggregates.totalCost)}</b>
                 </div>
-                <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a", marginTop: "4px" }}><AnimatedCounter value={aggregates.savingsPct} delay={250} />% saved</div>
+                <div style={{ fontSize: "20px", fontWeight: 800, color: colors.textDim, marginTop: "4px" }}><AnimatedCounter value={aggregates.savingsPct} delay={250} />% saved</div>
               </MetricCard>
               <MetricCard delay={180} label="Avg route decision" subtext="router decision time">
                 <div style={{ fontSize: "24px", fontWeight: 800 }}>{aggregates.avgRoutingMs != null ? aggregates.avgRoutingMs + " ms" : "—"}</div>
@@ -454,6 +459,8 @@ export default function Analytics() {
             </div>
             <p style={{ fontSize: "11px", color: colors.textDim, margin: "0 0 28px", lineHeight: "1.5" }}>
               Lifetime savings are calculated against the configured premium baseline (currently GPT-4o pricing).
+              <br />
+              Actuals tracked only since the post-response outcomes deploy (2026-08-05). Free-tier providers (Groq llama-3.3-70b at $0/$0 per 1K tokens) mean pooled savings can overstate routing — <b>Routing savings (paid-only)</b> isolates the non-free requests to show savings attributable to routing itself, not free-tier cost avoidance. Estimated = ceiling pricing (maxTokens × ceiling rate); actual = real token counts at real rates, with Groq free-tier = $0.
             </p>
 
             {/* ── Evidence ── */}
@@ -465,17 +472,17 @@ export default function Analytics() {
                 Evidence — post-response outcomes
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
-                <div style={{ ...cardStyle, textAlign: "left" }}>
+                <div style={{ ...cardStyle, textAlign: "left" }} title="Request served by a fallback provider because the primary route/model failed — timeout, HTTP 429, or an unconfigured API key. Only that a fallback happened is captured, not the specific cause.">
                   <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Rescue rate</div>
                   <div style={{ fontSize: "20px", fontWeight: 800 }}>{aggregates.rescueRate}% <span style={{ fontSize: "11px", color: colors.textDim, fontWeight: 500 }}>({aggregates.rescueCount} of {aggregates.totalRequests})</span></div>
                   <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>served by fallback provider</div>
                 </div>
-                <div style={{ ...cardStyle, textAlign: "left" }}>
+                <div style={{ ...cardStyle, textAlign: "left" }} title="Response cut at the route's maxTokens cap before it completed. Truncation limits cost but can cut the reasoning short.">
                   <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Truncation rate</div>
                   <div style={{ fontSize: "20px", fontWeight: 800 }}>{aggregates.truncationRate}% <span style={{ fontSize: "11px", color: colors.textDim, fontWeight: 500 }}>({aggregates.truncatedCount} of {aggregates.totalRequests})</span></div>
                   <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>response cut at maxTokens</div>
                 </div>
-                <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
+                <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }} title="Estimates use ceiling pricing (est = maxTokens/1000 × ceilingRate), assuming the full token budget is consumed. Actuals use real token counts at real rates (actual = (promptTokens × inputRate + completionTokens × outputRate) / 1000), with Groq free-tier = $0. The gap is estimator bias, not a math error.">
                   <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Actual vs estimate</div>
                   <div style={{ fontSize: "20px", fontWeight: 800 }}>
                     {aggregates.estimateVsActualPct != null ? aggregates.estimateVsActualPct + "%" : "—"}
@@ -484,10 +491,13 @@ export default function Analytics() {
                   <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
                     {aggregates.actualCount > 0 ? "real spend " + formatCost(aggregates.totalActual) + " vs est. " + formatCost(aggregates.totalCost) : "no actuals logged yet"}
                   </div>
+                  <div style={{ fontSize: "10px", color: colors.textDim, marginTop: "4px" }}>
+                    estimate is ceiling-based; actuals use real tokens (Groq free-tier = $0)
+                  </div>
                 </div>
                 {aggregates.actualCount > 0 && (
                   <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
-                    <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Real savings</div>
+                    <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Actual savings</div>
                     <div style={{ fontSize: "20px", fontWeight: 800, color: "#16a34a" }}>
                       {aggregates.actualSavingsPct != null ? aggregates.actualSavingsPct + "%" : "—"}
                     </div>
@@ -508,7 +518,7 @@ export default function Analytics() {
                   </div>
                 )}
                 {evalAggregates && evalAggregates.escalatedCount > 0 && (
-                  <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }}>
+                  <div style={{ ...cardStyle, flex: "1 1 160px", textAlign: "left" }} title="Of inputs the deterministic scanner escalated, the share that reached the adversarial-validation route. 'Flags' = responses whose safety scan returned non-clean (suspicious/high-risk/critical). 100% adherence with 0 misses is the healthy signal.">
                     <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.06em", color: colors.textDim, marginBottom: "6px" }}>Adversarial route adherence</div>
                     <div style={{ fontSize: "20px", fontWeight: 800, color: evalAggregates.adherencePct != null && evalAggregates.adherencePct >= 80 ? "#16a34a" : "#e11d48" }}>
                       {evalAggregates.adherencePct != null ? evalAggregates.adherencePct + "%" : "—"}
@@ -519,7 +529,7 @@ export default function Analytics() {
                   </div>
                 )}
               </div>
-              <div style={{ fontSize: "11px", color: colors.textDim, marginBottom: "8px" }}>HingeScore distribution</div>
+              <div style={{ fontSize: "11px", color: colors.textDim, marginBottom: "8px" }} title="0.3–0.55 is the Medium complexity band. A 0% share at ≥0.8 just means no ultra-complex query in this window — not a defect. Low/medium queries route cheap; high/ultra queries get more tokens and stricter reasoning.">HingeScore distribution</div>
               <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 {Object.entries(aggregates.hingeBands).map(function (entry) {
                   var band = entry[0];
@@ -532,9 +542,6 @@ export default function Analytics() {
                   );
                 })}
               </div>
-              <p style={{ fontSize: "11px", color: colors.textDim, margin: "12px 0 0", lineHeight: "1.5", fontStyle: "italic" }}>
-              Actuals tracked only since the post-response outcomes deploy (2026-08-05). Free-tier providers (Groq llama-3.3-70b at $0/$0 per 1K tokens) mean pooled savings can overstate routing — <b>Routing savings (paid-only)</b> isolates the non-free requests to show savings attributable to routing itself, not free-tier cost avoidance.
-              </p>
             </div>
 
             {/* ── Domain distribution ── */}
@@ -577,6 +584,9 @@ export default function Analytics() {
               <div style={{ fontSize: "12px", fontWeight: 700, color: colors.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px" }}>
                 Cumulative Savings Trend
               </div>
+              <div style={{ fontSize: "11px", color: colors.textDim, margin: "-8px 0 12px", lineHeight: "1.5" }}>
+                Lifetime saved {formatCost(lifetimeSaved)} vs gpt-4o baseline at current pricing.
+              </div>
               {costTrend.length === 0 ? (
                 <div style={{ fontSize: "12px", color: colors.textDim }}>No data in range yet.</div>
               ) : (
@@ -618,13 +628,16 @@ export default function Analytics() {
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {modelHealth.map(function (m) {
+                    var okCount = m.count - m.rescueCount;
                     return (
-                      <div key={m.model} style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px" }}>
+                      <div key={m.model} style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px" }}
+                        title={m.rescueCount > 0 ? ("Rescued = requests that hit a fallback provider (outage, HTTP 429, timeout, unconfigured key). " + m.rescueCount + " of " + m.count + " requests were rescued. Details appear in Recent Requests.") : undefined}>
                         <div style={{ fontSize: "13px", fontWeight: 600, width: "180px", flexShrink: 0, color: colors.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={m.model}>
                           {m.model}
                         </div>
-                        <div style={{ width: "90px", flexShrink: 0, color: colors.textDim }}>
+                        <div style={{ width: "110px", flexShrink: 0, color: colors.textDim }}>
                           {m.count} reqs · {m.successRate}% ok
+                          {m.rescueCount > 0 && <span style={{ color: "#e11d48", fontWeight: 700 }}> · {okCount}/{m.count} ok · {m.rescueCount} rescued</span>}
                         </div>
                         <div style={{ width: "90px", flexShrink: 0, color: colors.textDim }}>
                           {m.avgLatencyMs != null ? m.avgLatencyMs + " ms" : "—"} avg
@@ -710,31 +723,38 @@ export default function Analytics() {
                             title={entry.model}>
                             {entry.model || ""}
                           </td>
-                          <td style={{ padding: "7px 10px", maxWidth: "220px" }}
-                            title={entry.rationale || (terms.length > 0 ? "Matched: " + terms.join(", ") : "")}>
-                            {terms.length > 0 ? (
-                              <span style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                                {terms.slice(0, 4).map(function (term) {
-                                  return (
-                                    <span key={term} style={{
-                                      fontSize: "10px", padding: "1px 6px", borderRadius: "4px",
-                                      background: colors.amberBg, color: colors.amber,
-                                      fontWeight: 600, whiteSpace: "nowrap",
-                                    }}>
-                                      {term}
-                                    </span>
-                                  );
-                                })}
-                                {terms.length > 4 ? <span style={{ fontSize: "10px", color: colors.textDim }}>+{terms.length - 4}</span> : null}
-                              </span>
-                            ) : (
+                          <td style={{ padding: "7px 10px", maxWidth: "280px" }}
+                            title={entry.rationale || (terms.length > 0 ? "Hinge: " + terms.join(", ") + " → " + (entry.routeId || "?") : "—")}>
+                            <span style={{ display: "flex", flexWrap: "wrap", gap: "4px", alignItems: "center" }}>
                               <span style={{
-                                fontSize: "11px", color: colors.textDim,
-                                display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                fontSize: "10px", padding: "1px 6px", borderRadius: "4px",
+                                background: colors.amberBg, color: colors.amber,
+                                fontWeight: 700, whiteSpace: "nowrap",
                               }}>
-                                {entry.rationale || "—"}
+                                {entry.routeId || "—"}
                               </span>
-                            )}
+                              {entry.rationale ? (
+                                <span style={{ fontSize: "11px", color: colors.textDim, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "120px" }}>
+                                  {entry.rationale}
+                                </span>
+                              ) : null}
+                              {terms.length > 0 ? (
+                                <span style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                                  {terms.slice(0, 4).map(function (term) {
+                                    return (
+                                      <span key={term} style={{
+                                        fontSize: "10px", padding: "1px 6px", borderRadius: "4px",
+                                        background: colors.amberBg, color: colors.amber,
+                                        fontWeight: 600, whiteSpace: "nowrap",
+                                      }}>
+                                        {term}
+                                      </span>
+                                    );
+                                  })}
+                                  {terms.length > 4 ? <span style={{ fontSize: "10px", color: colors.textDim }}>+{terms.length - 4}</span> : null}
+                                </span>
+                              ) : null}
+                            </span>
                           </td>
                           <td style={{ padding: "7px 10px", color: colors.textDim, fontFamily: "monospace" }}>
                             {formatCost(entry.estimatedCost || 0)}

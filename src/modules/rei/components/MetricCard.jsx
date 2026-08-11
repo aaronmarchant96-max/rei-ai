@@ -1,6 +1,6 @@
-export default function MetricCard({ label, children, subtext, delay = 0, style }) {
+export default function MetricCard({ label, children, subtext, delay = 0, style, title }) {
   return (
-    <div className="metric-card" style={{
+    <div className="metric-card" title={title} style={{
       padding: "18px 20px",
       borderRadius: "14px",
       background: "linear-gradient(135deg, rgba(17,19,24,0.58), rgba(17,19,24,0.38))",
