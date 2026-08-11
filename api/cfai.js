@@ -12,6 +12,44 @@ const CFAI_PATH = process.env.CFAI_PATH;
 const MAX_INPUT_CHARS = 14000;
 const PROVIDER_TIMEOUT_MS = 30000;
 
+var providerCooldown = new Map();
+var THROTTLE_COOLDOWN_MS = 15000;
+var INTER_FALLBACK_MS = 300;
+var DEFAULT_RETRY_AFTER_MS = 1500;
+
+function sleep(ms) {
+  return new Promise(function (resolve) { setTimeout(resolve, ms); });
+}
+
+function parseRetryAfter(res) {
+  try {
+    var header = res.headers.get("Retry-After");
+    if (!header) return DEFAULT_RETRY_AFTER_MS;
+    var seconds = Number(header);
+    if (!isNaN(seconds) && seconds > 0) return seconds * 1000;
+    var date = Date.parse(header);
+    if (!isNaN(date)) return Math.max(0, date - Date.now());
+  } catch (_) { /* fall through */ }
+  return DEFAULT_RETRY_AFTER_MS;
+}
+
+function recordThrottle(provider, res) {
+  var retryAfter = parseRetryAfter(res);
+  providerCooldown.set(provider, Date.now() + THROTTLE_COOLDOWN_MS);
+  console.warn(provider + " rate-limited — cooling down for " + (THROTTLE_COOLDOWN_MS / 1000) + "s");
+  return sleep(retryAfter);
+}
+
+export function getProviderCooldown() {
+  return Array.from(providerCooldown.entries()).map(function (entry) {
+    return { provider: entry[0], until: entry[1], remaining: Math.max(0, entry[1] - Date.now()) };
+  });
+}
+
+export function clearProviderCooldown() {
+  providerCooldown.clear();
+}
+
 
 // ── Backend dispatcher: model name → API provider ──
 
@@ -39,8 +77,11 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
       body: JSON.stringify({ model: "deepseek-v4-flash", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
-      const err = await res.text().catch(function () { return "(unreadable)"; });
-      console.warn("DeepSeek status " + res.status + ": " + err.slice(0, 300));
+      if (res.status === 429) { await recordThrottle("deepseek", res); }
+      else {
+        var errText = await res.text().catch(function () { return "(unreadable)"; });
+        console.warn("DeepSeek status " + res.status + ": " + errText.slice(0, 300));
+      }
       return null;
     }
     const data = await res.json();
@@ -64,7 +105,8 @@ async function callGemini(messages, maxTokens, temperature = 0.7) {
       body: JSON.stringify({ model: "gemini-flash-latest", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
-      console.warn("Gemini status " + res.status);
+      if (res.status === 429) { await recordThrottle("gemini", res); }
+      else { console.warn("Gemini status " + res.status); }
       return null;
     }
     const data = await res.json();
@@ -88,7 +130,8 @@ async function callGroq(messages, maxTokens, model, temperature = 0.7) {
       body: JSON.stringify({ model: model || "llama-3.3-70b-versatile", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
-      console.warn("Groq status " + res.status);
+      if (res.status === 429) { await recordThrottle("groq", res); }
+      else { console.warn("Groq status " + res.status); }
       return null;
     }
     const data = await res.json();
@@ -111,7 +154,10 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7) {
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
       body: JSON.stringify({ model: "gpt-4o", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      if (res.status === 429) { await recordThrottle("openai", res); }
+      return null;
+    }
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
     return { content: data.choices?.[0]?.message?.content || "No content from OpenAI.", model: "gpt-4o", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
@@ -152,11 +198,17 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
   if (process.env.GROQ_API_KEY) backends.groq = function () { return callGroq(messages, maxTokens, groqModel, temperature); };
   if (process.env.OPENAI_API_KEY) backends.openai = function () { return callOpenAI(messages, maxTokens, temperature); };
 
-  // Try primary backend first
+  // Try primary backend first (unless in cooldown)
   if (primaryBackend && backends[primaryBackend]) {
-    var result = await backends[primaryBackend]();
-    if (result) {
-      return { content: result.content, model: primaryModel, routerDecision: routerDecision, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+    var cooldownUntil = providerCooldown.get(primaryBackend);
+    if (cooldownUntil && Date.now() < cooldownUntil) {
+      console.warn("Skipping primary backend " + primaryBackend + " — in cooldown (" + Math.ceil((cooldownUntil - Date.now()) / 1000) + "s remaining)");
+    } else {
+      var result = await backends[primaryBackend]();
+      if (result) {
+        providerCooldown.delete(primaryBackend);
+        return { content: result.content, model: primaryModel, routerDecision: routerDecision, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+      }
     }
   }
 
@@ -165,11 +217,18 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
   for (var i = 0; i < order.length; i++) {
     var backend = order[i];
     if (backends[backend]) {
+      var fbCooldown = providerCooldown.get(backend);
+      if (fbCooldown && Date.now() < fbCooldown) {
+        console.warn("Skipping fallback " + backend + " — in cooldown (" + Math.ceil((fbCooldown - Date.now()) / 1000) + "s remaining)");
+        continue;
+      }
       console.warn("Primary backend " + primaryBackend + " failed, falling back to " + backend);
       result = await backends[backend]();
       if (result) {
+        providerCooldown.delete(backend);
         return { content: result.content, model: result.model + " (fallback)", routerDecision: routerDecision, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
       }
+      await sleep(INTER_FALLBACK_MS);
     }
   }
 

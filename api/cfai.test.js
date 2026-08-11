@@ -1,14 +1,27 @@
-function mockFetch(responseData, status, ok) {
+function mockFetch(responseData, status, ok, headers) {
   if (status === undefined) status = 200;
   if (ok === undefined) ok = true;
   global.fetch = jest.fn(function () {
     return Promise.resolve({
       ok: ok,
       status: status,
+      headers: headers ? { get: function (name) { return headers[name] || null; } } : { get: function () { return null; } },
       json: function () { return Promise.resolve(responseData); },
       text: function () { return Promise.resolve(JSON.stringify(responseData)); },
     });
   });
+}
+
+function fetchOnceResponse(data, status, ok, headers) {
+  if (status === undefined) status = 200;
+  if (ok === undefined) ok = true;
+  return {
+    ok: ok,
+    status: status,
+    headers: headers ? { get: function (name) { return headers[name] || null; } } : { get: function () { return null; } },
+    json: function () { return Promise.resolve(data); },
+    text: function () { return Promise.resolve(JSON.stringify(data)); },
+  };
 }
 
 beforeEach(function () {
@@ -79,8 +92,8 @@ describe("handler", function () {
     expect(res._status).toBe(200);
   });
 
-  it("returns graceful message when all backends fail", async function () {
-    mockFetch({ error: "Rate limited" }, 429, false);
+  it("returns graceful message when all backends fail (non-429 errors)", async function () {
+    mockFetch({ error: "Server error" }, 500, false);
     process.env.DEEPSEEK_API_KEY = undefined;
     var handler = (await import("./cfai.js")).default;
     var req = { method: "POST", body: { command: "score", input: "test query", systemPrompt: "assistant", domain: "assistant" } };
@@ -101,5 +114,67 @@ describe("handler", function () {
     expect(res._body.success).toBe(true);
     var parsed = JSON.parse(res._body.result);
     expect(parsed.verdict).toBe("critical");
+  });
+
+  it("records provider cooldown on 429 and falls back to next provider", async function () {
+    global.fetch = jest.fn()
+      .mockImplementationOnce(function () {
+        return Promise.resolve(fetchOnceResponse({ error: "rate limited" }, 429, false, { "Retry-After": "3" }));
+      })
+      .mockImplementationOnce(function () {
+        return Promise.resolve(fetchOnceResponse(
+          { choices: [{ message: { content: "groq fallback ok" } }], usage: { prompt_tokens: 5, completion_tokens: 3 } },
+          200, true
+        ));
+      });
+
+    process.env.DEEPSEEK_API_KEY = "sk-valid";
+    process.env.GROQ_API_KEY = "gsk_test";
+    var mod = await import("./cfai.js");
+    var handler = mod.default;
+    var req = { method: "POST", body: { command: "score", input: "test", domain: "assistant" } };
+    var res = { _status: null, _body: null, status: function (code) { this._status = code; return this; }, json: function (data) { this._body = data; }, setHeader: function () {} };
+    await handler(req, res);
+
+    expect(res._status).toBe(200);
+    expect(res._body.result).toContain("groq fallback ok");
+
+    var cooldown = mod.getProviderCooldown();
+    var dsCooldown = cooldown.filter(function (c) { return c.provider === "deepseek"; });
+    expect(dsCooldown.length).toBe(1);
+    expect(dsCooldown[0].remaining).toBeGreaterThan(0);
+  });
+
+  it("skips in-cooldown provider and continues fallback to remaining backend", async function () {
+    global.fetch = jest.fn()
+      .mockImplementationOnce(function () {
+        return Promise.resolve(fetchOnceResponse({ error: "rate limited" }, 429, false, { "Retry-After": "1" }));
+      })
+      .mockImplementationOnce(function () {
+        return Promise.resolve(fetchOnceResponse({ error: "also throttled" }, 429, false, { "Retry-After": "1" }));
+      })
+      .mockImplementationOnce(function () {
+        return Promise.resolve(fetchOnceResponse(
+          { choices: [{ message: { content: "gemini fallback ok" } }], usage: { prompt_tokens: 5, completion_tokens: 3 } },
+          200, true
+        ));
+      });
+
+    process.env.DEEPSEEK_API_KEY = "sk-valid";
+    process.env.GROQ_API_KEY = "gsk_test";
+    process.env.GEMINI_API_KEY = "AQ.test-key";
+    var mod = await import("./cfai.js");
+    var handler = mod.default;
+    var req = { method: "POST", body: { command: "score", input: "test", domain: "assistant" } };
+    var res = { _status: null, _body: null, status: function (code) { this._status = code; return this; }, json: function (data) { this._body = data; }, setHeader: function () {} };
+    await handler(req, res);
+
+    expect(res._status).toBe(200);
+    expect(res._body.result).toContain("gemini fallback ok");
+    expect(res._body.model).toContain("fallback");
+
+    var cooldown = mod.getProviderCooldown();
+    var cooled = cooldown.filter(function (c) { return c.provider === "deepseek" || c.provider === "groq"; });
+    expect(cooled.length).toBe(2);
   });
 });

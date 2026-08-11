@@ -71,7 +71,7 @@ describe("REI", () => {
       const calls = global.fetch.mock.calls;
       const lastCall = calls[calls.length - 1];
       const body = JSON.parse(lastCall[1].body);
-      expect(body.systemPrompt).toBe("You are REI. Reply in one short, friendly sentence.");
+      expect(body.systemPrompt).toContain("Reply to this greeting in one short, friendly sentence");
       // input must not carry the full 6K-char Generalist prompt for a greeting
       expect(body.input).toBe("hello");
     }, { timeout: 3000 });
@@ -95,7 +95,7 @@ describe("REI", () => {
       const calls = global.fetch.mock.calls;
       const lastCall = calls[calls.length - 1];
       const body = JSON.parse(lastCall[1].body);
-      expect(body.systemPrompt).toBe("You are REI. Reply in one short, friendly sentence.");
+      expect(body.systemPrompt).toContain("Reply to this greeting in one short, friendly sentence");
 
       // Check 2: the router decision is simple-greeting with 50-token cap
       expect(body.routerDecision.id).toBe("simple-greeting");

@@ -608,7 +608,7 @@ export default function REI({ initialPrompt } = {}) {
       // Call route handler API with domain-specific context
       const isGreeting = routerDecision.id === "simple-greeting";
       const systemPrompt = isGreeting
-        ? "You are REI. Reply in one short, friendly sentence."
+        ? `You are REI — the "${currentDomain.label}" persona (${currentDomain.subtitle}). Reply to this greeting in one short, friendly sentence in-character.`
         : systemContext;
       // Inject the live claims-gate self-audit block ONLY for self-improvement
       // intent in the generalist channel, so the engine reasons over its own

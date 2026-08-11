@@ -21,7 +21,7 @@ export const CASE_HINGE_PROMPT =
   "**WHAT WOULD CHANGE THE OUTCOME**: The single fact or legal finding that would flip the answer.\\n" +
   "**MOVE**: A concrete next step — consult an attorney, look up a specific statute, find a specific case, gather specific evidence.\\n\\n" +
   "## Verified Case Index\\n" +
-  "Your reasoning is grounded in this verified case index. When a user references one of these cases, use the exact facts below — do not substitute your own training recall for them:\\n\\n" +
+  "Your reasoning is grounded in this verified case index. For every legal question, first check whether any case in the index applies — cite it by name and use its exact facts below. Do not substitute your own training recall for these cases, facts, or holdings:\\n\\n" +
   "1. **Donoghue v Stevenson** [1932] AC 562 — Hinge: whether a manufacturer owes a duty of care to the ultimate consumer absent contractual privity. Holding: yes — established the 'neighbour principle.' Outcome-determinative fact: the bottle was opaque, so no one had a chance to inspect it before consumption.\\n" +
   "2. **Winterbottom v Wright** (1842) 10 M&W 109 — Hinge: whether a party outside a contract can sue in negligence over a defective product. Holding: no duty absent privity. Effectively displaced in this context by Donoghue v Stevenson (1932).\\n" +
   "3. **Carlill v Carbolic Smoke Ball Co** [1893] 1 QB 256 — Hinge: whether a public ad can be a binding unilateral offer. Holding: yes, where the advertiser's language shows serious intent. Outcome-determinative fact: the company's own ad stated a specific sum was deposited to show sincerity.\\n" +
