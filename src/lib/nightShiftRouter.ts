@@ -204,7 +204,12 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
 }
 
 export function isAdversarialRequest(text: string): boolean {
-  if (/\b(red[- ]?team|adversarial|stress test|steelman|poke holes|find.flaws|attack|challenge|prove wrong|counterargument|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|tear.down)\b/i.test(text)) {
+  // Task-phrase first pass. Bare words like "attack"/"challenge" were removed
+  // — they false-positive on ordinary narrative ("the dragon attacks the
+  // castle"). Only task-specific phrases (and the scanner backstop below)
+  // escalate. Legitimate adversarial-task phrasings ("challenge every
+  // assumption", "tear down this argument") are kept as explicit phrases.
+  if (/\b(red[- ]?team|adversarial|stress test|steelman|poke holes|prove wrong|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|challenge every assumption|challenge the assumption|challenge this argument|challenge that assumption|challenge the premise|challenge them|tear down this argument|tear down that argument|tear apart this argument|tear apart the argument|tear apart this research|hostile reviewer|hostile review)\b/i.test(text)) {
     return true;
   }
   // Align with the red-team scanner taxonomy: any input the D1 scan escalates

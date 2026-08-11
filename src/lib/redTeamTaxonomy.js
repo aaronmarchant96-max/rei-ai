@@ -275,27 +275,27 @@ export const RED_TEAM_CATEGORIES = {
   child_safety_violation: {
     label: "Child Safety Violation",
     severity: "critical",
+    // Bare age/person terms (child, kid, minor, school) were removed as
+    // standalone escalators — they false-positive on benign narrative
+    // ("a child finds a treasure map"). Only explicit exploitative phrases
+    // escalate here; bare child terms are caught by the child_safety_compound
+    // PROXIMITY_PATTERN when a harm target appears nearby.
     keywords: [
-      "child",
-      "minor",
-      "underage",
-      "under 18",
-      "under 13",
-      "teenager",
-      "kid",
-      "young person",
-      "school",
-      "elementary",
-      "middle school",
-      "high school",
       "child safety",
       "minor safety",
       "protect children",
       "child protection",
       "child exploitation",
-      "csam",
+      "child sexual abuse",
+      "child abuse",
+      "groom a child",
+      "grooming a child",
+      "sexual abuse of a minor",
+      "sexual content involving a child",
+      "child pornography",
       "underage content",
-      "minor content"
+      "minor content",
+      "csam"
     ],
     weight: 1.0,
     riskImpact: "Content that exploits children or attempts to generate child-harm material."
@@ -578,6 +578,12 @@ export const RED_TEAM_CATEGORIES = {
   nested_instructions: {
     label: "Nested Instructions",
     severity: "medium",
+    // All keywords here are story/hypothetical framings ("in this story",
+    // "imagine that"). They are NOT escalators on their own — an ordinary
+    // story opener would route every narrative prompt to the expensive
+    // adversarial path. They only count when a directive/instruction verb
+    // also appears in the input (see requiresCompound gate in
+    // getCategoryByKeyword), so nested injection = story-framing + directive.
     keywords: [
       "within this story",
       "in this story",
@@ -610,6 +616,28 @@ export const RED_TEAM_CATEGORIES = {
       "as a thought experiment",
       "as an exercise",
       "as a demonstration"
+    ],
+    requiresCompound: [
+      "ignore",
+      "disregard",
+      "forget",
+      "override",
+      "bypass",
+      "disable",
+      "no restrictions",
+      "no limits",
+      "no filters",
+      "you are now",
+      "do anything",
+      "from now on",
+      "new instruction",
+      "follow",
+      "execute",
+      "no longer",
+      "stop following",
+      "ignore all",
+      "ignore any",
+      "instead"
     ],
     weight: 0.7,
     riskImpact: "Instructions hidden inside stories or hypotheticals that the model processes as real directives."
@@ -664,6 +692,7 @@ export const ALWAYS_HIGH_RISK = [
   "data_exfiltration",
   "policy_bypass",
   "child_safety_violation",
+  "child_safety_compound",
   "self_harm_instructions",
   "weapon_proliferation",
   "roleplay_jailbreak",
@@ -733,6 +762,19 @@ export const PROXIMITY_PATTERNS = [
     maxDistance: 5,
     label: "proximity_translation_attack",
     weight: 0.75
+  },
+  {
+    // Compound child-safety detection. Bare child terms (child/kid/minor/
+    // school) were removed from child_safety_violation keywords because they
+    // false-positive on benign narrative. A child term is only a signal when
+    // a sexual/exploitation/grooming target appears nearby. Deliberately
+    // excludes non-exploitation harm (accident, illness) to avoid flagging
+    // "a child was hurt in the accident."
+    terms: ["child", "children", "kid", "kids", "minor", "minors", "teenager", "teenagers", "underage", "student", "students"],
+    targets: ["sexual", "sexually", "sex", "abuse", "abusive", "exploit", "exploitation", "exploited", "groom", "grooming", "molest", "molesting", "porn", "pornography", "explicit", "nude", "naked", "sexualized"],
+    maxDistance: 5,
+    label: "child_safety_compound",
+    weight: 0.9
   }
 ];
 
@@ -753,6 +795,12 @@ export function getCategoryByKeyword(input) {
     }
 
     if (score > 0) {
+      // Compound requirement: categories that need a directive verb alongside
+      // their framing keywords (e.g. nested_instructions) are suppressed when
+      // no compound signal is present — prevents story openers from escalating.
+      if (category.requiresCompound && !category.requiresCompound.some(sig => normalizedInput.includes(sig))) {
+        continue;
+      }
       matches.push({
         category: categoryKey,
         label: category.label,
@@ -794,10 +842,12 @@ export function getCategoryByKeyword(input) {
     for (let i = 0; i < words.length; i++) {
       const termMatch = proxPattern.terms.find(t => words[i].includes(t));
       if (termMatch) {
-        // Look within maxDistance words
-        const window = words.slice(i + 1, i + 1 + proxPattern.maxDistance);
+        // Look within maxDistance words on BOTH sides (compound patterns like
+        // "grooms a child" put the harm target before the child term).
+        const backWindow = words.slice(Math.max(0, i - proxPattern.maxDistance), i);
+        const forwardWindow = words.slice(i + 1, i + 1 + proxPattern.maxDistance);
         const targetMatch = proxPattern.targets.find(t =>
-          window.some(w => w.includes(t))
+          backWindow.some(w => w.includes(t)) || forwardWindow.some(w => w.includes(t))
         );
         if (targetMatch) {
           const existingMatch = matches.find(m => m.category === `proximity_${proxPattern.label?.replace("proximity_", "")}`);
