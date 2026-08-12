@@ -45,6 +45,9 @@ typecheck:
     # declarations hit ERESOLVE under strict peer resolution (same as all
     # other install jobs in this file). See package.json.
     - npm ci --legacy-peer-deps
+    # tsc statically resolves the dynamic import of sourceIndex.json, which is
+    # a gitignored prebuild artifact — generate it before typechecking.
+    - node scripts/index-source.mjs
     - npm run typecheck
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
