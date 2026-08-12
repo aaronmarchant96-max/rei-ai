@@ -14,6 +14,7 @@ import {
   markImplemented,
 } from "./lib/policyProposalStore";
 import { computeProposalMetrics } from "./lib/policyProposalMetrics";
+import { fetchLongitudinalEvals } from "./lib/longitudinalEvalSource";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
@@ -100,15 +101,37 @@ export default function Analytics() {
   const [dateRange, setDateRange] = useState("all");
   const [proposals, setProposals] = useState(function () { return getProposals(); });
 
-  // Generate policy proposals from observed evidence and merge them into the
-  // store. Regeneration is idempotent; dismissals survive. This is the
-  // self-informed loop: evidence → deterministic proposal → human review.
-  // The engine never mutates policy (see docs/POLICY_LOOP.md).
+  // Generate policy proposals from observed evidence — both local (localStorage)
+  // and longitudinal (server-side KV). The engine is pure/deterministic; this
+  // useEffect is the data-source layer only. Set local proposals immediately,
+  // then async-fetch the durable eval plane to supplement.
   useEffect(function () {
     var evals = getEvals({ evaluator: "deterministic" });
     var claims = verifyAll();
-    var generated = generateProposals(evals, getLogs(), claims);
-    setProposals(upsertProposals(generated));
+    var localLogs = getLogs();
+    var generated = generateProposals(evals, localLogs, claims);
+    var immediate = upsertProposals(generated);
+    setProposals(immediate);
+
+    // Supplement from the durable evaluation plane (server-side KV via
+    // /api/eval/status). Degrades gracefully — a failure here leaves the
+    // localStorage-only proposals in place.
+    fetchLongitudinalEvals().then(function (remote) {
+      if (remote.evals.length === 0 && remote.logs.length === 0) return;
+      var allEvals = evals.concat(remote.evals);
+      var allLogs = localLogs.concat(remote.logs);
+      var merged = generateProposals(allEvals, allLogs, claims);
+
+      // Merge longitudinal proposals into the store, with local proposals
+      // winning on id collisions so disposition (dismissed/accepted) is preserved
+      // across regeneration.
+      var byId = new Map();
+      for (var i = 0; i < immediate.length; i++) byId.set(immediate[i].id, immediate[i]);
+      for (var j = 0; j < merged.length; j++) {
+        if (!byId.has(merged[j].id)) byId.set(merged[j].id, merged[j]);
+      }
+      setProposals(upsertProposals(Array.from(byId.values())));
+    }).catch(function () {});
   }, [logs, dateRange]);
 
   // Date-range filter: logs carry ISO timestamps; filter before aggregation.
