@@ -163,24 +163,24 @@ export default function ToolsLanding({ onOpenTool }) {
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
             Measured savings. Not a single magic number.
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center flex flex-col justify-center min-h-[116px]">
               <div className="text-3xl md:text-4xl font-bold text-white mb-1">85.7%</div>
               <div className="text-xs text-gray-400 uppercase tracking-wider">Baseline savings</div>
               <div className="text-[10px] text-[#565B72] mt-1">vs premium</div>
             </div>
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center flex flex-col justify-center min-h-[116px]">
               <div className="text-3xl md:text-4xl font-bold text-white mb-1">83.1%</div>
               <div className="text-xs text-gray-400 uppercase tracking-wider">Paid-routing savings</div>
               <div className="text-[10px] text-[#565B72] mt-1">paid → paid</div>
             </div>
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center flex flex-col justify-center min-h-[116px]">
               <div className="text-3xl md:text-4xl font-bold text-white mb-1">+0 pts</div>
               <div className="text-xs text-gray-400 uppercase tracking-wider">Free capacity</div>
               <div className="text-[10px] text-[#565B72] mt-1">disclosed separately</div>
             </div>
           </div>
-          <p className="text-[10px] text-[#565B72] text-center mt-3">
+          <p className="text-xs text-[#565B72] text-center mt-4 max-w-xl mx-auto leading-relaxed">
             Replay estimate on the synthetic demo corpus (9 measured requests). Free-capacity contribution is 0 points here because the demo catalog has no free provider — the stress test below shows it when one exists.
           </p>
         </div>

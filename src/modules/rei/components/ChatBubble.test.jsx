@@ -56,6 +56,14 @@ describe("ChatBubble", () => {
     expect(screen.getByTitle("Copy message")).toBeInTheDocument();
   });
 
+  it("fires onCopy with the message text and shows feedback when Copy is clicked", async () => {
+    const onCopy = jest.fn().mockResolvedValue(true);
+    render(<ChatBubble msg={baseMsg} selectedDomain="assistant" mobile={false} onCopy={onCopy} />);
+    fireEvent.click(screen.getByTitle("Copy message"));
+    expect(onCopy).toHaveBeenCalledWith("Here is a direct answer to your question.");
+    expect(await screen.findByText("Copied ✓")).toBeInTheDocument();
+  });
+
   it("renders export button for structured CARDO replies", () => {
     const onExport = jest.fn();
     const structuredMsg = {

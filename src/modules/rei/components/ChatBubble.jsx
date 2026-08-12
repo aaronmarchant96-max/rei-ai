@@ -1,6 +1,17 @@
+import { useState } from "react";
 import { parseAssistantStyleReply } from "../../../lib/replyParser.js";
 
 export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport, domainLabel = "REI.ai" }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (text) => {
+    const ok = await onCopy(text);
+    if (ok !== false) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
+
   const isAssistantStructuredReply = selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback;
   const sections = isAssistantStructuredReply ? parseAssistantStyleReply(msg.text) : null;
   const hasHinge = sections?.Hinge && sections.Hinge.trim();
@@ -187,14 +198,14 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
           )}
 
           <button
-            onClick={() => onCopy(msg.text)}
+            onClick={() => handleCopy(msg.text)}
             className="rei-copy-btn touch-target"
             aria-label="Copy message"
             onMouseOver={(e) => e.currentTarget.style.opacity = 1}
             onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
             title="Copy message"
           >
-            Copy
+            {copied ? "Copied ✓" : "Copy"}
           </button>
           {msg.sender === "rei" && (() => {
             const s = parseAssistantStyleReply(msg.text);
@@ -211,7 +222,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
             return (
               <>
                 <button
-                  onClick={() => onCopy(report)}
+                  onClick={() => handleCopy(report)}
                   className="rei-copy-btn touch-target"
                   aria-label="Copy report"
                   style={{ fontSize: "9px" }}
@@ -219,7 +230,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                   onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
                   title="Copy CARDO report"
                 >
-                  Report
+                  {copied ? "Copied ✓" : "Report"}
                 </button>
                 <button
                   onClick={() => onExport && onExport({ sections: s, routerDecision: msg.rawJson?.routerDecision, timestamp: msg.timestamp })}
