@@ -1,0 +1,51 @@
+{
+  "_note": "Provider-price sensitivity scenarios. The workload is the shared pilot-traffic.json (10 entries); only the economic view changes. Each scenario is an isolated delta over pilot-catalog.json — nothing here mutates the base catalog or traffic. Scenario C (capacity-constrained) is deferred.",
+  "scenarios": [
+    {
+      "id": "A",
+      "label": "Current pricing (Groq free tier)",
+      "note": "Groq llama-3.3-70b serves the cheap/generalist routes at $0. This is the real-world deployment the product currently assumes.",
+      "models": {
+        "groq-llama-3.3-70b": { "input": 0, "output": 0 }
+      },
+      "routeModels": {
+        "simple-greeting": "groq-llama-3.3-70b",
+        "structured-reasoning": "groq-llama-3.3-70b",
+        "coding-hinge": "groq-llama-3.3-70b",
+        "genealogy-deep-dive": "groq-llama-3.3-70b",
+        "story-architect": "groq-llama-3.3-70b",
+        "legal-hinge": "groq-llama-3.3-70b"
+      }
+    },
+    {
+      "id": "B",
+      "label": "Groq loses free tier (commercial price)",
+      "note": "The same routes now pay commercial Groq rates ($0.00059/$0.00079 per 1K, matching the system's fallback cost table).",
+      "models": {
+        "groq-llama-3.3-70b": { "input": 0.00059, "output": 0.00079 }
+      },
+      "routeModels": {
+        "simple-greeting": "groq-llama-3.3-70b",
+        "structured-reasoning": "groq-llama-3.3-70b",
+        "coding-hinge": "groq-llama-3.3-70b",
+        "genealogy-deep-dive": "groq-llama-3.3-70b",
+        "story-architect": "groq-llama-3.3-70b",
+        "legal-hinge": "groq-llama-3.3-70b"
+      }
+    },
+    {
+      "id": "D",
+      "label": "Groq unavailable",
+      "note": "Groq is removed entirely; the routes it served fall back to the next-cheapest paid model (gpt-4o-mini).",
+      "unavailableModels": ["groq-llama-3.3-70b"],
+      "routeModels": {
+        "simple-greeting": "gpt-4o-mini",
+        "structured-reasoning": "gpt-4o-mini",
+        "coding-hinge": "gpt-4o-mini",
+        "genealogy-deep-dive": "gpt-4o-mini",
+        "story-architect": "gpt-4o-mini",
+        "legal-hinge": "gpt-4o-mini"
+      }
+    }
+  ]
+}

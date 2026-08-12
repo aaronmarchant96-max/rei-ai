@@ -55,6 +55,12 @@ export interface PilotCatalog {
   routeModels: Record<string, string>;
   /** Default customer model for routes not present in routeModels. */
   defaultModel?: string;
+  /**
+   * The model used as the premium baseline ("always send this to premium").
+   * Defaults to "gpt-4o". The baseline-relative savings figure is computed
+   * against this model, and it must exist in `models` or that figure is null.
+   */
+  premiumModel?: string;
   /** Optional label for the report. */
   label?: string;
   /** Origin of the traffic being evaluated — determines how savings are worded. */
@@ -67,6 +73,13 @@ export interface PilotRouteStat {
   reiCost: number;
   savings: number;
   savingsPercent: number;
+}
+
+export interface PilotSavingsDecomposition {
+  /** Savings attributable to routing paid→cheaper-paid (customer baseline vs REI cost). */
+  priceOptimization: number;
+  /** Savings attributable to routing paid→$0 provider capacity. */
+  freeCapacity: number;
 }
 
 export interface PilotReport {
@@ -86,6 +99,34 @@ export interface PilotReport {
   escalated: number;
   byRoute: Record<string, PilotRouteStat>;
   /**
+   * Baseline-relative savings vs the premium model ("always premium").
+   * `premiumModel` is resolved to the catalog's `premiumModel` or "gpt-4o".
+   * When the premium model is absent from `models`, these are 0 / null — the
+   * premium-relative figure cannot be computed honestly, so it is not shown.
+   */
+  premiumModel: string | null;
+  premiumBaselineCost: number;
+  premiumSavings: number;
+  premiumSavingsPercent: number | null;
+  /**
+   * Paid-provider routing savings: savings measured over entries whose REI
+   * route model is billed (non-zero rate), i.e. excluding free-capacity rows.
+   * This is the stronger measure of REI's routing capability — it cannot be
+   * inflated by zero-priced provider capacity. Null when no paid-route entry
+   * was measurable.
+   */
+  paidProviderSavings: number;
+  paidProviderSavingsPercent: number | null;
+  /**
+   * Free-tier contribution: the share of the customer baseline that REI
+   * avoided by routing to zero-priced capacity, in percentage points.
+   * Reported separately from paid-provider savings so the two economic
+   * sources (price optimization vs zero-cost capacity) are never conflated.
+   */
+  freeCapacityContribution: number | null;
+  /** Split of total savings into price-optimization vs free-capacity. */
+  savingsDecomposition: PilotSavingsDecomposition;
+  /**
    * Origin of the evaluated traffic. When source is NOT 'production', savings
    * is a REPLAY ESTIMATE over the given traffic, not measured live spend —
    * the report must never present it as measured telemetry.
@@ -97,6 +138,11 @@ const num = (n: unknown): number => (typeof n === "number" && isFinite(n) ? n : 
 
 function costOf(rate: PilotModelRate, tokens: number): number {
   return ((tokens || 0) / 1000) * (rate.input + rate.output);
+}
+
+/** A route model is "free capacity" when its catalog rate is $0 (input+output). */
+function isFreeRate(rate: PilotModelRate): boolean {
+  return rate.input + rate.output <= 0;
 }
 
 /**
@@ -111,6 +157,8 @@ export function evaluatePilotTraffic(
   const models = catalog?.models ?? {};
   const routeModels = catalog?.routeModels ?? {};
   const defaultModel = catalog?.defaultModel;
+  const premiumModel = catalog?.premiumModel || "gpt-4o";
+  const hasPremium = typeof models[premiumModel] === "object" && models[premiumModel] !== null;
 
   const excludedReasons: Record<string, number> = {};
   const byRoute: Record<string, PilotRouteStat> = {};
@@ -120,6 +168,13 @@ export function evaluatePilotTraffic(
   let baselineCost = 0;
   let reiCost = 0;
   let escalated = 0;
+
+  // Premium-relative + decomposition accumulators (measured entries only).
+  let premiumBaselineCost = 0;
+  let paidProviderBaseline = 0;
+  let paidProviderRei = 0;
+  let priceOptimization = 0;
+  let freeCapacity = 0;
 
   const exclude = (reason: string) => {
     excludedReasons[reason] = (excludedReasons[reason] || 0) + 1;
@@ -146,9 +201,7 @@ export function evaluatePilotTraffic(
 
     // Baseline: prefer what the customer actually paid.
     let baseline = num(entry.actualCost);
-    if (baseline > 0 && entry.model && models[entry.model]) {
-      baseline = baseline; // actual reported spend wins
-    } else if (baseline <= 0 && entry.model && models[entry.model]) {
+    if (baseline <= 0 && entry.model && models[entry.model]) {
       baseline = costOf(models[entry.model], tokens); // synthesize from their catalog
     }
     // If still zero, baseline is unmeasurable → excluded.
@@ -170,6 +223,20 @@ export function evaluatePilotTraffic(
     baselineCost += baseline;
     reiCost += rei;
 
+    // Premium-relative baseline (only when the premium model is in the catalog).
+    if (hasPremium) {
+      premiumBaselineCost += costOf(models[premiumModel], tokens);
+    }
+
+    // Decompose this entry's savings: paid→cheaper-paid vs paid→$0 capacity.
+    if (isFreeRate(rate)) {
+      freeCapacity += baseline - rei;
+    } else {
+      priceOptimization += baseline - rei;
+      paidProviderBaseline += baseline;
+      paidProviderRei += rei;
+    }
+
     if (!byRoute[routeId]) {
       byRoute[routeId] = { entries: 0, baseline: 0, reiCost: 0, savings: 0, savingsPercent: 0 };
     }
@@ -181,6 +248,14 @@ export function evaluatePilotTraffic(
 
   const savings = baselineCost - reiCost;
   const savingsPercent = baselineCost > 0 ? (savings / baselineCost) * 100 : 0;
+
+  const premiumSavings = premiumBaselineCost - reiCost;
+  const premiumSavingsPercent = premiumBaselineCost > 0 ? (premiumSavings / premiumBaselineCost) * 100 : null;
+
+  const paidProviderSavings = paidProviderBaseline - paidProviderRei;
+  const paidProviderSavingsPercent = paidProviderBaseline > 0 ? (paidProviderSavings / paidProviderBaseline) * 100 : null;
+
+  const freeCapacityContribution = baselineCost > 0 ? (freeCapacity / baselineCost) * 100 : null;
 
   for (const routeId of Object.keys(byRoute)) {
     const r = byRoute[routeId];
@@ -200,6 +275,14 @@ export function evaluatePilotTraffic(
     routeDistribution,
     escalated,
     byRoute,
+    premiumModel: hasPremium ? premiumModel : null,
+    premiumBaselineCost,
+    premiumSavings,
+    premiumSavingsPercent,
+    paidProviderSavings,
+    paidProviderSavingsPercent,
+    freeCapacityContribution,
+    savingsDecomposition: { priceOptimization, freeCapacity },
     provenance: catalog?.provenance ?? null,
   };
 }

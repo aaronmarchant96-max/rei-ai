@@ -127,4 +127,120 @@ describe("pilotEval — single-customer pilot evaluator", () => {
     });
     expect(none.provenance).toBeNull();
   });
+
+  it("computes premium-relative savings against the premium model (default gpt-4o)", () => {
+    // 200 tokens @ gpt-4o = (200/1000)*(0.0025+0.01) = 0.0025 premium baseline.
+    // Customer paid 0.004; REI routes to gpt-4o-mini = (200/1000)*0.00075 = 0.00015.
+    const report = evaluatePilotTraffic(
+      [{ prompt: "what is the capital of France?", tokens: 200, actualCost: 0.004 }],
+      CATALOG
+    );
+    expect(report.premiumModel).toBe("gpt-4o");
+    expect(report.premiumBaselineCost).toBeCloseTo(0.0025, 12);
+    expect(report.premiumSavings).toBeCloseTo(0.0025 - 0.00015, 12);
+    expect(report.premiumSavingsPercent).not.toBeNull();
+    expect(report.premiumSavingsPercent).toBeGreaterThan(80);
+  });
+
+  it("honors a catalog-defined premiumModel instead of the default", () => {
+    const report = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001 }],
+      { ...CATALOG, premiumModel: "gpt-4o-mini" }
+    );
+    expect(report.premiumModel).toBe("gpt-4o-mini");
+    // premium baseline = (100/1000)*0.00075 = 0.000075
+    expect(report.premiumBaselineCost).toBeCloseTo(0.000075, 12);
+  });
+
+  it("returns null premium fields when the premium model is absent from the catalog", () => {
+    const report = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001 }],
+      { ...CATALOG, premiumModel: "not-in-catalog" }
+    );
+    expect(report.premiumModel).toBeNull();
+    expect(report.premiumBaselineCost).toBe(0);
+    expect(report.premiumSavingsPercent).toBeNull();
+  });
+
+  it("decomposes savings: paid→cheaper-paid is price optimization, paid→$0 is free capacity", () => {
+    // gpt-4o-mini is paid (0.00075). A $0-rate model serves one route as free capacity.
+    const catalog: PilotCatalog = {
+      ...CATALOG,
+      models: {
+        ...CATALOG.models,
+        "free-tier-model": { input: 0, output: 0 },
+      },
+      routeModels: {
+        ...CATALOG.routeModels,
+        "genealogy-deep-dive": "free-tier-model",
+      },
+    };
+    const report = evaluatePilotTraffic(
+      [
+        { prompt: "hi", tokens: 100, actualCost: 0.001 }, // → simple-greeting (paid gpt-4o-mini)
+        { prompt: "trace the ancestry of Charles Dyer", tokens: 100, actualCost: 0.002 }, // → genealogy (free)
+      ],
+      catalog
+    );
+    expect(report.measured).toBe(2);
+    // simple-greeting: baseline 0.001 - rei 0.000075 = 0.000925 → price optimization.
+    // genealogy: baseline 0.002 - rei 0 = 0.002 → free capacity.
+    expect(report.savingsDecomposition.priceOptimization).toBeCloseTo(0.000925, 12);
+    expect(report.savingsDecomposition.freeCapacity).toBeCloseTo(0.002, 12);
+    // price + free == total savings.
+    expect(
+      report.savingsDecomposition.priceOptimization + report.savingsDecomposition.freeCapacity
+    ).toBeCloseTo(report.savings, 12);
+  });
+
+  it("isolates paid-provider savings from free-tier contribution", () => {
+    const catalog: PilotCatalog = {
+      ...CATALOG,
+      models: {
+        ...CATALOG.models,
+        "free-tier-model": { input: 0, output: 0 },
+      },
+      routeModels: {
+        ...CATALOG.routeModels,
+        "genealogy-deep-dive": "free-tier-model",
+      },
+    };
+    const report = evaluatePilotTraffic(
+      [
+        { prompt: "hi", tokens: 100, actualCost: 0.001 }, // paid route
+        { prompt: "trace the ancestry of Charles Dyer", tokens: 100, actualCost: 0.002 }, // free route
+      ],
+      catalog
+    );
+    // Paid-only: baseline 0.001 → rei 0.000075.
+    expect(report.paidProviderSavings).toBeCloseTo(0.000925, 12);
+    expect(report.paidProviderSavingsPercent).toBeCloseTo(92.5, 6);
+    // Free-tier contribution = 0.002 / (0.001 + 0.002) = 66.67% of baseline.
+    expect(report.freeCapacityContribution).toBeCloseTo(66.6667, 2);
+  });
+
+  it("excludes free-tier entries from paid-provider savings when none are measurable", () => {
+    const catalog: PilotCatalog = {
+      ...CATALOG,
+      models: {
+        ...CATALOG.models,
+        "free-tier-model": { input: 0, output: 0 },
+      },
+      routeModels: {
+        ...CATALOG.routeModels,
+        "genealogy-deep-dive": "free-tier-model",
+        "simple-greeting": "free-tier-model",
+      },
+    };
+    const report = evaluatePilotTraffic(
+      [
+        { prompt: "hi", tokens: 100, actualCost: 0.001 },
+        { prompt: "trace the ancestry of Charles Dyer", tokens: 100, actualCost: 0.002 },
+      ],
+      catalog
+    );
+    expect(report.paidProviderSavings).toBeCloseTo(0, 12);
+    expect(report.paidProviderSavingsPercent).toBeNull();
+    expect(report.freeCapacityContribution).toBeCloseTo(100, 6);
+  });
 });
