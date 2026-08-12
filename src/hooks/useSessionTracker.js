@@ -12,6 +12,7 @@ export function useSessionTracker() {
   const [sessionTokens, setSessionTokens] = useState(0);
   const [sessionMessages, setSessionMessages] = useState(0);
   const [sessionCost, setSessionCost] = useState(0);
+  const [sessionChunks, setSessionChunks] = useState(0);
   const [modelBreakdown, setModelBreakdown] = useState({});
   const [showSessionSummary, setShowSessionSummary] = useState(false);
   const [savingsVsPremium, setSavingsVsPremium] = useState(0);
@@ -28,10 +29,11 @@ export function useSessionTracker() {
   savingsRef.current = savingsVsPremium;
   const premiumRef = useRef(0);
 
-  const trackMessage = useCallback((totalTokens, model, cost, premiumCost, wasEscalated) => {
+  const trackMessage = useCallback((totalTokens, model, cost, premiumCost, wasEscalated, chunks) => {
     setSessionTokens((prev) => prev + totalTokens);
     setSessionMessages((prev) => prev + 1);
     setSessionCost((prev) => prev + cost);
+    setSessionChunks((prev) => prev + (chunks || 1));
     setModelBreakdown((prev) => ({
       ...prev,
       [model]: (prev[model] || 0) + totalTokens,
@@ -68,6 +70,7 @@ export function useSessionTracker() {
     setSessionTokens(0);
     setSessionMessages(0);
     setSessionCost(0);
+    setSessionChunks(0);
     setModelBreakdown({});
     setShowSessionSummary(false);
     setSavingsVsPremium(0);
@@ -79,6 +82,7 @@ export function useSessionTracker() {
     sessionTokens,
     sessionMessages,
     sessionCost,
+    sessionChunks,
     modelBreakdown,
     showSessionSummary,
     setShowSessionSummary,

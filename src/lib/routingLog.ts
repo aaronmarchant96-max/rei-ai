@@ -11,6 +11,12 @@ export interface RoutingLogEntry {
   provider?: string;
   rescue?: boolean;
   truncated?: boolean;
+  /** Number of continuation chunks made beyond the first (0 = single chunk). */
+  continuations?: number;
+  /** Total inference chunks across the request lifetime (1 = no continuation). */
+  totalChunks?: number;
+  /** True if the final chunk still hit the output cap (honest truncation). */
+  finalTruncated?: boolean;
   hingeScore?: number;
   estimatedCost?: number;
   premiumCost?: number;

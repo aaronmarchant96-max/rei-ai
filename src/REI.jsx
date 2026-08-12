@@ -291,7 +291,7 @@ export default function REI({ initialPrompt } = {}) {
     const decisions = messages.filter(m => m?.sender === "rei" && (m?.rawJson?.routerDecision?.hingeScore || 0) > 0.3).length;
     return decisions > 0 ? { decisions } : null;
   }, [messages]);
-  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, escalationCount, trackMessage, lifetimeCost, lifetimeSavings, resetSession } = useSessionTracker();
+  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, sessionChunks, escalationCount, trackMessage, lifetimeCost, lifetimeSavings, resetSession } = useSessionTracker();
 
   // Pre-fill input when navigated from landing page with a prompt
   useEffect(() => {
@@ -435,7 +435,8 @@ export default function REI({ initialPrompt } = {}) {
       modelName,
       actualCost,
       actualPremium,
-      modelName === "gpt-4o"
+      modelName === "gpt-4o",
+      data.continuation?.chunks || 1
     );
 
     try {
@@ -455,6 +456,9 @@ export default function REI({ initialPrompt } = {}) {
         provider: deriveProvider(modelName),
         rescue: String(modelName || "").includes("(fallback)"),
         truncated: Boolean(data.truncated),
+        continuations: data.continuation?.attempted ? (data.continuation.chunks - 1) : 0,
+        totalChunks: data.continuation?.chunks || 1,
+        finalTruncated: data.continuation?.finalTruncated ?? Boolean(data.truncated),
         structured: isStructured,
         actualCost,
         actualTokens,
@@ -861,6 +865,7 @@ export default function REI({ initialPrompt } = {}) {
               sessionTokens={sessionTokens}
               sessionMessages={sessionMessages}
               sessionCost={sessionCost}
+              sessionChunks={sessionChunks}
               savingsVsPremium={savingsVsPremium}
               escalationCount={escalationCount}
               modelBreakdown={modelBreakdown}

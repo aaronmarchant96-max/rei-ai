@@ -4,6 +4,7 @@ export default function InstrumentRail({
   sessionTokens,
   sessionMessages,
   sessionCost,
+  sessionChunks,
   savingsVsPremium,
   escalationCount,
   modelBreakdown,
@@ -76,6 +77,16 @@ export default function InstrumentRail({
                 {sessionMessages === 0 ? "\u2014" : sessionMessages}
               </span>
             </div>
+            {sessionChunks > sessionMessages && (
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label" title="Some responses needed more than one inference chunk to finish (continuation).">
+                  Inference chunks
+                </span>
+                <span className="rei-side-stat__value mono">
+                  {sessionChunks}
+                </span>
+              </div>
+            )}
             <div className="rei-side-stat">
               <span className="rei-side-stat__label">Saved vs. premium</span>
               <span className="rei-side-stat__value verified mono">

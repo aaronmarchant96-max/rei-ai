@@ -32,6 +32,33 @@ function fetchOnceResponse(data, status, ok, headers) {
   };
 }
 
+// Returns a fetch mock that serves responses in order (one per provider call).
+// After the queue is exhausted it keeps returning the last element (or a null
+// provider failure if the last element is `null`).
+function mockFetchQueue(responses) {
+  var queue = responses.slice();
+  global.fetch = jest.fn(function () {
+    var next = queue.length > 1 ? queue.shift() : queue[0];
+    if (next === null) {
+      return Promise.resolve({ ok: false, status: 500, headers: { get: function () { return null; } }, json: function () { return Promise.resolve({}); }, text: function () { return Promise.resolve("{}"); } });
+    }
+    return Promise.resolve(fetchOnceResponse(next.data, next.status, next.ok, next.headers));
+  });
+}
+
+// Build a provider response object in OpenAI-compatible shape.
+function providerResponse(content, finishReason, promptTokens, completionTokens) {
+  if (finishReason === undefined) finishReason = "stop";
+  return {
+    choices: [{ message: { content: content }, finish_reason: finishReason }],
+    usage: {
+      prompt_tokens: promptTokens === undefined ? 10 : promptTokens,
+      completion_tokens: completionTokens === undefined ? 20 : completionTokens,
+      total_tokens: (promptTokens === undefined ? 10 : promptTokens) + (completionTokens === undefined ? 20 : completionTokens),
+    },
+  };
+}
+
 beforeEach(function () {
   mockFetch({ choices: [{ message: { content: "mock ok" } }] });
   process.env.GROQ_API_KEY = "test-key";
@@ -271,5 +298,117 @@ describe("handler", function () {
     // The final user message should be the input string, not an override.
     var lastMsg = fetchBody.messages[fetchBody.messages.length - 1];
     expect(lastMsg.content).toBe("what is the capital of France");
+  });
+});
+
+describe("controlled continuation (NEVER SILENTLY TRUNCATE)", function () {
+  async function runWithGroq(input) {
+    process.env.GROQ_API_KEY = "test-key";
+    var { handleCfaiRequest, clearProviderCooldown } = await import("./cfai.js");
+    clearProviderCooldown();
+    return handleCfaiRequest("score", [], input, "You are REI.", [], { id: "story-architect", model: "llama-3.3-70b-versatile", maxTokens: 2048 });
+  }
+
+  it("does not continue a complete response (finish_reason stop)", async function () {
+    mockFetchQueue([{ data: providerResponse("Part one complete.", "stop") }]);
+    var result = await runWithGroq("tell me a story");
+    expect(result.success).toBe(true);
+    expect(result.result).toBe("Part one complete.");
+    expect(result.truncated).toBe(false);
+    expect(result.continuation.attempted).toBe(false);
+    expect(result.continuation.chunks).toBe(1);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("continues once after a truncated first chunk and concatenates", async function () {
+    mockFetchQueue([
+      { data: providerResponse("The archive doors creaked open.", "length", 10, 5) },
+      { data: providerResponse("Inside, a single ledger waited.", "stop", 12, 6) },
+    ]);
+    var result = await runWithGroq("tell me a story");
+    expect(result.success).toBe(true);
+    expect(result.truncated).toBe(false);
+    expect(result.continuation.attempted).toBe(true);
+    expect(result.continuation.chunks).toBe(2);
+    expect(result.continuation.truncatedChunks).toBe(1);
+    expect(result.continuation.finalTruncated).toBe(false);
+    expect(result.result).toBe("The archive doors creaked open.Inside, a single ledger waited.");
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("caps at three chunks and surfaces final_truncated honestly", async function () {
+    mockFetchQueue([
+      { data: providerResponse("Chunk one.", "length") },
+      { data: providerResponse("Chunk two.", "length") },
+      { data: providerResponse("Chunk three.", "length") },
+    ]);
+    var result = await runWithGroq("tell me a very long story");
+    expect(result.success).toBe(true);
+    expect(result.continuation.chunks).toBe(3);
+    expect(result.continuation.truncatedChunks).toBe(3);
+    expect(result.continuation.finalTruncated).toBe(true);
+    expect(result.truncated).toBe(true);
+    expect(result.result).toBe("Chunk one.Chunk two.Chunk three.");
+    expect(global.fetch).toHaveBeenCalledTimes(3);
+  });
+
+  it("completes on the second of three chunks (two truncated, one complete)", async function () {
+    mockFetchQueue([
+      { data: providerResponse("Chunk one.", "length") },
+      { data: providerResponse("Chunk two.", "length") },
+      { data: providerResponse("Chunk three, done.", "stop") },
+    ]);
+    var result = await runWithGroq("tell me a long story");
+    expect(result.continuation.chunks).toBe(3);
+    expect(result.continuation.truncatedChunks).toBe(2);
+    expect(result.continuation.finalTruncated).toBe(false);
+    expect(result.truncated).toBe(false);
+    expect(result.result).toBe("Chunk one.Chunk two.Chunk three, done.");
+  });
+
+  it("surfaces partial honestly when the continuation call fails", async function () {
+    mockFetchQueue([
+      { data: providerResponse("Chunk one.", "length") },
+      null, // provider error on the continuation attempt
+    ]);
+    var result = await runWithGroq("tell me a story");
+    expect(result.success).toBe(true);
+    // We keep the partial we got; we do NOT fabricate a completion.
+    expect(result.result).toBe("Chunk one.");
+    expect(result.continuation.attempted).toBe(true);
+    expect(result.continuation.chunks).toBe(1);
+    expect(result.truncated).toBe(true);
+  });
+
+  it("preserves conversation structure: partial assistant turn + deterministic continue instruction", async function () {
+    mockFetchQueue([
+      { data: providerResponse("The archive doors creaked open.", "length") },
+      { data: providerResponse("Inside, a single ledger waited.", "stop") },
+    ]);
+    await runWithGroq("tell me a story");
+    var firstBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+    var secondBody = JSON.parse(global.fetch.mock.calls[1][1].body);
+    // Second call must include the partial assistant turn ...
+    var assistantTurn = secondBody.messages.find(function (m) { return m.role === "assistant"; });
+    expect(assistantTurn).toBeDefined();
+    expect(assistantTurn.content).toBe("The archive doors creaked open.");
+    // ... followed by the deterministic continuation instruction.
+    var lastMsg = secondBody.messages[secondBody.messages.length - 1];
+    expect(lastMsg.role).toBe("user");
+    expect(lastMsg.content).toMatch(/^Continue exactly where the previous response ended/);
+    // And the same model is used on the continuation (sticky, no re-route).
+    expect(secondBody.model).toBe(firstBody.model);
+  });
+
+  it("aggregates usage across all chunks", async function () {
+    mockFetchQueue([
+      { data: providerResponse("Chunk one.", "length", 10, 5) },
+      { data: providerResponse("Chunk two.", "stop", 12, 6) },
+    ]);
+    var result = await runWithGroq("tell me a story");
+    expect(result.usage).toBeDefined();
+    expect(result.usage.prompt_tokens).toBe(22);   // 10 + 12
+    expect(result.usage.completion_tokens).toBe(11); // 5 + 6
+    expect(result.usage.total_tokens).toBe(33);
   });
 });

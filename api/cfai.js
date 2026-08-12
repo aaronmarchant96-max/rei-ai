@@ -166,6 +166,108 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7) {
   }
 }
 
+// ── Controlled continuation (NEVER SILENTLY TRUNCATE) ──
+// When a provider returns finish_reason === "length", the model hit its
+// OUTPUT token cap mid-response. Rather than silently returning a cut-off
+// answer, REI continues the SAME model on the SAME backend, feeding the
+// partial assistant turn back into context with a deterministic "Continue
+// exactly where you left off" instruction. This is a controlled fallback:
+// capped at MAX_CONTINUATION_CHUNKS total chunks, sticky to the original
+// route/model/provider (never re-routed per chunk), and if the cap is hit
+// while still truncated the final response is surfaced honestly as
+// truncated rather than presented as complete.
+
+const MAX_CONTINUATION_CHUNKS = 3;
+const CONTINUATION_INSTRUCTION =
+  "Continue exactly where the previous response ended. Do not repeat, summarize, restart, or preface the continuation. Preserve the established style, characters, facts, formatting, and narrative state.";
+
+function sumUsage(acc, usage) {
+  if (!usage) return acc;
+  var out = acc || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+  out.prompt_tokens += usage.prompt_tokens || 0;
+  out.completion_tokens += usage.completion_tokens || 0;
+  out.total_tokens += usage.total_tokens || 0;
+  return out;
+}
+
+function appendContinuationTurns(messages, partialContent) {
+  return messages.concat([
+    { role: "assistant", content: partialContent },
+    { role: "user", content: CONTINUATION_INSTRUCTION },
+  ]);
+}
+
+// firstResult is an already-obtained truncated chunk. Continues on the SAME
+// backend (runBackend) up to MAX_CONTINUATION_CHUNKS total chunks.
+async function completeWithContinuation(runBackend, messages, firstResult) {
+  var full = firstResult.content || "";
+  var usage = sumUsage(null, firstResult.usage);
+  var chunks = 1;
+  var truncatedChunks = 1;
+  // We only enter here when the first chunk is truncated, so the response
+  // stays "truncated" until a continuation chunk completes cleanly.
+  var stillTruncated = true;
+  var finishReason = firstResult.finishReason || null;
+  var currentMessages = appendContinuationTurns(messages, firstResult.content || "");
+
+  while (chunks < MAX_CONTINUATION_CHUNKS) {
+    var result = await runBackend(currentMessages);
+    if (!result) {
+      // Provider error mid-continuation: keep the partial, stay truncated,
+      // never fabricate a completion.
+      break;
+    }
+    chunks += 1;
+    full += result.content || "";
+    usage = sumUsage(usage, result.usage);
+    finishReason = result.finishReason || finishReason;
+
+    if (result.truncated) {
+      truncatedChunks += 1;
+      if (chunks >= MAX_CONTINUATION_CHUNKS) {
+        break; // hit the cap while still truncated
+      }
+      currentMessages = appendContinuationTurns(currentMessages, result.content || "");
+    } else {
+      stillTruncated = false;
+      break;
+    }
+  }
+
+  return {
+    content: full,
+    usage: usage,
+    truncated: stillTruncated,
+    finishReason: finishReason,
+    continuation: { attempted: true, chunks: chunks, truncatedChunks: truncatedChunks, finalTruncated: stillTruncated },
+  };
+}
+
+function finalizeResult(result, runBackend, messages, modelLabel, routerDecision) {
+  if (result && result.truncated) {
+    return completeWithContinuation(runBackend, messages, result).then(function (done) {
+      return {
+        content: done.content,
+        model: modelLabel,
+        routerDecision: routerDecision,
+        usage: done.usage || null,
+        truncated: done.truncated || false,
+        finishReason: done.finishReason || null,
+        continuation: done.continuation,
+      };
+    });
+  }
+  return Promise.resolve({
+    content: result ? result.content : "",
+    model: modelLabel,
+    routerDecision: routerDecision,
+    usage: result && result.usage ? result.usage : null,
+    truncated: result ? (result.truncated || false) : false,
+    finishReason: result && result.finishReason ? result.finishReason : null,
+    continuation: { attempted: false, chunks: 1, truncatedChunks: 0, finalTruncated: false },
+  });
+}
+
 // ── Main API router: primary backend + fallback chain ──
 
 async function callModelAPI(prompt, systemPrompt, history, routerDecision, messagesOverride) {
@@ -195,12 +297,13 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   // like deepseek-v4-flash would be rejected by Groq's API).
   const groqModel = primaryBackend === "groq" ? primaryModel : null;
 
-  // Map of available backends
+  // Map of available backends (each accepts an optional message override so
+  // the continuation loop can re-call the SAME backend with appended turns)
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function () { return callDeepSeek(messages, maxTokens, temperature); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function () { return callGemini(messages, maxTokens, temperature); };
-  if (process.env.GROQ_API_KEY) backends.groq = function () { return callGroq(messages, maxTokens, groqModel, temperature); };
-  if (process.env.OPENAI_API_KEY) backends.openai = function () { return callOpenAI(messages, maxTokens, temperature); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxTokens, temperature); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, temperature); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxTokens, groqModel, temperature); };
+  if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxTokens, temperature); };
 
   // Try primary backend first (unless in cooldown)
   if (primaryBackend && backends[primaryBackend]) {
@@ -211,7 +314,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
       var result = await backends[primaryBackend]();
       if (result) {
         providerCooldown.delete(primaryBackend);
-        return { content: result.content, model: primaryModel, routerDecision: routerDecision, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+        return await finalizeResult(result, backends[primaryBackend], messages, primaryModel, routerDecision);
       }
     }
   }
@@ -230,7 +333,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        return { content: result.content, model: result.model + " (fallback)", routerDecision: routerDecision, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", routerDecision);
       }
       await sleep(INTER_FALLBACK_MS);
     }
@@ -258,10 +361,10 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
   const primaryBackend = getBackendForModel(model);
 
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function () { return callDeepSeek(messages, maxT, temp); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function () { return callGemini(messages, maxT, temp); };
-  if (process.env.GROQ_API_KEY) backends.groq = function () { return callGroq(messages, maxT, model, temp); };
-  if (process.env.OPENAI_API_KEY) backends.openai = function () { return callOpenAI(messages, maxT, temp); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxT, temp); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxT, temp); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxT, model, temp); };
+  if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxT, temp); };
 
   if (primaryBackend && backends[primaryBackend]) {
     var cooldownUntil = providerCooldown.get(primaryBackend);
@@ -271,7 +374,7 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
       var result = await backends[primaryBackend]();
       if (result) {
         providerCooldown.delete(primaryBackend);
-        return { content: result.content, model: model, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+        return await finalizeResult(result, backends[primaryBackend], messages, model, null);
       }
     }
   }
@@ -289,7 +392,7 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        return { content: result.content, model: result.model + " (fallback)", usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", null);
       }
       await sleep(INTER_FALLBACK_MS);
     }
@@ -322,6 +425,8 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
         routerDecision: response.routerDecision || routerDecision,
         usage: response.usage || null,
         truncated: response.truncated || false,
+        finishReason: response.finishReason || null,
+        continuation: response.continuation || { attempted: false, chunks: 1, truncatedChunks: 0, finalTruncated: false },
         timestamp: new Date().toISOString(),
       };
     } catch (apiError) {
@@ -438,6 +543,10 @@ export default async function handler(req, res) {
         truncated: result.truncated || false,
         finishReason: result.finishReason || null,
         usage: result.usage || null,
+        continuationAttempted: result.continuation?.attempted || false,
+        totalChunks: result.continuation?.chunks ?? 1,
+        truncatedChunks: result.continuation?.truncatedChunks ?? (result.truncated ? 1 : 0),
+        finalTruncated: result.continuation?.finalTruncated ?? (result.truncated || false),
         latencyMs: Date.now() - startTime,
         // The client writes actualCost + rescue to the routing log AFTER
         // receiving this response; the trace captures what the server

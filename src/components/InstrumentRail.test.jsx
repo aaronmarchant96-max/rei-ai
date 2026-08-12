@@ -6,6 +6,7 @@ describe("InstrumentRail", () => {
     sessionTokens: 12000,
     sessionMessages: 15,
     sessionCost: 0.0024,
+    sessionChunks: 15,
     savingsVsPremium: 0.0076,
     escalationCount: 2,
     lifetimeCost: 0.05,
@@ -58,6 +59,7 @@ describe("InstrumentRail", () => {
         sessionTokens={0}
         sessionMessages={0}
         sessionCost={0}
+        sessionChunks={0}
         savingsVsPremium={0}
         escalationCount={0}
         modelBreakdown={{}}
@@ -66,5 +68,24 @@ describe("InstrumentRail", () => {
 
     expect(screen.getByText(/Routing will select the cheapest capable model/)).toBeTruthy();
     expect(screen.queryByText("Escalations")).not.toBeInTheDocument();
+  });
+
+  it("shows inference chunks when chunks exceed messages (continuation happened)", () => {
+    render(
+      <InstrumentRail
+        {...defaultProps}
+        sessionMessages={3}
+        sessionChunks={7}
+      />
+    );
+
+    expect(screen.getByText("Inference chunks")).toBeInTheDocument();
+    expect(screen.getByText("7")).toBeInTheDocument();
+  });
+
+  it("hides inference chunks when chunks equal messages (no continuation)", () => {
+    render(<InstrumentRail {...defaultProps} />);
+
+    expect(screen.queryByText("Inference chunks")).not.toBeInTheDocument();
   });
 });

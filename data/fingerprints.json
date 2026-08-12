@@ -165,7 +165,7 @@
     "jobType": "story-architect",
     "label": "Story Architect",
     "model": "gemini-flash-latest",
-    "maxTokens": 4000,
+    "maxTokens": 8192,
     "costPer1k": 1,
     "qualityGate": "Character hinge + timeline",
     "enforce": "NARRATIVE_BLUEPRINT",
