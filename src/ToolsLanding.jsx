@@ -187,7 +187,7 @@ export default function ToolsLanding({ onOpenTool }) {
         {/* Technical Badges */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-4xl mx-auto">
           {[
-            { icon: "🎯", val: "60–80%", label: "Deterministic Accuracy" },
+            { icon: "🎯", val: "90–100%", label: "Router Accuracy (implemented routes)" },
             { icon: "✅", val: `${claimsData.testCount}+`, label: "Passing Tests" },
             { icon: "⚡", val: gateSavingsPct !== null ? `~${gateSavingsPct}%` : "~92%", label: "Savings vs Premium (ceiling)" },
           ].map((stat, index) => (

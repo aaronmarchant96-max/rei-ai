@@ -15,7 +15,7 @@ describe("ToolsLanding", () => {
 
     expect(screen.getByText(`${claimsData.testCount}+`)).toBeInTheDocument();
     expect(screen.getByText("Passing Tests")).toBeInTheDocument();
-    expect(screen.getByText("Deterministic Accuracy")).toBeInTheDocument();
+    expect(screen.getByText("Router Accuracy (implemented routes)")).toBeInTheDocument();
   });
 
   it("renders CARDO pipeline steps", () => {
