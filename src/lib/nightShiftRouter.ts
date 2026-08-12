@@ -247,6 +247,10 @@ function getHighStructureSignals(text: string): string[] {
   return HIGH_STRUCTURE_TERMS.filter((term) => text.includes(term));
 }
 
+function hasComparisonFraming(text: string): boolean {
+  return /\btrade-?offs?\b|\bpros and cons\b/i.test(text);
+}
+
 function getStoredPreferenceForContext(text: string, domainName: string): string | null {
   const storedPreference = getStoredRoutePreference();
   if (!storedPreference) {
@@ -365,7 +369,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "coding" || (domainName === "assistant" && (catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")))) {
+  if (domainName === "coding" || (domainName === "assistant" && !hasComparisonFraming(text) && (catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")))) {
     const routeTerms = actualMatchedTerms("coding-hinge", text);
     const decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",

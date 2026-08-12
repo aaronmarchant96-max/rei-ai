@@ -26,6 +26,8 @@ export const GREETING_TERMS = [
   "sup",
   "heya",
   "greetings",
+  "what's up",
+  "whats up",
 ];
 
 export function isSimpleGreeting(text = "") {

@@ -41,7 +41,7 @@ npm test -- --runInBand --testPathPatterns=routingEval
 
 | Claim | Producing command | Verified result (2026-08-10) |
 |-------|-------------------|-------------------------------|
-| Router accuracy (basic, implemented routes) | `npm test -- --runInBand src/__eval__/routingEval.test.js` | **90%** (35 correct, 4 incorrect) — 6 excluded (factCheck) |
+| Router accuracy (basic, implemented routes) | `npm test -- --runInBand src/__eval__/routingEval.test.js` | **100%** (39 correct, 0 incorrect) — 6 excluded (factCheck). PR 2 resolved all 4 previously-incorrect fixtures (2026-08-11) |
 | Router accuracy (ML holdout, implemented routes) | `npm test -- --runInBand src/__eval__/routingEvalML.test.js` | **95.7%** (22/23) — 4 excluded (factCheck) |
 | Router accuracy (blind, implemented routes) | `npm test -- --runInBand src/__eval__/routingEvalBlind.test.js` | **96%** (22 correct, 1 incorrect) — 4 excluded (factCheck) |
 | Router accuracy (V3 single-author holdout) | `npm test -- --runInBand src/__eval__/routingEvalBlindV3.test.js` | **90%** (27/30) |
@@ -52,10 +52,15 @@ npm test -- --runInBand --testPathPatterns=routingEval
 | ~~"~90% router accuracy"~~ | — | **Retired**: contradicted by measured range |
 
 **Known genuine routing failures** (outside the harness, listed for PR 2):
-1. `"what's up"` → routed to Structured Reasoning, not Simple Greeting (not in `GREETING_TERMS`).
-2. `"verify the ancestry transcript for Charles Dyer"` → routed to The Engineer (coding); should be genealogy.
-3. `"what evidence supports Josiah Ramsey's pay voucher"` → routed to Structured Reasoning; should be genealogy.
-4. `"validate this source about climate change statistics"` → routed to genealogy because `"source"` is in genealogy matchTerms; should be fact-check/reasoning (generic term collision).
+
+**RESOLVED (PR 2, 2026-08-11):**
+1. ~~`"what's up"` → routed to Structured Reasoning, not Simple Greeting~~ — **fixed**: added `"what's up"` / `"whats up"` to `GREETING_TERMS`.
+2. ~~`"verify the ancestry transcript for Charles Dyer"` → routed to The Engineer (coding); should be genealogy~~ — **fixed**: added `"ancestry"` / `"transcript"` to genealogy matchTerms, removed `"service"` from coding matchTerms (generic-term collision).
+3. ~~`"what evidence supports Josiah Ramsey's pay voucher"` → routed to Structured Reasoning; should be genealogy~~ — **fixed**: added `"voucher"` to genealogy matchTerms (genealogy lane runs before the high-structure lane).
+4. ~~`"validate this source about climate change statistics"` → routed to genealogy because `"source"` is in genealogy matchTerms; should be fact-check/reasoning (generic term collision)~~ — **fixed**: removed `"source"` from genealogy matchTerms.
+5. ~~`"evaluate the trade-offs between monorepo and polyrepo"` → routed to coding; should be reasoning~~ — **fixed**: coding lane now skips comparison-framed questions (`trade-?offs?` / `pros and cons`), routing them to structured-reasoning.
+
+routingEval basic now measures **100% (39 correct, 0 incorrect)** — all 4 previously-incorrect fixtures corrected. See `docs/ENGINEERING_POLICY.md` rule 4 (measurement corrections separated from behavior changes): measurement correction shipped first (PR 1, `b2ed578`), behavior fix now (PR 2). [caught: test]
 
 **Known genuine scanner misses** (outside the harness, listed for PR 3):
 

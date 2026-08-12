@@ -84,12 +84,18 @@ describe("nightShiftRouter", () => {
     expect(pumpDecision.qualityGate).toContain("Hinge + Facts + Move");
   });
 
-  it("routes architecture/technical-debt decisions to structured reasoning domain", () => {
-    const architectureDecision = buildRouterDecision({ input: "I'm the CTO of a mid-sized SaaS company. Our legacy monolith app has a 15% annual chance of a major security breach, which would cost us $2M to clean up. Rewriting it into microservices would cost $200k upfront, but it would drop the breach probability to 2%. Should we rewrite, or keep patching the monolith?", domain: "assistant" });
+    it("routes architecture/technical-debt decisions to structured reasoning domain", () => {
+      const architectureDecision = buildRouterDecision({ input: "I'm the CTO of a mid-sized SaaS company. Our legacy monolith app has a 15% annual chance of a major security breach, which would cost us $2M to clean up. Rewriting it into microservices would cost $200k upfront, but it would drop the breach probability to 2%. Should we rewrite, or keep patching the monolith?", domain: "assistant" });
 
-    expect(architectureDecision.id).toBe("structured-reasoning");
-    expect(architectureDecision.qualityGate).toContain("Hinge + Facts + Move");
-  });
+      expect(architectureDecision.id).toBe("structured-reasoning");
+      expect(architectureDecision.qualityGate).toContain("Hinge + Facts + Move");
+    });
+
+    it("routes trade-off/comparison questions to structured reasoning even when they mention coding terms", () => {
+      const decision = buildRouterDecision({ input: "evaluate the trade-offs between monorepo and polyrepo", domain: "assistant" });
+
+      expect(decision.id).toBe("structured-reasoning");
+    });
 
   it("falls back to the balanced reasoning profile for unclassified prompts", () => {
     const decision = buildRouterDecision({ input: "Help me think through a decision", domain: "assistant" });
@@ -227,7 +233,7 @@ describe("nightShiftRouter", () => {
     it("differentiates cost between 70B, 8B, and Gemini routes", () => {
       const greeting = buildRouterDecision({ input: "hello", domain: "assistant" });
       const freeReasoning = buildRouterDecision({ input: "Help me think through a decision", domain: "assistant" });
-      const coding = buildRouterDecision({ input: "evaluate tradeoffs between monorepo and polyrepo", domain: "assistant" });
+      const coding = buildRouterDecision({ input: "implement a react hook for form validation", domain: "assistant" });
 
       expect(greeting.model).toBe("llama-3.1-8b-instant");
       expect(freeReasoning.model).toBe("llama-3.3-70b-versatile");

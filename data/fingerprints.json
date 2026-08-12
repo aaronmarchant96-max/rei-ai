@@ -99,7 +99,6 @@
       "test",
       "patch",
       "class",
-      "service",
       "hook",
       "route",
       "next.js",
@@ -152,7 +151,9 @@
       "surname",
       "provenance",
       "citation",
-      "source"
+      "ancestry",
+      "transcript",
+      "voucher"
     ],
     "temperature": 0.2,
     "fallbackPriority": "structured-reasoning",
