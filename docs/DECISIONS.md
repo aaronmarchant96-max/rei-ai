@@ -254,7 +254,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 - `babel.config.cjs`: `@babel/preset-typescript` as LAST preset (executes first)
 - `jest.config.cjs`: `moduleFileExtensions` extended with `"ts"` and `"tsx"`
 - `package.json`: `typecheck` script = `tsc --noEmit`
-- `.github/workflows/typecheck.yml`: CI runs `tsc --noEmit` on push/PR to main
+- `.gitlab-ci.yml` `typecheck` job: CI runs `tsc --noEmit` on push to main
 
 **Phase B — Lib Layer (4 files `.js` → `.ts`):**
 - `src/lib/routingLog.ts` — `RoutingLogEntry` interface
@@ -271,4 +271,4 @@ Components (`.jsx` → `.tsx`): ChatBubble, DomainBanner, WelcomePanel, IngestPa
 - Full suite 455/455 (34 suites)
 - Build ✅
 
-**Code:** `tsconfig.json`, `babel.config.cjs`, `jest.config.cjs`, `package.json`, `.github/workflows/typecheck.yml`, `src/lib/routingLog.ts`, `src/lib/costHelpers.ts`, `src/lib/nightShiftRouter.ts`, `src/lib/hingeClassifier.ts`
+**Code:** `tsconfig.json`, `babel.config.cjs`, `jest.config.cjs`, `package.json`, `.gitlab-ci.yml` (typecheck job), `src/lib/routingLog.ts`, `src/lib/costHelpers.ts`, `src/lib/nightShiftRouter.ts`, `src/lib/hingeClassifier.ts`

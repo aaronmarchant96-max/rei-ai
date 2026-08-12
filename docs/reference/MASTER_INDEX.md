@@ -418,7 +418,7 @@ npm run token-audit
 | Configure model routing | `groq_router_v2_plan.md` | Routing Logic |
 | Add new domain prompt | `api/cfai.js` | `DOMAIN_SYSTEM_PROMPTS` |
 | Edit persona profiles | `src/REI.jsx` | `DOMAIN_PROFILES` |
-| Run CI/CD | `.github/workflows/ci.yml` | N/A |
+| Run CI/CD | `.gitlab-ci.yml` | N/A |
 | Check logs | `api/lib/logger.js` | `LOG_LEVEL` env |
 | Read router tests | `src/lib/nightShiftRouter.test.js` | Edge cases |
 | Read API integration tests | `api/cfai.test.js` | Full-route tests |
@@ -457,7 +457,7 @@ npm run token-audit
 ### CI/CD
 | File | Purpose | Status |
 |------|---------|--------|
-| `.github/workflows/ci.yml` | Test + build on push/PR to main | ✅ New |
+| `.gitlab-ci.yml` | Test + build + lint + typecheck on push to main | ✅ New |
 
 ---
 
@@ -475,7 +475,7 @@ npm run token-audit
 - **Error recovery** — categorized errors (Network/Server) + Retry button restores input
 - **Observability** — structured JSON logger (`api/lib/logger.js`, `LOG_LEVEL` env)
 - **Accessibility** — `role="log"`, `aria-live="polite"`, `aria-modal`, `aria-pressed`
-- **CI/CD** — `.github/workflows/ci.yml` (test + build on push/PR to main)
+- **CI/CD** — `.gitlab-ci.yml` (test + build + lint + typecheck on push to main)
 - **JSDoc types** — added to `nightShiftRouter.js` and `cardoGuard.js`
 - **+17 tests** (55→72, 10→12 suites): 9 router edge cases + 8 API integration tests
 - **Code-splitting** — all 7 tools switched to `React.lazy()`; initial bundle **849 kB → 339 kB (−60%)**

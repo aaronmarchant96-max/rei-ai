@@ -57,7 +57,7 @@
 - Typing indicator: `aria-live="polite"`
 
 ### P7 — CI/CD
-- `.github/workflows/ci.yml`: `npm test` + `npm run build` on `push`/`pull_request` to `main`.
+- `.gitlab-ci.yml` `ci` job: `npm test` + `npm run build` + lint + `gen-claims --check` on `push` to `main`.
 
 ### P8 — Documentation
 - `handoff.md`: Updated with all changes for next CLI agent
@@ -193,7 +193,7 @@ Documents:      6 updated/created
 ```
 ✅ npm test:      94 passed, 13 suites
 ✅ npm run build:  No warnings, 339 kB initial chunk
-✅ CI:            .github/workflows/ci.yml configured
+✅ CI:            .gitlab-ci.yml configured
 ✅ Docs:          handoff.md, CLI_ENTRY.md, fortis-et-liber.md, README, Master Index, Grant Appendix
 ⚠️ Lint:          ESLint v10 needs flat config (pre-existing)
 💰 Cost:          $0.00 (free tier)

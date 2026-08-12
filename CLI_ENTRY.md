@@ -21,7 +21,7 @@ REI.ai is a reasoning-first web app for structured decision support. It uses cos
 1. **DO NOT CREATE VERCEL PROJECTS:** The Vercel project `debate-furnace` (`prj_hI91HUiDFBnDE4Y7STtlzGDkwYGo`) is the single source of truth.
 2. **DO NOT RUN `vercel link` OR `vercel init`:** The local `.vercel/repo.json` is permanently configured. Running link/init will silently create parallel deployments, destroy the webhook, and waste money.
 3. **DO NOT CLONE:** Never clone this repo elsewhere to "fix" a git state.
-4. **ASK BEFORE TOUCHING CONFIGS:** Deployments are triggered automatically via GitHub webhooks (verified by `.github/workflows/verify-deploy.yml`). If deployments fail, **ASK THE USER**—never attempt to restructure the pipeline.
+4. **ASK BEFORE TOUCHING CONFIGS:** Deployments are triggered automatically via Vercel webhooks (verified by the manual `verify-vercel-webhook` job in `.gitlab-ci.yml`). If deployments fail, **ASK THE USER**—never attempt to restructure the pipeline.
 
 ---
 

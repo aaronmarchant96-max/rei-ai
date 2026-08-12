@@ -1,15 +1,16 @@
-# GitLab CI mirror of the GitHub Actions gate.
+# GitLab CI — the single source of truth for the REI CI gate.
 #
-# Why this exists: GitHub Actions is billing-locked (runners never provision,
-# runnerName: null) while Vercel auto-deploys continue. This pipeline gives REI
-# a real CI gate on GitLab's free runners until the GitHub flag clears.
+# History: originally a mirror of the GitHub Actions gate while Actions was
+# billing-locked (runners never provision, runnerName: null). The GitHub
+# workflows were deleted on 2026-08-12 and GitLab CI became the gate of record
+# (Rule 7 in docs/ENGINEERING_POLICY.md retired the same day).
 #
-# Coverage map (see docs/ENGINEERING_POLICY.md Rule 7):
-#   .github/workflows/ci.yml                  -> job `ci`
-#   .github/workflows/typecheck.yml           -> job `typecheck`
-#   .github/workflows/app-build-drift-check.yml -> job `app-build-drift`
-#   .github/workflows/seed-harness-drift-check.yml -> job `seed-harness-drift`
-#   .github/workflows/verify-deploy.yml       -> job `verify-vercel-webhook`
+# Jobs cover the former GitHub gate surface:
+#   test+lint+build+gen-claims (was .github/workflows/ci.yml)      -> job `ci`
+#   typecheck (was .github/workflows/typecheck.yml)                -> job `typecheck`
+#   app-shell drift (was app-build-drift-check.yml)                -> job `app-build-drift`
+#   seed harness drift (was seed-harness-drift-check.yml)          -> job `seed-harness-drift`
+#   vercel webhook presence (was verify-deploy.yml)                -> job `verify-vercel-webhook`
 #
 # Required CI/CD variables (Settings -> CI/CD -> Variables):
 #   GITHUB_TOKEN            - fine-grained PAT with repo read + hooks read

@@ -60,7 +60,7 @@ PromptHound Labs is an applied AI engineering lab. Everything in this repo is an
 | `docs/experiments/` | Structured lab reports |
 | `docs/lab-report-template.md` | Lab report template |
 | `scripts/batchRoute.cjs` | Batch route tester (28 sample inputs) |
-| `.github/workflows/ci.yml` | CI pipeline |
+| `.gitlab-ci.yml` | CI pipeline (typecheck, app-build-drift, seed-harness-drift, ci) |
 
 ## Next experiments (if applicable)
 
