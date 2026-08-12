@@ -7,8 +7,11 @@
 // Response: { tenant, from, to, traces: TraceEntry[], evals: EvalEntry[] }
 
 import { getTracesWithEvals } from "../lib/kv.js";
+import { requireApiKey } from "../lib/auth.js";
 
 export default async function handler(req, res) {
+  if (!requireApiKey(req, res)) return;
+
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }

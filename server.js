@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cfaiHandler from "./api/cfai.js";
+import evalResultHandler from "./api/eval/result.js";
+import evalStatusHandler from "./api/eval/status.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +32,26 @@ app.post("/api/cfai", async (req, res) => {
         error: error.message,
         timestamp: new Date().toISOString()
       });
+    }
+  }
+});
+
+app.post("/api/eval/result", async (req, res) => {
+  try {
+    await evalResultHandler(req, res);
+  } catch (error) {
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+});
+
+app.get("/api/eval/status", async (req, res) => {
+  try {
+    await evalStatusHandler(req, res);
+  } catch (error) {
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 });

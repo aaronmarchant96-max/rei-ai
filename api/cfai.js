@@ -315,6 +315,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
 // See docs/POLICY_LOOP.md for the evaluation plane boundary.
 
 import { storeTrace } from "./lib/kv.js";
+import { requireApiKey } from "./lib/auth.js";
 const POLICY_VERSION = "v1";
 const PILOT_TENANT = "pilot";
 
@@ -331,6 +332,8 @@ function resolveProvider(modelName) {
 export default async function handler(req, res) {
   try {
     res.setHeader("Content-Type", "application/json");
+
+    if (!requireApiKey(req, res)) return;
 
     if (req.method === "POST") {
       var body = req.body || {};

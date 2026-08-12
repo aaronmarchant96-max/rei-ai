@@ -8,8 +8,11 @@
 //   evaluatorVersion?, domain?, routeId?, model? }
 
 import { storeEval } from "../lib/kv.js";
+import { requireApiKey } from "../lib/auth.js";
 
 export default async function handler(req, res) {
+  if (!requireApiKey(req, res)) return;
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
