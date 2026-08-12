@@ -142,6 +142,46 @@ this rule and keep the human/claims-gate gate in the loop.
 
 ---
 
+## Rule 7 — When CI is down, the local gate covers ALL five workflows, not three
+
+**Status: ACTIVE only while GitHub Actions is billing-locked.** This rule is
+conditional by design — every other rule here is a permanent invariant. Retire
+this rule the moment CI runs are confirmed green again; it exists to plug a
+temporary gap, and keeping it past the outage would make it dead weight that
+masks the fact that real CI has returned.
+
+**Origin:** GitHub Actions billing lock (Aug 2026). Every workflow run failed in
+seconds with `runnerName: null` despite positive budgets at $0 spend and no
+outage — a GitHub-side stuck compute-eligibility flag (also blocking Codespaces
+despite a $5 budget at $0 spend). Vercel auto-deploys were unaffected, but CI
+stopped gating production. The coding agent's standing "local verification gate"
+was `tsc --noEmit` + `npm test` + `npm run build` — which covers `ci.yml` and
+`typecheck.yml` but NOT the other three workflows:
+
+- `seed-harness-drift-check.yml` → `npm run seeds:validate && npm run seeds:build
+  && git diff --exit-code` (schema drift between seed source and built artifact)
+- `app-build-drift-check.yml` → `npm run app:validate` (app-shell contract)
+- `verify-deploy.yml` → webhook presence; cannot be replicated locally — manual:
+  `Settings → Webhooks`, confirm `api.vercel.com/v1/integrations/deploy` is active
+
+**Policy:** While CI is down, "done" means running the full extended gate before
+every commit, not the standard trio:
+1. `npx tsc --noEmit`
+2. `npm test -- --runInBand`
+3. `npm run build`
+4. `npm run seeds:validate && npm run seeds:build && git diff --exit-code`
+5. `npm run app:validate`
+6. `npm run prebuild` (eval-integrity, model-rates, app-shell, index-source)
+
+Do not report a commit as verified unless all six are green. When CI is restored,
+drop this rule and return to relying on the real workflows.
+
+**Enforcement:** Manual — a required pre-commit checklist step while the lock is
+active. Revisit weekly (or on any `runnerName` change) to confirm the status line
+above still reflects reality.
+
+---
+
 ## Reference: where these live
 
 | Rule | Automated gate | Regression test |
@@ -152,6 +192,7 @@ this rule and keep the human/claims-gate gate in the loop.
 | 4. Split measurement/behavior | — (manual) | — |
 | 5. Verify metrics | `CLAIM_LEDGER.md` + prebuild `--check` gates | — |
 | 6. Self-informed, not self-modifying | — (structural: no mutation API; UI has no apply control) | `Analytics.test.jsx` (no Apply/Accept) |
+| 7. Local gate covers all five (CI-down) | `npm run seeds:*` + `npm run app:validate` (manual, while lock active) | — (manual pre-commit checklist) |
 
 New workflow lessons should be added here as Rule 6+, with the incident that
 produced them, so the policy stays the memory of the project.
