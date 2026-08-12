@@ -183,4 +183,48 @@ describe("Analytics", () => {
     expect(screen.getByText(/No routing data yet/i)).toBeInTheDocument();
     expect(screen.queryByText(/Cumulative Savings Trend/i)).not.toBeInTheDocument();
   });
+
+  it("renders Policy Proposals from seeded eval evidence", async () => {
+    // Seed a missed escalation: scanner escalated but router went elsewhere.
+    window.localStorage.setItem("rei_eval_log", JSON.stringify([
+      {
+        requestId: "req-miss",
+        domain: "assistant",
+        routeId: "structured-reasoning",
+        model: "deepseek-v4-flash",
+        evaluator: "deterministic",
+        evaluatorVersion: "red-team-v1",
+        evaluation: {
+          qualityScore: 86,
+          safetyVerdict: "high-risk",
+          routeExpected: true,
+          routeCorrect: false,
+          evaluatedAt: "2026-08-04T01:00:00.000Z",
+        },
+      },
+    ]));
+    window.localStorage.setItem("rei_routing_log", JSON.stringify([
+      {
+        requestId: "req-miss",
+        timestamp: "2026-08-04T01:00:00.000Z",
+        domain: "assistant",
+        routeId: "structured-reasoning",
+        model: "deepseek-v4-flash",
+        estimatedCost: 0.0005,
+        premiumCost: 0.006,
+        hingeScore: 0.4,
+      },
+    ]));
+
+    render(<Analytics />);
+
+    await waitFor(() => expect(screen.getByText(/Policy Proposals/i)).toBeInTheDocument(), { timeout: 1200 });
+    // The missed-escalation proposal must appear with its evidence.
+    expect(screen.getAllByText(/Missed escalation/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Copy proposal/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Dismiss/i).length).toBeGreaterThanOrEqual(1);
+    // No apply/accept/modify control exists.
+    expect(screen.queryByText(/Apply/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Accept/i)).not.toBeInTheDocument();
+  });
 });

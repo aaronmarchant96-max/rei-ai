@@ -1,7 +1,15 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { getLogs, clearLogs, exportLogsJSON } from "./lib/routingLog";
 import { getEvals } from "./lib/evalLog";
 import { deriveProvider } from "./lib/provider";
+import { verifyAll } from "./lib/claimGateway";
+import "./__eval__/claimRegistry";
+import { generateProposals, SIGNAL_LABEL } from "./lib/policyProposalEngine";
+import {
+  getProposals,
+  upsertProposals,
+  dismissProposal,
+} from "./lib/policyProposalStore";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
@@ -86,6 +94,18 @@ export default function Analytics() {
   const [tab, setTab] = useState("usage");
   const [logs, setLogs] = useState(function () { return getLogs(); });
   const [dateRange, setDateRange] = useState("all");
+  const [proposals, setProposals] = useState(function () { return getProposals(); });
+
+  // Generate policy proposals from observed evidence and merge them into the
+  // store. Regeneration is idempotent; dismissals survive. This is the
+  // self-informed loop: evidence → deterministic proposal → human review.
+  // The engine never mutates policy (see docs/POLICY_LOOP.md).
+  useEffect(function () {
+    var evals = getEvals({ evaluator: "deterministic" });
+    var claims = verifyAll();
+    var generated = generateProposals(evals, getLogs(), claims);
+    setProposals(upsertProposals(generated));
+  }, [logs, dateRange]);
 
   // Date-range filter: logs carry ISO timestamps; filter before aggregation.
   var filteredLogs = useMemo(function () {
@@ -782,6 +802,98 @@ export default function Analytics() {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* ── Policy Proposals ── */}
+            <div style={{
+              padding: "20px", borderRadius: "14px",
+              background: colors.surface, border: "1px solid " + colors.border,
+              marginTop: "18px",
+            }}>
+              <div style={{ fontSize: "12px", fontWeight: 700, color: colors.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
+                Policy Proposals
+              </div>
+              <div style={{ fontSize: "11px", color: colors.textDim, marginBottom: "14px", lineHeight: "1.5" }}>
+                Self-informed loop: deterministic signals from the eval/routing/claims logs generate
+                proposals. None are applied automatically — each requires human review and an
+                engineering change with tests. See docs/POLICY_LOOP.md.
+              </div>
+              {proposals.length === 0 ? (
+                <div style={{ fontSize: "12px", color: colors.textDim, padding: "10px 0" }}>
+                  No open proposals. New signals appear here after reviewable evidence is logged.
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {proposals.map(function (p) {
+                    return (
+                      <div key={p.id} style={{
+                        padding: "14px 16px", borderRadius: "10px",
+                        background: colors.page, border: "1px solid " + colors.border,
+                        opacity: p.status === "dismissed" ? 0.5 : 1,
+                      }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "6px" }}>
+                          <span style={{
+                            fontSize: "10px", padding: "2px 8px", borderRadius: "999px",
+                            background: colors.amberBg, color: colors.amber, fontWeight: 700,
+                            textTransform: "uppercase", letterSpacing: "0.05em",
+                          }}>
+                            {SIGNAL_LABEL[p.signal]}
+                          </span>
+                          <span style={{ fontSize: "13px", fontWeight: 700, color: colors.text, flex: "1 1 200px" }}>
+                            {p.title}
+                          </span>
+                          <span style={{ fontSize: "10px", color: colors.textDim, fontFamily: "monospace" }}>
+                            {p.id}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: "12px", color: colors.textDim, lineHeight: "1.5", marginBottom: "4px" }}>
+                          <b style={{ color: colors.text }}>Evidence:</b> {p.evidence}
+                        </div>
+                        <div style={{ fontSize: "12px", color: colors.textDim, lineHeight: "1.5", marginBottom: "10px" }}>
+                          <b style={{ color: colors.text }}>Proposed change:</b> {p.suggestedChange}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          {p.requestIds.length > 0 && (
+                            <span style={{ fontSize: "10px", color: colors.textDim, fontFamily: "monospace" }}>
+                              {p.requestIds.join(", ")}
+                            </span>
+                          )}
+                          <span style={{ flex: 1 }} />
+                          <button
+                            onClick={function () {
+                              var text = "### " + p.id + " — " + SIGNAL_LABEL[p.signal] + "\n\n**Evidence:** " + p.evidence + "\n\n**Proposed change:** " + p.suggestedChange;
+                              if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(text).catch(function () { alert(text); });
+                              } else {
+                                alert(text);
+                              }
+                            }}
+                            style={{
+                              fontSize: "11px", padding: "4px 10px", borderRadius: "6px",
+                              border: "1px solid " + colors.border, background: "transparent",
+                              color: colors.textDim, cursor: "pointer",
+                            }}
+                          >
+                            Copy proposal
+                          </button>
+                          {p.status === "proposed" && (
+                            <button
+                              onClick={function () { setProposals(dismissProposal(p.id)); }}
+                              style={{
+                                fontSize: "11px", padding: "4px 10px", borderRadius: "6px",
+                                border: "1px solid " + colors.border, background: "transparent",
+                                color: colors.textDim, cursor: "pointer",
+                              }}
+                            >
+                              Dismiss
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </>
         ))}
