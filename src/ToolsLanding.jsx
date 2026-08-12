@@ -151,15 +151,39 @@ export default function ToolsLanding({ onOpenTool }) {
           className="relative text-5xl md:text-7xl font-medium leading-[1.05] mb-6 z-10"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
-          Find the one fact that <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">changes the answer</span>.
+          Stop guessing what your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">AI traffic costs</span>.
         </h1>
         
-        <p className="relative text-[#EDEFF5] text-xl md:text-2xl max-w-3xl mx-auto mb-8 leading-relaxed font-light z-10">
-          Structured reasoning with cost-aware AI routing. Pick a problem. Find the hinge. Make the call.
+        <p className="relative text-[#EDEFF5] text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed font-light z-10">
+          REI measures every routing decision, replays your traffic against real baselines, and shows where intelligent model selection reduces cost without hiding the quality or security trade-offs.
         </p>
 
-        <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-10 z-10">
-          For teams that use LLMs in production and want to know <span className="text-[#EDEFF5]">why</span> each request cost what it did — not just what the model said.
+        {/* Measured savings — not a single magic number */}
+        <div className="relative z-10 w-full max-w-3xl mx-auto mb-8">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
+            Measured savings. Not a single magic number.
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">XX%</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wider">Baseline savings</div>
+              <div className="text-[10px] text-[#565B72] mt-1">vs premium</div>
+            </div>
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">XX%</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wider">Paid-routing savings</div>
+              <div className="text-[10px] text-[#565B72] mt-1">paid → paid</div>
+            </div>
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">+XX pts</div>
+              <div className="text-xs text-gray-400 uppercase tracking-wider">Free capacity</div>
+              <div className="text-[10px] text-[#565B72] mt-1">disclosed separately</div>
+            </div>
+          </div>
+        </div>
+
+        <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-8 z-10">
+          You know what your AI providers charged you. Do you know whether every request took the cheapest path that still met your requirements? REI isn't replacing provider billing — it optimizes the decision that happens before the bill.
         </p>
 
         <button
@@ -204,15 +228,15 @@ export default function ToolsLanding({ onOpenTool }) {
           ))}
         </div>
 
-        {/* Savings honesty note */}
+        {/* Accuracy precision + proof philosophy */}
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <p className="text-sm text-[#94A3B8] leading-relaxed">
-            Savings are measured in three separate ways — never presented as one number.{" "}
-            <span className="text-[#EDEFF5]">Baseline-relative</span> (vs a premium model),{" "}
-            <span className="text-[#EDEFF5]">paid-provider routing</span> (cheaper paid model),
-            and <span className="text-[#EDEFF5]">free-tier contribution</span> (paid → $0 provider).
-            Provider-price sensitivity is stress-tested against multi-baselines across scenarios —
-            see{" "}
+            <span className="text-[#EDEFF5]">90–100% route-selection accuracy on our reproducible benchmark.</span>{" "}
+            Production traffic is evaluated separately. Where ground truth doesn't exist, REI labels the measurement as{" "}
+            <span className="text-[#EDEFF5]">unavailable</span> rather than converting uncertainty into a score.
+          </p>
+          <p className="text-sm text-[#94A3B8] leading-relaxed mt-3">
+            Savings are measured in three separate ways — never presented as one number: baseline-relative, paid-provider routing, and free-tier contribution, stress-tested across scenarios. See{" "}
             <a
               href={`${REPO_URL}/blob/main/docs/CLAIM_LEDGER.md`}
               target="_blank" rel="noopener noreferrer"
@@ -221,6 +245,9 @@ export default function ToolsLanding({ onOpenTool }) {
               CLAIM_LEDGER.md
             </a>{" "}
             for the producing commands.
+          </p>
+          <p className="text-sm text-[#E2A33D] leading-relaxed mt-4 font-medium">
+            We caught our own measurement error. Then we fixed the measurement instead of defending the number.
           </p>
         </div>
 
@@ -279,10 +306,93 @@ export default function ToolsLanding({ onOpenTool }) {
               </div>
             </div>
           )}
+
+          {/* Provider-price stress test — same traffic, same decisions, different economics */}
+          <div className="mt-12 border-t border-border pt-10">
+            <div className="text-center mb-8">
+              <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">Provider-Price Stress Test</div>
+              <h3 className="font-heading text-2xl md:text-3xl font-bold">What happens if your free provider disappears?</h3>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm font-mono">
+                <thead>
+                  <tr className="border-b border-border text-left">
+                    <th className="py-3 pr-4 text-foreground-muted font-medium">Scenario</th>
+                    <th className="py-3 pr-4 text-foreground-muted font-medium text-right">REI savings vs premium</th>
+                    <th className="py-3 pr-4 text-foreground-muted font-medium text-right">Escalations</th>
+                    <th className="py-3 text-foreground-muted font-medium text-right">Free capacity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-border/50">
+                    <td className="py-3 pr-4 text-foreground">Current pricing</td>
+                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">XX%</td>
+                    <td className="py-3 pr-4 text-right text-foreground-muted">X</td>
+                    <td className="py-3 text-right text-foreground-muted">XX%</td>
+                  </tr>
+                  <tr className="border-b border-border/50">
+                    <td className="py-3 pr-4 text-foreground">Groq commercial</td>
+                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">XX%</td>
+                    <td className="py-3 pr-4 text-right text-foreground-muted">X</td>
+                    <td className="py-3 text-right text-foreground-muted">0%</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 pr-4 text-foreground">Groq unavailable</td>
+                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">XX%</td>
+                    <td className="py-3 pr-4 text-right text-foreground-muted">X</td>
+                    <td className="py-3 text-right text-foreground-muted">0%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-center text-[#94A3B8] text-sm mt-6 leading-relaxed">
+              <span className="text-[#EDEFF5] font-semibold">Same traffic. Same routing decisions. Different provider economics.</span>{" "}
+              The experiment controls exactly what the scenario changes.
+            </p>
+          </div>
         </div>
       </motion.section>
 
-      {/* ── 2.5. Why trust this? ── */}
+      {/* ── 2.5. If our own number is wrong ── */}
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
+        className="relative z-10 max-w-5xl mx-auto py-24"
+      >
+        <div className="text-center mb-14">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">Evidence, Not Assertion</div>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold">
+            If our own number is wrong, REI should be able to show you why.
+          </h2>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 text-sm font-mono">
+          {[
+            "Traffic",
+            "Route decision",
+            "Baseline",
+            "Replay",
+            "Quality / security evaluation",
+            "Cost attribution",
+            "Claim verification",
+            "Proposal / correction",
+          ].map((step, i) => (
+            <div key={step} className="flex items-center gap-2 md:gap-3">
+              <span className="px-3 py-2 bg-surface border border-border rounded-md text-foreground/90 hover:border-hinge-bright transition-colors">
+                {step}
+              </span>
+              {i < 7 && <span className="text-hinge-bright">→</span>}
+            </div>
+          ))}
+        </div>
+
+        <p className="text-center text-[#94A3B8] text-sm md:text-base max-w-2xl mx-auto mt-10 leading-relaxed">
+          REI isn't replacing provider billing or observability. It optimizes the decision that happens before the bill — and it measures whether that decision worked, replaying the workload against alternative baselines instead of asserting a single number.
+        </p>
+      </motion.section>
+
+      {/* ── 2.6. Why trust this? ── */}
       <motion.section 
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
         className="relative z-10 max-w-3xl mx-auto py-16 text-center"
