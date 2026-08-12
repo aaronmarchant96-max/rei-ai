@@ -165,21 +165,24 @@ export default function ToolsLanding({ onOpenTool }) {
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">XX%</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">85.7%</div>
               <div className="text-xs text-gray-400 uppercase tracking-wider">Baseline savings</div>
               <div className="text-[10px] text-[#565B72] mt-1">vs premium</div>
             </div>
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">XX%</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">83.1%</div>
               <div className="text-xs text-gray-400 uppercase tracking-wider">Paid-routing savings</div>
               <div className="text-[10px] text-[#565B72] mt-1">paid → paid</div>
             </div>
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">+XX pts</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-1">+0 pts</div>
               <div className="text-xs text-gray-400 uppercase tracking-wider">Free capacity</div>
               <div className="text-[10px] text-[#565B72] mt-1">disclosed separately</div>
             </div>
           </div>
+          <p className="text-[10px] text-[#565B72] text-center mt-3">
+            Replay estimate on the synthetic demo corpus (9 measured requests). Free-capacity contribution is 0 points here because the demo catalog has no free provider — the stress test below shows it when one exists.
+          </p>
         </div>
 
         <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-8 z-10">
@@ -327,20 +330,20 @@ export default function ToolsLanding({ onOpenTool }) {
                 <tbody>
                   <tr className="border-b border-border/50">
                     <td className="py-3 pr-4 text-foreground">Current pricing</td>
-                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">XX%</td>
-                    <td className="py-3 pr-4 text-right text-foreground-muted">X</td>
-                    <td className="py-3 text-right text-foreground-muted">XX%</td>
+                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">91.2%</td>
+                    <td className="py-3 pr-4 text-right text-foreground-muted">1</td>
+                    <td className="py-3 text-right text-foreground-muted">91.2%</td>
                   </tr>
                   <tr className="border-b border-border/50">
                     <td className="py-3 pr-4 text-foreground">Groq commercial</td>
-                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">XX%</td>
-                    <td className="py-3 pr-4 text-right text-foreground-muted">X</td>
+                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">81.1%</td>
+                    <td className="py-3 pr-4 text-right text-foreground-muted">1</td>
                     <td className="py-3 text-right text-foreground-muted">0%</td>
                   </tr>
                   <tr>
                     <td className="py-3 pr-4 text-foreground">Groq unavailable</td>
-                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">XX%</td>
-                    <td className="py-3 pr-4 text-right text-foreground-muted">X</td>
+                    <td className="py-3 pr-4 text-right text-hinge-bright font-bold">85.7%</td>
+                    <td className="py-3 pr-4 text-right text-foreground-muted">1</td>
                     <td className="py-3 text-right text-foreground-muted">0%</td>
                   </tr>
                 </tbody>
