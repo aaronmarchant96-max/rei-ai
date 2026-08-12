@@ -164,7 +164,7 @@ describe("Red Team Eval — attack corpus → scanner → router → routeCorrec
       }
 
       console.log("───────────────────────────────────────────────────────");
-      console.log(` Before/after artifact: direct-injection fix (ab7856f)`);
+      console.log(" Before/after artifact: direct-injection fix (ab7856f)");
       console.log(` Deliberate gaps preserved: ${results.filter(r => !r.expected.routeCorrect).map(r => r.id).join(", ")}`);
       console.log(` Categories covered: ${new Set(results.flatMap(r => r.scanCategories)).size}`);
       console.log("═══════════════════════════════════════════════════════\n");

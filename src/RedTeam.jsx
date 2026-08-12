@@ -208,40 +208,40 @@ export default function RedTeam() {
                 </select>
               </div>
               <div className="space-y-4">
-              {history
-                .filter(entry => historyFilter === "all" || entry.report.verdict === historyFilter)
-                .map((entry, idx) => (
-                <div key={idx} className="bg-[#1a1a2e] border border-gray-700 rounded-lg overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500">{formatTimestamp(entry.ts)}</span>
-                      <span className={`text-xs uppercase font-bold px-2 py-0.5 rounded ${entry.report.verdict === "clean" ? "bg-green-500/10 text-green-400" : entry.report.verdict === "suspicious" ? "bg-yellow-500/10 text-yellow-400" : entry.report.verdict === "high-risk" ? "bg-orange-500/10 text-orange-400" : "bg-red-500/10 text-red-400"}`}>
-                        {entry.report.verdict}
-                      </span>
-                      <span className="text-sm font-mono text-gray-400">{entry.report.score}/100</span>
-                    </div>
-                    <span className="text-xs text-gray-500">{entry.report.findings.length} finding{entry.report.findings.length !== 1 ? "s" : ""}</span>
-                  </div>
-                  <div className="px-4 py-3">
-                    <div className="text-sm text-gray-300 font-mono line-clamp-2 break-all">{entry.input}</div>
-                  </div>
-                  {entry.report.findings.length > 0 && (
-                    <div className="px-4 pb-3">
-                      <div className="flex flex-wrap gap-1">
-                        {entry.report.findings.slice(0, 5).map((f, fi) => (
-                          <span key={fi} className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded">
-                            {f.finding}
+                {history
+                  .filter(entry => historyFilter === "all" || entry.report.verdict === historyFilter)
+                  .map((entry, idx) => (
+                    <div key={idx} className="bg-[#1a1a2e] border border-gray-700 rounded-lg overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-gray-500">{formatTimestamp(entry.ts)}</span>
+                          <span className={`text-xs uppercase font-bold px-2 py-0.5 rounded ${entry.report.verdict === "clean" ? "bg-green-500/10 text-green-400" : entry.report.verdict === "suspicious" ? "bg-yellow-500/10 text-yellow-400" : entry.report.verdict === "high-risk" ? "bg-orange-500/10 text-orange-400" : "bg-red-500/10 text-red-400"}`}>
+                            {entry.report.verdict}
                           </span>
-                        ))}
-                        {entry.report.findings.length > 5 && (
-                          <span className="text-xs text-gray-500">+{entry.report.findings.length - 5} more</span>
-                        )}
+                          <span className="text-sm font-mono text-gray-400">{entry.report.score}/100</span>
+                        </div>
+                        <span className="text-xs text-gray-500">{entry.report.findings.length} finding{entry.report.findings.length !== 1 ? "s" : ""}</span>
                       </div>
+                      <div className="px-4 py-3">
+                        <div className="text-sm text-gray-300 font-mono line-clamp-2 break-all">{entry.input}</div>
+                      </div>
+                      {entry.report.findings.length > 0 && (
+                        <div className="px-4 pb-3">
+                          <div className="flex flex-wrap gap-1">
+                            {entry.report.findings.slice(0, 5).map((f, fi) => (
+                              <span key={fi} className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded">
+                                {f.finding}
+                              </span>
+                            ))}
+                            {entry.report.findings.length > 5 && (
+                              <span className="text-xs text-gray-500">+{entry.report.findings.length - 5} more</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  ))}
+              </div>
             </>
           )}
         </div>

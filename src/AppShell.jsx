@@ -144,11 +144,11 @@ export default function AppShell() {
                 ? "PromptHound Labs | REI.ai"
                 : tool === "tracepoint"
                   ? "PromptHound Labs | Tracepoint"
-                : tool === "analytics"
-                  ? "PromptHound Labs | Analytics"
-                  : tool === "red-team"
-                    ? "PromptHound Labs | Red Team"
-                    : "PromptHound Labs | The Furnace";
+                  : tool === "analytics"
+                    ? "PromptHound Labs | Analytics"
+                    : tool === "red-team"
+                      ? "PromptHound Labs | Red Team"
+                      : "PromptHound Labs | The Furnace";
   }, [tool]);
 
   const currentToolLabel = getToolLabel(tool);

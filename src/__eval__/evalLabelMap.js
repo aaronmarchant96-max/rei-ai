@@ -103,7 +103,7 @@ export function validateEvalIntegrity(fingerprints) {
         type: "error",
         message:
           `canonical category "${category}" maps to route id "${routeId}" ` +
-          `which does not exist in fingerprints.json. Either add the route, ` +
+          "which does not exist in fingerprints.json. Either add the route, " +
           `or move "${category}" to EXCLUDED_CATEGORIES with a reason.`,
       });
     }
@@ -119,8 +119,8 @@ export function validateEvalIntegrity(fingerprints) {
       type: "error",
       message:
         `label "${label}" normalizes to "${category}" which is neither a ` +
-        `canonical category (CATEGORY_TO_ROUTE_ID) nor explicitly excluded ` +
-        `(EXCLUDED_CATEGORIES). Add the route or declare the exclusion.`,
+        "canonical category (CATEGORY_TO_ROUTE_ID) nor explicitly excluded " +
+        "(EXCLUDED_CATEGORIES). Add the route or declare the exclusion.",
     });
   }
 
@@ -143,8 +143,8 @@ export function validateEvalIntegrity(fingerprints) {
         type: "error",
         message:
           `fingerprint route "${f.id}" label "${f.label}" has no mapping in ` +
-          `LABEL_TO_CATEGORY. Add an intentional mapping — if this is a rename, ` +
-          `keep the old label as a LEGACY_ALIAS too.`,
+          "LABEL_TO_CATEGORY. Add an intentional mapping — if this is a rename, " +
+          "keep the old label as a LEGACY_ALIAS too.",
       });
     }
   }
@@ -157,7 +157,7 @@ export function validateEvalIntegrity(fingerprints) {
         type: "error",
         message:
           `legacy alias "${alias}" → "${current}" references a label missing ` +
-          `from LABEL_TO_CATEGORY.`,
+          "from LABEL_TO_CATEGORY.",
       });
       continue;
     }
@@ -167,7 +167,7 @@ export function validateEvalIntegrity(fingerprints) {
         message:
           `legacy alias "${alias}" maps to "${LABEL_TO_CATEGORY[alias]}" but its ` +
           `replacement "${current}" maps to "${LABEL_TO_CATEGORY[current]}". ` +
-          `A rename must preserve the canonical category.`,
+          "A rename must preserve the canonical category.",
       });
     }
   }
@@ -181,7 +181,7 @@ export function validateEvalIntegrity(fingerprints) {
         type: "warning",
         message:
           `fingerprint route "${f.id}" has no inverse entry in ` +
-          `ROUTE_ID_TO_CATEGORY — evals that key on route ids will not measure it.`,
+          "ROUTE_ID_TO_CATEGORY — evals that key on route ids will not measure it.",
       });
     }
   }
