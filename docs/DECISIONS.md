@@ -124,7 +124,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 **Trade-off:** If the model produces a genuinely useful opening that happens to match a banned pattern, it gets stripped. The filter is aggressive by design. It's easy to add new patterns to the banned list — no prompt iteration needed.
 
-**Code:** `api/lib/deRoboticize.js`, called in `api/cfai.js:handleCfaiRequest()`
+**Code:** `shared/lib/deRoboticize.js`, called in `api/cfai.js:handleCfaiRequest()`
 
 ---
 

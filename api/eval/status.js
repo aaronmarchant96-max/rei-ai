@@ -6,8 +6,8 @@
 //
 // Response: { tenant, from, to, traces: TraceEntry[], evals: EvalEntry[] }
 
-import { getTracesWithEvals } from "../lib/kv.js";
-import { requireApiKey } from "../lib/auth.js";
+import { getTracesWithEvals } from "../../shared/lib/kv.js";
+import { requireApiKey } from "../../shared/lib/auth.js";
 
 export default async function handler(req, res) {
   if (!requireApiKey(req, res)) return;

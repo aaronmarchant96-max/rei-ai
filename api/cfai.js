@@ -479,8 +479,8 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
 // longitudinal questions instead of only client-side localStorage snapshots.
 // See docs/POLICY_LOOP.md for the evaluation plane boundary.
 
-import { storeTrace } from "./lib/kv.js";
-import { requireApiKey } from "./lib/auth.js";
+import { storeTrace } from "../shared/lib/kv.js";
+import { requireApiKey } from "../shared/lib/auth.js";
 const POLICY_VERSION = "v1";
 const PILOT_TENANT = "pilot";
 

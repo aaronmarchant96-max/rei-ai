@@ -48,7 +48,7 @@
 - Fallback messages include a **Retry button** that restores the user's original input text.
 
 ### P5 — Observability
-- `api/lib/logger.js`: Structured JSON logger with `logger.debug/info/warn/error`. Controlled by `LOG_LEVEL` env var (default: `info`). Each entry includes `timestamp`, `level`, `message`, and optional `data` payload.
+- `shared/lib/logger.js`: Structured JSON logger with `logger.debug/info/warn/error`. Controlled by `LOG_LEVEL` env var (default: `info`). Each entry includes `timestamp`, `level`, `message`, and optional `data` payload.
 
 ### P6 — Accessibility
 - Chat history: `role="log"` + `aria-live="polite"`

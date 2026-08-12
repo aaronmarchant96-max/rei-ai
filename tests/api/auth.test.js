@@ -1,4 +1,4 @@
-import { checkApiKey, requireApiKey } from "./auth.js";
+import { checkApiKey, requireApiKey } from "../../shared/lib/auth.js";
 
 function makeReq(headers) {
   return { headers: headers || {} };

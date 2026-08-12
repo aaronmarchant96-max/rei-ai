@@ -11,7 +11,7 @@
 | **Groq/OpenAI API** | Provider billing | Production token counts and costs | Groq Dashboard → Usage tab |
 | **routingEval benchmark** | Reproducible test | ~92% ceiling-based savings vs always-premium, 60–80% deterministic accuracy band, 5 deterministic at $0 | `npm test -- --testPathPatterns=routingEval` |
 | **SessionSummary tracker** | Live session telemetry | Per-message cost, cumulative savings, escalation count | `src/hooks/useSessionTracker.js` |
-| **API logger** | Structured JSON logs | Per-call prompt/completion/cached tokens, model, pathway | `api/lib/logger.js` (set `LOG_LEVEL=debug`) |
+| **API logger** | Structured JSON logs | Per-call prompt/completion/cached tokens, model, pathway | `shared/lib/logger.js` (set `LOG_LEVEL=debug`) |
 | **Fingerprint catalog** | Versioned data | Per-pathway cost rates, confidence thresholds | `data/fingerprints.json` |
 | **DeepSeek API dashboard** | Development billing | 601M tokens, 1,497 requests, $6.51 — "the cost to build" | `https://platform.deepseek.com/` → Usage tab |
 

@@ -50,7 +50,7 @@ PromptHound Labs is an applied AI engineering lab. Everything in this repo is an
 |------|---------|
 | `src/REI.jsx` | REI.ai chat interface (flagship experiment) |
 | `api/cfai.js` | Backend — domain prompt resolution + Groq/OpenAI routing |
-| `api/lib/logger.js` | Structured JSON logger |
+| `shared/lib/logger.js` | Structured JSON logger |
 | `src/lib/nightShiftRouter.js` | Night Shift fingerprint routing engine |
 | `src/lib/cardoGuard.js` | CARDO GUARD decision gate |
 | `data/fingerprints.json` | 9-entry fingerprint catalog (routing + pricing) |

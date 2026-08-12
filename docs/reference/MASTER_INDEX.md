@@ -419,7 +419,7 @@ npm run token-audit
 | Add new domain prompt | `api/cfai.js` | `DOMAIN_SYSTEM_PROMPTS` |
 | Edit persona profiles | `src/REI.jsx` | `DOMAIN_PROFILES` |
 | Run CI/CD | `.gitlab-ci.yml` | N/A |
-| Check logs | `api/lib/logger.js` | `LOG_LEVEL` env |
+| Check logs | `shared/lib/logger.js` | `LOG_LEVEL` env |
 | Read router tests | `src/lib/nightShiftRouter.test.js` | Edge cases |
 | Read API integration tests | `api/cfai.test.js` | Full-route tests |
 | Update fingerprints | `data/fingerprints.json` | N/A |
@@ -443,7 +443,7 @@ npm run token-audit
 | `debate-furnace/src/REI.jsx` | Main chat component (prompt strings removed) | ✅ |
 | `debate-furnace/src/AppShell.jsx` | Navigation, now lazy-loads all tools | ✅ Updated |
 | `debate-furnace/api/cfai.js` | Backend route + domain prompt owner | ✅ Updated |
-| `debate-furnace/api/lib/logger.js` | Structured JSON logger | ✅ New |
+| `debate-furnace/shared/lib/logger.js` | Structured JSON logger | ✅ New |
 | `debate-furnace/api/cfai.test.js` | Integration tests (8) | ✅ New |
 
 ### Night Shift / Router
@@ -473,7 +473,7 @@ npm run token-audit
 - **Prompt deduplication** — all 4 domain prompts moved to `api/cfai.js DOMAIN_SYSTEM_PROMPTS`
 - **Router hardened** — word-boundary matching, null-safe catalog lookups, 9 edge case tests
 - **Error recovery** — categorized errors (Network/Server) + Retry button restores input
-- **Observability** — structured JSON logger (`api/lib/logger.js`, `LOG_LEVEL` env)
+- **Observability** — structured JSON logger (`shared/lib/logger.js`, `LOG_LEVEL` env)
 - **Accessibility** — `role="log"`, `aria-live="polite"`, `aria-modal`, `aria-pressed`
 - **CI/CD** — `.gitlab-ci.yml` (test + build + lint + typecheck on push to main)
 - **JSDoc types** — added to `nightShiftRouter.js` and `cardoGuard.js`

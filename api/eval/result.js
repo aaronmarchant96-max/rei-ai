@@ -7,8 +7,8 @@
 //   routeExpected?, routeCorrect?, notes?, evaluatedAt }, evaluator,
 //   evaluatorVersion?, domain?, routeId?, model? }
 
-import { storeEval } from "../lib/kv.js";
-import { requireApiKey } from "../lib/auth.js";
+import { storeEval } from "../../shared/lib/kv.js";
+import { requireApiKey } from "../../shared/lib/auth.js";
 
 export default async function handler(req, res) {
   if (!requireApiKey(req, res)) return;
