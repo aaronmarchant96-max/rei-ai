@@ -41,7 +41,10 @@ typecheck:
   stage: verify
   image: node:${NODE_VERSION}
   script:
-    - npm ci
+    # --legacy-peer-deps required: react@18 runtime vs @types/react@19
+    # declarations hit ERESOLVE under strict peer resolution (same as all
+    # other install jobs in this file). See package.json.
+    - npm ci --legacy-peer-deps
     - npm run typecheck
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
