@@ -97,6 +97,37 @@ describe("nightShiftRouter", () => {
     expect(decision.id).toBe("structured-reasoning");
   });
 
+  it("routes narrative-framed prompts with coding vocabulary to story, not coding", () => {
+    const decision = buildRouterDecision({
+      input: "Write a story about a programmer debugging code at 3 AM. Make it funny but also technically accurate about async/await patterns.",
+      domain: "assistant",
+    });
+
+    expect(decision.id).toBe("story-architect");
+  });
+
+  it("routes a short narrative request mentioning async/await to story", () => {
+    const decision = buildRouterDecision({
+      input: "Write a funny story about debugging code at 3 AM with async/await.",
+      domain: "assistant",
+    });
+
+    expect(decision.id).toBe("story-architect");
+  });
+
+  it("keeps a plain coding request on the coding route even though it names async/await", () => {
+    const decision = buildRouterDecision({ input: "Explain async/await patterns in JavaScript.", domain: "assistant" });
+
+    expect(decision.id).toBe("coding-hinge");
+  });
+
+  it("keeps incidental story nouns inside a coding request on the coding route", () => {
+    // Reverse collision: the creation verb targets a component, not a story.
+    const decision = buildRouterDecision({ input: "write a react component that tells a story", domain: "assistant" });
+
+    expect(decision.id).toBe("coding-hinge");
+  });
+
   it("falls back to the balanced reasoning profile for unclassified prompts", () => {
     const decision = buildRouterDecision({ input: "Help me think through a decision", domain: "assistant" });
 

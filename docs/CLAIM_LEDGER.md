@@ -76,6 +76,11 @@ routingEval basic now measures **100% (39 correct, 0 incorrect)** — all 4 prev
    - **Proposed remediation:** proximity-based detection across `[action: output/reveal/print/show]` + `[target: system/hidden/internal]` + `[object: prompt/message/instructions/rules]` within bounded token distance, with concept-level adversarial + benign regression corpus
    - **Status:** deferred — PR 3 (separate from router PR 2)
 
+**Known genuine routing failures — addendum (2026-08-12):**
+
+6. ~~`"Write a story about a programmer debugging code at 3 AM... async/await patterns"` → routed to The Engineer (coding); should be story~~ — **fixed**: coding lane now skips narrative-framed requests (creation verb directly governing a story noun via `hasNarrativeFraming`), routing them to `story-architect`. Incidental story nouns in genuine coding requests ("write a react component that tells a story") still route to coding. [caught: manual]
+   - Note: an external report on this case claimed a 2.7x cost overpayment (llama-3.3-70b) — **false**: both `coding-hinge` and `story-architect` resolve to gemini-flash-latest at 4000 tokens, so the routes are cost-identical; the model name in that report was fabricated.
+
 ## Cost savings
 
 | Claim | Producing command | Verified result (2026-08-06) |

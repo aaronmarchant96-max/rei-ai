@@ -251,6 +251,20 @@ function hasComparisonFraming(text: string): boolean {
   return /\btrade-?offs?\b|\bpros and cons\b/i.test(text);
 }
 
+/**
+ * True when the input is an explicit request to PRODUCE a narrative — a
+ * creation verb directly governing a story noun ("write a story about X").
+ * Used to resolve the story/coding collision: a narrative request that also
+ * mentions code ("write a story about a programmer debugging async/await")
+ * must reach the story lane, not the coding lane. Deliberately does NOT fire
+ * on incidental story nouns ("write a react component that tells a story")
+ * or on story nouns without a creation verb — those stay with the stronger
+ * domain match.
+ */
+function hasNarrativeFraming(text: string): boolean {
+  return /(?:write|tell|build|create|make(?:\s+up)?|generate|craft|compose|draft|pen)\s+(?:(?:me|us|them|him|her|it)\s+)?(?:(?:a|an|the|one|another)\s+)?(?:funny|short|little|quick|long|creative|epic|scary|silly|heartwarming|children'?s|bedtime)?\s*(?:story|tale|narrative)\b/i.test(text);
+}
+
 function getStoredPreferenceForContext(text: string, domainName: string): string | null {
   const storedPreference = getStoredRoutePreference();
   if (!storedPreference) {
@@ -369,7 +383,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "coding" || (domainName === "assistant" && !hasComparisonFraming(text) && (catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")))) {
+  if (domainName === "coding" || (domainName === "assistant" && !hasComparisonFraming(text) && !hasNarrativeFraming(text) && (catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")))) {
     const routeTerms = actualMatchedTerms("coding-hinge", text);
     const decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",
