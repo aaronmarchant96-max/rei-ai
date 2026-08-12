@@ -223,8 +223,67 @@ describe("Analytics", () => {
     expect(screen.getAllByText(/Missed escalation/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/Copy proposal/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/Dismiss/i).length).toBeGreaterThanOrEqual(1);
-    // No apply/accept/modify control exists.
+    // Human disposition buttons exist (the boundary: machine proposes, human disposes).
+    expect(screen.getAllByText(/Mark accepted/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Mark rejected/i).length).toBeGreaterThanOrEqual(1);
+    // But there is NO apply/modify control — the engine never mutates policy.
     expect(screen.queryByText(/Apply/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Accept/i)).not.toBeInTheDocument();
+  });
+
+  it("records human disposition and renders proposal usefulness metrics", async () => {
+    window.localStorage.setItem("rei_eval_log", JSON.stringify([
+      {
+        requestId: "req-miss",
+        domain: "assistant",
+        routeId: "structured-reasoning",
+        model: "deepseek-v4-flash",
+        evaluator: "deterministic",
+        evaluatorVersion: "red-team-v1",
+        evaluation: {
+          qualityScore: 86,
+          safetyVerdict: "high-risk",
+          routeExpected: true,
+          routeCorrect: false,
+          evaluatedAt: "2026-08-04T01:00:00.000Z",
+        },
+      },
+    ]));
+    window.localStorage.setItem("rei_routing_log", JSON.stringify([
+      {
+        requestId: "req-miss",
+        timestamp: "2026-08-04T01:00:00.000Z",
+        domain: "assistant",
+        routeId: "structured-reasoning",
+        model: "deepseek-v4-flash",
+        estimatedCost: 0.0005,
+        premiumCost: 0.006,
+        hingeScore: 0.4,
+      },
+    ]));
+
+    render(<Analytics />);
+
+    await waitFor(() => expect(screen.getByText(/Policy Proposals/i)).toBeInTheDocument(), { timeout: 1200 });
+    // Metrics line renders with null-safe precision (nothing reviewed yet).
+    const metricsBefore = screen.getByTestId("proposal-metrics").textContent;
+    expect(metricsBefore).toMatch(/0 of \d+ reviewed/);
+    expect(metricsBefore).toContain("precision —");
+    expect(metricsBefore).toContain("realization —");
+    expect(metricsBefore).toContain("0 implemented");
+
+    // Human clicks "Mark accepted" — status flips, precision becomes 100%.
+    fireEvent.click(screen.getAllByText(/Mark accepted/i)[0]);
+    const metricsAccepted = screen.getByTestId("proposal-metrics").textContent;
+    expect(metricsAccepted).toMatch(/1 of \d+ reviewed/);
+    expect(metricsAccepted).toContain("precision 100%");
+    expect(metricsAccepted).toContain("realization 0%");
+
+    // Human clicks "Mark implemented" with a value note — realization updates.
+    const promptSpy = jest.spyOn(window, "prompt").mockReturnValue("baseline 0.006 → post 0.0005");
+    fireEvent.click(screen.getAllByText(/Mark implemented/i)[0]);
+    const metricsImpl = screen.getByTestId("proposal-metrics").textContent;
+    expect(metricsImpl).toContain("realization 100%");
+    expect(metricsImpl).toContain("1 implemented");
+    promptSpy.mockRestore();
   });
 });

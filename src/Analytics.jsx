@@ -9,7 +9,11 @@ import {
   getProposals,
   upsertProposals,
   dismissProposal,
+  acceptProposal,
+  rejectProposal,
+  markImplemented,
 } from "./lib/policyProposalStore";
+import { computeProposalMetrics } from "./lib/policyProposalMetrics";
 import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
@@ -818,6 +822,20 @@ export default function Analytics() {
                 proposals. None are applied automatically — each requires human review and an
                 engineering change with tests. See docs/POLICY_LOOP.md.
               </div>
+              {proposals.length > 0 &&
+                (function () {
+                  var m = computeProposalMetrics(proposals);
+                  return (
+                    <div data-testid="proposal-metrics" style={{ fontSize: "11px", color: colors.textDim, marginBottom: "14px", lineHeight: "1.6", padding: "10px 12px", borderRadius: "8px", background: colors.page, border: "1px solid " + colors.border }}>
+                      <b style={{ color: colors.text }}>Proposal usefulness:</b>{" "}
+                      {m.reviewed} of {m.total} reviewed · precision{" "}
+                      {m.precision === null ? "—" : m.precision + "%"} (accepted/reviewed) ·
+                      realization{" "}
+                      {m.realization === null ? "—" : m.realization + "%"} (implemented/accepted) ·
+                      {m.withValue} implemented with a value note
+                    </div>
+                  );
+                })()}
               {proposals.length === 0 ? (
                 <div style={{ fontSize: "12px", color: colors.textDim, padding: "10px 0" }}>
                   No open proposals. New signals appear here after reviewable evidence is logged.
@@ -887,6 +905,50 @@ export default function Analytics() {
                             >
                               Dismiss
                             </button>
+                          )}
+                          {p.status === "proposed" && (
+                            <button
+                              onClick={function () { setProposals(rejectProposal(p.id)); }}
+                              style={{
+                                fontSize: "11px", padding: "4px 10px", borderRadius: "6px",
+                                border: "1px solid " + colors.border, background: "transparent",
+                                color: "#e11d48", cursor: "pointer",
+                              }}
+                            >
+                              Mark rejected
+                            </button>
+                          )}
+                          {p.status === "proposed" && (
+                            <button
+                              onClick={function () { setProposals(acceptProposal(p.id)); }}
+                              style={{
+                                fontSize: "11px", padding: "4px 10px", borderRadius: "6px",
+                                border: "1px solid " + colors.border, background: colors.amberBg,
+                                color: colors.amber, fontWeight: 700, cursor: "pointer",
+                              }}
+                            >
+                              Mark accepted
+                            </button>
+                          )}
+                          {p.status === "accepted" && (
+                            <button
+                              onClick={function () {
+                                var note = window.prompt("Value note (baseline → post-change failure/cost). Required for realization measurement:", "");
+                                if (note !== null) setProposals(markImplemented(p.id, note.trim()));
+                              }}
+                              style={{
+                                fontSize: "11px", padding: "4px 10px", borderRadius: "6px",
+                                border: "1px solid " + colors.border, background: "transparent",
+                                color: "#16a34a", fontWeight: 700, cursor: "pointer",
+                              }}
+                            >
+                              Mark implemented
+                            </button>
+                          )}
+                          {p.status !== "proposed" && p.status !== "accepted" && (
+                            <span style={{ fontSize: "10px", color: colors.textDim, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                              {p.status}
+                            </span>
                           )}
                         </div>
                       </div>

@@ -9,11 +9,22 @@ import type { PolicyProposal } from "./policyProposalEngine";
 const STORAGE_KEY = "rei_policy_proposals";
 const MAX_ENTRIES = 100;
 
-export type ProposalStatus = "proposed" | "dismissed";
+export type ProposalStatus =
+  | "proposed"
+  | "dismissed"
+  | "accepted"
+  | "rejected"
+  | "implemented";
 
 export interface StoredProposal extends PolicyProposal {
   status: ProposalStatus;
   createdAt: string;
+  /** Set when a human records a review disposition (accepted or rejected). */
+  reviewedAt?: string;
+  /** Set when a human marks an accepted proposal as implemented. */
+  implementedAt?: string;
+  /** Human-recorded baseline→post-change note, required before marking implemented. */
+  valueNote?: string;
 }
 
 export function getProposals(): StoredProposal[] {
@@ -62,10 +73,65 @@ export function upsertProposals(proposals: PolicyProposal[]): StoredProposal[] {
 
 /** Mark a proposal dismissed. Dismissal is durable — regeneration keeps it dismissed. */
 export function dismissProposal(id: string): StoredProposal[] {
+  return updateStatus(id, function (p) {
+    return p.status === "proposed" ? { ...p, status: "dismissed" as const } : p;
+  });
+}
+
+/**
+ * Human disposition — Mark accepted. Only a human invokes these; the engine
+ * never sets a review disposition. Accepted implies the reviewer judged the
+ * proposal actionable (precision numerator).
+ */
+export function acceptProposal(id: string): StoredProposal[] {
+  return updateStatus(id, function (p) {
+    if (p.status !== "proposed") return p;
+    return {
+      ...p,
+      status: "accepted" as const,
+      reviewedAt: new Date().toISOString(),
+    };
+  });
+}
+
+/** Human disposition — Mark rejected. Reviewed denominator alongside accepted. */
+export function rejectProposal(id: string): StoredProposal[] {
+  return updateStatus(id, function (p) {
+    if (p.status !== "proposed") return p;
+    return {
+      ...p,
+      status: "rejected" as const,
+      reviewedAt: new Date().toISOString(),
+    };
+  });
+}
+
+/**
+ * Human disposition — Mark implemented. Requires an accepted proposal and a
+ * value note (baseline failure/cost vs post-change failure/cost); the
+ * realization rate is implemented/accepted.
+ */
+export function markImplemented(id: string, valueNote: string): StoredProposal[] {
+  return updateStatus(id, function (p) {
+    if (p.status !== "accepted") return p;
+    return {
+      ...p,
+      status: "implemented" as const,
+      implementedAt: new Date().toISOString(),
+      valueNote: valueNote,
+    };
+  });
+}
+
+/** Shared write path for disposition transitions. No-op when the transition is invalid. */
+function updateStatus(
+  id: string,
+  transition: (p: StoredProposal) => StoredProposal
+): StoredProposal[] {
   if (typeof window === "undefined") return getProposals();
-  const all = getProposals().map((p) =>
-    p.id === id ? { ...p, status: "dismissed" as const } : p
-  );
+  const all = getProposals().map(function (p) {
+    return p.id === id ? transition(p) : p;
+  });
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
   } catch (e) {

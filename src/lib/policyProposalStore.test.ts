@@ -1,6 +1,9 @@
 import {
   upsertProposals,
   dismissProposal,
+  acceptProposal,
+  rejectProposal,
+  markImplemented,
   getProposals,
   clearProposals,
 } from "./policyProposalStore";
@@ -67,5 +70,42 @@ describe("policyProposalStore", () => {
   it("survives corrupted storage (returns empty array)", () => {
     localStorage.setItem("rei_policy_proposals", "{{not json");
     expect(getProposals()).toEqual([]);
+  });
+
+  it("acceptProposal records reviewedAt and sets accepted (precision numerator)", () => {
+    upsertProposals([proposal("p1")]);
+    acceptProposal("p1");
+    const stored = getProposals();
+    expect(stored[0].status).toBe("accepted");
+    expect(typeof stored[0].reviewedAt).toBe("string");
+  });
+
+  it("rejectProposal records reviewedAt and sets rejected (reviewed denominator)", () => {
+    upsertProposals([proposal("p1")]);
+    rejectProposal("p1");
+    const stored = getProposals();
+    expect(stored[0].status).toBe("rejected");
+    expect(typeof stored[0].reviewedAt).toBe("string");
+  });
+
+  it("markImplemented requires accepted and stores the value note", () => {
+    upsertProposals([proposal("p1")]);
+    // Cannot implement a proposed proposal — disposition lifecycle enforced.
+    markImplemented("p1", "baseline 0.0041 → post 0.0020");
+    expect(getProposals()[0].status).toBe("proposed");
+
+    acceptProposal("p1");
+    markImplemented("p1", "baseline 0.0041 → post 0.0020");
+    const stored = getProposals();
+    expect(stored[0].status).toBe("implemented");
+    expect(stored[0].valueNote).toBe("baseline 0.0041 → post 0.0020");
+    expect(typeof stored[0].implementedAt).toBe("string");
+  });
+
+  it("rejected proposals stay rejected across regeneration (human disposition is durable)", () => {
+    upsertProposals([proposal("p1")]);
+    rejectProposal("p1");
+    upsertProposals([proposal("p1")]);
+    expect(getProposals()[0].status).toBe("rejected");
   });
 });
