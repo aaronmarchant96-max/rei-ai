@@ -185,4 +185,91 @@ describe("handler", function () {
     var cooled = cooldown.filter(function (c) { return c.provider === "deepseek" || c.provider === "groq"; });
     expect(cooled.length).toBe(2);
   });
+
+  it("messagesOverride preserves the original multi-turn message structure", async function () {
+    process.env.GROQ_API_KEY = "test-key";
+    var multiTurnMessages = [
+      { role: "system", content: "You are a helpful assistant." },
+      { role: "user", content: "Hello" },
+      { role: "assistant", content: "Hi there!" },
+      { role: "user", content: "What is 2+2?" },
+    ];
+    var { handleCfaiRequest, clearProviderCooldown } = await import("./cfai.js");
+    clearProviderCooldown();
+    var routerDecision = { id: "simple-greeting", model: "llama-3.1-8b-instant", maxTokens: 50, temperature: 0.5 };
+    var result = await handleCfaiRequest("chat", [], "flat prompt that the router reads", "system", [], routerDecision, multiTurnMessages);
+    expect(result.success).toBe(true);
+    // The backend received the structured messages, not the flattened "flat prompt".
+    var fetchBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+    expect(fetchBody.messages).toHaveLength(4);
+    expect(fetchBody.messages[0].role).toBe("system");
+    expect(fetchBody.messages[0].content).toBe("You are a helpful assistant.");
+    expect(fetchBody.messages[3].content).toBe("What is 2+2?");
+  });
+
+  it("callModelDirect calls the requested model without running the router", async function () {
+    process.env.GROQ_API_KEY = "test-key";
+    var { callModelDirect, clearProviderCooldown } = await import("./cfai.js");
+    // Clear any cooldown state leaked from other tests (module is cached).
+    clearProviderCooldown();
+    var messages = [
+      { role: "user", content: "Say hello." },
+    ];
+    var result = await callModelDirect("llama-3.3-70b-versatile", messages, 100, 0.5);
+    expect(result.content).toContain("mock ok");
+    expect(result.model).toBe("llama-3.3-70b-versatile");
+    var fetchBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+    expect(fetchBody.model).toContain("llama-3.3-70b");
+    // Should contain the user message exactly, not a flattened prompt.
+    expect(fetchBody.messages).toHaveLength(1);
+    expect(fetchBody.messages[0].content).toBe("Say hello.");
+  });
+
+  it("handler passes messagesOverride to handleCfaiRequest when set on the POST body", async function () {
+    process.env.GROQ_API_KEY = "test-key";
+    var handler = (await import("./cfai.js")).default;
+    var { clearProviderCooldown } = await import("./cfai.js");
+    clearProviderCooldown();
+    var structuredMessages = [
+      { role: "system", content: "You are a strict legal clerk." },
+      { role: "user", content: "What is the hinge in Donoghue v Stevenson?" },
+    ];
+    var req = {
+      method: "POST",
+      body: {
+        command: "score",
+        input: "legal question about Donoghue",
+        messagesOverride: structuredMessages,
+      },
+    };
+    var res = { _status: null, _body: null, status: function (code) { this._status = code; return this; }, json: function (data) { this._body = data; }, setHeader: function () {} };
+    await handler(req, res);
+    expect(res._status).toBe(200);
+    var fetchBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+    expect(fetchBody.messages).toHaveLength(2);
+    expect(fetchBody.messages[0].role).toBe("system");
+  });
+
+  it("POST without messagesOverride still assembles messages from prompt + history (safety regression)", async function () {
+    process.env.GROQ_API_KEY = "test-key";
+    var handler = (await import("./cfai.js")).default;
+    var req = {
+      method: "POST",
+      body: {
+        command: "score",
+        input: "what is the capital of France",
+        systemPrompt: "You are REI.",
+        history: [],
+      },
+    };
+    var res = { _status: null, _body: null, status: function (code) { this._status = code; return this; }, json: function (data) { this._body = data; }, setHeader: function () {} };
+    await handler(req, res);
+    expect(res._status).toBe(200);
+    var fetchBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+    // The messages array is built internally from systemPrompt + history + input.
+    expect(fetchBody.messages).toBeDefined();
+    // The final user message should be the input string, not an override.
+    var lastMsg = fetchBody.messages[fetchBody.messages.length - 1];
+    expect(lastMsg.content).toBe("what is the capital of France");
+  });
 });

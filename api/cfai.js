@@ -168,19 +168,23 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7) {
 
 // ── Main API router: primary backend + fallback chain ──
 
-async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
-  const formattedHistory = history.map(function (msg) {
-    return {
-      role: msg.role === "assistant" || msg.role === "system" ? msg.role : "user",
-      content: msg.content,
-    };
-  });
-
-  const messages = [
-    { role: "system", content: systemPrompt || REI_SYSTEM_PROMPT },
-    ...formattedHistory,
-    { role: "user", content: prompt },
-  ];
+async function callModelAPI(prompt, systemPrompt, history, routerDecision, messagesOverride) {
+  var messages;
+  if (messagesOverride && Array.isArray(messagesOverride) && messagesOverride.length > 0) {
+    messages = messagesOverride;
+  } else {
+    const formattedHistory = history.map(function (msg) {
+      return {
+        role: msg.role === "assistant" || msg.role === "system" ? msg.role : "user",
+        content: msg.content,
+      };
+    });
+    messages = [
+      { role: "system", content: systemPrompt || REI_SYSTEM_PROMPT },
+      ...formattedHistory,
+      { role: "user", content: prompt },
+    ];
+  }
 
   const maxTokens = routerDecision?.maxTokens || 2048;
   const primaryModel = routerDecision?.model || "deepseek-v4-flash";
@@ -243,7 +247,63 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision) {
   };
 }
 
-export async function handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision) {
+// ── Direct model API: called when an explicit model bypasses the router cascade ──
+
+export async function callModelDirect(model, messages, maxTokens, temperature) {
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    return { content: "[REI.AI NOTICE] No messages provided.", model: "none", rateLimited: false };
+  }
+  const maxT = maxTokens || 2048;
+  const temp = temperature ?? 0.7;
+  const primaryBackend = getBackendForModel(model);
+
+  var backends = {};
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function () { return callDeepSeek(messages, maxT, temp); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function () { return callGemini(messages, maxT, temp); };
+  if (process.env.GROQ_API_KEY) backends.groq = function () { return callGroq(messages, maxT, model, temp); };
+  if (process.env.OPENAI_API_KEY) backends.openai = function () { return callOpenAI(messages, maxT, temp); };
+
+  if (primaryBackend && backends[primaryBackend]) {
+    var cooldownUntil = providerCooldown.get(primaryBackend);
+    if (cooldownUntil && Date.now() < cooldownUntil) {
+      console.warn("Skipping primary backend " + primaryBackend + " — in cooldown (" + Math.ceil((cooldownUntil - Date.now()) / 1000) + "s remaining)");
+    } else {
+      var result = await backends[primaryBackend]();
+      if (result) {
+        providerCooldown.delete(primaryBackend);
+        return { content: result.content, model: model, usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+      }
+    }
+  }
+
+  var order = primaryBackend ? ["groq", "gemini", "deepseek", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["groq", "gemini", "deepseek", "openai"];
+  for (var i = 0; i < order.length; i++) {
+    var backend = order[i];
+    if (backends[backend]) {
+      var fbCooldown = providerCooldown.get(backend);
+      if (fbCooldown && Date.now() < fbCooldown) {
+        console.warn("Skipping fallback " + backend + " — in cooldown (" + Math.ceil((fbCooldown - Date.now()) / 1000) + "s remaining)");
+        continue;
+      }
+      console.warn("Primary backend " + primaryBackend + " failed, falling back to " + backend);
+      result = await backends[backend]();
+      if (result) {
+        providerCooldown.delete(backend);
+        return { content: result.content, model: result.model + " (fallback)", usage: result.usage || null, truncated: result.truncated || false, finishReason: result.finishReason || null };
+      }
+      await sleep(INTER_FALLBACK_MS);
+    }
+  }
+
+  return {
+    content: "[REI.AI NOTICE] All reasoning backends are unavailable. Please wait a moment and try again.",
+    model: "none",
+    rateLimited: true,
+    retryAfter: "~30s",
+  };
+}
+
+export async function handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision, messagesOverride) {
   args = args || [];
   input = input || "";
   systemPrompt = systemPrompt || "";
@@ -254,7 +314,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
   if (!localCliExists) {
     try {
       const payload = input || (args.length > 0 ? args.join(" ") : "help");
-      const response = await callModelAPI(payload, systemPrompt, history, routerDecision);
+      const response = await callModelAPI(payload, systemPrompt, history, routerDecision, messagesOverride);
       return {
         success: true,
         result: response.content,
@@ -343,6 +403,7 @@ export default async function handler(req, res) {
       var systemPrompt = body.systemPrompt || "";
       var history = body.history || [];
       var routerDecision = body.routerDecision;
+      var messagesOverride = body.messagesOverride;
       var startTime = Date.now();
 
       if (typeof input === "string" && input.length > MAX_INPUT_CHARS) {
@@ -352,7 +413,7 @@ export default async function handler(req, res) {
         });
       }
 
-      const result = await handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision);
+      const result = await handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision, messagesOverride);
 
       // Persist a durable trace entry to the evaluation plane.  Non-blocking:
       // the response is prepared before the KV write, but Vercel waits for
