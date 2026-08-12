@@ -111,6 +111,37 @@ must map to the command that reproduces it. An unverifiable claim is retired.
 
 ---
 
+## Rule 6 — Self-informed, NOT self-modifying (the machine proposes, a human or claims-gate disposes)
+
+**Origin:** The policy-improvement loop (`docs/POLICY_LOOP.md`,
+`src/lib/policyProposalEngine.ts`). REI is a controller around intelligence: it
+measures its own routing, evaluation, and claims output and converts evidence into
+structured policy proposals. The dangerous failure mode is crossing from *proposing*
+to *applying* — a system that rewrites its own thresholds, weights, fingerprints,
+scanner patterns, or claim definitions autonomously.
+
+**Policy:** REI is permanently **self-observing → self-evaluating → self-proposing**,
+and permanently **NOT self-modifying**. The complete boundary:
+
+1. The proposal engine is pure/deterministic: same evidence → same proposals. No LLM
+   calls, no network, no provider cost, no random variation.
+2. The proposal engine and store never mutate policy — no thresholds, weights,
+   fingerprints, scanner patterns, or claim definitions are changed by the system.
+3. Every proposal requires reviewable evidence, never "absence of evidence."
+4. Application of a proposal requires a human review and an engineering change that
+   ships with tests and claims, then a re-measurement.
+5. The word **"self-improving"** must never appear in product description without the
+   qualifier "self-informed, NOT self-modifying." The system proposes; it does not
+   improve itself.
+
+**Enforcement:** Structural — the engine exports no mutation API; the store owns
+persistence only; the Analytics proposals panel exposes evidence + Copy + Dismiss
+and **no** Apply/Accept/Modify control (regression-tested in
+`src/Analytics.test.jsx`). Any future feature that touches the boundary must cite
+this rule and keep the human/claims-gate gate in the loop.
+
+---
+
 ## Reference: where these live
 
 | Rule | Automated gate | Regression test |
@@ -120,6 +151,7 @@ must map to the command that reproduces it. An unverifiable claim is retired.
 | 3. Explicit exclusions | `scripts/validate-eval-integrity.mjs` | `evalLabelMap.test.js` |
 | 4. Split measurement/behavior | — (manual) | — |
 | 5. Verify metrics | `CLAIM_LEDGER.md` + prebuild `--check` gates | — |
+| 6. Self-informed, not self-modifying | — (structural: no mutation API; UI has no apply control) | `Analytics.test.jsx` (no Apply/Accept) |
 
 New workflow lessons should be added here as Rule 6+, with the incident that
 produced them, so the policy stays the memory of the project.
