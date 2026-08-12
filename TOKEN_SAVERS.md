@@ -5,9 +5,18 @@ last_reviewed: 2026-07-31
 
 # Token Efficiency Handbook
 
-## Why This Exists
+## Core Thesis: The Caching & Compression Model
 
-Multi-agent workflows (AGY + EXEC) can burn 25K+ tokens per task. This document lists the tactics that keep sessions under budget, fight clutter, and make context windows work harder.
+> **"The model is cheap; the context is what you pay for."**
+
+This build (768 tests, 63 suites, ~22k lines) cost ~$22 because **97.7% of tokens were cache hits** (~120x cost reduction). Token efficiency isn't a complex prompt library—it's three habits and one systemic leverage point:
+
+1. **Freeze the Prefix & Compress History:** Don't let conversation context grow infinitely. Compress closed work into dense summaries. Keep instructions and prefix frozen so they hit cache. Only new work pays fresh tokens.
+2. **Read Small, Search Tight:** Grep for exact symbols, read 20 lines around them. Delegate discovery to subagents so it returns in one concise paragraph instead of paging through raw files.
+3. **Machine Verification Over Conversational Re-explanation:** Run local tests and typecheckers (`npm test`, `tsc --noEmit`). Look at logs directly. Don't ask the LLM "is this right?" when the compiler/test suite already told you.
+4. **Plan Before Execution:** Explore, map the plan, get human "go", then edit. Wasted build attempts are wasted fresh turns.
+
+*Freeze the prefix, compress everything closed, and let the tests carry the memory. Then a big system is mostly one long cache hit.*
 
 ---
 
