@@ -1,0 +1,124 @@
+# GitLab CI mirror of the GitHub Actions gate.
+#
+# Why this exists: GitHub Actions is billing-locked (runners never provision,
+# runnerName: null) while Vercel auto-deploys continue. This pipeline gives REI
+# a real CI gate on GitLab's free runners until the GitHub flag clears.
+#
+# Coverage map (see docs/ENGINEERING_POLICY.md Rule 7):
+#   .github/workflows/ci.yml                  -> job `ci`
+#   .github/workflows/typecheck.yml           -> job `typecheck`
+#   .github/workflows/app-build-drift-check.yml -> job `app-build-drift`
+#   .github/workflows/seed-harness-drift-check.yml -> job `seed-harness-drift`
+#   .github/workflows/verify-deploy.yml       -> job `verify-vercel-webhook`
+#
+# Required CI/CD variables (Settings -> CI/CD -> Variables):
+#   GITHUB_TOKEN            - fine-grained PAT with repo read + hooks read
+#                             (only needed for verify-vercel-webhook job)
+#   VERCEL_DEPLOY_HOOK      - full secret path AFTER /deploy/ from
+#                             Vercel -> Project -> Settings -> Deploy Hooks
+#                             (only needed for manual deploy job)
+
+stages:
+  - verify
+  - test
+  - deploy
+
+variables:
+  GIT_DEPTH: 0
+  NODE_VERSION: "20"
+
+# Cache node_modules across jobs/pipelines, keyed by lockfile.
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+
+# ---------- Stage: verify (parallel fast checks) ----------
+
+typecheck:
+  stage: verify
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci
+    - npm run typecheck
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+
+app-build-drift:
+  stage: verify
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --legacy-peer-deps
+    - npm run build
+    - npm run app:validate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+
+seed-harness-drift:
+  stage: verify
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --legacy-peer-deps
+    - npm run seeds:validate
+    - npm run seeds:build
+    - git diff --exit-code -- data/inspiration-seeds.batch.jsonl data/inspiration-seeds.manifest.json
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# ---------- Stage: test (full suite + claims freshness) ----------
+
+ci:
+  stage: test
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci --legacy-peer-deps
+    - npm run lint
+    - npm test
+    # Claims freshness gate: the landing-page test-count badge is generated from
+    # the live suite by scripts/gen-claims.mjs. A change in test count without
+    # regenerating src/data/claims.json fails here — the badge never drifts.
+    - node scripts/gen-claims.mjs --check
+    - npm run build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# ---------- Stage: deploy (gated, main only) ----------
+
+verify-vercel-webhook:
+  stage: deploy
+  image: alpine:3
+  script:
+    - apk add --no-cache curl
+    - |
+      HOOKS=$(curl -s \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/aaronmarchant96-max/rei-ai/hooks")
+      if echo "$HOOKS" | grep -q "api.vercel.com/v1/integrations/deploy"; then
+        echo "Vercel auto-deploy webhook active on GitHub"
+      else
+        echo "Vercel auto-deploy webhook missing — push won't deploy!" >&2
+        echo "Fix: Settings -> Webhooks on the repo, add the Vercel deploy hook." >&2
+        exit 1
+      fi
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  when: manual
+
+# Manual deploy via Vercel Deploy Hook. Keep this MANUAL so a human pulls the
+# trigger after the gated CI is green; Vercel's GitHub webhook auto-deploy
+# continues to work independently (see verify-vercel-webhook).
+deploy-to-vercel:
+  stage: deploy
+  image: alpine:3
+  script:
+    - apk add --no-cache curl
+    - |
+      curl -sS -X POST \
+        "https://api.vercel.com/v1/integrations/deploy/${VERCEL_DEPLOY_HOOK}" \
+        -w "\ndeploy hook triggered (HTTP %{http_code})\n"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  when: manual
