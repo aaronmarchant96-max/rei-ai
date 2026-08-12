@@ -85,7 +85,9 @@ routingEval basic now measures **100% (39 correct, 0 incorrect)** — all 4 prev
 
 | Claim | Producing command | Verified result (2026-08-06) |
 |-------|-------------------|-------------------------------|
-| ~92% savings vs gpt-4o baseline (ceiling-based) | `npm test -- --runInBand --testPathPatterns=routingEval` | 92.3% (routingEval 57), 92.5% (ML 27) — after honest 70B pricing fix |
+| ~92% savings vs gpt-4o baseline (ceiling-based) | `npm test -- --runInBand --testPathPatterns=routingEval` | 92.3% (routingEval 57), 92.5% (ML 27) — after honest 70B pricing fix. **Single-baseline, ceiling-based; see rows below for the decomposed view.** |
+| Savings decomposition (price-optimization vs free-capacity) | `npx tsx scripts/run-pilot.mjs --traffic src/__eval__/fixtures/pilot-traffic.json --catalog src/__eval__/fixtures/pilot-catalog.json` | Synthetic corpus (9 measured, 1 excluded no_prompt): baseline-relative 83.1%, premium-relative 85.7%, paid-provider 83.1%, free-tier 0.0 pts, decomposition price-opt $0.01990 · free $0.00000. **Provider-price savings and free-tier capacity reported separately — never conflated.** |
+| Provider-price sensitivity (B1/B2/B3/B4, scenarios A/B/D) | `npx tsx scripts/run-pilot.mjs --scenarios src/__eval__/fixtures/provider-scenarios.json --traffic src/__eval__/fixtures/pilot-traffic.json --catalog src/__eval__/fixtures/pilot-catalog.json` | Same workload, same routing decisions, isolated economic view per scenario. A (Groq free): 91.2% vs always-premium, free share 91.2%. B (Groq commercial): 81.1% vs premium, free share 0%. D (Groq unavailable): 85.7% vs premium, free share 0%. **REI stays materially cheaper than always-premium even with no free-tier provider.** |
 | Production telemetry savings | N/A — self-reported | Not independently verifiable |
 
 ## Other claims

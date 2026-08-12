@@ -7,17 +7,17 @@
 
 REI.ai is the answer — a smart, budget-friendly AI system that reads your prompts locally and routes them to the cheapest model capable of giving a great answer. 
 
-It includes **6 specialized tools** and **726 automated test checks** ensuring everything stays fast, accurate, and cost-effective.
+It includes **6 specialized tools** and **768 automated test checks** ensuring everything stays fast, accurate, and cost-effective.
 
 ---
 
 ## 📊 What This Is (And Isn't)
 
 **What this is:**
-- **A Smart AI Traffic Controller:** Saves up to ~98% on AI API costs compared to always using expensive models like GPT-4o by picking the right model for the job.
+- **A Smart AI Traffic Controller:** Routes each request to the cheapest capable model, with honest, measured economics — savings are decomposed into *provider-price optimization* (cheaper paid provider) and *free-tier capacity* (paid → $0 provider), reported separately, and stress-tested across provider-price scenarios. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for the exact numbers and producing commands.
 - **A Structured Thinking Engine:** Uses a clear, step-by-step framework (CARDO REI) to separate facts from assumptions and give clear reasoning.
 - **A Suite of 6 Specialized Tools:** Includes tools for debate pressure-testing, storytelling, legal precedent checks, industrial monitoring, genealogy, and everyday AI chat.
-- **Battle-Tested Code:** Backed by 726 automated unit tests across 61 test suites to ensure routing and security logic never drift.
+- **Battle-Tested Code:** Backed by 768 automated unit tests across 63 test suites to ensure routing and security logic never drift.
 
 **What this is not:**
 - Just another standard ChatGPT clone with a pretty interface.
@@ -104,7 +104,7 @@ I started learning software and AI development in 2026. This project is the resu
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.35 billion** |
 | Tools Built | **6 specialized applications** |
-| Automated Tests | **726 passing tests across 61 suites** |
+| Automated Tests | **768 passing tests across 63 suites** |
 | Delivery | **1,000+ Vercel deployments** — production is live on Vercel with full deploy history |
 | Hardware Used | Intel Celeron J4105, 8GB RAM |
 | Monthly Budget | $25/month |
@@ -121,7 +121,7 @@ git clone https://github.com/aaronmarchant96-max/rei-ai
 cd rei-ai
 npm install
 npm run dev      # Launch local web interface
-npm test         # Run all 726 automated tests
+npm test         # Run all 768 automated tests
 ```
 
 ---

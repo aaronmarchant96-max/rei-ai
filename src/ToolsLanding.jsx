@@ -189,7 +189,7 @@ export default function ToolsLanding({ onOpenTool }) {
           {[
             { icon: "🎯", val: "60–80%", label: "Deterministic Accuracy" },
             { icon: "✅", val: `${claimsData.testCount}+`, label: "Passing Tests" },
-            { icon: "⚡", val: gateSavingsPct !== null ? `~${gateSavingsPct}%` : "~92%", label: "Cost Savings" },
+            { icon: "⚡", val: gateSavingsPct !== null ? `~${gateSavingsPct}%` : "~92%", label: "Savings vs Premium (ceiling)" },
           ].map((stat, index) => (
             <div
               key={index}
@@ -202,6 +202,26 @@ export default function ToolsLanding({ onOpenTool }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Savings honesty note */}
+        <div className="max-w-4xl mx-auto mb-12 text-center">
+          <p className="text-sm text-[#94A3B8] leading-relaxed">
+            Savings are measured in three separate ways — never presented as one number.{" "}
+            <span className="text-[#EDEFF5]">Baseline-relative</span> (vs a premium model),{" "}
+            <span className="text-[#EDEFF5]">paid-provider routing</span> (cheaper paid model),
+            and <span className="text-[#EDEFF5]">free-tier contribution</span> (paid → $0 provider).
+            Provider-price sensitivity is stress-tested against multi-baselines across scenarios —
+            see{" "}
+            <a
+              href={`${REPO_URL}/blob/main/docs/CLAIM_LEDGER.md`}
+              target="_blank" rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-hinge-bright transition-colors"
+            >
+              CLAIM_LEDGER.md
+            </a>{" "}
+            for the producing commands.
+          </p>
         </div>
 
         {/* Live Claims Gate */}
