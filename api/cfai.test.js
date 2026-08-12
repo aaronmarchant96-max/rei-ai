@@ -1,3 +1,11 @@
+jest.mock("./lib/kv.js", function () {
+  return {
+    storeTrace: jest.fn(function () { return Promise.resolve(); }),
+    storeEval: jest.fn(function () { return Promise.resolve(); }),
+    getTracesWithEvals: jest.fn(function () { return Promise.resolve({ traces: [], evals: [] }); }),
+  };
+});
+
 function mockFetch(responseData, status, ok, headers) {
   if (status === undefined) status = 200;
   if (ok === undefined) ok = true;

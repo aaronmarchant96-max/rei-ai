@@ -490,6 +490,35 @@ export default function REI({ initialPrompt } = {}) {
           evaluatedAt: new Date().toISOString(),
         },
       });
+
+      // Fire-and-forget: persist the deterministic evaluation result to the
+      // server-side evaluation plane for longitudinal queries. The localStorage
+      // evalLog remains the safety-net — if this POST fails, nothing is lost.
+      fetch("/api/eval/result", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId,
+          tenantId: "pilot",
+          domain: selectedDomain,
+          routeId: routerDecision?.id,
+          model: modelName,
+          evaluator: "deterministic",
+          evaluatorVersion: "red-team-v1",
+          evaluation: {
+            qualityScore: inputScan?.score ?? null,
+            safetyVerdict: responseScan?.verdict,
+            routeExpected,
+            routeCorrect,
+            notes: responseScan?.findings?.length
+              ? responseScan.findings.map((f) => `${f.severity}: ${f.finding} (${f.category})`)
+              : [],
+            evaluatedAt: new Date().toISOString(),
+          },
+        }),
+      }).catch(function () {
+        // Silently degrade — the localStorage evalLog is the safety net.
+      });
     } catch (e) {
       console.warn("Failed to write eval log:", e);
     }
@@ -664,6 +693,7 @@ export default function REI({ initialPrompt } = {}) {
           systemPrompt: systemPrompt,
           history: historyPayload,
           routerDecision,
+          requestId,
         })
       });
 

@@ -69,8 +69,8 @@ describe("REI", () => {
 
     await waitFor(() => {
       const calls = global.fetch.mock.calls;
-      const lastCall = calls[calls.length - 1];
-      const body = JSON.parse(lastCall[1].body);
+      const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
       expect(body.systemPrompt).toContain("Reply to this greeting in one short, friendly sentence");
       // input must not carry the full 6K-char Generalist prompt for a greeting
       expect(body.input).toBe("hello");
@@ -93,8 +93,8 @@ describe("REI", () => {
 
       // Check 1: the system prompt sent is the greeting prompt, not a tool-using domain
       const calls = global.fetch.mock.calls;
-      const lastCall = calls[calls.length - 1];
-      const body = JSON.parse(lastCall[1].body);
+      const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
       expect(body.systemPrompt).toContain("Reply to this greeting in one short, friendly sentence");
 
       // Check 2: the router decision is simple-greeting with 50-token cap
@@ -122,8 +122,8 @@ describe("REI", () => {
 
     await waitFor(() => {
       const calls = global.fetch.mock.calls;
-      const lastCall = calls[calls.length - 1];
-      const body = JSON.parse(lastCall[1].body);
+      const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
       // Injection must carry the self-audit evidence block, NOT the no-claims fallback
       expect(body.input).toContain("## Self-Audit (from our own claims gate");
     }, { timeout: 3000 });
@@ -138,8 +138,8 @@ describe("REI", () => {
 
     await waitFor(() => {
       const calls = global.fetch.mock.calls;
-      const lastCall = calls[calls.length - 1];
-      const body = JSON.parse(lastCall[1].body);
+      const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
       expect(body.input).not.toContain("## Self-Audit");
     }, { timeout: 3000 });
   });
@@ -154,7 +154,8 @@ describe("REI", () => {
 
     await waitFor(() => {
       const calls = global.fetch.mock.calls;
-      const body = JSON.parse(calls[calls.length - 1][1].body);
+      const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
       expect(body.input).toContain("## Source Code");
     }, { timeout: 3000 });
   });
@@ -169,7 +170,8 @@ describe("REI", () => {
 
     await waitFor(() => {
       const calls = global.fetch.mock.calls;
-      const body = JSON.parse(calls[calls.length - 1][1].body);
+      const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
       expect(body.input).toContain("## Source Code");
     }, { timeout: 3000 });
   });
@@ -184,7 +186,8 @@ describe("REI", () => {
 
     await waitFor(() => {
       const calls = global.fetch.mock.calls;
-      const body = JSON.parse(calls[calls.length - 1][1].body);
+      const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
       expect(body.input).not.toContain("## Source Code");
     }, { timeout: 3000 });
   });

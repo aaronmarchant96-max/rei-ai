@@ -309,6 +309,25 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
   }
 }
 
+// ── Evaluation-plane persistence ──
+// Stores durable server-side traces so the evaluation plane can answer
+// longitudinal questions instead of only client-side localStorage snapshots.
+// See docs/POLICY_LOOP.md for the evaluation plane boundary.
+
+import { storeTrace } from "./lib/kv.js";
+const POLICY_VERSION = "v1";
+const PILOT_TENANT = "pilot";
+
+function resolveProvider(modelName) {
+  if (!modelName) return null;
+  const m = modelName.toLowerCase().replace(/\s*\(fallback\)\s*/g, "");
+  if (m.includes("deepseek")) return "deepseek";
+  if (m.includes("gemini")) return "gemini";
+  if (m.includes("llama") || m.includes("groq")) return "groq";
+  if (m.includes("gpt") || m.includes("openai")) return "openai";
+  return "unknown";
+}
+
 export default async function handler(req, res) {
   try {
     res.setHeader("Content-Type", "application/json");
@@ -321,6 +340,7 @@ export default async function handler(req, res) {
       var systemPrompt = body.systemPrompt || "";
       var history = body.history || [];
       var routerDecision = body.routerDecision;
+      var startTime = Date.now();
 
       if (typeof input === "string" && input.length > MAX_INPUT_CHARS) {
         return res.status(400).json({
@@ -330,7 +350,45 @@ export default async function handler(req, res) {
       }
 
       const result = await handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision);
+
+      // Persist a durable trace entry to the evaluation plane.  Non-blocking:
+      // the response is prepared before the KV write, but Vercel waits for
+      // unresolved promises before terminating the function.
+      const requestId = body.requestId ||
+        (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "req-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10));
+      const tracePromise = storeTrace(PILOT_TENANT, requestId, {
+        requestId: requestId,
+        clientRequestId: body.requestId || null,
+        policyVersion: POLICY_VERSION,
+        tenantId: PILOT_TENANT,
+        timestamp: new Date().toISOString(),
+        prompt: (input || "").slice(0, 500),
+        domain: routerDecision?.domain || null,
+        routeId: routerDecision?.id || null,
+        model: routerDecision?.model || null,
+        estimatedCost: routerDecision?.estimatedCost ?? null,
+        premiumCost: routerDecision?.premiumCost ?? null,
+        hingeScore: routerDecision?.hingeScore ?? null,
+        responseModel: result.model || null,
+        provider: resolveProvider(result.model),
+        truncated: result.truncated || false,
+        finishReason: result.finishReason || null,
+        usage: result.usage || null,
+        latencyMs: Date.now() - startTime,
+        // The client writes actualCost + rescue to the routing log AFTER
+        // receiving this response; the trace captures what the server
+        // observed at decision time.
+      });
+
       res.status(result.success ? 200 : 500).json(result);
+
+      // Await after sending the response — the client gets its data while
+      // the trace persists. Vercel keeps the function alive for this.
+      try {
+        await tracePromise;
+      } catch (e) {
+        console.warn("[eval-plane] Trace persistence deferred:", e.message);
+      }
       return;
     }
 
