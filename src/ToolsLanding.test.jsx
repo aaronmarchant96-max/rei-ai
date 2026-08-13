@@ -28,6 +28,18 @@ describe("ToolsLanding", () => {
     expect(screen.getByText("Evaluate")).toBeInTheDocument();
   });
 
+  it("renders the methodology flow (find the hinge → test/measure/trace → gate → iterate)", () => {
+    render(<ToolsLanding onOpenTool={jest.fn()} />);
+
+    expect(screen.getByRole("heading", { name: /not a product\..*methodology/i })).toBeInTheDocument();
+    expect(screen.getByText(/find the hinge/i)).toBeInTheDocument();
+    expect(screen.getByText(/verified evidence/i)).toBeInTheDocument();
+    expect(screen.getByText(/human \/ claims gate/i)).toBeInTheDocument();
+    expect(screen.getByText(/the artifact proposes, the human decides/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/iterate/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/closed loop/i)).toBeInTheDocument();
+  });
+
   it("renders router demo with scenario buttons", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 

@@ -212,6 +212,105 @@ export default function ToolsLanding({ onOpenTool }) {
         </p>
       </motion.header>
 
+      {/* ── 1.5. The Methodology (not a product, a methodology) ── */}
+      <motion.section 
+        initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
+        className="relative z-10 max-w-5xl mx-auto py-24"
+      >
+        <div className="text-center mb-16">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">Formal Methodology for Trustworthy AI Development</div>
+          <h2 className="font-heading text-3xl md:text-5xl font-bold mb-4">
+            Not a product. A <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">methodology</span>.
+          </h2>
+          <p className="text-[#EDEFF5] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-light">
+            CARDO REI finds the hinge — the single factor that changes the answer. Every decision is tested, every claim is measured, every system is traced. Then a human gate decides.
+          </p>
+        </div>
+
+        {/* Flow: Find the Hinge → 3 branches → converge to gate → iterate */}
+        <div className="relative mx-auto max-w-4xl">
+          {/* Find the Hinge */}
+          <motion.div variants={fadeIn} className="flex flex-col items-center mb-10">
+            <div className="px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-hinge-bright shadow-[0_0_25px_rgba(228,167,62,0.12)]">
+              <div className="font-mono text-xs uppercase tracking-widest text-hinge-bright mb-1">Cardo Rei</div>
+              <div className="font-heading text-2xl md:text-3xl font-bold text-white">Find the Hinge</div>
+              <div className="text-xs text-[#94A3B8] mt-1 text-center">the single factor that changes the answer</div>
+            </div>
+            <div className="text-hinge-bright mt-3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+            </div>
+          </motion.div>
+
+          {/* Three branches */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+            {[
+              { key: "decision", label: "Decision", tag: "→ Test it", icon: "⤷",
+                href: `${REPO_URL}/blob/main/docs/INFORMATION_THEORETIC_ARCHITECTURE.md` },
+              { key: "claim", label: "Claim", tag: "→ Measure it", icon: "¶",
+                href: `${REPO_URL}/blob/main/docs/CLAIM_LEDGER.md` },
+              { key: "system", label: "System", tag: "→ Trace it", icon: "⌖",
+                href: `${REPO_URL}/blob/main/docs/INFORMATION_THEORETIC_ARCHITECTURE.md` },
+            ].map((b) => (
+              <a
+                key={b.key}
+                href={b.href}
+                target="_blank" rel="noopener noreferrer"
+                className="group bg-surface border-2 border-border rounded-md p-5 text-center hover:border-hinge transition-colors"
+              >
+                <div className="text-hinge-bright text-2xl mb-2">{b.icon}</div>
+                <div className="font-heading font-bold text-lg text-white">{b.label}</div>
+                <div className="font-mono text-xs text-hinge-bright mt-1">{b.tag}</div>
+              </a>
+            ))}
+          </div>
+
+          {/* Verified evidence */}
+          <motion.div variants={fadeIn} className="flex flex-col items-center mb-10">
+            <div className="flex items-center justify-center gap-2 text-hinge-bright mb-2 text-sm font-mono">
+              <span>Decision</span><span>Claim</span><span>System</span>
+            </div>
+            <div className="text-hinge-bright mb-2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14m-6-6 6 6 6-6"/></svg>
+            </div>
+            <div className="px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-border">
+              <div className="font-mono text-xs uppercase tracking-widest text-[#94A3B8] mb-1">Verified Evidence</div>
+              <div className="font-heading text-xl md:text-2xl font-bold text-white">tested · measured · traced</div>
+            </div>
+          </motion.div>
+
+          {/* Human / Claims Gate */}
+          <motion.div variants={fadeIn} className="flex flex-col items-center mb-10">
+            <div className="text-hinge-bright mb-2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14m-6-6 6 6 6-6"/></svg>
+            </div>
+            <div className="px-8 py-4 rounded-lg bg-surface border-2 border-hinge-bright/40">
+              <div className="font-mono text-xs uppercase tracking-widest text-hinge-bright mb-1">Human / Claims Gate</div>
+              <div className="font-heading text-xl md:text-2xl font-bold text-white">the artifact proposes, the human decides</div>
+            </div>
+            <div className="text-hinge-bright mt-3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+            </div>
+          </motion.div>
+
+          {/* Iterate */}
+          <motion.div variants={fadeIn} className="flex flex-col items-center">
+            <div className="px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-border">
+              <div className="font-mono text-xs uppercase tracking-widest text-hinge-bright mb-1">Closed Loop</div>
+              <div className="font-heading text-2xl font-bold text-white">Iterate</div>
+              <div className="text-xs text-[#94A3B8] mt-1 text-center">reconstruct plank-by-plank, commit by commit</div>
+            </div>
+          </motion.div>
+        </div>
+
+        <a 
+          href={`${REPO_URL}/blob/main/docs/CARDO_REI.md`}
+          target="_blank" rel="noopener noreferrer"
+          className="inline-block mx-auto mt-10 text-sm text-[#94A3B8] hover:text-hinge-bright transition-colors underline underline-offset-4"
+        >
+          Read the CARDO REI methodology →
+        </a>
+      </motion.section>
+
       {/* ── 2. The Flagship (REI.ai) ── */}
       <motion.section 
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
