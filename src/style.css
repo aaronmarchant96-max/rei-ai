@@ -3945,7 +3945,6 @@ body {
 
 button,
 [role="button"],
-.touch-target,
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
@@ -4149,53 +4148,6 @@ input:focus:not(:focus-visible) {
    APP SHELL MOBILE NAVIGATION
    ========================================================================== */
 
-/* Mobile drawer */
-.rei-mobile-drawer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  padding: var(--spacing-md);
-}
-
-.rei-mobile-drawer-nav {
-  margin-top: var(--spacing-md);
-}
-
-.rei-mobile-drawer-close {
-  align-self: flex-end;
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 24px;
-  cursor: pointer;
-  min-width: 48px;
-  min-height: 48px;
-}
-
-/* Hamburger menu button */
-.rei-hamburger {
-  display: none;
-}
-
-@media (max-width: 45em) {
-  .rei-hamburger {
-    display: block;
-    min-width: 48px;
-    min-height: 48px;
-    background: none;
-    border: none;
-    color: var(--text);
-    font-size: 24px;
-    cursor: pointer;
-  }
-}
-
 /* ==========================================================================
    UTILITY CLASSES
    ========================================================================== */
@@ -4209,11 +4161,6 @@ input:focus:not(:focus-visible) {
   .hide-mobile {
     display: revert;
   }
-}
-
-/* Hide on desktop */
-.hide-desktop {
-  display: revert;
 }
 
 /* ==========================================================================
@@ -4841,12 +4788,6 @@ input:focus:not(:focus-visible) {
 
 .relume-footer__link:hover {
   text-decoration: underline;
-}
-
-@media (min-width: 30em) {
-  .hide-desktop {
-    display: none;
-  }
 }
 
 /* Micro Animations for Landing Page */

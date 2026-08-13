@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from "react";
-import { useMobile, useSwipe } from "./useMobile.js";
+import { useMobile } from "./useMobile.js";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 
@@ -21,6 +21,9 @@ function LoadingShell() {
   );
 }
 
+// Build-time tool inventory contract (validated by scripts/validate-app-shell.mjs).
+// Not consumed by render since the mobile drawer was removed — kept for the guard.
+/* eslint-disable no-unused-vars */
 const TOP_LEVEL = [
   {
     id: "tools",
@@ -68,6 +71,7 @@ const TOP_LEVEL = [
     subtitle: "Adversarial prompt scanner — D1 keyword surface analysis."
   }
 ];
+/* eslint-enable no-unused-vars */
 
 function getInitialTool() {
   if (typeof window === "undefined") return "tools";
@@ -95,35 +99,10 @@ function getToolPath(tool) {
   return "/";
 }
 
-function getToolLabel(tool) {
-  if (tool === "tools") return "Tools";
-  if (tool === "story-forge") return "Story Forge";
-  if (tool === "storm-replay") return "Storm Replay";
-  if (tool === "cardo-guard") return "CARDO GUARD";
-  if (tool === "rei" || tool === "cfai") return "REI.ai";
-  if (tool === "tracepoint") return "Tracepoint";
-  if (tool === "analytics") return "Analytics";
-  if (tool === "red-team") return "Red Team";
-  return "The Furnace";
-}
-
 export default function AppShell() {
   const [tool, setTool] = useState(getInitialTool);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [reiInitialPrompt, setReiInitialPrompt] = useState(null);
   const mobile = useMobile(45); // 45em = 720px
-
-  // Swipe handlers for mobile drawer
-  const { onTouchStart, onTouchMove, onTouchEnd } = useSwipe(
-    () => setDrawerOpen(false), // Swipe left: close drawer
-    () => setDrawerOpen(true),   // Swipe right: open drawer
-    50
-  );
-
-  // Close drawer on tool change
-  useEffect(() => {
-    if (drawerOpen) setDrawerOpen(false);
-  }, [tool]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -151,79 +130,8 @@ export default function AppShell() {
                       : "PromptHound Labs | The Furnace";
   }, [tool]);
 
-  const currentToolLabel = getToolLabel(tool);
-
   return (
-    <div className="app-shell" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-      {mobile && (
-        <>
-          {/* Mobile drawer overlay */}
-          {drawerOpen && (
-            <div className="rei-mobile-drawer" onClick={() => setDrawerOpen(false)}>
-              <button 
-                className="rei-mobile-drawer-close hide-desktop"
-                onClick={(e) => { e.stopPropagation(); setDrawerOpen(false); }}
-                aria-label="Close menu"
-              >
-                ✕
-              </button>
-              <nav className="rei-mobile-drawer-nav" onClick={(e) => e.stopPropagation()}>
-                {TOP_LEVEL.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className="rei-mobile-nav-item touch-target"
-                    onClick={() => setTool(item.id)}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      padding: "20px 16px",
-                      minWidth: "100%",
-                      minHeight: "72px",
-                      background: "none",
-                      border: "none",
-                      color: "#E2E8F0",
-                      cursor: "pointer",
-                      fontSize: "16px",
-                      borderBottom: "1px solid rgba(255,255,255,0.1)",
-                      textAlign: "left"
-                    }}
-                  >
-                    <span style={{ fontWeight: "bold", fontSize: "16px" }}>{item.label}</span>
-                    <span style={{ fontSize: "0.85em", opacity: 0.7, marginTop: "4px" }}>{item.subtitle}</span>
-                  </button>
-                ))}
-              </nav>
-            </div>
-          )}
-          
-          {/* Hamburger menu */}
-          <button 
-            className="rei-hamburger touch-target hide-desktop"
-            onClick={() => setDrawerOpen(!drawerOpen)}
-            aria-label="Open menu"
-            aria-expanded={drawerOpen}
-            style={{
-              position: "fixed",
-              top: "16px",
-              left: "16px",
-              zIndex: 1001,
-              minWidth: "48px",
-              minHeight: "48px",
-              background: "rgba(0,0,0,0.8)",
-              border: "none",
-              borderRadius: "8px",
-              color: "#E2E8F0",
-              fontSize: "24px",
-              cursor: "pointer"
-            }}
-          >
-            ☰
-          </button>
-        </>
-      )}
-
+    <div className="app-shell">
       <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
         <a href="/" className="flex items-center gap-3 cursor-pointer rei-brand" onClick={(e) => {
           if (window.location.pathname === "/" && !window.location.hash) {
@@ -255,7 +163,7 @@ export default function AppShell() {
         )}
       </header>
 
-      <main className="shell-main" style={mobile && drawerOpen ? { opacity: 0.3 } : {}}>
+      <main className="shell-main">
         <Suspense fallback={<LoadingShell />}>
           {tool === "tools" ? (
             <ErrorBoundary toolName="Tools">
