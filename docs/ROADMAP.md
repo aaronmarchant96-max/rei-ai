@@ -68,7 +68,7 @@ REI.ai solves this by placing a **zero-inference deterministic engine** and **co
 
 ### Phase 3: Cost Savings Dashboard & Analytics (Week 3)
 - [x] Build user telemetry dashboard displaying real-time dollar savings vs. frontier baselines.
-- [ ] Implement token budget ceiling controls (`max_cost_per_query`).
+- [x] Implement token budget ceiling controls (`max_cost_per_query`).
 
 ### Phase 4: Public Launch & Case Studies (Week 4)
 - [ ] Publish reproducible 57-prompt benchmark study ([`INFORMATION_THEORETIC_ARCHITECTURE.md`](INFORMATION_THEORETIC_ARCHITECTURE.md)).

@@ -7,7 +7,16 @@ jest.mock("../../../shared/lib/kv.js", function () {
   };
 });
 
+jest.mock("../../../shared/lib/costModel.js", function () {
+  return {
+    projectedCost: jest.fn(function () { return 0.001; }),
+    maxCostPerQuery: jest.fn(function () { return null; }),
+    isOverBudget: jest.fn(function () { return false; }),
+  };
+});
+
 const kv = require("../../../shared/lib/kv.js");
+const costModel = require("../../../shared/lib/costModel.js");
 
 function mockFetch(responseData, status = 200, ok = true) {
   global.fetch = jest.fn(() =>
@@ -26,6 +35,10 @@ beforeEach(() => {
   process.env.REI_API_KEY = "test-api-key";
   delete process.env.CFAI_PATH;
   jest.clearAllMocks();
+  // Ceiling enforcement is opt-in: reset to "no ceiling" so baseline tests run
+  // under the un-gated path (matches production when MAX_COST_PER_QUERY is unset).
+  costModel.maxCostPerQuery.mockReturnValue(null);
+  costModel.isOverBudget.mockReturnValue(false);
 });
 
 describe("OpenAI-compatible chat completions endpoint", () => {
@@ -155,5 +168,78 @@ describe("OpenAI-compatible chat completions endpoint", () => {
     const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
     await handler(req, res);
     expect(kv.storeTrace).not.toHaveBeenCalled();
+  });
+
+  describe("per-query cost ceiling (max_cost_per_query, Increment B)", () => {
+    it("refuses with CF_BUDGET_EXCEEDED when the projected cost exceeds the ceiling (never silently downgrades)", async () => {
+      costModel.maxCostPerQuery.mockReturnValue(0.001);
+      costModel.projectedCost.mockReturnValue(0.005);
+      costModel.isOverBudget.mockReturnValue(true);
+      const handler = (await import("../../../api/v1/chat/completions.js")).default;
+      const req = {
+        method: "POST",
+        headers: { authorization: "Bearer test-api-key" },
+        body: { model: "rei-auto", max_tokens: 20000, messages: [{ role: "user", content: "hello" }] },
+      };
+      const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
+      await handler(req, res);
+      expect(res._status).toBe(402);
+      expect(res._body.error.code).toBe("CF_BUDGET_EXCEEDED");
+    });
+
+    it("does NOT call the provider or persist a trace when the ceiling is exceeded (refuse before spend)", async () => {
+      costModel.maxCostPerQuery.mockReturnValue(0.001);
+      costModel.isOverBudget.mockReturnValue(true);
+      const handler = (await import("../../../api/v1/chat/completions.js")).default;
+      const req = {
+        method: "POST",
+        headers: { authorization: "Bearer test-api-key" },
+        body: { model: "rei-auto", messages: [{ role: "user", content: "hello" }] },
+      };
+      const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
+      await handler(req, res);
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(kv.storeTrace).not.toHaveBeenCalled();
+      expect(res._status).toBe(402);
+    });
+
+    it("allows the request when the projected cost is within budget", async () => {
+      mockFetch({ choices: [{ message: { content: "mock response" } }] });
+      costModel.maxCostPerQuery.mockReturnValue(0.005);
+      costModel.projectedCost.mockReturnValue(0.001);
+      costModel.isOverBudget.mockReturnValue(false);
+      const handler = (await import("../../../api/v1/chat/completions.js")).default;
+      const req = {
+        method: "POST",
+        headers: { authorization: "Bearer test-api-key" },
+        body: { model: "rei-auto", messages: [{ role: "user", content: "hello" }] },
+      };
+      const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
+      await handler(req, res);
+      // The ceiling gate is consulted and does NOT refuse. (Downstream provider
+      // availability may be flaky from shared-cooldown test pollution, so we
+      // assert the ceiling decision, not the provider outcome.)
+      expect(costModel.maxCostPerQuery).toHaveBeenCalled();
+      expect(costModel.isOverBudget).toHaveBeenCalled();
+      expect(res._status).not.toBe(402);
+      expect(res._body.error).toBeUndefined();
+    });
+
+    it("enforcement is fully off when maxCostPerQuery returns null (backward-compatible)", async () => {
+      mockFetch({ choices: [{ message: { content: "mock response" } }] });
+      costModel.maxCostPerQuery.mockReturnValue(null);
+      costModel.isOverBudget.mockReturnValue(false);
+      const handler = (await import("../../../api/v1/chat/completions.js")).default;
+      const req = {
+        method: "POST",
+        headers: { authorization: "Bearer test-api-key" },
+        body: { model: "rei-auto", messages: [{ role: "user", content: "hello" }] },
+      };
+      const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
+      await handler(req, res);
+      // No ceiling configured ⇒ the gate is entirely bypassed (never refuses).
+      expect(costModel.maxCostPerQuery).toHaveBeenCalled();
+      expect(res._status).not.toBe(402);
+    });
   });
 });

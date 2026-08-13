@@ -7,6 +7,7 @@
 import "dotenv/config";
 import { handleCfaiRequest, callModelDirect } from "../../cfai.js";
 import { storeTrace } from "../../../shared/lib/kv.js";
+import { projectedCost, maxCostPerQuery, isOverBudget } from "../../../shared/lib/costModel.js";
 
 const ERROR_CODES = {
   CF_INVALID_REQUEST: "CF_INVALID_REQUEST",
@@ -14,8 +15,14 @@ const ERROR_CODES = {
   CF_MODEL_UNAVAILABLE: "CF_MODEL_UNAVAILABLE",
   CF_PROVIDER_ERROR: "CF_PROVIDER_ERROR",
   CF_RATE_LIMITED: "CF_RATE_LIMITED",
+  CF_BUDGET_EXCEEDED: "CF_BUDGET_EXCEEDED",
   CF_INTERNAL_ERROR: "CF_INTERNAL_ERROR",
 };
+
+// Auto-routed proxy traffic is served on this model unless a client-side router
+// decision is supplied (it currently never is from this endpoint). Its ceiling
+// rate is the cost basis for the auto-route budget projection before spend.
+const AUTO_ROUTE_MODEL = "deepseek-v4-flash";
 
 const PILOT_TENANT = "pilot";
 const POLICY_VERSION = "v1";
@@ -77,6 +84,23 @@ export default async function handler(req, res) {
       .join("\n");
 
     const useAutoRoute = !model || model === "rei-auto";
+
+    // ── Per-query cost ceiling (ROADMAP Phase 3, Increment B) ──
+    // Enforced BEFORE any provider token spend. Refuses with CF_BUDGET_EXCEEDED
+    // when the projected worst-case cost exceeds MAX_COST_PER_QUERY. Never
+    // downgrades silently — refusing is the honest boundary.
+    const ceiling = maxCostPerQuery();
+    if (ceiling !== null) {
+      const projectedForEnforcement = projectedCost({
+        model: useAutoRoute ? AUTO_ROUTE_MODEL : model,
+        maxTokens: max_tokens,
+      });
+      if (isOverBudget(projectedForEnforcement, ceiling)) {
+        return errorReply(res, 402, ERROR_CODES.CF_BUDGET_EXCEEDED,
+          "Requested query would exceed the configured per-query cost ceiling ($" +
+          ceiling.toFixed(6) + "): projected $" + projectedForEnforcement.toFixed(6));
+      }
+    }
 
     if (!useAutoRoute) {
       // ── Explicit model: bypass the router and call the provider directly ──
