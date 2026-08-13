@@ -102,7 +102,7 @@ async function callGemini(messages, maxTokens, temperature = 0.7) {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "gemini-flash-latest", messages: messages, temperature: temperature, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: "gemini-2.5-flash", messages: messages, temperature: temperature, max_tokens: maxTokens }),
     });
     if (!res.ok) {
       if (res.status === 429) { await recordThrottle("gemini", res); }
@@ -111,7 +111,7 @@ async function callGemini(messages, maxTokens, temperature = 0.7) {
     }
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
-    return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-flash-latest", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+    return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-2.5-flash", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
   } finally {
     clearTimeout(timer);
   }

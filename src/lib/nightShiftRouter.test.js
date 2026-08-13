@@ -268,7 +268,7 @@ describe("nightShiftRouter", () => {
 
       expect(greeting.model).toBe("llama-3.1-8b-instant");
       expect(freeReasoning.model).toBe("llama-3.3-70b-versatile");
-      expect(coding.model).toBe("gemini-flash-latest");
+      expect(coding.model).toBe("gemini-2.5-flash");
       // 70B bills at its real Groq rate (FALLBACK_COST_INPUT + FALLBACK_COST_OUTPUT = 0.00138/1k),
       // NOT $0 — the savings dashboard must reflect honest paid-model math.
       // estimatedCost = (maxTokens/1000) x rate, so 1500 maxTokens x 0.00138 = 0.00207.

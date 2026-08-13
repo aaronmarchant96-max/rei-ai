@@ -100,7 +100,7 @@ export default function ToolsLanding({ onOpenTool }) {
   const savingsPct = premiumCost > 0 ? Math.round((1 - reiCost / premiumCost) * 100) : 0;
   const hsv = demoResult?.hingeVector || {};
   const hingeRationale = demoResult?.id === "simple-greeting" ? "Cheapest route — 50-token budget on llama-3.1-8b-instant."
-    : demoResult?.id?.includes("coding") ? "Coding signals detected — gemini-flash-latest with Phase 0 + HARD STOP gate."
+    : demoResult?.id?.includes("coding") ? "Coding signals detected — gemini-2.5-flash with Phase 0 + HARD STOP gate."
       : demoResult?.id?.includes("adversarial") ? "Injection pattern detected — strictest gate, 5× cost multiplier."
         : "Generic reasoning. Balanced cost/safety profile.";
 

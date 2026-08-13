@@ -111,7 +111,7 @@ both machine-generated and human-discovered proposals.
   JavaScript" still → `coding-hinge`; "write a react component that tells a story" still →
   `coding-hinge`; suite 726 → 730 tests (4 new router tests); all 6 routing suites green.
   Note: the external report's cost claim (llama-3.3-70b, 2.7x) was false — both routes resolve to
-  gemini-flash-latest, zero cost difference.
+   gemini-2.5-flash, zero cost difference.
 - **caught:** `[caught: manual]`
 - **ref:** commit on 2026-08-12 (story/code collision fix)
 
