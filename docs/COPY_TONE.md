@@ -3,6 +3,16 @@
 > **Purpose:** a decision record + operational guide for how REI writes copy. It
 > turns "sound authentic, not AI" from a hope into a hard-stop-adjacent check.
 
+## Terminology
+
+- **CARDO Method** — the framework: find the hinge, every decision.
+- **CARDO REI** — the product.
+
+This copy-tone guardrail is **CARDO Method applied to marketing**: the hinge on
+the landing page is *the one measured number that earns the hype*, and the
+detector keeps the copy around it authentic. The framework name is used
+deliberately, never as decoration.
+
 ## The boundary (decision)
 
 | Surface | Tone | Why |
