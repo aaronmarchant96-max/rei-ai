@@ -285,6 +285,7 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 |------|---------|
 | `AGENTS.md` | This file — workflow rules |
 | `WORKFLOW_QUICKREF.md` | One-page operational memory (3-layer) |
+| `docs/WORKFLOW_DETAILED.md` | Detailed workflow reference (full rationale) |
 | `docs/fortis-et-liber.md` | REI codebase reference (project-specific) |
 | `docs/REI_CODE_PATTERNS.md` | Code patterns to follow |
 | `TOKEN_SAVERS.md` | Token efficiency tactics |

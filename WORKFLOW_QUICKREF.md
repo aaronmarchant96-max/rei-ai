@@ -1,6 +1,6 @@
 # Workflow Quick-ref (verified 2026-08-13)
 
-One-page operational memory. Rationale lives in `AGENTS.md` / `TOKEN_SAVERS.md` / specialist docs.
+One-page operational memory. Rationale lives in `AGENTS.md` / `docs/WORKFLOW_DETAILED.md` / `TOKEN_SAVERS.md`.
 
 ---
 
