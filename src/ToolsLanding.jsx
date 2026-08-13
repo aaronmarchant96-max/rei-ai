@@ -151,33 +151,33 @@ export default function ToolsLanding({ onOpenTool }) {
           className="relative text-4xl sm:text-5xl md:text-7xl font-medium leading-[1.08] mb-5 md:mb-6 z-10"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
-          Stop guessing what your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">AI traffic costs</span>.
+          Your AI bill is leaking money — <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">quietly</span>.
         </h1>
         
         <p className="relative text-[#EDEFF5] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-8 md:mb-10 leading-relaxed font-light z-10">
-          REI measures every routing decision, replays your traffic against real baselines, and shows where intelligent model selection reduces cost without hiding the quality or security trade-offs.
+          Every request you send to an expensive model that a cheaper one could answer is money straight down the drain. REI routes each request to the right model — and shows you the receipt. No guessing, no claimed headline numbers.
         </p>
 
-        {/* Measured savings — not a single magic number */}
+        {/* The catch — what wrong routing actually costs */}
         <div className="relative z-10 w-full max-w-3xl mx-auto mb-7 md:mb-8">
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
-            Measured savings. Not a single magic number.
+            In one measured pass, REI cut 85.7% off the premium bill.
           </div>
           <div className="grid grid-cols-3 gap-2 md:grid-cols-3 md:gap-4">
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
-              <div className="text-2xl md:text-4xl font-bold text-white mb-1">85.7%</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Baseline savings</div>
+              <div className="text-2xl md:text-4xl font-bold text-white mb-1">-85.7%</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Cheaper routing</div>
               <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">vs premium</div>
             </div>
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
-              <div className="text-2xl md:text-4xl font-bold text-white mb-1">83.1%</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Paid-routing</div>
-              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">paid → paid</div>
+              <div className="text-2xl md:text-4xl font-bold text-white mb-1">-83.1%</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Paid → paid</div>
+              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">same quality class</div>
             </div>
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
               <div className="text-2xl md:text-4xl font-bold text-white mb-1">+0 pts</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Free capacity</div>
-              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">disclosed</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">No quality cut</div>
+              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">disclosed, measured</div>
             </div>
           </div>
           <p className="text-xs text-[#565B72] text-center mt-4 max-w-xl mx-auto leading-relaxed px-1">
@@ -186,7 +186,7 @@ export default function ToolsLanding({ onOpenTool }) {
         </div>
 
         <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-8 z-10 px-1">
-          You know what your AI providers charged you. Do you know whether every request took the cheapest path that still met your requirements? REI isn't replacing provider billing — it optimizes the decision that happens before the bill.
+          Your provider bills you for tokens. It does not tell you whether a smaller model could have handled the job. REI isn't replacing provider billing — it fixes the decision that happens before the bill.
         </p>
 
         <button
