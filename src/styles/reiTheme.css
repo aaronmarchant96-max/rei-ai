@@ -499,19 +499,21 @@
  * row that never interleaves tabs with the theme toggle, and a composer
  * that never overflows the viewport. Desktop is unaffected (all below). */
 @media (max-width: 720px) {
-  /* Header: keep tabs + theme toggle on ONE non-wrapping row. `flex-wrap`
-   * let the `flex:1` tab strip and `margin-left:auto` toggle interleave into
-   * a mis-wrapped line (stranded sun icon + dead gap + broken wrap). Now the
-   * tabs scroll horizontally and the toggle stays pinned as a fixed chip. */
+  /* Header: ONE non-wrapping row — tabs shrink to a scrollable strip, theme
+   * chip stays pinned right. `.rei-domain-tabs` must use flex-basis 0 (not
+   * auto) so it actually shrinks to the available width; otherwise it sizes to
+   * its content (~676px) and pushes the toggle to a second row / overflows.
+   * `nowrap` on the header prevents the two-row stack seen on phones. */
   .rei-header {
+    flex-wrap: nowrap;
     padding: 6px 12px;
     gap: 8px;
   }
   .rei-header .rei-domain-tabs {
+    flex: 1 1 0;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    flex: 1 1 auto;
     min-width: 0;
     scrollbar-width: none;
   }
@@ -547,6 +549,32 @@
   }
   .rei-clip-btn {
     flex-shrink: 0;
+  }
+
+  /* Welcome card (first-load prompt): desktop pads this generously (34/30px
+   * intro, 22+26px starters), which reads as a stretched, clunky block on a
+   * small screen. Tighten the vertical rhythm so it reads as one intentional,
+   * compact card. Hierarchy unchanged — this only rescales spacing. */
+  .rei-chat-intro {
+    padding: 22px 20px 20px;
+  }
+  .rei-chat-intro__headline {
+    font-size: 22px;
+    margin: 0 0 8px;
+  }
+  .rei-chat-intro__text {
+    font-size: 14px;
+  }
+  .rei-starters {
+    padding: 16px 16px 18px;
+  }
+  .rei-starter-row {
+    padding: 12px 14px;
+    gap: 11px;
+  }
+  .rei-starter-row__glyph {
+    width: 28px;
+    height: 28px;
   }
 }
 
