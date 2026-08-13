@@ -196,6 +196,17 @@ export default function ToolsLanding({ onOpenTool }) {
           LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
 
+        <div className="relative z-10 flex items-center justify-center gap-3 mt-4">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-[#565B72]">or</span>
+          <button
+            onClick={() => onOpenTool({ tool: "analytics" })}
+            className="group inline-flex items-center gap-2 text-sm text-hinge-bright hover:text-[var(--amber)] transition-colors font-mono tracking-wide"
+          >
+            View measured savings analytics
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-[3px] transition-transform duration-300" />
+          </button>
+        </div>
+
         <p className="relative z-10 text-[#565B72] text-xs mt-5">
           1. Pick a domain → 2. Ask your question → 3. See the reasoning, not just the answer.
         </p>

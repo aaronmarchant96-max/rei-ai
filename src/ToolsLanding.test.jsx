@@ -52,6 +52,16 @@ describe("ToolsLanding", () => {
     expect(onOpenTool).toHaveBeenCalledWith({ tool: "rei" });
   });
 
+  it("surfaces a prominent analytics CTA next to the launch button", () => {
+    const onOpenTool = jest.fn();
+    render(<ToolsLanding onOpenTool={onOpenTool} />);
+
+    const cta = screen.getByRole("button", { name: /view measured savings analytics/i });
+    expect(cta).toBeInTheDocument();
+    fireEvent.click(cta);
+    expect(onOpenTool).toHaveBeenCalledWith({ tool: "analytics" });
+  });
+
   it("renders footer", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
