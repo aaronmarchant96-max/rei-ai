@@ -494,6 +494,62 @@
   line-height: 1;
 }
 
+/* Mobile-first fixes (aligned to useMobile 45em = 720px breakpoint).
+ * On phones the demo-first chat must be ONE clean prompt: a stable header
+ * row that never interleaves tabs with the theme toggle, and a composer
+ * that never overflows the viewport. Desktop is unaffected (all below). */
+@media (max-width: 720px) {
+  /* Header: keep tabs + theme toggle on ONE non-wrapping row. `flex-wrap`
+   * let the `flex:1` tab strip and `margin-left:auto` toggle interleave into
+   * a mis-wrapped line (stranded sun icon + dead gap + broken wrap). Now the
+   * tabs scroll horizontally and the toggle stays pinned as a fixed chip. */
+  .rei-header {
+    padding: 6px 12px;
+    gap: 8px;
+  }
+  .rei-header .rei-domain-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1 1 auto;
+    min-width: 0;
+    scrollbar-width: none;
+  }
+  .rei-header .rei-domain-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .rei-header .rei-domain-tab {
+    flex-shrink: 0;
+  }
+  .rei-header .rei-header__mobile-theme {
+    margin-left: 0;
+    flex-shrink: 0;
+  }
+
+  /* Composer: the row is a fixed non-wrapping flex row with a nowrap hint and
+   * a nowrap Send, so on a phone the textarea + Send spill off-screen. Hide
+   * the wide hint, add left/right padding safety, and let the textarea fit. */
+  .rei-input-shell {
+    padding: 10px 10px 12px;
+  }
+  .rei-input-row {
+    gap: 8px;
+  }
+  .rei-file-hint {
+    display: none;
+  }
+  .rei-touch-button--send {
+    padding: 0 14px;
+    min-width: 0;
+  }
+  .rei-input-area {
+    min-width: 0;
+  }
+  .rei-clip-btn {
+    flex-shrink: 0;
+  }
+}
+
 /* Active Voice Glassmorphism Banner */
 .rei-domain-banner {
   background: rgba(17, 17, 17, 0.75) !important;

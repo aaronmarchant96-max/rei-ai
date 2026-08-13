@@ -9,7 +9,7 @@ export default function ChatInput() {
   const [fileErrors, setFileErrors] = useState([]);
 
   return (
-    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: "12px 16px 16px", background: "var(--surface)", backdropFilter: "blur(12px)", borderTop: "1px solid var(--border)" }}>
+    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: mobile ? "10px 10px 12px" : "12px 16px 16px", background: "var(--surface)", backdropFilter: "blur(12px)", borderTop: "1px solid var(--border)" }}>
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
 
         {attachedFiles && attachedFiles.length > 0 && (
