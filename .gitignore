@@ -27,3 +27,6 @@ API_ENDPOINT_SETUP.md
 handoff_*.txt
 .aider*
 api_keys.md
+
+# Separate Azure debate-furnace package lockfile (kept out of REI main; private package)
+api/package-lock.json
