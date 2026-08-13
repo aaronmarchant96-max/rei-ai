@@ -119,3 +119,126 @@ describe("providerSensitivity — provider-price stress test", () => {
     expect(evaluateScenarios(TRAFFIC, null, [{ id: "A", label: "x" }])[0].b4Cost).toBe(0);
   });
 });
+
+// ── Cache-aware scenario economics ────────────────────────────────────────
+
+const CACHE_TRAFFIC: PilotTrafficEntry[] = [
+  { prompt: "hi", tokens: 100, actualCost: 0.001, inputTokens: 80, outputTokens: 20 },
+  { prompt: "what is the capital of France?", tokens: 200, actualCost: 0.004, inputTokens: 160, outputTokens: 40 },
+];
+
+describe("providerSensitivity — cache-aware scenarios", () => {
+  it("applies an assumed cache-hit ratio: cacheAdjustedB4Cost < b4Cost, savings > 0", () => {
+    // Per-model cacheHit rates override the base catalog (isolated view); the
+    // assumed ratio drives the cached split for entries with input tokens.
+    const scenarios: ScenarioDelta[] = [
+      {
+        id: "E",
+        label: "cache",
+        cache: { cacheHitRatio: 0.8, cacheHit: { "gpt-4o-mini": 0.000015, "gpt-4o": 0.00025 } },
+      },
+    ];
+    const r = evaluateScenarios(CACHE_TRAFFIC, BASE_CATALOG, scenarios)[0];
+    expect(r.cacheAdjustedB4Cost).not.toBeNull();
+    expect(r.cacheAdjustedB4Cost!).toBeLessThan(r.b4Cost);
+    expect(r.estimatedCacheSavings).not.toBeNull();
+    expect(r.estimatedCacheSavings!).toBeGreaterThan(0);
+    // Routing decisions are untouched: same measured/escalation as the base run.
+    expect(r.measured).toBe(2);
+  });
+
+  it("scenario without cache assumptions leaves cache fields null (legacy authoritative)", () => {
+    const scenarios: ScenarioDelta[] = [{ id: "N", label: "no-cache" }];
+    const r = evaluateScenarios(CACHE_TRAFFIC, BASE_CATALOG, scenarios)[0];
+    expect(r.cacheAdjustedB4Cost).toBeNull();
+    expect(r.estimatedCacheSavings).toBeNull();
+  });
+
+  it("cacheHitRatio = 0 leaves B4 cost EXACTLY unchanged (cache modeling cannot alter legacy)", () => {
+    const scenarios: ScenarioDelta[] = [
+      { id: "A", label: "plain" },
+      {
+        id: "Z",
+        label: "zero-cache",
+        cache: { cacheHitRatio: 0, cacheHit: { "gpt-4o-mini": 0.000015, "gpt-4o": 0.00025 } },
+      },
+    ];
+    const results = evaluateScenarios(CACHE_TRAFFIC, BASE_CATALOG, scenarios);
+    // With no cached tokens, the cache-adjusted view is not modeled (null) and
+    // B4 is byte-identical to the no-cache scenario — no silent cost change.
+    expect(results[0].b4Cost).toBe(results[1].b4Cost);
+    expect(results[1].cacheAdjustedB4Cost).toBeNull();
+  });
+
+  it("traffic with only bare tokens does not participate in cache modeling", () => {
+    const traffic: PilotTrafficEntry[] = [{ prompt: "hi", tokens: 100, actualCost: 0.001 }];
+    const scenarios: ScenarioDelta[] = [
+      {
+        id: "E",
+        label: "cache",
+        cache: { cacheHitRatio: 0.8, cacheHit: { "gpt-4o-mini": 0.000015 } },
+      },
+    ];
+    const r = evaluateScenarios(traffic, BASE_CATALOG, scenarios)[0];
+    expect(r.cacheAdjustedB4Cost).toBeNull();
+    expect(r.estimatedCacheSavings).toBeNull();
+  });
+});
+
+// ── Fixture-level experimental-isolation contract ─────────────────────────
+// The on-disk fixtures are the shared evidence surface for the product's
+// economic question. These tests guard the scientific separation:
+//   A/B/D answer the provider-price question  → cache-neutral (null).
+//   E answers the cache-economics question    → cache-modeled (non-null),
+//   and its cache savings must trace ONLY to E's own declared rates, never to
+//   an inherited base-catalog rate.
+// Routing decisions are frozen (identical across A and E) — only the economic
+// view differs.
+
+import pilotTrafficFixture from "@/__eval__/fixtures/pilot-traffic.json";
+import pilotCatalogFixture from "@/__eval__/fixtures/pilot-catalog.json";
+import providerScenariosFixture from "@/__eval__/fixtures/provider-scenarios.json";
+
+const FIX_TRAFFIC = pilotTrafficFixture as unknown as PilotTrafficEntry[];
+const FIX_CATALOG = pilotCatalogFixture as unknown as PilotCatalog;
+const FIX_SCENARIOS = providerScenariosFixture.scenarios as unknown as ScenarioDelta[];
+
+describe("providerSensitivity — fixture experimental-isolation contract", () => {
+  const results = evaluateScenarios(FIX_TRAFFIC, FIX_CATALOG, FIX_SCENARIOS);
+  const byId = (id: string) => results.find((r) => r.id === id)!;
+
+  it("A/B/D are cache-neutral: cacheModeledEntries === 0 and cache fields are null", () => {
+    for (const id of ["A", "B", "D"]) {
+      const r = byId(id);
+      expect(r.cacheModeledEntries).toBe(0);
+      expect(r.cacheAdjustedB4Cost).toBeNull();
+      expect(r.estimatedCacheSavings).toBeNull();
+    }
+  });
+
+  it("E is cache-modeled: cacheModeledEntries > 0 and estimatedCacheSavings non-null", () => {
+    const e = byId("E");
+    expect(e.cacheModeledEntries).toBeGreaterThan(0);
+    expect(e.cacheAdjustedB4Cost).not.toBeNull();
+    expect(e.estimatedCacheSavings).not.toBeNull();
+    expect(e.estimatedCacheSavings!).toBeGreaterThan(0);
+    expect(e.cacheAdjustedB4Cost!).toBeLessThan(e.b4Cost);
+  });
+
+  it("routing decisions are frozen identical across A and E (same measured/escalated)", () => {
+    const a = byId("A");
+    const e = byId("E");
+    expect(e.measured).toBe(a.measured);
+    expect(e.escalated).toBe(a.escalated);
+    expect(e.excluded).toBe(a.excluded);
+  });
+
+  it("E's cache economics differ from A while the decision surface stays identical", () => {
+    const a = byId("A");
+    const e = byId("E");
+    // A has no cache economics at all.
+    expect(a.cacheAdjustedB4Cost).toBeNull();
+    // E re-costs the same measured/escalated workload under cache-aware rates.
+    expect(e.cacheModeledEntries).toBeGreaterThan(0);
+  });
+});

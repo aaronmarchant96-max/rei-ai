@@ -244,3 +244,81 @@ describe("pilotEval — single-customer pilot evaluator", () => {
     expect(report.freeCapacityContribution).toBeCloseTo(100, 6);
   });
 });
+
+// ── Cache-aware cost model ────────────────────────────────────────────────
+// The existing CATALOG fixture has NO cacheHit rates, so all 14 tests above
+// stay on the legacy path. These tests use a cache-enabled catalog.
+
+const CACHE_CATALOG: PilotCatalog = {
+  ...CATALOG,
+  models: {
+    "gpt-4o": { input: 0.0025, output: 0.01, cacheHit: 0.00025 },
+    "gpt-4o-mini": { input: 0.00015, output: 0.0006, cacheHit: 0.000015 },
+    "deepseek-v4-flash": { input: 0.00014, output: 0.00028, cacheHit: 0.000014 },
+  },
+};
+
+describe("pilotEval — cache-aware cost model", () => {
+  it("INVARIANT: cacheHitRatio = 0 makes cache-aware cost EXACTLY equal the legacy cost", () => {
+    // greeting → gpt-4o-mini: legacy = 100/1000 * 0.00075 = 0.000075.
+    const report = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001, inputTokens: 80, outputTokens: 20, cacheHitRatio: 0 }],
+      CACHE_CATALOG
+    );
+    expect(report.reiCost).toBeCloseTo(0.000075, 12);
+    expect(report.cacheAdjustedReiCost).not.toBeNull();
+    expect(report.cacheAdjustedReiCost).toBeCloseTo(report.reiCost, 12); // EXACT equality
+    expect(report.estimatedCacheSavings).toBeCloseTo(0, 12);
+    expect(report.estimatedCacheSavingsPercent).toBeCloseTo(0, 12);
+    expect(report.cacheModeledEntries).toBe(1);
+  });
+
+  it("measured path: cachedInputTokens present → EXACT cache-aware cost", () => {
+    // greeting → gpt-4o-mini. input 80, cached 64, output 20.
+    // cost = (16*0.00015 + 64*0.000015 + 20*0.0006)/1000 = 0.00001536
+    const report = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001, inputTokens: 80, cachedInputTokens: 64, outputTokens: 20 }],
+      CACHE_CATALOG
+    );
+    expect(report.cacheAdjustedReiCost).toBeCloseTo(0.00001536, 12);
+    expect(report.estimatedCacheSavings).toBeCloseTo(0.000075 - 0.00001536, 12);
+    expect(report.estimatedCacheSavingsPercent).toBeGreaterThan(50);
+    expect(report.cacheModeledEntries).toBe(1);
+  });
+
+  it("assumption path: inputTokens + outputTokens + cacheHitRatio → ESTIMATED cache-aware cost", () => {
+    // Same entry but ratio-derived instead of measured: 0.8 * 80 = 64 cached → identical math.
+    const report = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001, inputTokens: 80, outputTokens: 20, cacheHitRatio: 0.8 }],
+      CACHE_CATALOG
+    );
+    expect(report.cacheAdjustedReiCost).toBeCloseTo(0.00001536, 12);
+    expect(report.estimatedCacheSavings).toBeCloseTo(0.000075 - 0.00001536, 12);
+    expect(report.cacheModeledEntries).toBe(1);
+  });
+
+  it("REGRESSION: bare tokens + cacheHitRatio does NOT invent an input/output split", () => {
+    // tokens-only entry: input cannot be identified → legacy cost authoritative,
+    // no cache adjustment, no 'estimated cache savings' claim.
+    const report = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001, cacheHitRatio: 0.5 }],
+      CACHE_CATALOG
+    );
+    expect(report.reiCost).toBeCloseTo(0.000075, 12); // legacy unchanged
+    expect(report.cacheAdjustedReiCost).toBeNull();
+    expect(report.estimatedCacheSavings).toBeNull();
+    expect(report.estimatedCacheSavingsPercent).toBeNull();
+    expect(report.cacheModeledEntries).toBe(0);
+  });
+
+  it("model without a cacheHit rate stays on the legacy path even with input tokens present", () => {
+    // Plain CATALOG (no cacheHit on any model) → no cache modeling possible.
+    const report = evaluatePilotTraffic(
+      [{ prompt: "hi", tokens: 100, actualCost: 0.001, inputTokens: 80, cachedInputTokens: 64, outputTokens: 20 }],
+      CATALOG
+    );
+    expect(report.cacheAdjustedReiCost).toBeNull();
+    expect(report.estimatedCacheSavings).toBeNull();
+    expect(report.cacheModeledEntries).toBe(0);
+  });
+});

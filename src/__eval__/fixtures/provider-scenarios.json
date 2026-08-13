@@ -46,6 +46,27 @@
         "story-architect": "gpt-4o-mini",
         "legal-hinge": "gpt-4o-mini"
       }
+    },
+    {
+      "id": "E",
+      "label": "Cache-aware economics (same route decisions, cache-capable models)",
+      "note": "Isolated cache-economics experiment: the SAME traffic and the SAME per-request route decisions as A, but the routes that contribute to B4 now resolve to paid, cache-capable models with explicit cacheHit rates (deepseek-v4-flash 0.1x cached-input, gpt-4o 0.1x cached-input on the adversarial floor). The adversarial-validation route is explicitly covered so EVERY route feeding B4 has a cacheHit — nothing leaks to an inherited catalog rate. cachedInputTokens in the traffic are measured (traffic default), so cache economics here do not depend on the 0.8 assumed ratio except for entries lacking measured cached counts. Holds 'same routing decisions + different cache economics'.",
+      "models": {
+        "deepseek-v4-flash": { "input": 0.00014, "output": 0.00028, "cacheHit": 0.000014 },
+        "gpt-4o": { "input": 0.0025, "output": 0.01, "cacheHit": 0.00025 }
+      },
+      "routeModels": {
+        "simple-greeting": "deepseek-v4-flash",
+        "structured-reasoning": "deepseek-v4-flash",
+        "coding-hinge": "deepseek-v4-flash",
+        "genealogy-deep-dive": "deepseek-v4-flash",
+        "story-architect": "deepseek-v4-flash",
+        "legal-hinge": "deepseek-v4-flash",
+        "adversarial-validation": "gpt-4o"
+      },
+      "cache": {
+        "cacheHitRatio": 0.8
+      }
     }
   ]
 }

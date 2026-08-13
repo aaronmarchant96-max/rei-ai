@@ -80,6 +80,9 @@ if (scenariosPath) {
     console.log(`      B2 cheapest paid floor $${r.b2Cost.toFixed(5)}  (${r.b2Model || "—"})`);
     console.log(`      B3 best fixed paid     $${r.b3Cost.toFixed(5)}  (${r.b3Model || "—"})`);
     console.log(`      B4 REI routing         $${r.b4Cost.toFixed(5)}`);
+    if (r.cacheAdjustedB4Cost != null) {
+      console.log(`      B4 cache-adjusted      $${r.cacheAdjustedB4Cost.toFixed(5)}  (est. cache savings $${r.estimatedCacheSavings.toFixed(5)})`);
+    }
     console.log(`      savings vs B1          ${pct(r.savingsVsB1Percent)}`);
     console.log(`      savings vs B2 floor    ${pct(r.savingsVsB2Percent)}`);
     console.log(`      free-capacity share    ${r.freeCapacityShare != null ? r.freeCapacityShare.toFixed(1) : "—"}% of premium baseline`);
@@ -133,6 +136,15 @@ for (const [reason, count] of Object.entries(report.excludedReasons)) {
   }
   if (report.freeCapacityContribution != null) {
     console.log(`  Free-tier contribution:                      ${report.freeCapacityContribution.toFixed(1)} points of baseline`);
+  }
+  if (report.estimatedCacheSavings != null && report.cacheAdjustedReiCost != null) {
+    console.log("  ─────────────────────────────────────────────");
+    console.log(`  Cache-aware (ESTIMATED, not actual spend):`);
+    console.log(`      REI at uncached rates:      $${report.reiCost.toFixed(5)}`);
+    console.log(`      cache-adjusted estimate:    $${report.cacheAdjustedReiCost.toFixed(5)}  (${report.cacheModeledEntries} entries modeled)`);
+    console.log(`      est. cache savings:         $${report.estimatedCacheSavings.toFixed(5)}  (${pct(report.estimatedCacheSavingsPercent)})`);
+    console.log("      ⚠ cached-token billing is an estimate whenever the traffic's cache split");
+    console.log("        came from an assumed ratio — never present it as measured spend.");
   }
   console.log(`  Decomposition: price-optimization $${report.savingsDecomposition.priceOptimization.toFixed(5)} · free-capacity $${report.savingsDecomposition.freeCapacity.toFixed(5)}`);
   console.log("  ─────────────────────────────────────────────");

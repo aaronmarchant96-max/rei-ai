@@ -32,6 +32,25 @@ export interface PilotTrafficEntry {
   actualCost?: number;
   /** Their provider, for reference. */
   provider?: string;
+  /**
+   * Measured input tokens. Present when the caller has real telemetry. When
+   * `cachedInputTokens` is ALSO present this is the exact (measured) cache
+   * path. When only `inputTokens`+`outputTokens`+`cacheHitRatio` are present
+   * this is the assumption path (estimated cache cost).
+   */
+  inputTokens?: number;
+  /** Measured cached (cache-hit) input tokens — exact cache path. */
+  cachedInputTokens?: number;
+  /** Measured output tokens. */
+  outputTokens?: number;
+  /**
+   * Assumed cache-hit ratio (0..1), convenience for fixtures/scenarios.
+   * Only used to DERIVE a cache estimate when real `cachedInputTokens` are
+   * absent. NEVER applied to a bare `tokens` total — an input/output split
+   * cannot be inferred from a single sum, so a `tokens`-only entry is billed
+   * at the legacy rate regardless of this value.
+   */
+  cacheHitRatio?: number;
 }
 
 export interface PilotModelRate {
@@ -39,6 +58,9 @@ export interface PilotModelRate {
   input: number;
   /** USD per 1K output tokens. */
   output: number;
+  /** USD per 1K CACHED input tokens (cache-hit rate). When present and the
+   *  traffic carries identifiable input tokens, cache economics are modeled. */
+  cacheHit?: number;
 }
 
 export interface PilotProvenance {
@@ -127,6 +149,26 @@ export interface PilotReport {
   /** Split of total savings into price-optimization vs free-capacity. */
   savingsDecomposition: PilotSavingsDecomposition;
   /**
+   * CACHE-AWARE economics (estimated, NEVER measured spend).
+   *
+   * `reiCost` is the actual/replay cost at uncached rates. `cacheAdjustedReiCost`
+   * is what that same workload would cost if cached input tokens were billed at
+   * each route model's `cacheHit` rate. The two are DIFFERENT economic models:
+   * nothing here means REI actually paid the lower number. `estimatedCacheSavings`
+   * = reiCost − cacheAdjustedReiCost; it is an estimate whenever the traffic's
+   * cache split was derived from a `cacheHitRatio`, exact only when real
+   * `cachedInputTokens` were provided.
+   *
+   * Populated only when (a) a route model carries a `cacheHit` rate AND (b) the
+   * entry carries identifiable input tokens. A `tokens`-only entry never
+   * participates — the legacy cost model remains authoritative.
+   */
+  cacheAdjustedReiCost: number | null;
+  estimatedCacheSavings: number | null;
+  estimatedCacheSavingsPercent: number | null;
+  /** Number of measured entries where cache economics were modeled. */
+  cacheModeledEntries: number;
+  /**
    * Origin of the evaluated traffic. When source is NOT 'production', savings
    * is a REPLAY ESTIMATE over the given traffic, not measured live spend —
    * the report must never present it as measured telemetry.
@@ -143,6 +185,65 @@ function costOf(rate: PilotModelRate, tokens: number): number {
 /** A route model is "free capacity" when its catalog rate is $0 (input+output). */
 function isFreeRate(rate: PilotModelRate): boolean {
   return rate.input + rate.output <= 0;
+}
+
+/**
+ * Resolve how many input tokens are cache-eligible for one entry, honoring the
+ * three-path precedence. Returns null when the evaluator CANNOT identify input
+ * tokens (legacy path — caller bills at the uncached rate, no cache modeling).
+ *
+ *   measured:   inputTokens + cachedInputTokens + outputTokens  → exact
+ *   assumption: inputTokens + outputTokens + cacheHitRatio      → estimated
+ *   legacy:     tokens only (+ cacheHitRatio)                    → null
+ *
+ * A bare `tokens` total is never split — that would fabricate a cache cost.
+ */
+function cacheSplit(entry: PilotTrafficEntry): { cached: number; input: number; mode: "measured" | "assumption" } | null {
+  const input = num(entry.inputTokens);
+  if (input <= 0) return null;
+
+  const cachedMeasured = num(entry.cachedInputTokens);
+  if (entry.cachedInputTokens !== undefined) {
+    return { cached: Math.min(cachedMeasured, input), input, mode: "measured" };
+  }
+
+  const ratio = num(entry.cacheHitRatio);
+  if (ratio > 0) {
+    return { cached: Math.min(input * ratio, input), input, mode: "assumption" };
+  }
+  // ratio present but 0 → nothing cached; still cache-modelable (exact, zero).
+  if (entry.cacheHitRatio !== undefined) {
+    return { cached: 0, input, mode: "assumption" };
+  }
+  return null;
+}
+
+/**
+ * Cache-aware cost of a route model serving `entry`. Returns the legacy
+ * (uncached) cost when the model has no cacheHit rate or the entry cannot
+ * identify input tokens — cache modeling never changes the legacy result.
+ *
+ * INVARIANT: when the effective cached count is 0 (cacheHitRatio = 0, or
+ * measured cachedInputTokens = 0), the cost reduces EXACTLY to the legacy
+ * costOf() — cache modeling never silently changes the existing measurement.
+ */
+function cacheAwareCost(rate: PilotModelRate, entry: PilotTrafficEntry): { cost: number; cached: number; mode: "measured" | "assumption" | "legacy" } {
+  if (typeof rate.cacheHit !== "number" || !isFinite(rate.cacheHit)) {
+    return { cost: costOf(rate, num(entry.tokens)), cached: 0, mode: "legacy" };
+  }
+  const split = cacheSplit(entry);
+  if (!split) {
+    return { cost: costOf(rate, num(entry.tokens)), cached: 0, mode: "legacy" };
+  }
+  const { cached, input, mode } = split;
+  if (cached <= 0) {
+    // Nothing cached → no cache benefit → legacy model remains authoritative (exact equality).
+    return { cost: costOf(rate, num(entry.tokens)), cached: 0, mode };
+  }
+  const output = num(entry.outputTokens);
+  const uncachedInput = input - cached;
+  const cost = (uncachedInput * rate.input + cached * (rate.cacheHit ?? 0) + output * rate.output) / 1000;
+  return { cost, cached, mode };
 }
 
 /**
@@ -175,6 +276,10 @@ export function evaluatePilotTraffic(
   let paidProviderRei = 0;
   let priceOptimization = 0;
   let freeCapacity = 0;
+
+  // Cache-aware accumulators (measured entries only).
+  let cacheAdjustedReiCost = 0;
+  let cacheModeledEntries = 0;
 
   const exclude = (reason: string) => {
     excludedReasons[reason] = (excludedReasons[reason] || 0) + 1;
@@ -223,6 +328,11 @@ export function evaluatePilotTraffic(
     baselineCost += baseline;
     reiCost += rei;
 
+    // Cache-aware cost of this entry (estimated when the split was assumed).
+    const cacheCost = cacheAwareCost(rate, entry);
+    cacheAdjustedReiCost += cacheCost.cost;
+    if (cacheCost.mode !== "legacy") cacheModeledEntries += 1;
+
     // Premium-relative baseline (only when the premium model is in the catalog).
     if (hasPremium) {
       premiumBaselineCost += costOf(models[premiumModel], tokens);
@@ -257,6 +367,14 @@ export function evaluatePilotTraffic(
 
   const freeCapacityContribution = baselineCost > 0 ? (freeCapacity / baselineCost) * 100 : null;
 
+  // Cache economics: report only when at least one entry was cache-modeled.
+  // When cacheModeledEntries === 0, the cache-adjusted figures are null —
+  // nothing claims a cache saving that was never modeled.
+  const cacheAdjusted = cacheModeledEntries > 0 ? cacheAdjustedReiCost : null;
+  const estimatedCacheSavings = cacheAdjusted !== null ? reiCost - cacheAdjusted : null;
+  const estimatedCacheSavingsPercent =
+    cacheAdjusted !== null && reiCost > 0 ? (estimatedCacheSavings! / reiCost) * 100 : null;
+
   for (const routeId of Object.keys(byRoute)) {
     const r = byRoute[routeId];
     r.savings = r.baseline - r.reiCost;
@@ -283,6 +401,10 @@ export function evaluatePilotTraffic(
     paidProviderSavingsPercent,
     freeCapacityContribution,
     savingsDecomposition: { priceOptimization, freeCapacity },
+    cacheAdjustedReiCost: cacheAdjusted,
+    estimatedCacheSavings,
+    estimatedCacheSavingsPercent,
+    cacheModeledEntries,
     provenance: catalog?.provenance ?? null,
   };
 }

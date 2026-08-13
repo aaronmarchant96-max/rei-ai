@@ -49,6 +49,19 @@ export interface ScenarioDelta {
   premiumModel?: string;
   /** Default route model for this scenario. */
   defaultModel?: string;
+  /**
+   * CACHE assumptions for this scenario: per-model cacheHit rates to apply
+   * (overrides base), plus an entry-level cacheHitRatio for traffic entries
+   * that carry inputTokens but no cachedInputTokens. Only traffic entries with
+   * identifiable input tokens participate in cache modeling; the routing
+   * decisions are the SAME precomputed ones used for every scenario.
+   */
+  cache?: {
+    /** Per-model cacheHit rates (USD/1K cached input) to add/override. */
+    cacheHit?: Record<string, number>;
+    /** Assumed cache-hit ratio (0..1) for eligible entries without real cached counts. */
+    cacheHitRatio?: number;
+  };
 }
 
 export interface ScenarioResult {
@@ -78,6 +91,18 @@ export interface ScenarioResult {
   escalated: number;
   /** Share of REI-routed cost attributable to $0-rate (free-capacity) models, 0–100. */
   freeCapacityShare: number | null;
+  /**
+   * CACHE-AWARE economics for this scenario (estimated, never actual spend).
+   * `cacheAdjustedB4Cost` is B4 re-costed with cached input tokens billed at
+   * each route model's cacheHit rate. `estimatedCacheSavings` = b4Cost −
+   * cacheAdjustedB4Cost. Populated only when the scenario supplied cache
+   * assumptions AND at least one measured entry carried identifiable input
+   * tokens — otherwise null (legacy model remains authoritative).
+   */
+  cacheAdjustedB4Cost: number | null;
+  estimatedCacheSavings: number | null;
+  /** Number of measured entries where cache economics were modeled (0 means cache-neutral). */
+  cacheModeledEntries: number;
 }
 
 const num = (n: unknown): number => (typeof n === "number" && isFinite(n) ? n : 0);
@@ -103,6 +128,10 @@ function isolatedCatalog(
   for (const [name, rate] of Object.entries(delta?.models ?? {})) {
     models[name] = { ...rate };
   }
+  // Apply per-model cacheHit rates (additive to the scenario's models).
+  for (const [name, cacheHit] of Object.entries(delta?.cache?.cacheHit ?? {})) {
+    models[name] = { ...(models[name] ?? { input: 0, output: 0 }), cacheHit };
+  }
   for (const name of delta?.unavailableModels ?? []) {
     delete models[name];
   }
@@ -113,6 +142,38 @@ function isolatedCatalog(
   const defaultModel = delta?.defaultModel ?? base?.defaultModel;
   const premiumModel = delta?.premiumModel ?? base?.premiumModel ?? "gpt-4o";
   return { models, routeModels, defaultModel, premiumModel };
+}
+
+/**
+ * Cache-aware cost of one entry under a scenario's cache assumptions. Returns
+ * the legacy cost when the model has no cacheHit rate OR the entry cannot
+ * identify input tokens — cache modeling never changes the legacy result.
+ */
+function scenarioCacheCost(
+  rate: PilotModelRate,
+  entry: PilotTrafficEntry,
+  assumedRatio: number | undefined,
+  tokens: number
+): { cost: number; modeled: boolean } {
+  if (typeof rate.cacheHit !== "number" || !isFinite(rate.cacheHit)) {
+    return { cost: costOf(rate, tokens), modeled: false };
+  }
+  const input = num(entry.inputTokens);
+  if (input <= 0) {
+    return { cost: costOf(rate, tokens), modeled: false };
+  }
+  const cachedMeasured = num(entry.cachedInputTokens);
+  const cached = entry.cachedInputTokens !== undefined
+    ? Math.min(cachedMeasured, input)
+    : Math.min(input * (num(assumedRatio) || 0), input);
+  if (cached <= 0) {
+    // Nothing cached → legacy model remains authoritative (exact equality with no-cache view).
+    return { cost: costOf(rate, tokens), modeled: false };
+  }
+  const output = num(entry.outputTokens);
+  const uncachedInput = input - cached;
+  const cost = (uncachedInput * rate.input + cached * rate.cacheHit + output * rate.output) / 1000;
+  return { cost, modeled: true };
 }
 
 /** Precompute routing decisions ONCE so every scenario re-costs the same policy. */
@@ -160,6 +221,9 @@ export function evaluateScenarios(
     let b1Cost = 0;
     let b4Cost = 0;
     let freeCapacitySavings = 0;
+    // Cache-aware B4 accumulator + modeled count (estimated, never actual spend).
+    let cacheAdjustedB4Cost = 0;
+    let cacheModeledEntries = 0;
     // Per-entry baseline tokens for B2/B3 are the same measured entries; we need
     // the token counts that enter the fixed-workload sums.
     const measuredTokens: number[] = [];
@@ -189,6 +253,10 @@ export function evaluateScenarios(
       const rei = costOf(reiRate, tokens);
       measured += 1;
       b4Cost += rei;
+      // Cache-aware cost of this entry under the scenario's cache assumptions.
+      const cacheCost = scenarioCacheCost(reiRate, entry, scenario.cache?.cacheHitRatio, tokens);
+      cacheAdjustedB4Cost += cacheCost.cost;
+      if (cacheCost.modeled) cacheModeledEntries += 1;
       if (hasPremium) {
         const b1 = costOf(models[premiumModel], tokens);
         b1Cost += b1;
@@ -221,6 +289,10 @@ export function evaluateScenarios(
     const savingsVsB2Percent = b2Cost > 0 ? ((b2Cost - b4Cost) / b2Cost) * 100 : null;
     const freeCapacityShare = b1Cost > 0 ? (freeCapacitySavings / b1Cost) * 100 : null;
 
+    // Cache economics surface only when the scenario modeled at least one entry.
+    const cacheAdjusted = cacheModeledEntries > 0 ? cacheAdjustedB4Cost : null;
+    const estimatedCacheSavings = cacheAdjusted !== null ? b4Cost - cacheAdjusted : null;
+
     return {
       id: scenario.id,
       label: scenario.label,
@@ -238,6 +310,9 @@ export function evaluateScenarios(
       savingsVsB2Percent,
       escalated,
       freeCapacityShare,
+      cacheAdjustedB4Cost: cacheAdjusted,
+      estimatedCacheSavings,
+      cacheModeledEntries,
     };
   });
 }
