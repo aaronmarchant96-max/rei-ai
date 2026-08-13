@@ -60,6 +60,11 @@ git_commit: <HEAD commit hash>
 files_affected: <count>
 reversible: yes | no | partial
 blast_radius: <what breaks if this fails>
+stop_conditions:
+  - tests_regress
+  - scope_drift
+  - measurement_contract_break
+  - unexpected_runtime_behavior
 ---
 ```
 
@@ -70,6 +75,7 @@ blast_radius: <what breaks if this fails>
 | `plan_valid_as_of` | Prevents executing against stale state. AGY MUST re-check if HEAD differs from plan's `git_commit`. |
 | `blast_radius` | Before any destructive op (git, sync, schema), the agent must estimate what breaks. If "irreversible" → user confirmation required. |
 | `reversible` | Fast Lanes are always reversible. AGY plans may not be. Flag it. |
+| `stop_conditions` | Explicit conditions at which the plan halts. **On a stop condition, preserve the worktree for diagnosis; do NOT auto-revert unless the plan explicitly declares the rollback safe.** Blind rollback can destroy evidence. |
 
 ### Pre-execution gate
 
@@ -78,6 +84,32 @@ Before executing an AGY plan, the execution agent MUST:
 1. Run `git status --short` and compare with `git_commit` in the plan
 2. If HEAD differs → **stale plan**. Re-route to AGY for re-evaluation.
 3. If `blast_radius` includes files not in the plan → **halt and report**.
+
+### Worktree gate
+
+Before *any* modification, run `git status --short` and `git diff --stat`:
+
+- Pre-existing modifications are **OUT-OF-SCOPE**. Do not modify, stage, reset,
+  stash, or commit them.
+- If the task scope overlaps a dirty file → **STOP and ask / re-plan** (don't
+  silently touch someone else's in-flight work).
+- Record unrelated dirty paths in the execution handoff so a later agent knows
+  they are not yours.
+
+This prevents the "unrelated file bundled into a commit" incident class.
+
+### Scope gate (scope drift)
+
+The plan may stay on the same commit while implementation discovers the planned
+scope is insufficient. If a change requires an **unplanned** file, architecture
+change, new dependency, changed public contract, changed runtime behavior, or
+new external service/API → **STOP**.
+
+Do not silently expand the plan. Record:
+- WHY discovered
+- BLAST RADIUS
+- ALTERNATIVES
+- REPLAN_REQUIRED: yes/no
 
 ---
 
@@ -184,6 +216,54 @@ This adds almost no cost at commit time and over months produces a dataset showi
 
 ---
 
+## Measurement & Evidence Discipline
+
+Standing rules for anything touching claims, economics, analytics, accuracy, or security:
+
+**Claim before code.** Before implementing, answer: *"What claim will this change allow us to make?"*
+If the answer is unclear → STOP, define the measurement first. Then the order is:
+
+```
+claim
+ ↓
+measurement definition
+ ↓
+fixture
+ ↓
+acceptance test
+ ↓
+implementation
+ ↓
+claim verification
+```
+
+**Provenance.** Every externally visible metric must identify: numerator · denominator ·
+baseline · corpus · measurement mode · assumptions · exclusions · timestamp/version ·
+whether `measured`, `replayed`, `estimated`, or `modeled`.
+**Never let an estimated/modelled value occupy a measured-value field.**
+
+**Counterfactual isolation.** Any economic/quality/security counterfactual must freeze
+the variables not under test — same corpus, same routing decisions (unless routing
+adaptation is itself the test), same exclusions, same evaluation criteria; only declared
+scenario variables change. The test must prove both `CONTROL == CONTROL` and
+`EFFECT != CONTROL`.
+
+---
+
+## Concurrent Work
+
+Before editing: verify HEAD, branch, worktree, and recent commits. If another agent or
+session may be working in this repo:
+
+- Do not assume its changes are yours
+- Do not reset, stash, or checkout its work
+- Rebase/re-plan only with explicit authority
+
+A commit appearing after plan creation does **not** automatically make the plan stale —
+but if HEAD changed, the plan's pinned execution context must be **revalidated**.
+
+---
+
 ## Token Budget
 
 | Path | Budget | When |
@@ -204,10 +284,11 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 | File | Purpose |
 |------|---------|
 | `AGENTS.md` | This file — workflow rules |
+| `WORKFLOW_QUICKREF.md` | One-page operational memory (3-layer) |
 | `docs/fortis-et-liber.md` | REI codebase reference (project-specific) |
 | `docs/REI_CODE_PATTERNS.md` | Code patterns to follow |
 | `TOKEN_SAVERS.md` | Token efficiency tactics |
 
 ---
 
-*Last reviewed: 2026-08-13 (added Tactic 8-10 pointers). Stale after: 2026-08-14. Verify rules before executing.*
+*Last reviewed: 2026-08-13 (added worktree/scope gates, stop_conditions, evidence + concurrent-work discipline). Stale after: 2026-08-14. Verify rules before executing.*
