@@ -67,7 +67,7 @@ REI.ai solves this by placing a **zero-inference deterministic engine** and **co
 - [ ] Release TypeScript / Node SDK (`npm install @rei-ai/sdk`).
 
 ### Phase 3: Cost Savings Dashboard & Analytics (Week 3)
-- [ ] Build user telemetry dashboard displaying real-time dollar savings vs. frontier baselines.
+- [x] Build user telemetry dashboard displaying real-time dollar savings vs. frontier baselines.
 - [ ] Implement token budget ceiling controls (`max_cost_per_query`).
 
 ### Phase 4: Public Launch & Case Studies (Week 4)

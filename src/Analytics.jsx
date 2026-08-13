@@ -19,6 +19,7 @@ import DecisionFeed from "./modules/rei/components/DecisionFeed.jsx";
 import AnimatedCounter from "./modules/rei/components/AnimatedCounter.jsx";
 import MetricCard from "./modules/rei/components/MetricCard.jsx";
 import ProgressBar from "./modules/rei/components/ProgressBar.jsx";
+import { fetchSavings } from "./lib/savingsClient.js";
 
 const DOMAIN_LABELS = {
   assistant: "Generalist",
@@ -100,6 +101,20 @@ export default function Analytics() {
   const [logs, setLogs] = useState(function () { return getLogs(); });
   const [dateRange, setDateRange] = useState("all");
   const [proposals, setProposals] = useState(function () { return getProposals(); });
+  const [savings, setSavings] = useState(null);
+
+  // Proxy savings telemetry (ROADMAP Phase 3). Reads the durable evaluation
+  // plane via /api/savings. On failure or unavailable telemetry the UI shows
+  // the honest empty state rather than a fabricated number.
+  useEffect(function () {
+    var cancelled = false;
+    fetchSavings().then(function (data) {
+      if (!cancelled) setSavings(data);
+    }).catch(function () {
+      // Leave savings null → the section renders the unavailable state.
+    });
+    return function () { cancelled = true; };
+  }, []);
 
   // Generate policy proposals from observed evidence — both local (localStorage)
   // and longitudinal (server-side KV). The engine is pure/deterministic; this
@@ -982,6 +997,60 @@ export default function Analytics() {
             </div>
           </>
         ))}
+
+        {/* ── Proxy savings telemetry (ROADMAP Phase 3, measured) ── */}
+        {tab === "usage" && (
+          <div style={{
+            padding: "20px", borderRadius: "14px",
+            background: colors.surface, border: "1px solid " + colors.border, marginBottom: "18px",
+          }}>
+            <div style={{ fontSize: "12px", fontWeight: 700, color: colors.textDim, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "14px" }}>
+              Provider-spanning savings — measured (proxy telemetry)
+            </div>
+            {!savings ? (
+              <p style={{ fontSize: "13px", color: colors.textDim }}>
+                Loading measured savings from the evaluation plane…
+              </p>
+            ) : savings.savingsMode === "empty-unavailable" ? (
+              <p style={{ fontSize: "13px", color: colors.textDim, lineHeight: "1.6" }}>
+                Telemetry unavailable — no measured proxy savings to display yet. The gateway to the durable trace ledger (KV) is not reporting data, so we present <b>nothing rather than a fabricated number</b>. This appears when the proxy has not served auto-routed traffic in range, or when the trace store is not reachable.
+              </p>
+            ) : (
+              <>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "12px" }}>
+                  <MetricCard label="Measured Saved" subtext={savings.requests + " measurable requests"}>
+                    <div style={{ fontSize: "24px", fontWeight: 800, color: "#16a34a" }}>{formatCost(savings.totalSaved)}</div>
+                  </MetricCard>
+                  <MetricCard label="Baseline Spend" subtext="frontier (premium) cost of same traffic">
+                    <div style={{ fontSize: "24px", fontWeight: 800 }}>{formatCost(savings.totalPremiumBaseline)}</div>
+                  </MetricCard>
+                  <MetricCard label="Avg Savings" subtext="vs frontier baseline">
+                    <div style={{ fontSize: "24px", fontWeight: 800 }}>{savings.avgSavingsPercent != null ? savings.avgSavingsPercent.toFixed(1) + "%" : "—"}</div>
+                  </MetricCard>
+                </div>
+                {savings.avgSavingsPercent != null && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <div style={{ fontSize: "12px", color: colors.textDim, flexShrink: 0 }}>Avg measured savings</div>
+                    <div style={{ height: "8px", borderRadius: "4px", flex: 1, minWidth: "60px", overflow: "hidden", background: colors.border }}>
+                      <div style={{
+                        height: "100%",
+                        width: Math.max(savings.avgSavingsPercent, 2) + "%",
+                        borderRadius: "4px",
+                        background: "linear-gradient(90deg, #F59E0B, #D4AF37)",
+                        transition: "width 0.4s ease",
+                      }} />
+                    </div>
+                    <div style={{ fontSize: "12px", fontWeight: 700, color: colors.text }}>{savings.avgSavingsPercent.toFixed(1)}%</div>
+                  </div>
+                )}
+                <p style={{ fontSize: "11px", color: colors.textDim, margin: "12px 0 0", lineHeight: "1.5" }}>
+                  Measured = surface across the /api/v1/chat/completions proxy, aggregated from the durable evaluation-plane ledger. Savings = frontier (premium) baseline cost − REI routed cost per request. Reported only when telemetry is actually available.
+                </p>
+              </>
+            )}
+          </div>
+        )}
+
         {tab === "decisions" && <DecisionFeed />}
       </div>
     </div>

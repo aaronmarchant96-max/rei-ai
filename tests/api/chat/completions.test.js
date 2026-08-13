@@ -1,3 +1,14 @@
+jest.mock("../../../shared/lib/kv.js", function () {
+  return {
+    storeTrace: jest.fn(function () { return Promise.resolve(); }),
+    storeEval: jest.fn(function () { return Promise.resolve(); }),
+    getTracesWithEvals: jest.fn(function () { return Promise.resolve({ traces: [], evals: [] }); }),
+    isKvAvailable: jest.fn(function () { return Promise.resolve(true); }),
+  };
+});
+
+const kv = require("../../../shared/lib/kv.js");
+
 function mockFetch(responseData, status = 200, ok = true) {
   global.fetch = jest.fn(() =>
     Promise.resolve({
@@ -14,6 +25,7 @@ beforeEach(() => {
   process.env.GROQ_API_KEY = "test-key";
   process.env.REI_API_KEY = "test-api-key";
   delete process.env.CFAI_PATH;
+  jest.clearAllMocks();
 });
 
 describe("OpenAI-compatible chat completions endpoint", () => {
@@ -106,5 +118,42 @@ describe("OpenAI-compatible chat completions endpoint", () => {
     const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
     await handler(req, res);
     expect(res._body.usage).toBeDefined();
+  });
+
+  it("persists a durable trace (storeTrace) on auto-routed requests for the savings dashboard", async () => {
+    const handler = (await import("../../../api/v1/chat/completions.js")).default;
+    const req = {
+      method: "POST",
+      headers: { authorization: "Bearer test-api-key" },
+      body: { model: "rei-auto", messages: [{ role: "user", content: "hello" }] },
+    };
+    const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
+    await handler(req, res);
+    expect(kv.storeTrace).toHaveBeenCalledTimes(1);
+    const [tenant, requestId, entry] = kv.storeTrace.mock.calls[0];
+    expect(tenant).toBe("pilot");
+    expect(typeof requestId).toBe("string");
+    expect(entry).toMatchObject({
+      tenantId: "pilot",
+      policyVersion: "v1",
+    });
+    // The entry must carry the routing shape expected by the savings ledger.
+    expect(entry).toHaveProperty("routeId");
+    expect(entry).toHaveProperty("model");
+    expect(entry).toHaveProperty("timestamp");
+    expect(entry).toHaveProperty("estimatedCost");
+    expect(entry).toHaveProperty("premiumCost");
+  });
+
+  it("does NOT persist a trace on explicit (non-auto-routed) requests", async () => {
+    const handler = (await import("../../../api/v1/chat/completions.js")).default;
+    const req = {
+      method: "POST",
+      headers: { authorization: "Bearer test-api-key" },
+      body: { model: "gpt-4o-mini", messages: [{ role: "user", content: "hello" }] },
+    };
+    const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
+    await handler(req, res);
+    expect(kv.storeTrace).not.toHaveBeenCalled();
   });
 });

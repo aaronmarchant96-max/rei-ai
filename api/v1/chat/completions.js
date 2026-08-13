@@ -6,6 +6,7 @@
 
 import "dotenv/config";
 import { handleCfaiRequest, callModelDirect } from "../../cfai.js";
+import { storeTrace } from "../../../shared/lib/kv.js";
 
 const ERROR_CODES = {
   CF_INVALID_REQUEST: "CF_INVALID_REQUEST",
@@ -15,6 +16,19 @@ const ERROR_CODES = {
   CF_RATE_LIMITED: "CF_RATE_LIMITED",
   CF_INTERNAL_ERROR: "CF_INTERNAL_ERROR",
 };
+
+const PILOT_TENANT = "pilot";
+const POLICY_VERSION = "v1";
+
+function resolveProvider(modelName) {
+  if (!modelName) return null;
+  const m = modelName.toLowerCase();
+  if (m.includes("deepseek")) return "deepseek";
+  if (m.includes("gemini")) return "gemini";
+  if (m.includes("llama") || m.includes("groq")) return "groq";
+  if (m.includes("gpt") || m.includes("openai")) return "openai";
+  return "unknown";
+}
 
 function errorReply(res, status, code, message) {
   return res.status(status).json({ error: { code: code, message: message } });
@@ -124,6 +138,29 @@ export default async function handler(req, res) {
       total_tokens: null,
       note: "Routing proxy — token counts available via provider API directly",
     };
+
+    // Persist a durable trace entry to the evaluation plane so the savings
+    // dashboard can aggregate REAL dollar savings over proxy traffic. Mirrors
+    // cfai.js; non-blocking (Vercel waits for the promise before returning).
+    // Gracefully no-ops when KV is not configured.
+    const requestId =
+      (req.body && req.body.requestId) ||
+      (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "req-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10));
+    const tracePromise = storeTrace(PILOT_TENANT, requestId, {
+      requestId: requestId,
+      clientRequestId: (req.body && req.body.requestId) || null,
+      policyVersion: POLICY_VERSION,
+      tenantId: PILOT_TENANT,
+      timestamp: new Date().toISOString(),
+      routeId: routerDecision?.id || null,
+      model: routerDecision?.model || null,
+      estimatedCost: routerDecision?.estimatedCost ?? null,
+      premiumCost: routerDecision?.premiumCost ?? null,
+      responseModel: result.model || null,
+      provider: resolveProvider(result.model),
+      usage: result.usage || null,
+    });
+    void tracePromise;
 
     return res.status(200).json({
       id: `chatcmpl-${Date.now()}`,

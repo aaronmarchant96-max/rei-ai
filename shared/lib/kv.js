@@ -31,6 +31,15 @@ async function isAvailable() {
   return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 }
 
+/**
+ * Whether Vercel KV is configured and reachable (REI_KV env present + SDK).
+ * Exported so read-path aggregators can surface an honest status instead of
+ * implying "no traffic" when telemetry is simply unavailable.
+ */
+export async function isKvAvailable() {
+  return isAvailable();
+}
+
 function key(type, tenant, id) {
   return PREFIX + ":" + type + ":" + tenant + ":" + id;
 }
