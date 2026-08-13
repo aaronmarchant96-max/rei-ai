@@ -129,7 +129,7 @@ export default function ToolsLanding({ onOpenTool }) {
       {/* ── 1. Premium Hero ── */}
       <motion.header 
         initial="hidden" animate="visible" variants={fadeIn}
-        className="relative z-10 max-w-4xl mx-auto pt-24 pb-32 text-center flex flex-col items-center overflow-hidden"
+        className="relative z-10 w-full px-4 sm:px-6 md:px-0 max-w-4xl mx-auto pt-16 md:pt-24 pb-20 md:pb-32 text-center flex flex-col items-center overflow-hidden"
       >
         {/* Subtle Radial Gradient */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(226,163,61,0.08),transparent_50%)] pointer-events-none"></div>
@@ -138,7 +138,7 @@ export default function ToolsLanding({ onOpenTool }) {
           whileHover={{ rotateY: -48 }}
           style={{ transformPerspective: 200 }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          className="relative w-16 h-16 rounded-xl bg-surface border border-[var(--amber)]/30 flex items-center justify-center mb-8 drop-shadow-[0_0_10px_rgba(226,163,61,0.2)] cursor-crosshair z-10"
+          className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl bg-surface border border-[var(--amber)]/30 flex items-center justify-center mb-6 md:mb-8 drop-shadow-[0_0_10px_rgba(226,163,61,0.2)] cursor-crosshair z-10"
         >
           <HingeMark size={32} animated={false} color="#E2A33D" />
         </motion.div>
@@ -148,50 +148,50 @@ export default function ToolsLanding({ onOpenTool }) {
         </div>
         
         <h1 
-          className="relative text-5xl md:text-7xl font-medium leading-[1.05] mb-6 z-10"
+          className="relative text-4xl sm:text-5xl md:text-7xl font-medium leading-[1.08] mb-5 md:mb-6 z-10"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
           Stop guessing what your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">AI traffic costs</span>.
         </h1>
         
-        <p className="relative text-[#EDEFF5] text-xl md:text-2xl max-w-3xl mx-auto mb-10 leading-relaxed font-light z-10">
+        <p className="relative text-[#EDEFF5] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-8 md:mb-10 leading-relaxed font-light z-10">
           REI measures every routing decision, replays your traffic against real baselines, and shows where intelligent model selection reduces cost without hiding the quality or security trade-offs.
         </p>
 
         {/* Measured savings — not a single magic number */}
-        <div className="relative z-10 w-full max-w-3xl mx-auto mb-8">
+        <div className="relative z-10 w-full max-w-3xl mx-auto mb-7 md:mb-8">
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
             Measured savings. Not a single magic number.
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center flex flex-col justify-center min-h-[116px]">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">85.7%</div>
-              <div className="text-xs text-gray-400 uppercase tracking-wider">Baseline savings</div>
-              <div className="text-[10px] text-[#565B72] mt-1">vs premium</div>
+          <div className="grid grid-cols-3 gap-2 md:grid-cols-3 md:gap-4">
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
+              <div className="text-2xl md:text-4xl font-bold text-white mb-1">85.7%</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Baseline savings</div>
+              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">vs premium</div>
             </div>
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center flex flex-col justify-center min-h-[116px]">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">83.1%</div>
-              <div className="text-xs text-gray-400 uppercase tracking-wider">Paid-routing savings</div>
-              <div className="text-[10px] text-[#565B72] mt-1">paid → paid</div>
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
+              <div className="text-2xl md:text-4xl font-bold text-white mb-1">83.1%</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Paid-routing</div>
+              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">paid → paid</div>
             </div>
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-5 text-center flex flex-col justify-center min-h-[116px]">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">+0 pts</div>
-              <div className="text-xs text-gray-400 uppercase tracking-wider">Free capacity</div>
-              <div className="text-[10px] text-[#565B72] mt-1">disclosed separately</div>
+            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
+              <div className="text-2xl md:text-4xl font-bold text-white mb-1">+0 pts</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Free capacity</div>
+              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">disclosed</div>
             </div>
           </div>
-          <p className="text-xs text-[#565B72] text-center mt-4 max-w-xl mx-auto leading-relaxed">
+          <p className="text-xs text-[#565B72] text-center mt-4 max-w-xl mx-auto leading-relaxed px-1">
             Replay estimate on the synthetic demo corpus (9 measured requests). Free-capacity contribution is 0 points here because the demo catalog has no free provider — the stress test below shows it when one exists.
           </p>
         </div>
 
-        <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-8 z-10">
+        <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-8 z-10 px-1">
           You know what your AI providers charged you. Do you know whether every request took the cheapest path that still met your requirements? REI isn't replacing provider billing — it optimizes the decision that happens before the bill.
         </p>
 
         <button
           onClick={() => onOpenTool({ tool: "rei" })}
-          className="relative z-10 group flex items-center gap-2 bg-[var(--amber)] text-[#1A1300] px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300"
+          className="relative z-10 group flex items-center gap-2 bg-[var(--amber)] text-[#1A1300] px-7 md:px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300"
         >
           LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
@@ -207,7 +207,7 @@ export default function ToolsLanding({ onOpenTool }) {
           </button>
         </div>
 
-        <p className="relative z-10 text-[#565B72] text-xs mt-5">
+        <p className="relative z-10 text-[#565B72] text-xs mt-5 px-1">
           1. Pick a domain → 2. Ask your question → 3. See the reasoning, not just the answer.
         </p>
       </motion.header>
@@ -215,25 +215,25 @@ export default function ToolsLanding({ onOpenTool }) {
       {/* ── 1.5. The Methodology (not a product, a methodology) ── */}
       <motion.section 
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
-        className="relative z-10 max-w-5xl mx-auto py-24"
+        className="relative z-10 w-full px-4 sm:px-6 md:px-0 mx-auto max-w-5xl py-14 md:py-24"
       >
-        <div className="text-center mb-16">
-          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">Formal Methodology for Trustworthy AI Development</div>
-          <h2 className="font-heading text-3xl md:text-5xl font-bold mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <div className="font-mono text-[11px] md:text-xs font-bold tracking-widest uppercase text-hinge-bright mb-3 md:mb-4 px-2">Formal Methodology for Trustworthy AI Development</div>
+          <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-2">
             Not a product. A <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">methodology</span>.
           </h2>
-          <p className="text-[#EDEFF5] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-[#EDEFF5] text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-light px-3">
             CARDO REI finds the hinge — the single factor that changes the answer. Every decision is tested, every claim is measured, every system is traced. Then a human gate decides.
           </p>
         </div>
 
         {/* Flow: Find the Hinge → 3 branches → converge to gate → iterate */}
-        <div className="relative mx-auto max-w-4xl">
+        <div className="relative w-full mx-auto max-w-md md:max-w-4xl">
           {/* Find the Hinge */}
-          <motion.div variants={fadeIn} className="flex flex-col items-center mb-10">
-            <div className="px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-hinge-bright shadow-[0_0_25px_rgba(228,167,62,0.12)]">
-              <div className="font-mono text-xs uppercase tracking-widest text-hinge-bright mb-1">Cardo Rei</div>
-              <div className="font-heading text-2xl md:text-3xl font-bold text-white">Find the Hinge</div>
+          <motion.div variants={fadeIn} className="flex flex-col items-center mb-8 md:mb-10">
+            <div className="w-full md:w-auto px-6 sm:px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-hinge-bright shadow-[0_0_25px_rgba(228,167,62,0.12)]">
+              <div className="font-mono text-[11px] uppercase tracking-widest text-hinge-bright mb-1">Cardo Rei</div>
+              <div className="font-heading text-xl md:text-3xl font-bold text-white">Find the Hinge</div>
               <div className="text-xs text-[#94A3B8] mt-1 text-center">the single factor that changes the answer</div>
             </div>
             <div className="text-hinge-bright mt-3">
@@ -241,51 +241,53 @@ export default function ToolsLanding({ onOpenTool }) {
             </div>
           </motion.div>
 
-          {/* Three branches */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          {/* Three branches — compact stacked rows on mobile, three columns on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-8 md:mb-10">
             {[
-              { key: "decision", label: "Decision", tag: "→ Test it", icon: "⤷",
+              { key: "decision", label: "Decision", tag: "Test it", icon: "⤷",
                 href: `${REPO_URL}/blob/main/docs/INFORMATION_THEORETIC_ARCHITECTURE.md` },
-              { key: "claim", label: "Claim", tag: "→ Measure it", icon: "¶",
+              { key: "claim", label: "Claim", tag: "Measure it", icon: "¶",
                 href: `${REPO_URL}/blob/main/docs/CLAIM_LEDGER.md` },
-              { key: "system", label: "System", tag: "→ Trace it", icon: "⌖",
+              { key: "system", label: "System", tag: "Trace it", icon: "⌖",
                 href: `${REPO_URL}/blob/main/docs/INFORMATION_THEORETIC_ARCHITECTURE.md` },
             ].map((b) => (
               <a
                 key={b.key}
                 href={b.href}
                 target="_blank" rel="noopener noreferrer"
-                className="group bg-surface border-2 border-border rounded-md p-5 text-center hover:border-hinge transition-colors"
+                className="group flex md:flex-col items-center justify-between md:justify-center gap-3 md:gap-0 bg-surface border-2 border-border rounded-md px-4 py-3 md:p-5 text-center hover:border-hinge transition-colors"
               >
-                <div className="text-hinge-bright text-2xl mb-2">{b.icon}</div>
-                <div className="font-heading font-bold text-lg text-white">{b.label}</div>
-                <div className="font-mono text-xs text-hinge-bright mt-1">{b.tag}</div>
+                <span className="text-hinge-bright text-xl md:text-2xl md:mb-2 shrink-0">{b.icon}</span>
+                <span className="flex-1 md:flex-none">
+                  <span className="block font-heading font-bold text-base md:text-lg text-white md:mb-1">{b.label}</span>
+                  <span className="block font-mono text-[11px] md:text-xs text-[#94A3B8] md:text-hinge-bright">→ {b.tag}</span>
+                </span>
               </a>
             ))}
           </div>
 
           {/* Verified evidence */}
-          <motion.div variants={fadeIn} className="flex flex-col items-center mb-10">
+          <motion.div variants={fadeIn} className="flex flex-col items-center mb-8 md:mb-10">
             <div className="flex items-center justify-center gap-2 text-hinge-bright mb-2 text-sm font-mono">
-              <span>Decision</span><span>Claim</span><span>System</span>
+              <span>Decision</span><span className="text-[#565B72]">/</span><span>Claim</span><span className="text-[#565B72]">/</span><span>System</span>
             </div>
             <div className="text-hinge-bright mb-2">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14m-6-6 6 6 6-6"/></svg>
             </div>
-            <div className="px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-border">
-              <div className="font-mono text-xs uppercase tracking-widest text-[#94A3B8] mb-1">Verified Evidence</div>
-              <div className="font-heading text-xl md:text-2xl font-bold text-white">tested · measured · traced</div>
+            <div className="w-full md:w-auto px-6 md:px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-border">
+              <div className="font-mono text-[11px] uppercase tracking-widest text-[#94A3B8] mb-1">Verified Evidence</div>
+              <div className="font-heading text-lg md:text-2xl font-bold text-white">tested · measured · traced</div>
             </div>
           </motion.div>
 
           {/* Human / Claims Gate */}
-          <motion.div variants={fadeIn} className="flex flex-col items-center mb-10">
+          <motion.div variants={fadeIn} className="flex flex-col items-center mb-8 md:mb-10">
             <div className="text-hinge-bright mb-2">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 5v14m-6-6 6 6 6-6"/></svg>
             </div>
-            <div className="px-8 py-4 rounded-lg bg-surface border-2 border-hinge-bright/40">
-              <div className="font-mono text-xs uppercase tracking-widest text-hinge-bright mb-1">Human / Claims Gate</div>
-              <div className="font-heading text-xl md:text-2xl font-bold text-white">the artifact proposes, the human decides</div>
+            <div className="w-full md:w-auto px-6 md:px-8 py-4 rounded-lg bg-surface border-2 border-hinge-bright/40">
+              <div className="font-mono text-[11px] uppercase tracking-widest text-hinge-bright mb-1">Human / Claims Gate</div>
+              <div className="font-heading text-lg md:text-2xl font-bold text-white">the artifact proposes, the human decides</div>
             </div>
             <div className="text-hinge-bright mt-3">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
@@ -294,9 +296,9 @@ export default function ToolsLanding({ onOpenTool }) {
 
           {/* Iterate */}
           <motion.div variants={fadeIn} className="flex flex-col items-center">
-            <div className="px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-border">
-              <div className="font-mono text-xs uppercase tracking-widest text-hinge-bright mb-1">Closed Loop</div>
-              <div className="font-heading text-2xl font-bold text-white">Iterate</div>
+            <div className="w-full md:w-auto px-6 md:px-8 py-4 rounded-lg bg-[#111111]/80 backdrop-blur-sm border-2 border-border">
+              <div className="font-mono text-[11px] uppercase tracking-widest text-hinge-bright mb-1">Closed Loop</div>
+              <div className="font-heading text-xl md:text-2xl font-bold text-white">Iterate</div>
               <div className="text-xs text-[#94A3B8] mt-1 text-center">reconstruct plank-by-plank, commit by commit</div>
             </div>
           </motion.div>
@@ -305,7 +307,7 @@ export default function ToolsLanding({ onOpenTool }) {
         <a 
           href={`${REPO_URL}/blob/main/docs/CARDO_REI.md`}
           target="_blank" rel="noopener noreferrer"
-          className="inline-block mx-auto mt-10 text-sm text-[#94A3B8] hover:text-hinge-bright transition-colors underline underline-offset-4"
+          className="inline-block mx-auto mt-8 md:mt-10 text-sm text-[#94A3B8] hover:text-hinge-bright transition-colors underline underline-offset-4"
         >
           Read the CARDO REI methodology →
         </a>
