@@ -487,6 +487,13 @@
   }
 }
 
+/* Compact mobile-only theme toggle: pushed to the far right of the header */
+.rei-header__mobile-theme {
+  margin-left: auto;
+  padding: 6px 10px;
+  line-height: 1;
+}
+
 /* Active Voice Glassmorphism Banner */
 .rei-domain-banner {
   background: rgba(17, 17, 17, 0.75) !important;

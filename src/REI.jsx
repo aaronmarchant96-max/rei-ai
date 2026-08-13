@@ -768,7 +768,7 @@ export default function REI({ initialPrompt } = {}) {
       >
         {/* Sticky Header with safe area top */}
         <header className="safe-top rei-header">
-          <span className="rei-header__version" title="CARDO REI protocol version">CARDO v3.4</span>
+          {!mobile && <span className="rei-header__version" title="CARDO REI protocol version">CARDO v3.4</span>}
           {/* Domain selection tab strip */}
           <div className="rei-domain-tabs">
             {DOMAIN_PROFILES.map((dom) => (
@@ -783,58 +783,75 @@ export default function REI({ initialPrompt } = {}) {
               </button>
             ))}
           </div>
-          <div className="rei-header__actions">
+          {mobile && (
             <button
               type="button"
               onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
-              className="rei-action-btn"
+              className="rei-action-btn rei-header__mobile-theme"
               title="Toggle light / dark theme"
+              aria-label="Toggle light or dark theme"
             >
-              {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
+              {themeMode === "light" ? "🌙" : "☀️"}
             </button>
-            <button
-              type="button"
-              onClick={handleClearHistory}
-              className="rei-action-btn rei-action-btn--danger"
-            >
-              Clear Chat
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsPhilosophyOpen(true)}
-              className="rei-action-btn"
-            >
-              Philosophy
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedDomain("legal");
-                setInputMessage("What is the hinge in Donoghue v Stevenson?");
-              }}
-              className="rei-action-btn rei-action-btn--accent"
-            >
-              Try a Case
-            </button>
-          </div>
+          )}
+          {!mobile && (
+            <div className="rei-header__actions">
+              <button
+                type="button"
+                onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
+                className="rei-action-btn"
+                title="Toggle light / dark theme"
+              >
+                {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
+              </button>
+              <button
+                type="button"
+                onClick={handleClearHistory}
+                className="rei-action-btn rei-action-btn--danger"
+              >
+                Clear Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPhilosophyOpen(true)}
+                className="rei-action-btn"
+              >
+                Philosophy
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedDomain("legal");
+                  setInputMessage("What is the hinge in Donoghue v Stevenson?");
+                }}
+                className="rei-action-btn rei-action-btn--accent"
+              >
+                Try a Case
+              </button>
+            </div>
+          )}
         </header>
 
         {/* Scrollable Main Content with keyboard space */}
         <div style={{ display: "flex", flex: 1, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
           <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
-            <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
+            {(!mobile || messages.length > 1 || isTyping) && (
+              <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
+            )}
 
-            <IngestPanel
-              selectedDomain={selectedDomain}
-              rawRecordText={rawRecordText}
-              setRawRecordText={setRawRecordText}
-              showIngest={showIngest}
-              setShowIngest={setShowIngest}
-              recordSourceType={recordSourceType}
-              setRecordSourceType={setRecordSourceType}
-              maxRecordChars={MAX_RECORD_CHARS}
-              sourceTypes={SOURCE_TYPES}
-            />
+            {(!mobile || messages.length > 1 || isTyping) && (
+              <IngestPanel
+                selectedDomain={selectedDomain}
+                rawRecordText={rawRecordText}
+                setRawRecordText={setRawRecordText}
+                showIngest={showIngest}
+                setShowIngest={setShowIngest}
+                recordSourceType={recordSourceType}
+                setRecordSourceType={setRecordSourceType}
+                maxRecordChars={MAX_RECORD_CHARS}
+                sourceTypes={SOURCE_TYPES}
+              />
+            )}
 
             {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
               <WelcomePanel
