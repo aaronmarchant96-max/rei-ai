@@ -192,7 +192,10 @@ This adds almost no cost at commit time and over months produces a dataset showi
 | AGY plan | < 12K tokens | Research/design |
 | AGY + EXEC combined | < 25K tokens | Full implementation |
 
-If a task exceeds its budget, compress the conversation and continue.
+If a task reaches its budget with work remaining, **compress the closed ranges and continue — do not power past the cap silently.** Budget overrun that is absorbed without compression actively costs tokens. Also see TOKEN_SAVERS.md Tactics 8-10:
+- **Budget is the compress trigger, not size.**
+- **Write acceptance/experimental-isolation tests first** to avoid the implement→review→re-plan loop.
+- **Full suite + `gen-claims` are commit-time-only**; extract gate numbers via `npm test -- --runInBand 2>&1 | rg "Tests:|Test Suites:"`. `gen-claims` re-runs the full suite — run it once, right before commit, not during iteration.
 
 ---
 
@@ -207,4 +210,4 @@ If a task exceeds its budget, compress the conversation and continue.
 
 ---
 
-*Last reviewed: 2026-08-08. Stale after: 2026-08-09. Verify rules before executing.*
+*Last reviewed: 2026-08-13 (added Tactic 8-10 pointers). Stale after: 2026-08-14. Verify rules before executing.*

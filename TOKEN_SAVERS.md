@@ -149,4 +149,32 @@ Before any tool call or output, ask:
 
 ---
 
+## Tactic 8: Budget Is the Compress Trigger, Not Size
+
+Compression must be driven by the **token budget** in AGENTS.md (Fast <5K, plan <12K, AGY+EXEC <25K), not by how large the conversation *looks*. When a task reaches its budget and work remains:
+
+- `compress` the closed ranges into dense summaries, drop a handoff note
+- then continue — do NOT "power through" past the cap hoping it fits
+
+A budget overrun that is just absorbed costs fresh tokens with zero signal. The rule: **hit budget → compress → continue**, never hit budget → keep going.
+
+## Tactic 9: Write the Acceptance Tests First
+
+The expensive pattern is *implement → review → re-plan → re-implement* (doubles the burn). Kill the loop up front: before writing code for any non-trivial (5+ file / reasoning) change, write the **experimental-isolation contract** as executable assertions — the same assertions a reviewer would demand:
+
+- Which cases must be *controls* (unchanged: e.g. `cacheModeledEntries === 0`, null cache fields)
+- Which case carries the *effect* (`cacheModeledEntries > 0`, savings non-null)
+- What must stay *frozen* (identical routing/escalation/exclusion between control and effect)
+
+Pin these in the test file *before* implementing. Then the first pass is the final pass, and the review is a confirmation, not a correction.
+
+## Tactic 10: Full Suite + gen-claims Are Commit-Time Only
+
+- `npm test -- --runInBand` without a path is a **commit/push gate only** — never an iteration tool.
+- Iterate with `npm test -- --runInBand src/lib/<module>.test.ts`.
+- `node scripts/gen-claims.mjs` re-runs the whole suite every time — run it **once**, immediately before commit, not during exploration.
+- Extract gate numbers cheaply: `npm test -- --runInBand 2>&1 | rg "Tests:|Test Suites:"` — don't dump the whole chatty output.
+
+---
+
 *Compress early. Compress often. Stay under budget.*
