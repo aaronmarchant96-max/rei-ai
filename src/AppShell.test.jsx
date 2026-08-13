@@ -22,8 +22,8 @@ describe("AppShell", () => {
       expect(document.title).toBe("PromptHound Labs | Story Forge");
     });
 
-    // Current UI: back to landing is the header "Ecosystem" nav button
-    fireEvent.click(screen.getByRole("button", { name: /ecosystem/i }));
+    // Current UI: back to landing is the header "Experiments" nav button
+    fireEvent.click(screen.getByRole("button", { name: /experiments/i }));
 
     await waitFor(() => {
       expect(window.location.pathname).toBe("/");

@@ -36,10 +36,12 @@ describe("ToolsLanding", () => {
     expect(screen.getByRole("button", { name: "Greeting" })).toBeInTheDocument();
   });
 
-  it("renders domain experiments section", () => {
+  it("renders domain experiments section as the originals REI bundles into personas", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
     expect(screen.getByText(/domain experiments/i)).toBeInTheDocument();
+    expect(screen.getByText(/the originals/i)).toBeInTheDocument();
+    expect(screen.getByText(/bundles them as specialized personas/i)).toBeInTheDocument();
     expect(screen.getByText(/the furnace/i)).toBeInTheDocument();
     expect(screen.getByText(/storm replay/i)).toBeInTheDocument();
   });

@@ -247,7 +247,7 @@ export default function AppShell() {
                 const el = document.getElementById("ecosystem");
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }, 100);
-            }} className="rei-header-nav__link">Ecosystem</button>
+            }} className="rei-header-nav__link">Experiments</button>
             <div className="w-px h-4 bg-gray-700 mx-1"></div>
             <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="rei-header-nav__link">X (Twitter)</a>
             <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="rei-header-nav__link">GitHub</a>

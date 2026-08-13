@@ -458,15 +458,18 @@ export default function ToolsLanding({ onOpenTool }) {
         </motion.div>
       </motion.section>
 
-      {/* ── 4. Experimental Ecosystem ── */}
+      {/* ── 4. Original Domain Experiments → bundled into REI personas ── */}
       <motion.section 
         id="ecosystem"
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
         className="relative z-10 max-w-6xl mx-auto py-20 border-t-2 border-border"
       >
         <div className="mb-12">
-          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">Ecosystem Spin-Offs</div>
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">The Originals</div>
           <h2 className="font-heading text-3xl md:text-4xl font-bold">Domain Experiments</h2>
+          <p className="text-sm text-[#94A3B8] max-w-2xl mx-auto mt-4 leading-relaxed">
+            These were the first-place experiments that proved the CARDO pipeline across domains. REI.ai bundles them as specialized personas — not the other way around.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
