@@ -92,6 +92,103 @@ This is what separates a *self-informed* system (one that reads its own measurem
 reasoning) from a *self-modifying* system (one that rewrites its own behavior autonomously).
 REI is deliberately the former.
 
+## CARDO is canonical
+
+CARDO is the 8-stage reasoning discipline that governs how REI decides. It is canonical and
+not to be redefined by any operational loop:
+
+> Collect → Analyze → Record → Distinguish → Organize → Review → Evaluate → Iterate
+
+**Invariant:** *CARDO is canonical. Any derivative operational loop must not redefine the CARDO
+acronym or alter its eight-stage semantics. Derivative loops must map explicitly to the
+canonical stages.*
+
+This keeps three distinct disciplines from colliding, all preserving the human/claims gate:
+
+| Discipline | Role |
+|-----------|------|
+| **CARDO** | the reasoning discipline operating inside the workflow (8 stages) |
+| **Workflow** | the governance/execution discipline (triage gate, plan-gate, scope gate, acceptance tests, verification, commit) |
+| **Policy loop** | the system-level feedback mechanism (this document) |
+
+### Mapping a derivative loop onto CARDO
+
+Rather than inventing a second acronym, a reasoning/execution loop maps its activities onto the
+canonical stages. The table below anchors each stage to an existing workflow artifact, so the
+mapping is concrete rather than cosmetic:
+
+| Stage | Representative activity | Workflow anchor |
+|-------|-------------------------|-----------------|
+| **Collect** | gather repo, plan, tests, evidence, context | triage gate (research/plan, 5+ files, reasoning) |
+| **Analyze** | determine cause, constraints, alternatives, blast radius | AGY plan `blast_radius` + `ALTERNATIVES` / `REPLAN_REQUIRED` |
+| **Record** | capture facts, assumptions, unknowns, decision | AGY-plan YAML header (`plan_valid_as_of`, `git_commit`) |
+| **Distinguish** | separate fact / observation / measurement / replay / estimate / model / assumption | measurement mode ledger (`measured`\|`replayed`\|`estimated`\|`modeled`) |
+| **Organize** | structure into acceptance criteria, dependencies, execution order | claim-before-code + acceptance-tests-first + scope-collision handling |
+| **Review** | challenge the decision before execution | plan-gate / scope-gate pre-execution checkpoint |
+| **Evaluate** | test the result against the acceptance contract | verification gate (targeted → full suite → build → gen-claims) |
+| **Iterate** | feed verified evidence into the next decision | policy loop → re-measure; proposal registry |
+
+### Evidence invariant (Distinguish)
+
+Evidence strength must never increase without new evidence.
+
+```
+assumed
+  ↓
+estimated
+  ↓
+modeled
+  ↓
+replayed
+  ↓
+measured
+```
+
+The ladder is not strictly monotonic for every piece of evidence — but the critical rule is
+**non-self-upgrade**:
+
+> *A transformation, calculation, or repetition cannot upgrade an evidence class by itself.*
+
+A computed projection stays `estimated`; a replay stays `replayed`; a cache-adjusted number is
+`estimated`, never `measured spend` — no matter how precise the arithmetic. Only genuinely new
+observations can move evidence to a stronger class. This is the same rule already enforced in
+the savings decomposition, provider-price sensitivity, cache economics, routing accuracy, and
+claims ledger.
+
+## The boundary: CARDO informs, never mutates
+
+```
+CARDO
+  │
+  ├── Collect
+  ├── Analyze
+  ├── Record
+  ├── Distinguish
+  ├── Organize
+  ├── Review
+  ├── Evaluate
+  └── Iterate
+          │
+          ▼
+   verified evidence
+          │
+          ▼
+   Policy proposal (engine)
+          │
+          ▼
+   Human / claims gate
+          │
+      ┌───┴───┐
+      │       │
+   reject   approve
+              │
+              ▼
+        policy change
+```
+
+CARDO can generate the evidence that informs a policy proposal. **CARDO cannot directly mutate
+policy.** Proposal ≠ mutation.
+
 ## Design constraints on proposal generation
 
 - **Pure / deterministic**: same observed evidence → same proposals. No LLM calls, no network,
