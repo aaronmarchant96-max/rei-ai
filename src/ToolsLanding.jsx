@@ -223,7 +223,7 @@ export default function ToolsLanding({ onOpenTool }) {
             Not a product. A <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">methodology</span>.
           </h2>
           <p className="text-[#EDEFF5] text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-light px-3">
-            CARDO REI finds the hinge — the single factor that changes the answer. Every decision is tested, every claim is measured, every system is traced. Then a human gate decides.
+            That 85.7% isn't a headline we defend — it's the measured output of how REI works. CARDO finds the hinge, the single factor that changes the answer. Every decision is tested, every claim is measured, every system is traced. Then a human gate decides.
           </p>
         </div>
 
