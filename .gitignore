@@ -30,3 +30,6 @@ api_keys.md
 
 # Separate Azure debate-furnace package lockfile (kept out of REI main; private package)
 api/package-lock.json
+
+# Transient test-output artifacts (jest --json audit path)
+.artifacts/
