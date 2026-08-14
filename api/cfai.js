@@ -87,6 +87,13 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
     return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-v4-flash", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      console.warn("DeepSeek timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+    } else {
+      console.warn("DeepSeek request error: " + (err && err.message ? err.message : err));
+    }
+    return null;
   } finally {
     clearTimeout(timer);
   }
@@ -112,6 +119,13 @@ async function callGemini(messages, maxTokens, temperature = 0.7) {
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
     return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-2.5-flash", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      console.warn("Gemini timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+    } else {
+      console.warn("Gemini request error: " + (err && err.message ? err.message : err));
+    }
+    return null;
   } finally {
     clearTimeout(timer);
   }
@@ -137,6 +151,13 @@ async function callGroq(messages, maxTokens, model, temperature = 0.7) {
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
     return { content: data.choices?.[0]?.message?.content || "No content from Groq.", model: model || "llama-3.3-70b-versatile", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      console.warn("Groq timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+    } else {
+      console.warn("Groq request error: " + (err && err.message ? err.message : err));
+    }
+    return null;
   } finally {
     clearTimeout(timer);
   }
@@ -161,6 +182,13 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7) {
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
     return { content: data.choices?.[0]?.message?.content || "No content from OpenAI.", model: "gpt-4o", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      console.warn("OpenAI timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+    } else {
+      console.warn("OpenAI request error: " + (err && err.message ? err.message : err));
+    }
+    return null;
   } finally {
     clearTimeout(timer);
   }

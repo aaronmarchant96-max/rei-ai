@@ -301,6 +301,58 @@ describe("handler", function () {
   });
 });
 
+describe("provider timeout (AbortError) falls back instead of hard-failing", function () {
+  // A provider fetch that throws an AbortError (what happens when the 30s
+  // AbortController fires) must return null so the fallback chain runs —
+  // NOT bubble up and kill the whole request as "API error: This operation
+  // was aborted". This regression guards the provider callers' catch blocks.
+  function mockFetchAbortThenSuccess(successContent) {
+    var calls = 0;
+    global.fetch = jest.fn(function () {
+      calls += 1;
+      if (calls === 1) {
+        var abortErr = new Error("This operation was aborted");
+        abortErr.name = "AbortError";
+        return Promise.reject(abortErr);
+      }
+      return Promise.resolve(fetchOnceResponse(providerResponse(successContent)));
+    });
+  }
+
+  it("falls back to the next backend when the primary backend aborts (timeout)", async function () {
+    process.env.GEMINI_API_KEY = "AQ.test-key";
+    process.env.GROQ_API_KEY = "test-key";
+    process.env.DEEPSEEK_API_KEY = undefined;
+    process.env.OPENAI_API_KEY = undefined;
+    var { handleCfaiRequest, clearProviderCooldown } = await import("../../api/cfai.js");
+    clearProviderCooldown();
+    mockFetchAbortThenSuccess("Fell back to Groq.");
+    var result = await handleCfaiRequest("score", [], "tell me a story", "You are REI.", [], { id: "story-architect", model: "gemini-2.5-flash", maxTokens: 2048 });
+    expect(result.success).toBe(true);
+    expect(result.result).toBe("Fell back to Groq.");
+    expect(result.model).toContain("fallback");
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("surfaces the graceful all-backends-unavailable notice when every backend aborts", async function () {
+    process.env.GEMINI_API_KEY = "AQ.test-key";
+    process.env.GROQ_API_KEY = undefined;
+    process.env.DEEPSEEK_API_KEY = undefined;
+    process.env.OPENAI_API_KEY = undefined;
+    var { handleCfaiRequest, clearProviderCooldown } = await import("../../api/cfai.js");
+    clearProviderCooldown();
+    global.fetch = jest.fn(function () {
+      var abortErr = new Error("This operation was aborted");
+      abortErr.name = "AbortError";
+      return Promise.reject(abortErr);
+    });
+    var result = await handleCfaiRequest("score", [], "tell me a story", "You are REI.", [], { id: "story-architect", model: "gemini-2.5-flash", maxTokens: 2048 });
+    expect(result.success).toBe(true);
+    expect(result.model).toBe("none");
+    expect(result.result).toContain("All reasoning backends are unavailable");
+  });
+});
+
 describe("controlled continuation (NEVER SILENTLY TRUNCATE)", function () {
   async function runWithGroq(input) {
     process.env.GROQ_API_KEY = "test-key";
