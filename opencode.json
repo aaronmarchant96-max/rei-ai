@@ -13,12 +13,14 @@
     }
   },
   "instructions": [
-    "AGENTS.md",
-    "docs/WORKFLOW_DETAILED.md",
-    "WORKFLOW_QUICKREF.md",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
     "docs/fortis-et-liber.md",
     "docs/REI_CODE_PATTERNS.md",
     "TOKEN_SAVERS.md",
-    "docs/COPY_TONE.md"
+    "docs/COPY_TONE.md",
+    "docs/WORKFLOW_DETAILED.md",
+    "WORKFLOW_QUICKREF.md",
+    "AGENTS.md"
   ]
 }
