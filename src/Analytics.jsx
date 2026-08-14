@@ -385,7 +385,7 @@ export default function Analytics() {
     }}>
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
         {/* ── Header ── */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "28px" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", marginBottom: "28px" }}>
           <div>
             <div style={{ fontSize: "10px", letterSpacing: "0.35em", color: colors.amber, fontWeight: 800, marginBottom: "8px", textTransform: "uppercase" }}>
               Observability
@@ -402,7 +402,7 @@ export default function Analytics() {
               </p>
             )}
           </div>
-          <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", maxWidth: "100%" }}>
             {logs.length > 0 && (
               <button
                 onClick={function () { exportCSV(logs); }}
