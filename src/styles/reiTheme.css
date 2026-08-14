@@ -298,30 +298,30 @@
 }
 
 .rei-custom-container {
-  background: radial-gradient(circle at 30% 15%, #111111 0%, #111111 45%, #0A0A0A 100%) !important;
+  background: radial-gradient(circle at 30% 15%, #101216 0%, #0c0e12 50%, #07080a 100%) !important;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
   border-radius: 16px !important;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
 }
 
 .rei-custom-container::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(226, 163, 61, 0.08), transparent 55%);
+  background: linear-gradient(135deg, rgba(226, 163, 61, 0.04), transparent 45%);
   pointer-events: none;
 }
 
 .rei-custom-container::after {
   content: '';
   position: absolute;
-  top: -40%;
-  right: -20%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(226, 163, 61, 0.12), transparent 70%);
+  top: -30%;
+  right: -15%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(226, 163, 61, 0.06), transparent 70%);
   pointer-events: none;
 }
 
@@ -446,39 +446,50 @@
 .rei-header__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  padding-left: 16px;
+  gap: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  padding-left: 14px;
   margin-left: auto;
 }
 
 .rei-action-btn {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #e2e8f0;
-  background: rgba(255, 255, 255, 0.02);
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.015);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .rei-action-btn:hover {
-  border-color: rgba(226, 163, 61, 0.4);
-  color: var(--amber);
-  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .rei-action-btn--danger {
-  color: #fda4af;
-  border-color: rgba(251, 113, 133, 0.25);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.18);
+}
+
+.rei-action-btn--danger:hover {
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.06);
 }
 
 .rei-action-btn--accent {
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.25);
+}
+
+.rei-action-btn--accent:hover {
   color: var(--amber);
-  border-color: rgba(226, 163, 61, 0.35);
-  background: rgba(226, 163, 61, 0.1);
+  border-color: rgba(226, 163, 61, 0.4);
+  background: rgba(226, 163, 61, 0.06);
 }
 
 @media (max-width: 900px) {
@@ -1349,12 +1360,24 @@
 .rei-starters {
   padding: 22px 26px 26px;
 }
+.rei-starters {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 767px) {
+  .rei-starters {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
 .rei-starters__label {
-  font-size: 11.5px;
+  grid-column: 1 / -1;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #565B72;
-  margin-bottom: 12px;
+  letter-spacing: 0.08em;
+  color: #71768E;
+  margin-bottom: 4px;
   font-weight: 600;
   opacity: 0;
   animation: rise 0.5s cubic-bezier(.2,.7,.3,1) forwards;
@@ -1363,27 +1386,25 @@
 .rei-starter-row {
   display: flex;
   align-items: center;
-  gap: 13px;
-  padding: 13px 16px;
-  border: 1px solid #232838;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 10px;
-  margin-bottom: 9px;
   cursor: pointer;
-  transition: border-color .15s, background .15s, transform .15s;
-  background: #0A0C12;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease, box-shadow .18s ease;
+  background: rgba(14, 17, 24, 0.85);
   width: 100%;
+  box-sizing: border-box;
   text-align: left;
   opacity: 0;
   animation: rise 0.45s cubic-bezier(.2,.7,.3,1) forwards;
   will-change: transform;
 }
-.rei-starter-row:last-child {
-  margin-bottom: 0;
-}
 .rei-starter-row:hover {
-  border-color: #E2A33D;
-  background: rgba(226, 163, 61, 0.12);
-  transform: translateY(-1px);
+  border-color: rgba(226, 163, 61, 0.4);
+  background: rgba(226, 163, 61, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
 .rei-starter-row:active {
   transform: translateY(0px) scale(0.995);
