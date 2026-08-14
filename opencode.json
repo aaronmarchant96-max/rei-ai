@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "openrouter/deepseek/deepseek-chat",
+  "model": "deepseek/deepseek-chat",
   "default_agent": "build",
   "plugin": [
     "@tarquinen/opencode-dcp"

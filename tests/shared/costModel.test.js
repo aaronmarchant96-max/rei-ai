@@ -1,5 +1,5 @@
 // Unit tests for shared/lib/costModel.js — the plain-JS per-query ceiling model.
-import { modelCeilingRate, projectedCost, maxCostPerQuery, isOverBudget } from "../../shared/lib/costModel.js";
+import { modelCeilingRate, projectedCost, maxCostPerQuery, isOverBudget, effectiveCost } from "../../shared/lib/costModel.js";
 
 describe("costModel — projected per-query cost ceiling", () => {
   const OLD_MAX = process.env.MAX_COST_PER_QUERY;
@@ -55,5 +55,44 @@ describe("costModel — projected per-query cost ceiling", () => {
     expect(isOverBudget(0.002, 0.002)).toBe(false); // equal ⇒ allowed
     expect(isOverBudget(0.003, null)).toBe(false); // no ceiling ⇒ allowed
     expect(isOverBudget(null, 0.002)).toBe(false); // no projection ⇒ allowed
+  });
+
+  describe("effectiveCost — cache-aware input cost", () => {
+    // deepseek-v4-flash measured rates: miss $0.00014/1K, hit $0.0000028/1K.
+    it("blends hit and miss by hitRate", () => {
+      // 0% hit ⇒ all miss
+      expect(effectiveCost({ model: "deepseek-v4-flash", tokens: 1000, hitRate: 0 }))
+        .toBeCloseTo(0.00014, 9);
+      // 100% hit ⇒ all at the hit price
+      expect(effectiveCost({ model: "deepseek-v4-flash", tokens: 1000, hitRate: 1 }))
+        .toBeCloseTo(0.0000028, 9);
+      // 50% ⇒ (0.5·hit + 0.5·miss)
+      expect(effectiveCost({ model: "deepseek-v4-flash", tokens: 1000, hitRate: 0.5 }))
+        .toBeCloseTo(0.5 * 0.0000028 + 0.5 * 0.00014, 9);
+    });
+
+    it("scales linearly with token count", () => {
+      const per1k = effectiveCost({ model: "deepseek-v4-flash", tokens: 1000, hitRate: 0.5 });
+      expect(effectiveCost({ model: "deepseek-v4-flash", tokens: 5000, hitRate: 0.5 }))
+        .toBeCloseTo(per1k * 5, 9);
+    });
+
+    it("clamps hitRate to [0, 1] and treats missing hitRate as 0 (no invented cache)", () => {
+      expect(effectiveCost({ model: "deepseek-v4-flash", tokens: 1000, hitRate: 5 }))
+        .toBeCloseTo(0.0000028, 9); // clamped to 1
+      expect(effectiveCost({ model: "deepseek-v4-flash", tokens: 1000 }))
+        .toBeCloseTo(0.00014, 9); // defaults to all-miss
+    });
+
+    it("falls back to the uncached input rate for models without declared cache rates", () => {
+      // gpt-4o has no cache rates in the mirror table ⇒ miss = ceiling.
+      expect(effectiveCost({ model: "gpt-4o", tokens: 1000, hitRate: 1 }))
+        .toBeCloseTo(0.0125, 9);
+    });
+
+    it("returns 0 for non-positive token counts", () => {
+      expect(effectiveCost({ model: "deepseek-v4-flash", tokens: 0, hitRate: 1 })).toBe(0);
+      expect(effectiveCost({ model: "deepseek-v4-flash" })).toBe(0);
+    });
   });
 });

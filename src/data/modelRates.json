@@ -8,6 +8,7 @@
   "deepseek-v4-flash": {
     "input": 0.00014,
     "output": 0.00028,
-    "ceiling": 0.00042
+    "ceiling": 0.00042,
+    "cacheHit": 0.0000028
   }
 }
