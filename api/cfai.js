@@ -102,33 +102,54 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
 async function callGemini(messages, maxTokens, temperature = 0.7) {
   const key = process.env.GEMINI_API_KEY;
   if (!key || key.includes("your_gemini_api_key_here")) return null;
-  const controller = new AbortController();
-  const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
-  try {
-    const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      signal: controller.signal,
-      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "gemini-2.5-flash", messages: messages, temperature: temperature, max_tokens: maxTokens }),
-    });
-    if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("gemini", res); }
-      else { console.warn("Gemini status " + res.status); }
-      return null;
+
+  const candidateModels = [
+    process.env.GEMINI_MODEL,
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+  ].filter(Boolean);
+
+  for (let m = 0; m < candidateModels.length; m++) {
+    const model = candidateModels[m];
+    const controller = new AbortController();
+    const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+    try {
+      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+        method: "POST",
+        signal: controller.signal,
+        headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: model, messages: messages, temperature: temperature, max_tokens: maxTokens }),
+      });
+      if (!res.ok) {
+        if (res.status === 429) {
+          await recordThrottle("gemini", res);
+          return null;
+        }
+        const errText = await res.text().catch(function () { return ""; });
+        console.warn("Gemini model " + model + " returned " + res.status + ": " + errText.slice(0, 200));
+        // If 404 model not found, continue to next candidate model
+        if (res.status === 404 && m < candidateModels.length - 1) {
+          continue;
+        }
+        return null;
+      }
+      const data = await res.json();
+      var finishReason = data.choices?.[0]?.finish_reason || null;
+      return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: model, usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+    } catch (err) {
+      if (err && err.name === "AbortError") {
+        console.warn("Gemini timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+        return null;
+      } else {
+        console.warn("Gemini request error: " + (err && err.message ? err.message : err));
+        return null;
+      }
+    } finally {
+      clearTimeout(timer);
     }
-    const data = await res.json();
-    var finishReason = data.choices?.[0]?.finish_reason || null;
-    return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: "gemini-2.5-flash", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
-  } catch (err) {
-    if (err && err.name === "AbortError") {
-      console.warn("Gemini timed out after " + PROVIDER_TIMEOUT_MS + "ms");
-    } else {
-      console.warn("Gemini request error: " + (err && err.message ? err.message : err));
-    }
-    return null;
-  } finally {
-    clearTimeout(timer);
   }
+  return null;
 }
 
 async function callGroq(messages, maxTokens, model, temperature = 0.7) {
