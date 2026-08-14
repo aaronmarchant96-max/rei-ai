@@ -100,6 +100,10 @@ During the development of the v4 Semantic Router, three major architectural eval
    * **Fix:** Bypassed Jest completely for the true evaluation by writing a standalone native Node ESM benchmark (`scripts/run-v4-benchmark.mjs`).
 3. **Blind Set Contamination:** 8+ strings in the "un-contaminated" 50-prompt blind holdout set were identical to exemplars used to train the domain sub-centroids (`scripts/generate-domain-centroids.mjs`), leading to artificially perfect cosine similarities (1.0000) and an inflated 94.0% accuracy claim.
    * **Fix:** Exported the blind dataset, enforced a programmatic `Set` intersection check that throws an error on >0% overlap, and rewrote all 90 training exemplars to ensure true zero-shot evaluation (which yielded the true 92.0% accuracy).
+4. **The Sandboxed Local-Fix Illusion:** Editing and testing code locally in an agent session without committing and pushing to the remote git branch leads to false-positive success reports where production (Vercel) remains on old, broken code.
+   * **Fix:** Enforce pre-execution and verification git status checks (`git diff --stat`, `git log`) before marking any task complete.
+5. **Google Express API Key Model Gating (Gemini 404s):** Newer Google Gemini API keys (Express keys with `AQ...`) receive 404 Not Found errors on legacy 2.X models via the OpenAI compatibility layer, causing unwanted fallbacks to Groq/Llama.
+   * **Fix:** Always maintain a prioritized multi-model candidate list in `api/cfai.js` (`gemini-3.6-flash`, `gemini-3.1-pro-preview`, `gemini-2.5-flash`, `gemini-3.5-flash-lite`).
 
 ---
 

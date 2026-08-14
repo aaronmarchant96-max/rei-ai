@@ -1,6 +1,42 @@
 {
-  "generatedAt": "2026-08-10T20:38:39.384Z",
+  "generatedAt": "2026-08-14T22:42:12.122Z",
   "entries": [
+    {
+      "hash": "dd9a6c7",
+      "date": "2026-08-14",
+      "subject": "chore(opencode): static-first instruction prefix for prompt caching",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": ""
+    },
+    {
+      "hash": "270c2bc",
+      "date": "2026-08-12",
+      "subject": "feat(router): controlled continuation — never silently truncate",
+      "tags": [
+        "manual"
+      ],
+      "context": ""
+    },
+    {
+      "hash": "54245ea",
+      "date": "2026-08-11",
+      "subject": "fix(router): PR 2 — resolve all documented genuine routing failures",
+      "tags": [
+        "test"
+      ],
+      "context": ""
+    },
+    {
+      "hash": "0c4368e",
+      "date": "2026-08-11",
+      "subject": "fix(api): minimal rate-limit resilience — Retry-After + 15s provider cooldown + 300ms inter-fallback",
+      "tags": [
+        "manual"
+      ],
+      "context": ""
+    },
     {
       "hash": "f08c916",
       "date": "2026-08-10",
@@ -87,16 +123,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 9,
-    "totalTags": 12,
+    "totalEntries": 13,
+    "totalTags": 16,
     "byTag": {
-      "manual": 5,
-      "claim-gate": 5,
-      "ai-cross-check": 1,
-      "test": 1
+      "claim-gate": 6,
+      "manual": 7,
+      "test": 2,
+      "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 9
+      "2026-08": 13
     }
   }
 }

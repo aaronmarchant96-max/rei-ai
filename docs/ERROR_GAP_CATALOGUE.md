@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-10T20:38:39.384Z
-> Span: 2026-08-08 → 2026-08-10 (9 tagged commits, 12 total tags)
+> Last updated: 2026-08-14T22:42:12.122Z
+> Span: 2026-08-08 → 2026-08-14 (13 tagged commits, 16 total tags)
 
 ## Tag Taxonomy
 
@@ -17,15 +17,19 @@
 
 | Tag | Count |
 |---|---|
-| `manual` | 5 |
-| `claim-gate` | 5 |
+| `manual` | 7 |
+| `claim-gate` | 6 |
+| `test` | 2 |
 | `ai-cross-check` | 1 |
-| `test` | 1 |
 
 ## Timeline (newest first)
 
 | Commit | Date | Subject | Tags & Context |
 |---|---|---|---|
+| `dd9a6c7` | 2026-08-14 | chore(opencode): static-first instruction prefix for prompt caching | `claim-gate` |
+| `270c2bc` | 2026-08-12 | feat(router): controlled continuation — never silently truncate | `manual` |
+| `54245ea` | 2026-08-11 | fix(router): PR 2 — resolve all documented genuine routing failures | `test` |
+| `0c4368e` | 2026-08-11 | fix(api): minimal rate-limit resilience — Retry-After + 15s provider cooldown + ... | `manual` |
 | `f08c916` | 2026-08-10 | feat(eval): red team corpus → scanner → router → routeCorrect regression suite | `claim-gate` — the scanner escalation gate fix (ab7856f) is |
 | `edeece1` | 2026-08-10 | fix(landing): add Red Team card to ecosystem grid | `manual` — Red Team was invisible from desktop because no card existed |
 | `0327f40` | 2026-08-10 | fix(story): HARD STOP now honors explicit "just make the story" overrides | `manual` |
@@ -38,11 +42,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 9 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 13 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **9 tagged commits** across 1 month(s).
+- **13 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 
