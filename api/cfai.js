@@ -119,7 +119,11 @@ async function callGemini(messages, maxTokens, temperature = 0.7) {
       const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         signal: controller.signal,
-        headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+        headers: {
+          Authorization: "Bearer " + key,
+          "x-goog-api-key": key,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ model: model, messages: messages, temperature: temperature, max_tokens: maxTokens }),
       });
       if (!res.ok) {
