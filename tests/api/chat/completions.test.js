@@ -17,6 +17,7 @@ jest.mock("../../../shared/lib/costModel.js", function () {
 
 const kv = require("../../../shared/lib/kv.js");
 const costModel = require("../../../shared/lib/costModel.js");
+const { clearProviderCooldown } = require("../../../api/cfai.js");
 
 function mockFetch(responseData, status = 200, ok = true) {
   global.fetch = jest.fn(() =>
@@ -35,6 +36,10 @@ beforeEach(() => {
   process.env.REI_API_KEY = "test-api-key";
   delete process.env.CFAI_PATH;
   jest.clearAllMocks();
+  // Isolate provider cooldown state between tests: a throttled (429) mock in
+  // one test must not leak a module-level cooldown into later tests, which
+  // would otherwise flip them onto the "all backends unavailable" path.
+  clearProviderCooldown();
   // Ceiling enforcement is opt-in: reset to "no ceiling" so baseline tests run
   // under the un-gated path (matches production when MAX_COST_PER_QUERY is unset).
   costModel.maxCostPerQuery.mockReturnValue(null);
@@ -158,7 +163,7 @@ describe("OpenAI-compatible chat completions endpoint", () => {
     expect(entry).toHaveProperty("premiumCost");
   });
 
-  it("does NOT persist a trace on explicit (non-auto-routed) requests", async () => {
+  it("persists a durable trace on explicit (non-auto-routed) requests too", async () => {
     const handler = (await import("../../../api/v1/chat/completions.js")).default;
     const req = {
       method: "POST",
@@ -167,7 +172,37 @@ describe("OpenAI-compatible chat completions endpoint", () => {
     };
     const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
     await handler(req, res);
-    expect(kv.storeTrace).not.toHaveBeenCalled();
+    expect(kv.storeTrace).toHaveBeenCalledTimes(1);
+    const [tenant, requestId, entry] = kv.storeTrace.mock.calls[0];
+    expect(tenant).toBe("pilot");
+    expect(typeof requestId).toBe("string");
+    // Explicit path has no router decision, so routeId stays null but the
+    // requested model + tenant/policy identity are still recorded.
+    expect(entry).toMatchObject({ tenantId: "pilot", policyVersion: "v1" });
+    expect(entry.routeId).toBeNull();
+    expect(entry.model).toBe("gpt-4o-mini");
+    expect(entry).toHaveProperty("cacheHitTokens");
+    expect(entry).toHaveProperty("cacheMissTokens");
+  });
+
+  it("captures cache hit/miss tokens from provider usage on auto-routed requests", async () => {
+    mockFetch({
+      choices: [{ message: { content: "mock response" } }],
+      usage: { prompt_cache_hit_tokens: 1200, prompt_cache_miss_tokens: 80, total_tokens: 1300 },
+    });
+    const handler = (await import("../../../api/v1/chat/completions.js")).default;
+    const req = {
+      method: "POST",
+      headers: { authorization: "Bearer test-api-key" },
+      body: { model: "rei-auto", messages: [{ role: "user", content: "hello" }] },
+    };
+    const res = { _status: null, _body: null, status(c) { this._status = c; return this; }, json(d) { this._body = d; }, setHeader() {} };
+    await handler(req, res);
+    expect(kv.storeTrace).toHaveBeenCalledTimes(1);
+    const entry = kv.storeTrace.mock.calls[0][2];
+    expect(entry.cacheHitTokens).toBe(1200);
+    expect(entry.cacheMissTokens).toBe(80);
+    expect(entry.usage.prompt_cache_hit_tokens).toBe(1200);
   });
 
   describe("per-query cost ceiling (max_cost_per_query, Increment B)", () => {

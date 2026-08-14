@@ -13,6 +13,9 @@
 //     totalSaved,          // sum(premiumCost - estimatedCost) USD
 //     totalPremiumBaseline,// sum(premiumCost) USD
 //     avgSavingsPercent,   // 0..100, null when no measurable requests
+//     cacheAggregates,     // { requestsWithUsage, cacheHitTokens, cacheMissTokens,
+//                           //   measuredCacheHitRate } — measuredCacheHitRate null when
+//                           //   no trace carries cache token usage. Honesty invariant.
 //     series,              // [{ ts: 'YYYY-MM-DD', saved, spend, requests }] ascending
 //     savingsMode: "measured" | "empty-unavailable",
 //       // "measured"        -> KV present AND traces read
@@ -57,6 +60,9 @@ export default async function handler(req, res) {
     let totalSaved = 0;
     let totalPremiumBaseline = 0;
     let requests = 0;
+    let requestsWithUsage = 0;
+    let cacheHitTokens = 0;
+    let cacheMissTokens = 0;
     const byDay = {};
 
     const pushDay = (ts, saved, spend) => {
@@ -77,6 +83,17 @@ export default async function handler(req, res) {
       totalPremiumBaseline += premium;
       requests += 1;
       pushDay(trace.timestamp || new Date().toISOString(), saved, premium);
+
+      // Cache telemetry: only count traces that actually carry cache token
+      // usage. A trace without it contributes nothing — measuredCacheHitRate
+      // stays null until real usage exists (never fabricate a hit rate).
+      const hit = typeof trace.cacheHitTokens === "number" ? trace.cacheHitTokens : null;
+      const miss = typeof trace.cacheMissTokens === "number" ? trace.cacheMissTokens : null;
+      if (hit !== null || miss !== null) {
+        requestsWithUsage += 1;
+        cacheHitTokens += hit ?? 0;
+        cacheMissTokens += miss ?? 0;
+      }
     }
 
     const series = Object.keys(byDay)
@@ -92,6 +109,11 @@ export default async function handler(req, res) {
       ? (totalSaved / totalPremiumBaseline) * 100
       : null;
 
+    const measuredCacheHitRate =
+      requestsWithUsage > 0 && cacheHitTokens + cacheMissTokens > 0
+        ? (cacheHitTokens / (cacheHitTokens + cacheMissTokens)) * 100
+        : null;
+
     return res.status(200).json({
       tenant,
       from,
@@ -100,6 +122,12 @@ export default async function handler(req, res) {
       totalSaved,
       totalPremiumBaseline,
       avgSavingsPercent,
+      cacheAggregates: {
+        requestsWithUsage,
+        cacheHitTokens,
+        cacheMissTokens,
+        measuredCacheHitRate,
+      },
       series,
       // When KV is unavailable we cannot distinguish "no traffic" from "no
       // telemetry" — so we must NOT report "measured". Empty/unavailable is
@@ -116,6 +144,12 @@ export default async function handler(req, res) {
       totalSaved: 0,
       totalPremiumBaseline: 0,
       avgSavingsPercent: null,
+      cacheAggregates: {
+        requestsWithUsage: 0,
+        cacheHitTokens: 0,
+        cacheMissTokens: 0,
+        measuredCacheHitRate: null,
+      },
       series: [],
       savingsMode: "empty-unavailable",
     });

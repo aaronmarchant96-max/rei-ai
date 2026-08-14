@@ -98,4 +98,64 @@ describe("/api/savings", () => {
     // getTracesWithEvals must not even be called when KV is down.
     expect(kv.getTracesWithEvals).not.toHaveBeenCalled();
   });
+
+  it("aggregates measured cache hit rate from traces that carry cache usage", async () => {
+    kv.getTracesWithEvals.mockResolvedValueOnce({
+      traces: [
+        { timestamp: "2026-08-13T10:00:00Z", premiumCost: 0.0100, estimatedCost: 0.0020, cacheHitTokens: 900, cacheMissTokens: 100 },
+        { timestamp: "2026-08-13T11:00:00Z", premiumCost: 0.0050, estimatedCost: 0.0005, cacheHitTokens: 450, cacheMissTokens: 50 },
+        { timestamp: "2026-08-12T09:00:00Z", premiumCost: 0.0080, estimatedCost: 0.0030 },
+      ],
+      evals: [],
+    });
+    const handler = (await import("../../api/savings.js")).default;
+    const req = { method: "GET", query: { tenant: "pilot", from: "2026-08-12", to: "2026-08-13" } };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res._status).toBe(200);
+    const agg = res._body.cacheAggregates;
+    expect(agg.requestsWithUsage).toBe(2);
+    expect(agg.cacheHitTokens).toBe(1350);
+    expect(agg.cacheMissTokens).toBe(150);
+    expect(agg.measuredCacheHitRate).toBeCloseTo((1350 / 1500) * 100, 6);
+  });
+
+  it("reports measuredCacheHitRate null when no trace carries cache usage", async () => {
+    kv.getTracesWithEvals.mockResolvedValueOnce({
+      traces: [
+        { timestamp: "2026-08-13T10:00:00Z", premiumCost: 0.0100, estimatedCost: 0.0020 },
+      ],
+      evals: [],
+    });
+    const handler = (await import("../../api/savings.js")).default;
+    const req = { method: "GET", query: { tenant: "pilot", from: "2026-08-13", to: "2026-08-13" } };
+    const res = mockRes();
+    await handler(req, res);
+    const agg = res._body.cacheAggregates;
+    expect(agg.requestsWithUsage).toBe(0);
+    expect(agg.cacheHitTokens).toBe(0);
+    expect(agg.cacheMissTokens).toBe(0);
+    expect(agg.measuredCacheHitRate).toBeNull();
+  });
+
+  it("savings aggregation still works when some traces lack cache usage", async () => {
+    kv.getTracesWithEvals.mockResolvedValueOnce({
+      traces: [
+        { timestamp: "2026-08-13T10:00:00Z", premiumCost: 0.0100, estimatedCost: 0.0020, cacheHitTokens: 900, cacheMissTokens: 100 },
+        { timestamp: "2026-08-13T11:00:00Z", premiumCost: 0.0050, estimatedCost: 0.0005, cacheMissTokens: 200 },
+      ],
+      evals: [],
+    });
+    const handler = (await import("../../api/savings.js")).default;
+    const req = { method: "GET", query: { tenant: "pilot", from: "2026-08-13", to: "2026-08-13" } };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res._body.requests).toBe(2);
+    expect(res._body.totalSaved).toBeCloseTo(0.0125, 6);
+    const agg = res._body.cacheAggregates;
+    expect(agg.requestsWithUsage).toBe(2);
+    expect(agg.cacheHitTokens).toBe(900);
+    expect(agg.cacheMissTokens).toBe(300);
+    expect(agg.measuredCacheHitRate).toBeCloseTo((900 / 1200) * 100, 6);
+  });
 });

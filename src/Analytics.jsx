@@ -1027,6 +1027,18 @@ export default function Analytics() {
                   <MetricCard label="Avg Savings" subtext="vs frontier baseline">
                     <div style={{ fontSize: "24px", fontWeight: 800 }}>{savings.avgSavingsPercent != null ? savings.avgSavingsPercent.toFixed(1) + "%" : "—"}</div>
                   </MetricCard>
+                  <MetricCard
+                    label="Cache Hit Rate"
+                    subtext={savings.cacheAggregates.measuredCacheHitRate != null
+                      ? savings.cacheAggregates.requestsWithUsage + " requests w/ usage"
+                      : "no cache usage yet"}
+                  >
+                    <div style={{ fontSize: "24px", fontWeight: 800 }}>
+                      {savings.cacheAggregates.measuredCacheHitRate != null
+                        ? savings.cacheAggregates.measuredCacheHitRate.toFixed(2) + "%"
+                        : "—"}
+                    </div>
+                  </MetricCard>
                 </div>
                 {savings.avgSavingsPercent != null && (
                   <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -1044,7 +1056,7 @@ export default function Analytics() {
                   </div>
                 )}
                 <p style={{ fontSize: "11px", color: colors.textDim, margin: "12px 0 0", lineHeight: "1.5" }}>
-                  Measured = surface across the /api/v1/chat/completions proxy, aggregated from the durable evaluation-plane ledger. Savings = frontier (premium) baseline cost − REI routed cost per request. Reported only when telemetry is actually available.
+                  Measured = surface across the /api/v1/chat/completions proxy, aggregated from the durable evaluation-plane ledger. Savings = frontier (premium) baseline cost − REI routed cost per request. Cache hit rate = cached input tokens ÷ (cached + uncached) input tokens from provider usage, shown only when the proxy has actually received cache token usage in range. Reported only when telemetry is actually available.
                 </p>
               </>
             )}

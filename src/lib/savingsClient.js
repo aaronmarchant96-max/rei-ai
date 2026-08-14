@@ -25,6 +25,12 @@ export async function fetchSavings({ tenant = "pilot", from, to } = {}) {
       totalSaved: 0,
       totalPremiumBaseline: 0,
       avgSavingsPercent: null,
+      cacheAggregates: {
+        requestsWithUsage: 0,
+        cacheHitTokens: 0,
+        cacheMissTokens: 0,
+        measuredCacheHitRate: null,
+      },
       series: [],
       savingsMode: "empty-unavailable",
     };
@@ -32,6 +38,8 @@ export async function fetchSavings({ tenant = "pilot", from, to } = {}) {
 
   const data = await res.json();
   const measured = data.savingsMode === "measured";
+  const cache = data.cacheAggregates || {};
+  const cacheMeasured = measured && typeof cache.measuredCacheHitRate === "number";
   return {
     tenant: data.tenant || tenant,
     from: data.from || fromISO,
@@ -42,6 +50,12 @@ export async function fetchSavings({ tenant = "pilot", from, to } = {}) {
     totalSaved: measured && typeof data.totalSaved === "number" ? data.totalSaved : 0,
     totalPremiumBaseline: measured && typeof data.totalPremiumBaseline === "number" ? data.totalPremiumBaseline : 0,
     avgSavingsPercent: measured && typeof data.avgSavingsPercent === "number" ? data.avgSavingsPercent : null,
+    cacheAggregates: {
+      requestsWithUsage: cacheMeasured && typeof cache.requestsWithUsage === "number" ? cache.requestsWithUsage : 0,
+      cacheHitTokens: cacheMeasured && typeof cache.cacheHitTokens === "number" ? cache.cacheHitTokens : 0,
+      cacheMissTokens: cacheMeasured && typeof cache.cacheMissTokens === "number" ? cache.cacheMissTokens : 0,
+      measuredCacheHitRate: cacheMeasured ? cache.measuredCacheHitRate : null,
+    },
     series: measured && Array.isArray(data.series) ? data.series : [],
     savingsMode: measured ? "measured" : "empty-unavailable",
   };

@@ -41,6 +41,53 @@ function errorReply(res, status, code, message) {
   return res.status(status).json({ error: { code: code, message: message } });
 }
 
+function extractCacheTokens(usage) {
+  if (!usage || typeof usage !== "object") return { cacheHitTokens: null, cacheMissTokens: null };
+  const cacheHitTokens =
+    usage.prompt_cache_hit_tokens ??
+    usage.cache_read_input_tokens ??
+    usage.total_cached_tokens ??
+    usage.prompt_tokens_details?.cached_tokens ??
+    null;
+  const cacheMissTokens =
+    usage.prompt_cache_miss_tokens ??
+    usage.uncached_input_tokens ??
+    usage.prompt_tokens_details?.uncached_tokens ??
+    null;
+  return {
+    cacheHitTokens: typeof cacheHitTokens === "number" ? cacheHitTokens : null,
+    cacheMissTokens: typeof cacheMissTokens === "number" ? cacheMissTokens : null,
+  };
+}
+
+function buildTraceEntry({ requestId, clientRequestId, routeId, model, estimatedCost, premiumCost, responseModel, result }) {
+  const usage = result?.usage || null;
+  const cache = extractCacheTokens(usage);
+  return {
+    requestId: requestId,
+    clientRequestId: clientRequestId || null,
+    policyVersion: POLICY_VERSION,
+    tenantId: PILOT_TENANT,
+    timestamp: new Date().toISOString(),
+    routeId: routeId || null,
+    model: model || null,
+    estimatedCost: estimatedCost ?? null,
+    premiumCost: premiumCost ?? null,
+    responseModel: responseModel || null,
+    provider: resolveProvider(responseModel),
+    usage: usage,
+    cacheHitTokens: cache.cacheHitTokens,
+    cacheMissTokens: cache.cacheMissTokens,
+  };
+}
+
+function makeRequestId(req) {
+  return (
+    (req.body && req.body.requestId) ||
+    (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "req-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10))
+  );
+}
+
 function computeSavings(estimatedCost, premiumCost) {
   if (typeof estimatedCost !== "number" || typeof premiumCost !== "number" || premiumCost === 0) {
     return null;
@@ -118,6 +165,19 @@ export default async function handler(req, res) {
         note: "Direct model proxy — token counts may not be available",
       };
 
+      const requestId = makeRequestId(req);
+      const tracePromise = storeTrace(PILOT_TENANT, requestId, buildTraceEntry({
+        requestId: requestId,
+        clientRequestId: (req.body && req.body.requestId) || null,
+        routeId: null,
+        model: model,
+        estimatedCost: null,
+        premiumCost: null,
+        responseModel: directResult.model || null,
+        result: { usage: directResult.usage || null },
+      }));
+      void tracePromise;
+
       return res.status(200).json({
         id: `chatcmpl-${Date.now()}`,
         object: "chat.completion",
@@ -167,23 +227,17 @@ export default async function handler(req, res) {
     // dashboard can aggregate REAL dollar savings over proxy traffic. Mirrors
     // cfai.js; non-blocking (Vercel waits for the promise before returning).
     // Gracefully no-ops when KV is not configured.
-    const requestId =
-      (req.body && req.body.requestId) ||
-      (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : "req-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10));
-    const tracePromise = storeTrace(PILOT_TENANT, requestId, {
+    const requestId = makeRequestId(req);
+    const tracePromise = storeTrace(PILOT_TENANT, requestId, buildTraceEntry({
       requestId: requestId,
       clientRequestId: (req.body && req.body.requestId) || null,
-      policyVersion: POLICY_VERSION,
-      tenantId: PILOT_TENANT,
-      timestamp: new Date().toISOString(),
       routeId: routerDecision?.id || null,
       model: routerDecision?.model || null,
       estimatedCost: routerDecision?.estimatedCost ?? null,
       premiumCost: routerDecision?.premiumCost ?? null,
       responseModel: result.model || null,
-      provider: resolveProvider(result.model),
-      usage: result.usage || null,
-    });
+      result: result,
+    }));
     void tracePromise;
 
     return res.status(200).json({
