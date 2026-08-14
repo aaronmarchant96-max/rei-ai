@@ -58,6 +58,7 @@ function getBackendForModel(model) {
   if (model.startsWith("gpt-")) return "openai";
   if (model.startsWith("deepseek")) return "deepseek";
   if (model.includes("gemini") || model.includes("gemma")) return "gemini";
+  if (model.includes("glm") || model.includes("zai")) return "glm";
   if (model.includes("llama") || model.includes("mixtral")) return "groq";
   return "deepseek";
 }
@@ -215,6 +216,42 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7) {
   }
 }
 
+async function callGLM(messages, maxTokens, temperature = 0.7) {
+  const key = process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN;
+  if (!key || key.includes("your_glm_api_key_here")) return null;
+  const baseUrl = process.env.GLM_BASE_URL || "https://ai-gateway.vercel.sh/v1/chat/completions";
+  const controller = new AbortController();
+  const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+  try {
+    const res = await fetch(baseUrl, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "zai/glm-5.2", messages: messages, temperature: temperature, max_tokens: maxTokens }),
+    });
+    if (!res.ok) {
+      if (res.status === 429) { await recordThrottle("glm", res); }
+      else {
+        const errText = await res.text().catch(function () { return ""; });
+        console.warn("GLM status " + res.status + ": " + errText.slice(0, 200));
+      }
+      return null;
+    }
+    const data = await res.json();
+    var finishReason = data.choices?.[0]?.finish_reason || null;
+    return { content: data.choices?.[0]?.message?.content || "No content from GLM.", model: "zai/glm-5.2", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      console.warn("GLM timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+    } else {
+      console.warn("GLM request error: " + (err && err.message ? err.message : err));
+    }
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ── Controlled continuation (NEVER SILENTLY TRUNCATE) ──
 // When a provider returns finish_reason === "length", the model hit its
 // OUTPUT token cap mid-response. Rather than silently returning a cut-off
@@ -351,6 +388,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   var backends = {};
   if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxTokens, temperature); };
   if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, temperature); };
+  if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs) { return callGLM(msgs || messages, maxTokens, temperature); };
   if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxTokens, groqModel, temperature); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxTokens, temperature); };
 
@@ -369,7 +407,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   }
 
   // Fallback: try remaining backends in priority order
-  var order = primaryBackend ? ["groq", "gemini", "deepseek", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["groq", "gemini", "deepseek", "openai"];
+  var order = primaryBackend ? ["groq", "gemini", "glm", "deepseek", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["groq", "gemini", "glm", "deepseek", "openai"];
   for (var i = 0; i < order.length; i++) {
     var backend = order[i];
     if (backends[backend]) {

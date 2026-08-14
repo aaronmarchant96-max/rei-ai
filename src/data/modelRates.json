@@ -10,5 +10,11 @@
     "output": 0.00028,
     "ceiling": 0.00042,
     "cacheHit": 0.0000028
+  },
+  "zai/glm-5.2": {
+    "input": 0.0014,
+    "output": 0.0044,
+    "ceiling": 0.0058,
+    "cacheHit": 0.00026
   }
 }

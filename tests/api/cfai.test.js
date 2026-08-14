@@ -299,6 +299,18 @@ describe("handler", function () {
     var lastMsg = fetchBody.messages[fetchBody.messages.length - 1];
     expect(lastMsg.content).toBe("what is the capital of France");
   });
+
+  it("routes to GLM API when model is zai/glm-5.2", async function () {
+    process.env.GLM_API_KEY = "glm-test-key";
+    var { handleCfaiRequest, clearProviderCooldown } = await import("../../api/cfai.js");
+    clearProviderCooldown();
+    var routerDecision = { id: "coding-deep", model: "zai/glm-5.2", maxTokens: 4000, temperature: 0.7 };
+    var result = await handleCfaiRequest("chat", [], "refactor entire repository", "You are REI.", [], routerDecision);
+    expect(result.success).toBe(true);
+    expect(result.model).toBe("zai/glm-5.2");
+    var fetchBody = JSON.parse(global.fetch.mock.calls[0][1].body);
+    expect(fetchBody.model).toBe("zai/glm-5.2");
+  });
 });
 
 describe("provider timeout (AbortError) falls back instead of hard-failing", function () {
