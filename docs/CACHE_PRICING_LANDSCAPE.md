@@ -2,7 +2,7 @@
 
 > **Purpose:** the external provider market — which LLM APIs discount *cached input tokens*, by how much, automatically or opt-in. This is a *market reference*, NOT a claim about REI's own performance. REI's own claims (measured savings, stress-test results) live in `CLAIM_LEDGER.md`; this document feeds the product/economic hypothesis that the pilot measurement then tests.
 
-> **Last updated:** 2026-08-12. Rates are list prices from provider docs at that date and drift — verify against the provider's current pricing page before quoting to a customer.
+> **Last updated:** 2026-08-14. Rates are list prices from provider docs at that date and drift — verify against the provider's current pricing page before quoting to a customer.
 
 ## Why this matters to REI
 
@@ -19,11 +19,11 @@ The REI cost model prices every input token at the provider's *uncached* input r
 
 | Provider | Cache name | Mode | Hit discount | Write/storage cost | TTL | Min tokens | Notes / unverified flags |
 |---|---|---|---|---|---|---|---|
-| **DeepSeek** (own API) | prompt caching | automatic | **~0.008x** (measured 1/120: v4-pro hit $0.003625/M vs miss $0.435/M) | none | — | — | Extreme outlier. 97.7% hit rate measured on our own build spend (Jul 12–Aug 10 CSV). |
+| **DeepSeek** (own API) | prompt caching | automatic | **~0.008x** pre-2026-08-16 (measured 1/120: v4-pro hit $0.003625/M vs miss $0.435/M; 1/50 flash). **~1/30x from 2026-08-16 16:00 UTC** (peak & off-peak) | none | system-managed | — | Measured on own build spend (Jul 16 – Aug 14): **97.3502% input cache hit rate**, billed $23.5172 vs $590.5747 no-cache counterfactual (96.0% savings) — `npm run verify:cache` against `data/cache-spend.csv`. Rates from 2026-08-16: peak 01:00–04:00 + 06:00–10:00 UTC (2x off-peak). |
 | **Google Gemini** | context caching | implicit (automatic, 2.5+ models) + explicit `CachedContent` API | **0.1x** (2.5 Flash $0.30→$0.03, 3.6 Flash $1.50→$0.15) | no write fee; **storage fee $1.00/M tok/hour** (up to $8.10 Pro tiers) | implicit ~3–5 min (OpenRouter); explicit 5 min–60 days | 2048 (2.5 Flash/Pro), 4096 (3.1 Pro, 3.5 Flash) | Paid tier only. `usage.total_cached_tokens`. *Unverified: all Google data fetched via r.jina.ai reader proxy (ai.google.dev blocks direct fetch).* |
-| **Anthropic** | prompt caching | opt-in `cache_control` breakpoints (or automatic top-level breakpoint) | **0.1x** reads | **1.25x** writes (5-min TTL) / **2x** (1-hr TTL); refreshes free | 5 min / 1 hr | 512–4096 by model (Sonnet 4.6/4.5, Opus 4.8 = 1024; Opus 4.6/4.5, Haiku 4.5 = 4096; Opus 5/Fable 5 = 512) | `cache_creation_input_tokens` / `cache_read_input_tokens`. Workspace-isolated. |
-| **Mistral** | context caching | automatic (prefix-based); optional `prompt_cache_key` | **0.1x** (Large 3 €0.44→€0.044, Medium 3.5 €1.25→€0.125) | not stated | not stated | not stated | |
-| **Moonshot Kimi** | context caching | automatic | **0.1x** on K3 (¥2.00 hit vs ¥20.00 miss, "up to 90% savings") | none | system-managed | 256 | OpenRouter lists 0.25x (model/route dependent). |
+| **Anthropic** | prompt caching | opt-in `cache_control` breakpoints (or automatic top-level breakpoint) | **0.1x** reads (Sonnet 5 $2→$0.20, Haiku 4.5 $1→$0.10) | **1.25x** writes (5-min TTL) / **2x** (1-hr TTL); refreshes free — write-fee break-even ≈ 1.4x reads:writes, needs a warmer + volume | 5 min / 1 hr | 512–4096 by model (Sonnet 4.6/4.5, Opus 4.8 = 1024; Opus 4.6/4.5, Haiku 4.5 = 4096; Opus 5/Fable 5 = 512) | `cache_creation_input_tokens` / `cache_read_input_tokens`. Workspace-isolated. |
+| **Mistral** | context caching | automatic (prefix-based); optional `prompt_cache_key` | **0.1x** ('−90%' cached input, all models; Small 4 $0.15→$0.015, Medium 3.5 $1.50→$0.15) | not stated | not stated | not stated | GLM 5.2 (third-party on Mistral) $1.40→$0.14 cached, $4.40 out. Codestral $0.30→$0.03. |
+| **Moonshot Kimi** | context caching | automatic | **0.1x** on K3 (hit $0.30/M vs miss $3.00/M, out $15.00/M; "up to 90% savings") | none | system-managed | 1M context | OpenRouter lists 0.25x (model/route dependent). Live-verified 2026-08-14. |
 | **Z.ai GLM** | context caching | automatic | **~0.15–0.2x** (GLM-5.2 $1.40→$0.26, GLM-4.7 $0.60→$0.11) | no write cost; storage "limited-time free" | "reasonable time limits" | not stated | `usage.prompt_tokens_details.cached_tokens`. Billing prose ("50%") is stale vs the pricing table. |
 | **OpenAI** | prompt caching | automatic (≥1024 tokens, exact prefix) | ~**0.25x** (per OpenRouter; GPT-5.6+ reads 0.25x) | free pre-GPT-5.6; **1.25x writes on GPT-5.6+** | in-memory 5–10 min idle (≤1h); extended up to 24h | 1024 | `prompt_cache_key` + explicit breakpoints on GPT-5.6+. |
 | **OpenRouter** | prompt caching (aggregator) | pass-through (both) | 0.1x–0.5x by provider/model | provider-dependent | **10-min sticky session** | provider-dependent | Sticky routing pins you to one provider to keep cache warm; optional `session_id`. |
@@ -39,7 +39,18 @@ The REI cost model prices every input token at the provider's *uncached* input r
 - **Gemini implicit** (0.1x, no write fee, automatic on 2.5+)
 - **Moonshot K3** (0.1x, automatic, no write fee)
 - **Z.ai GLM** (0.15–0.2x, automatic, no write fee)
-- **DeepSeek own API** — still the extreme outlier at ~0.008x measured.
+- **DeepSeek own API** — was the extreme outlier at ~0.008x measured (1:120 pro / 1:50 flash) before 2026-08-16; from 2026-08-16 it drops to ~1/30x peak & off-peak. Still the best absolute rates + zero write fees, but the 120x moat is gone — the edge over the field (all clustered at ~0.1x) collapses to ~3x on the discount ratio.
+
+## Recommended stack (build-cost + product, 2026-08-14)
+
+| Priority | Provider | Why | Status |
+|---|---|---|---|
+| 1 | **DeepSeek** (own API) | Lowest absolute rates, automatic prefix caching, zero write fees. 97.35% measured hit rate on our own frozen-prefix workload. | ✅ wired (primary in `api/cfai.js` fallback chain) |
+| 2 | **Google Gemini** | 0.1x implicit, zero write fee, real-time availability. | ✅ wired (secondary in fallback chain) |
+| 3 | **Mistral / Kimi** | 0.1x automatic, zero write fee, cheap third leg; Kimi K3 has 1M context. | ⏳ staged third leg (not yet wired) |
+| 4 | **Anthropic** | 0.1x reads but 1.25–2x writes → only worthwhile behind a cache warmer with volume. | ⛔ deferred (needs warmer) |
+
+The stack's cache flywheel is *prefix-stability-dependent*: only the stable shared prefix (AGENTS.md + workflow docs + frozen system prompt) gets cached, so prefix order/stable-common-prefix is the hinge for keeping hit rates near measured levels.
 
 ## Unverified flags (honest limits)
 

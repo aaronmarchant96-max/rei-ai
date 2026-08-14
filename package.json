@@ -22,7 +22,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "pilot": "tsx scripts/run-pilot.mjs",
-    "copy:tone": "node scripts/check-copy-tone.mjs"
+    "copy:tone": "node scripts/check-copy-tone.mjs",
+    "verify:cache": "node scripts/verify-cache-spend.mjs"
   },
   "dependencies": {
     "@azure/functions": "^4.7.0",
