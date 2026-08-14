@@ -10,7 +10,7 @@ export default {
   rules: ["Verify API shapes", "Name hinges explicitly", "Stop and ask if underspecified"],
   exemplar: "Decomposing complex requirements into small, testable coding iterations.",
   systemPrompt: CODING_PROMPT,
-  matchTerms: ["implement", "debug", "fix", "refactor", "function", "component", "module", "api", "jest", "vite", "react", "node", "typescript", "javascript", "python", "test", "patch", "class", "hook", "route", "query", "optimize", "index", "postgresql", "database", "concurrent", "rate.limit", "build.script", "build.error", "build.target", "next.js", "tailwind", "express", "middleware", "svelte", "deno", "turborepo", "monorepo", "kubernetes", "pytest", "jquery", "blueprint", "clean version", "source code", "load_users", "login", "auth", "merge", "array", "cache", "fetch", "sort", "async", "await", "string", "error", "crash", "promise", "callback"],
+  matchTerms: ["implement", "debug", "fix", "refactor", "function", "component", "module", "api", "jest", "vite", "react", "node", "typescript", "javascript", "python", "test", "patch", "class", "hook", "route", "query", "optimize", "index", "postgresql", "database", "concurrent", "rate.limit", "build.script", "build.error", "build.target", "next.js", "tailwind", "express", "middleware", "svelte", "deno", "turborepo", "monorepo", "kubernetes", "pytest", "jquery", "blueprint", "clean version", "source code", "load_users", "login", "auth", "merge", "array", "cache", "fetch", "sort", "async", "await", "string", "error", "crash", "promise", "callback", "usememo", "useeffect", "useref", "usestate", "usecallback", "debounce"],
   fingerprint: {
     id: "coding-hinge",
     jobType: "coding-hinge",

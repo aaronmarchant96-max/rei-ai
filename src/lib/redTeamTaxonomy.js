@@ -709,7 +709,7 @@ export const OBFUSCATION_PATTERNS = [
   // Hex encoding
   { pattern: /(?:0x)?[0-9a-fA-F]{20,}/, label: "hex_encoded", weight: 0.7 },
   // Leetspeak substitution (ign0re, br3ak, etc.)
-  { pattern: /\b(?:1gn0r[e3]|br[e3]ak|jailbr[e3]ak|0v[e3]rrid[e3]|bypass|d1sab[l1]e)\b/i, label: "leetspeak_obfuscation", weight: 0.9 },
+  { pattern: /\b(?:1gn0r[e3]|br3ak|jailbr3ak|0v3rrid3|byp[@4]ss|d1sab[l1]e)\b/i, label: "leetspeak_obfuscation", weight: 0.9 },
   // Zero-width characters
   { pattern: /[\u200B-\u200F\uFEFF]/, label: "zero_width_chars", weight: 0.8 },
   // Unicode homoglyphs (Cyrillic, Greek lookalikes)
@@ -778,6 +778,26 @@ export const PROXIMITY_PATTERNS = [
   }
 ];
 
+function keywordMatch(normalizedInput, keyword) {
+  const key = String(keyword).toLowerCase();
+  if (!key) {
+    return false;
+  }
+  // Multi-word keywords ("help me break", "ignore previous instructions")
+  // are matched literally as substrings to preserve existing phrase detection.
+  if (/\s/.test(key)) {
+    return normalizedInput.includes(key);
+  }
+  // Single-word keywords are matched with word boundaries so short danger
+  // terms cannot false-positive inside ordinary words ("ricin" in "pricing").
+  const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const startsWithWord = /^[a-z0-9]/.test(key);
+  const endsWithWord = /[a-z0-9]$/.test(key);
+  const prefix = startsWithWord ? "(^|[^a-z0-9])" : "";
+  const suffix = endsWithWord ? "([^a-z0-9]|$)" : "";
+  return new RegExp(prefix + escaped + suffix, "i").test(normalizedInput);
+}
+
 export function getCategoryByKeyword(input) {
   const normalizedInput = input.toLowerCase();
   const matches = [];
@@ -788,7 +808,7 @@ export function getCategoryByKeyword(input) {
     const matchedKeywords = [];
 
     for (const keyword of category.keywords) {
-      if (normalizedInput.includes(keyword.toLowerCase())) {
+      if (keywordMatch(normalizedInput, keyword)) {
         score += category.weight;
         matchedKeywords.push(keyword);
       }

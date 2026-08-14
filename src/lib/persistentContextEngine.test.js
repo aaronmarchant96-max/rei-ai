@@ -182,6 +182,30 @@ describe("Persistent Context Engine (HCM)", () => {
       expect(messages[0].text).toBe("Fallback initialization.");
     });
 
+    it("recovers gracefully from schema version mismatch", () => {
+      window.localStorage.setItem(
+        "rei_chat_history_assistant",
+        JSON.stringify({ version: "hcm_v99_future", domainId: "assistant", data: [] })
+      );
+      const messages = readChatHistoryHCM("assistant", "Fallback initialization.");
+      expect(messages[0].text).toBe("Fallback initialization.");
+    });
+
+    it("recovers gracefully from domain mismatch in stored HCM", () => {
+      window.localStorage.setItem(
+        "rei_chat_history_assistant",
+        JSON.stringify({ version: "hcm_v1", domainId: "different_domain", recentMessages: [] })
+      );
+      const messages = readChatHistoryHCM("assistant", "Fallback initialization.");
+      expect(messages[0].text).toBe("Fallback initialization.");
+    });
+
+    it("recovers gracefully from empty legacy array", () => {
+      window.localStorage.setItem("rei_chat_history_assistant", JSON.stringify([]));
+      const messages = readChatHistoryHCM("assistant", "Fallback initialization.");
+      expect(messages[0].text).toBe("Fallback initialization.");
+    });
+
     it("saves and loads HCM with compression", () => {
       const messages = [
         { sender: "rei", text: "Welcome" },

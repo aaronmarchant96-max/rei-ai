@@ -209,7 +209,7 @@ export function isAdversarialRequest(text: string): boolean {
   // castle"). Only task-specific phrases (and the scanner backstop below)
   // escalate. Legitimate adversarial-task phrasings ("challenge every
   // assumption", "tear down this argument") are kept as explicit phrases.
-  if (/\b(red[- ]?team|adversarial|stress test|steelman|poke holes|prove wrong|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|challenge every assumption|challenge the assumption|challenge this argument|challenge that assumption|challenge the premise|challenge them|tear down this argument|tear down that argument|tear apart this argument|tear apart the argument|tear apart this research|hostile reviewer|hostile review)\b/i.test(text)) {
+  if (/\b(red[- ]?team|adversarial|stress test|steelman|poke holes|prove wrong|break it|stress-test|prove\b.*\bwrong|devil.s.advocate|challenge every assumption|challenge the assumption|challenge this argument|challenge that assumption|challenge the premise|challenge them|tear down this argument|tear down that argument|tear apart this argument|tear apart the argument|tear apart this research|rip apart|rip it apart|rip this apart|hostile reviewer|hostile review)\b/i.test(text)) {
     return true;
   }
   // Align with the red-team scanner taxonomy: any input the D1 scan escalates
@@ -219,7 +219,8 @@ export function isAdversarialRequest(text: string): boolean {
   // taxonomy-aligned backstop (injection phrases like "ignore previous
   // instructions" that the regex misses).
   try {
-    return scanRedTeamInput(text).escalateToD2;
+    const scan = scanRedTeamInput(text);
+    return scan.escalateToD2;
   } catch {
     return false;
   }
@@ -248,7 +249,7 @@ function getHighStructureSignals(text: string): string[] {
 }
 
 function hasComparisonFraming(text: string): boolean {
-  return /\btrade-?offs?\b|\bpros and cons\b/i.test(text);
+  return /\btrade-?offs?\b|\bpros and cons\b|\bpressure[- ]?test\b/i.test(text);
 }
 
 /**
@@ -316,6 +317,8 @@ export function buildRouterDecision({
   if (!text) {
     return buildDecision("structured-reasoning", {}, hingeResult);
   }
+
+  
 
   if (isSimpleGreeting(text)) {
     const decision = buildDecision("simple-greeting", {
@@ -398,6 +401,21 @@ export function buildRouterDecision({
     return decision;
   }
 
+  if (domainName === "legal" || (domainName === "assistant" && (catalogRoute?.id === "legal-hinge" || domainKeywordMatches(text, "legal")))) {
+    const routeTerms = actualMatchedTerms("legal-hinge", text);
+    const decision = buildDecision("legal-hinge", {
+      rationale: "Legal case analysis or precedent evaluation detected; enforce verified-index grounding.",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: routeTerms,
+        highStructureSignals,
+        storedPreference,
+      } as RoutingSignals,
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
   if (domainName === "genealogy" || (domainName === "assistant" && (catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")))) {
     const routeTerms = actualMatchedTerms("genealogy-deep-dive", text);
     const decision = buildDecision("genealogy-deep-dive", {
@@ -417,21 +435,6 @@ export function buildRouterDecision({
     const routeTerms = actualMatchedTerms("story-architect", text);
     const decision = buildDecision("story-architect", {
       rationale: "Story or narrative language detected; route through the storytelling blueprint path.",
-      routingSignals: {
-        complexityTier,
-        matchedTerms: routeTerms,
-        highStructureSignals,
-        storedPreference,
-      } as RoutingSignals,
-    }, hingeResult);
-    persistRouteHistory(decision.id);
-    return decision;
-  }
-
-  if (domainName === "legal" || (domainName === "assistant" && (catalogRoute?.id === "legal-hinge" || domainKeywordMatches(text, "legal")))) {
-    const routeTerms = actualMatchedTerms("legal-hinge", text);
-    const decision = buildDecision("legal-hinge", {
-      rationale: "Legal case analysis or precedent evaluation detected; enforce verified-index grounding.",
       routingSignals: {
         complexityTier,
         matchedTerms: routeTerms,

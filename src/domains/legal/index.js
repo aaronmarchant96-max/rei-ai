@@ -10,7 +10,7 @@ export default {
   rules: ["Verified-index grounding", "Hinge before holding", "Flag unverified cases explicitly"],
   exemplar: "Extracting the decisive legal principle and what fact would have changed the outcome.",
   systemPrompt: CASE_HINGE_PROMPT,
-  matchTerms: ["precedent", "holding", "dicta", "majority opinion", "dissent", "appeal", "court held", "ruling", "litigation", "overruled", "distinguish", "statute", "constitutional", "tort", "plaintiff", "defendant", "case law", "legal principle", "judicial review", "duty of care", "donoghue", "winterbottom", "carlill", "marbury", "brown v board", "rylands"],
+  matchTerms: ["precedent", "holding", "dicta", "majority opinion", "dissent", "appeal", "court held", "ruling", "litigation", "overruled", "distinguish", "statute", "constitutional", "tort", "plaintiff", "defendant", "case law", "legal principle", "judicial review", "duty of care", "donoghue", "winterbottom", "carlill", "marbury", "brown v board", "rylands", "appellate", "en banc", "burden-shifting"],
   fingerprint: {
     id: "legal-hinge",
     jobType: "legal-hinge",

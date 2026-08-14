@@ -28,6 +28,9 @@ export const GREETING_TERMS = [
   "greetings",
   "what's up",
   "whats up",
+  "morning",
+  "afternoon",
+  "evening",
 ];
 
 export function isSimpleGreeting(text = "") {
@@ -36,7 +39,7 @@ export function isSimpleGreeting(text = "") {
     if (t === term) return true;
     if (t.startsWith(term)) {
       const nextChar = t[term.length];
-      if (nextChar === undefined || /[\s!.?]/.test(nextChar)) return true;
+      if (nextChar === undefined || /[\s!?.,:;]/.test(nextChar)) return true;
     }
   }
   return false;

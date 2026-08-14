@@ -101,7 +101,7 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
 
 async function callGemini(messages, maxTokens, temperature = 0.7) {
   const key = process.env.GEMINI_API_KEY;
-  if (!key || !key.startsWith("AQ.")) return null;
+  if (!key || key.includes("your_gemini_api_key_here")) return null;
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {

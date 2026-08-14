@@ -1,6 +1,6 @@
 ---
 verified: true
-last_reviewed: 2026-07-31
+last_reviewed: 2026-08-14
 stale_after_hours: 24
 ---
 
@@ -134,8 +134,20 @@ constraints:
   - Execute steps in order — do not skip
   - If any step fails → stop, do not continue to next step
   - Report errors in structured format (see below)
+  - Preserve prompt-freeze prefix order in opencode.json
   - After all steps complete → run full verification suite
 ```
+
+---
+
+## Prompt-Freeze & Deterministic Caching Protocol
+
+To sustain a 90%+ prompt cache hit rate across LLM providers (e.g. Gemini 70-90% caching discount, DeepSeek prompt caching):
+
+1. **Frozen Prefix Order:** The file ordering in `opencode.json` under `instructions` must remain frozen. Changes to instruction ordering or `REI_SYSTEM_PROMPT` invalidate the cached prefix.
+2. **Deterministic Keys:** Cache keys are derived from SHA256 of the normalized prompt prefix, system prompt, user query, domain, and static routing signals. Dynamic tokens (e.g. client timestamps, random seeds, volatile session IDs) must never contaminate the cache key.
+3. **Safety Bypass:** All requests flagged for `adversarial-validation` or escalated by security scanners must explicitly bypass the cache.
+4. **Summary Compression:** Compress closed conversational context into HCM summaries (<=500 tokens) via `saveChatHistoryHCM()` on key decision hinges rather than every turn. See `memories/repo/caching_rules.md` for full policy.
 
 ---
 
@@ -289,7 +301,9 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 | `docs/fortis-et-liber.md` | REI codebase reference (project-specific) |
 | `docs/REI_CODE_PATTERNS.md` | Code patterns to follow |
 | `TOKEN_SAVERS.md` | Token efficiency tactics |
+| `docs/CACHE_PRICING_LANDSCAPE.md` | External LLM cache pricing and provider benchmarks |
+| `memories/repo/caching_rules.md` | Core prompt-freeze and cache invalidation rules |
 
 ---
 
-*Last reviewed: 2026-08-13 (added worktree/scope gates, stop_conditions, evidence + concurrent-work discipline). Stale after: 2026-08-14. Verify rules before executing.*
+*Last reviewed: 2026-08-14 (added prompt-freeze caching protocol, recovery tests, and updated review timestamps). Stale after: 2026-08-15. Verify rules before executing.*
