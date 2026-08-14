@@ -1,0 +1,66 @@
+{
+  "label": "Foreign-author routing corpus (independent-style)",
+  "sharpshot": "Proves the router generalizes to prompts written by OTHER people with different phrasing and domain vocabulary than the author's own eval set.",
+  "provenance": {
+    "source": "independent_style_generation",
+    "generated_by": "REI eval authoring (2026-08-14)",
+    "note": "These are NOT real production user telemetry. They are prompts written in the distinct voice/domain vocabulary of 5 non-author personas (a civil historian, a JavaScript engineer, a fiction novelist, a law student, and a product manager), to test whether routing accuracy holds on phrasing the author did not write. Each persona's vocabulary is deliberately disjoint from the author's own coding-/genealogy-heavy eval set. This is a generalization test, not a usage claim."
+  },
+  "generated": "2026-08-14",
+  "personas": ["historian", "js_engineer", "novelist", "law_student", "product_manager"],
+  "excluded_note": "factCheck fixtures are excluded from accuracy scoring: the Fact Check route is not implemented in fingerprints.json (route_not_implemented), matching the established evalLabelMap contract.",
+  "categories": {
+    "greeting": [
+      { "persona": "product_manager", "prompt": "hey, you around for a sec?" },
+      { "persona": "historian", "prompt": "good morning, archivist" },
+      { "persona": "js_engineer", "prompt": "sup" },
+      { "persona": "novelist", "prompt": "hello, muse" },
+      { "persona": "product_manager", "prompt": "afternoon folks" }
+    ],
+    "coding": [
+      { "persona": "js_engineer", "prompt": "my useMemo deps are firing every render — what's going on? I thought I mapped them right" },
+      { "persona": "js_engineer", "prompt": "why is my Express route swallowing the async error instead of hitting the error middleware?" },
+      { "persona": "js_engineer", "prompt": "debounce my save handler so rapid keystrokes only flush once, but keep the latest value" },
+      { "persona": "js_engineer", "prompt": "I'm chasing an infinite loop in a useEffect that depends on a stable ref — how do I break the cycle cleanly?" },
+      { "persona": "js_engineer", "prompt": "tree-shake lodash properly in my Vite build so I stop shipping the whole bundle" }
+    ],
+    "genealogy": [
+      { "persona": "historian", "prompt": "I'd like to reconcile the 1881 Scottish census return for the Henderson household against the parish burial register in Lanarkshire" },
+      { "persona": "historian", "prompt": "can you help me disentangle three John Murphys who appear in the 1851 Tipperary census and the same-name family Bible entries?" },
+      { "persona": "historian", "prompt": "trace the land conveyance for a 1798 Upper Canada lot grant back to the Crown patent and note who signed transfer" },
+      { "persona": "historian", "prompt": "compare the muster rolls and the pension application to establish whether this veteran's listed discharge date is consistent" },
+      { "persona": "historian", "prompt": "help me weigh a birth certificate against an infant-baptism register when the two dates disagree by a fortnight" }
+    ],
+    "creative": [
+      { "persona": "novelist", "prompt": "give me a beat sheet for a second-act betrayal that also raises the central mystery rather than just stalling it" },
+      { "persona": "novelist", "prompt": "draft the interior monologue of a coroner who's quietly terrified of the bodies she interprets every day" },
+      { "persona": "novelist", "prompt": "map a character's wants-versus-needs so his flaw bites hardest in the third-act confrontation scene" },
+      { "persona": "novelist", "prompt": "write the opening of a gothic novel where a lighthouse lamp does not actually keep the ship safe" },
+      { "persona": "novelist", "prompt": "construct a magic system whose cost is memory — and show me the logical consequences for a 900-year-old practitioner" }
+    ],
+    "factCheck": [
+      { "persona": "product_manager", "prompt": "is it actually true that the Colosseum could be flooded to stage naval battles?" },
+      { "persona": "historian", "prompt": "verify the often-repeated claim that Napoleon was short, and cite whether metric or imperial is being used" }
+    ],
+    "reasoning": [
+      { "persona": "product_manager", "prompt": "we're choosing between a usage-based pricing model and a flat seat license — what hidden second-order costs would change my mind one way or the other?" },
+      { "persona": "product_manager", "prompt": "pressure-test whether rolling a custom LLM gateway now beats renting one from a vendor in the next eighteen months" },
+      { "persona": "product_manager", "prompt": "I keep going back and forth on hiring a senior platform engineer vs a contractor — give me the decision hinge, not a list" },
+      { "persona": "product_manager", "prompt": "what evidence would actually falsify my assumption that developer-education content drives our activation, so I stop guessing?" },
+      { "persona": "historian", "prompt": "argue the weakest part of the thesis that literacy rates in Victorian England were rising faster than urbanization, and what data I'd need to settle it" }
+    ],
+    "adversarial": [
+      { "persona": "product_manager", "prompt": "rip apart this GTM motion: founder-led sales for a $2k/mo tool to seed-stage startups. Find the fatal flaw before we sink the quarter" },
+      { "persona": "js_engineer", "prompt": "I keep asserting my webhook retry logic is idempotent — red-team it and show me where double-delivery still slips through" },
+      { "persona": "historian", "prompt": "challenge the assumption that oral family history is structurally less reliable than parish registers; build the strongest case against it" },
+      { "persona": "product_manager", "prompt": "stress-test the argument that a freemium tier with a 2% paid conversion is healthy — break the assumption chain" }
+    ],
+    "legal": [
+      { "persona": "law_student", "prompt": "evaluate whether the majority opinion's reliance on legislative purpose actually reconciles the two competing remedies clauses" },
+      { "persona": "law_student", "prompt": "check the precedent posture: does this 1984 appellate ruling still control given the 2007 en banc split?" },
+      { "persona": "law_student", "prompt": "summarize the burden-shifting framework here and flag which element the plaintiff likely stumbles on" },
+      { "persona": "law_student", "prompt": "compare how the trial and appellate courts treated the standing question so I can see where the record diverges" },
+      { "persona": "law_student", "prompt": "flag every assumer the court made about the contract's enforceability that a subsequent ruling quietly undercut" }
+    ]
+  }
+}
