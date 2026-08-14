@@ -5,13 +5,7 @@
   "plugin": [
     "@tarquinen/opencode-dcp"
   ],
-  "mcp": {
-    "sentry": {
-      "type": "remote",
-      "url": "https://mcp.sentry.dev/mcp",
-      "oauth": {}
-    }
-  },
+  "mcp": {},
   "instructions": [
     "SECURITY.md",
     "CONTRIBUTING.md",
