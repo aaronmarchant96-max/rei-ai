@@ -6,21 +6,55 @@ the quick-ref can stay high-leverage. Source of authority: `AGENTS.md`.
 
 ---
 
-## The control-system view
+## The Complete 5-Layer Workflow Architecture
 
-The workflow is three stacked layers. Layer 0 things an agent can **never** do on
-its own. Layer 1 is the normal operating loop. Layer 2 is how we keep the loop
-cheap enough to run.
+Aaron's system is **five layers deep**, each with a specific purpose:
 
 ```
-Layer 0  Hard stops      (never override — always a human decision)
-Layer 1  Workflow        (triage → gates → build → verify → commit)
-Layer 2  Optimization    (token budget, pinning, targeted tests, single-shot)
+L0 — HARD STOPS (never overridden)
+  ├── HEAD mismatch
+  ├── Scope collision
+  ├── Dirty-file collision
+  ├── Deploy / Vercel
+  ├── Unsafe git
+  └── Unverified measurement
+
+L1 — GOVERNANCE (Triage → Plan → Scope → Claims → Verification → Commit)
+  ├── Task Triage Gate (AGY vs Fast Lane)
+  ├── AGY Plan Format (YAML header)
+  ├── Pre-execution Gates (HEAD, worktree, scope)
+  ├── Acceptance Tests First
+  ├── Implementation (in order)
+  ├── Stop Conditions
+  ├── Verification Gate
+  └── Commit Discipline
+
+L2 — CARDO LOOP (cognitive reasoning)
+  ├── Collect (facts/context)
+  ├── Analyze (constraints, alternatives, blast radius)
+  ├── Record (assumptions, evidence, decisions)
+  ├── Distinguish (fact vs assumption, measured vs estimated)
+  ├── Operate (smallest safe increment)
+  └── (loop back to Collect)
+
+L3 — EXECUTION (implementation, tests, verification)
+  ├── Implement
+  ├── Test (targeted)
+  ├── Observe
+  ├── Preserve evidence
+  └── Feed result back into CARDO
+
+L4 — OPTIMIZATION (token economy, tooling tactics)
+  ├── Budget = compress trigger (5K/12K/25K)
+  ├── Pin, don't wander (grep, line offsets)
+  ├── Targeted tests (module only)
+  ├── Single-shot tool calls
+  └── Concurrent work (verify HEAD/branch/worktree)
 ```
 
 ---
 
-## Layer 0 — Hard stops
+## Layer 0 — Hard Stops
 
 | Stop | Rule |
 |------|------|
@@ -35,22 +69,21 @@ On any hard stop: **STOP and ask the user.** Do not silently proceed.
 
 ---
 
-## Layer 1 — The operating loop
+## Layer 1 — Governance (The Operating Loop)
 
-### 1. Task triage gate
+### 1. Task Triage Gate
 
 ```
-research/plan  OR  5+ files  OR  reasoning
-   │
-   ├── YES → AGY (produce a plan)
-   └── NO  → Fast Lane (skip planning)
+research/plan task? OR touches 5+ files? OR involves reasoning?
+        │
+        ├── YES → AGY path (write a plan)
+        └── NO  → Fast Lane (<5 files, mechanical, reversible)
 ```
 
 - **AGY** — analysis, cross-file, or judgment work.
-- **Fast Lane** — all three must hold: fewer than 5 files, mechanical change
-  (pure sed/replace), reversible with a single `git checkout`.
+- **Fast Lane** — all three must hold: fewer than 5 files, mechanical change, reversible with a single `git checkout`.
 
-### 2a. AGY plan
+### 2a. AGY Plan Format
 
 ```yaml
 ---
@@ -72,7 +105,7 @@ stop_conditions:
 - Exact `file:line` references.
 - State WHY each file changes (not how, not prose).
 
-### 2b. Pre-execution gates — run before modifying anything
+### 2b. Pre-Execution Gates — Run Before Modifying Anything
 
 **HEAD gate**
 ```bash
@@ -87,25 +120,20 @@ git status --short
 git diff --stat
 git diff --name-only
 ```
-- Pre-existing modifications are **OUT-OF-SCOPE**: never modify, stage, reset,
-  stash, or commit them.
+- Pre-existing modifications are **OUT-OF-SCOPE**: never modify, stage, reset, stash, or commit them.
 - If the task's scope overlaps a dirty file → STOP and re-plan.
 - Record unrelated dirty paths in the handoff so the next agent knows they aren't yours.
 
 **Scope gate**
-If the implementation demands an unplanned file / arch change / dependency /
-contract / runtime / service → STOP. Record:
+If the implementation demands an unplanned file / arch change / dependency / contract / runtime / service → STOP. Record:
 - WHY discovered
 - BLAST_RADIUS
 - ALTERNATIVES
 - REPLAN_REQUIRED: yes/no
 
-The plan can stay on the same commit while scope drifts — the scope gate catches
-that regardless of HEAD.
+### 3. Claim Before Code (Acceptance Tests First)
 
-### 3. Claim before code (measurement-driven)
-
-For claims, economics, analytics, accuracy, or security:
+For anything touching claims, economics, analytics, accuracy, or security:
 
 ```
 claim
@@ -121,24 +149,44 @@ implementation
 claim verification
 ```
 
-Answer first: *"What claim will this change allow us to make?"*
-If unclear → STOP and define the measurement.
+Answer first: *"What claim will this change allow us to make?"* If unclear → STOP and define the measurement.
+**Counterfactual isolation:** prove both `CONTROL == CONTROL` and `EFFECT != CONTROL`.
 
-Write **experimental-isolation** assertions before code:
-- controls stay unchanged (e.g. `cacheModeledEntries === 0`, cache fields null)
-- the effect case carries the result (e.g. `cacheModeledEntries > 0`, savings non-null)
-- the frozen surface is identical (routing / escalation / exclusion)
-- prove `CONTROL == CONTROL` **and** `EFFECT != CONTROL`
+---
 
-This is what turns the claims ledger into engineering control rather than documentation.
+## Layer 2 — The CARDO Loop (Cognitive Reasoning)
 
-### 4. Implement
+```
+COLLECT → ANALYZE → RECORD → DISTINGUISH → OPERATE → (loop)
+```
 
+- **COLLECT**: git state, plan, source, tests, fixtures, claims, runtime behavior, external docs, prior measurements.
+- **ANALYZE**: what's happening, why, alternatives, dependencies, blast radius, reversibility.
+- **RECORD**: facts, assumptions, unknowns, decision, why, expected effect, stop conditions.
+- **DISTINGUISH**: classify evidence using the Evidence Ladder.
+- **OPERATE**: implement smallest safe increment → test → observe → preserve evidence → feed result back into CARDO.
+
+### The Evidence Ladder
+
+| Class | Label | Meaning |
+| :--- | :--- | :--- |
+| 🟢 | Primary Source | Original document/scan |
+| 🔵 | Strong Evidence | Corroborated by multiple sources |
+| 🟠 | Needs Review | Unresolved conflict or missing link |
+| 🟡 | Family Memory | Oral tradition, kept separate from facts |
+| 🟣 | Corroborated Compilation | Synthesized from multiple primary sources |
+
+*Rule:* Never promote a weaker evidence class into a stronger one.
+
+---
+
+## Layer 3 — Execution & Verification Gate
+
+### Implementation Rules
 - Execute the plan in order; do not skip steps.
 - If a step fails, **stop** — do not continue to the next step.
 
-### 5. Stop conditions
-
+### Stop Conditions
 `tests_regress` · `scope_drift` · `measurement_contract_break` · `unexpected_runtime_behavior`
 
 On a stop condition:
@@ -146,63 +194,54 @@ On a stop condition:
 - Do NOT auto-revert unless the plan explicitly declared the rollback safe.
 - Report via the structured Error Report template (AGENTS.md).
 
-Blind rollback can destroy evidence you need to understand the failure.
-
-### 6. Verification gate (commit-time only)
+### Verification Gate (Commit-Time Only)
 
 ```bash
-# full suite → silent count (don't dump the output)
+# full suite → silent count
 npm test -- --runInBand 2>&1 | rg "Tests:|Test Suites:"
 npm run build
-node scripts/gen-claims.mjs   # re-runs the whole suite — run ONCE, right before commit
+node scripts/gen-claims.mjs   # re-runs full suite — run ONCE, right before commit
 git diff --stat               # intended files only
 git status --short            # confirm scope
 ```
 
-`gen-claims` re-runs the full Jest suite by design (it counts tests). Run it a
-single time at the commit gate, not during iteration.
-
-### 7. Commit discipline
-
+### Commit Discipline
 - One commit per task.
+- Tag error-origin in commit message: `[caught: manual|ai-cross-check|test|claim-gate|review]`
+- Keep unrelated changes separate (e.g. `api/package-lock.json` stays separate).
 - Do **not** push until the user asks.
-- Tag error-origin in the message: `[caught: manual|ai-cross-check|test|claim-gate|review]`
-- Keep unrelated changes out (e.g. `api/package-lock.json` stays separate).
-
-**Measurement provenance** (standing): every externally visible metric identifies
-numerator · denominator · baseline · corpus · mode (`measured|replayed|estimated|modeled`)
-· assumptions · exclusions · timestamp/version.
 
 ---
 
-## Layer 2 — Optimization
+## Layer 4 — Optimization (Token Economy)
 
-| Tactic | Rule |
-|--------|------|
-| **Budget is the compress trigger** | Fast <5K / plan <12K / AGY+EXEC <25K. Hit budget → `compress` closed ranges + a handoff note → continue. Never silently exceed the cap. |
-| **Pin, don't wander** | grep tight, read at line offset, delegate discovery to a subagent so it returns one paragraph. |
-| **Targeted tests** | `npm test -- --runInBand src/lib/<module>.test.ts` while iterating; full suite only at the commit gate. |
-| **Single-shot tool calls** | one `vercel ls`, one `gen-claims`, batch independent git reads. |
-| **Concurrent work** | verify HEAD, branch, worktree, and recent commits before editing. Never assume another session's changes are yours; do not reset/stash/checkout its work; a commit appearing after plan creation does **not** auto-stale the plan, but a changed HEAD means the pinned context must be revalidated. |
+| Path | Budget | Rule |
+| :--- | :--- | :--- |
+| **Fast Lane** | < 5K | one commit, one verify |
+| **AGY plan** | < 12K | pin line numbers, list WHY not HOW |
+| **AGY + EXEC** | < 25K | compress closed ranges at budget; never silently exceed |
 
----
-
-## Standing constraints (not Layer 0, but never broken)
-
-- Two Git remotes (GitHub + GitLab) both push `main`; Vercel auto-deploys on push
-  via both webhooks → **one** production site, two builds of the same commit.
-- Semantic eval is NOT valid in CI (synthetic-hash fallback when ONNX/`fetch` is
-  undefined). Document it, don't treat it as a real semantic measurement.
+- **Budget = compress trigger:** hit budget → `compress` closed ranges + a handoff note → continue.
+- **Pin, don't wander:** grep tight, read at line offset, delegate discovery.
+- **Targeted tests:** `npm test -- --runInBand src/lib/<module>.test.ts` while iterating; full suite at commit gate only.
+- **Single-shot tool calls:** one `vercel ls`, one `gen-claims`, batch git reads.
+- **Concurrent work:** verify HEAD, branch, worktree, and recent commits before editing.
 
 ---
 
-## Workflow grammar (one line)
+## The Engelbart Connection (C-Work)
 
-> Triage → (AGY plan w/ `git_commit`+`stop_conditions` | Fast Lane) → HEAD /
-> worktree / scope gates → claim-before-code + acceptance tests → implement →
-> stop-condition check → targeted tests → budget-compress → commit gate (full
-> suite + build + gen-claims once) → one commit `[caught: …]` → push only on request.
+This workflow represents pure Engelbartian C-Work:
+- **A-Work:** REI.ai (the product)
+- **B-Work:** The code, tests, and deployments (the tools)
+- **C-Work:** The workflow itself—Hard Stops, CARDO, Evidence Ladder, Token Budgets (the system that improves the tools)
 
 ---
 
-*Last updated: 2026-08-13. Correlates to `WORKFLOW_QUICKREF.md` and `AGENTS.md`.*
+## The One-Liner
+
+> **Triage → gates → CARDO → claim/acceptance contract → implement → observe → CARDO → commit gate → one commit → push only on request.**
+
+---
+
+*Last updated: 2026-08-14. Correlates to `WORKFLOW_QUICKREF.md` and `AGENTS.md`.*
