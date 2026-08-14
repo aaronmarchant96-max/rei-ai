@@ -1,20 +1,21 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "deepseek/deepseek-chat",
+  "model": "google/gemini-2.5-flash",
   "default_agent": "build",
   "plugin": [
     "@tarquinen/opencode-dcp"
   ],
   "mcp": {},
   "instructions": [
+    "AGENTS.md",
+    "TOKEN_SAVERS.md",
+    "docs/fortis-et-liber.md",
+    "docs/SESSION_HANDOFF.md",
     "SECURITY.md",
     "CONTRIBUTING.md",
-    "docs/fortis-et-liber.md",
     "docs/REI_CODE_PATTERNS.md",
-    "TOKEN_SAVERS.md",
     "docs/COPY_TONE.md",
     "docs/WORKFLOW_DETAILED.md",
-    "WORKFLOW_QUICKREF.md",
-    "AGENTS.md"
+    "WORKFLOW_QUICKREF.md"
   ]
 }
