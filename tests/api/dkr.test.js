@@ -1,5 +1,5 @@
 /**
- * DKR (Dynamic Knowledge Repository) — unit tests
+ * Session Response Cache — unit tests
  *
  * Tests cover:
  *   - normalizeQuery determinism
