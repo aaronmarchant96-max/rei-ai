@@ -8,6 +8,7 @@ import "dotenv/config";
 import { handleCfaiRequest, callModelDirect } from "../../cfai.js";
 import { storeTrace } from "../../../shared/lib/kv.js";
 import { projectedCost, maxCostPerQuery, isOverBudget } from "../../../shared/lib/costModel.js";
+import { hashMessages, lookupDkrByHash, storeDkrEntry, recordDkrHit } from "../../../shared/lib/dkr.js";
 
 const ERROR_CODES = {
   CF_INVALID_REQUEST: "CF_INVALID_REQUEST",
@@ -132,6 +133,48 @@ export default async function handler(req, res) {
 
     const useAutoRoute = !model || model === "rei-auto";
 
+    // ── DKR session-scoped cache (read path) ────────────────────────────────────
+    // Tenant = "session:<X-Session-Id header>". If no X-Session-Id is present
+    // the DKR is entirely disabled for this request — there is NO fallback to
+    // a shared pool. Zero cross-user data leakage by design, not by policy.
+    //
+    // Cache key = hashMessages(messages) — SHA-256 of the FULL messages array.
+    // A single differing message produces a completely different hash, so short
+    // follow-up messages ('yes', 'go on') never collide across conversations.
+    //
+    // Only runs for auto-routed requests; explicit model calls bypass the DKR.
+    const rawSessionId = req.headers["x-session-id"] || null;
+    const dkrTenant = rawSessionId && typeof rawSessionId === "string" && rawSessionId.length > 0
+      ? `session:${rawSessionId}`
+      : null;
+    const msgHash = dkrTenant ? hashMessages(messages) : null;
+
+    if (dkrTenant && msgHash && useAutoRoute) {
+      const dkrHit = await lookupDkrByHash(dkrTenant, msgHash);
+      if (dkrHit && dkrHit.response) {
+        void recordDkrHit(dkrTenant, dkrHit.entryId); // hit-count is analytics; void is fine
+        return res.status(200).json({
+          id: `chatcmpl-dkr-${Date.now()}`,
+          object: "chat.completion",
+          created: Math.floor(Date.now() / 1000),
+          model: dkrHit.model || "unknown",
+          usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+          choices: [{
+            index: 0,
+            message: { role: "assistant", content: dkrHit.response },
+            finish_reason: "stop",
+          }],
+          rei: {
+            routed: false,
+            dkr_hit: true,
+            dkr_entry_id: dkrHit.entryId,
+            dkr_hit_count: dkrHit.hitCount ?? 0,
+            savings_usd: dkrHit.estimatedCost ?? 0,
+          },
+        });
+      }
+    }
+
     // ── Per-query cost ceiling (ROADMAP Phase 3, Increment B) ──
     // Enforced BEFORE any provider token spend. Refuses with CF_BUDGET_EXCEEDED
     // when the projected worst-case cost exceeds MAX_COST_PER_QUERY. Never
@@ -239,6 +282,34 @@ export default async function handler(req, res) {
       result: result,
     }));
     void tracePromise;
+
+    // ── DKR session-scoped cache (write path) ────────────────────────────────
+    // Writes only when: session ID present + CARDO success + text response.
+    // Awaited — NOT void. On Vercel serverless the container may freeze the
+    // instant res.json() is called; a fire-and-forget write silently disappears.
+    // The ~10–50ms write latency applies only to the first call for any unique
+    // conversation hash; subsequent identical calls are served from cache.
+    //
+    // queryText is intentionally omitted — the hash alone is sufficient for
+    // lookup; storing raw conversation text is an unnecessary privacy surface.
+    if (dkrTenant && msgHash && result.success && typeof result.result === "string") {
+      await storeDkrEntry({
+        entryId: crypto.randomUUID(),
+        queryHash: msgHash,
+        queryText: "",
+        queryVector: [],
+        response: result.result,
+        model: routerDecision?.model || selectedModel,
+        provider: resolveProvider(result.model || selectedModel),
+        routeId: routerDecision?.id || null,
+        estimatedCost: routerDecision?.estimatedCost ?? 0,
+        tenantId: dkrTenant,
+        timestamp: new Date().toISOString(),
+        policyVersion: POLICY_VERSION,
+        hitCount: 0,
+        lastHitAt: null,
+      });
+    }
 
     return res.status(200).json({
       id: `chatcmpl-${Date.now()}`,

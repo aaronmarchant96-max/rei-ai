@@ -1,16 +1,24 @@
 // REI Dynamic Knowledge Repository (DKR)
 //
-// Engelbart-inspired model-agnostic response cache. Every response that
-// passes the CARDO gate is verified knowledge. Instead of discarding it
-// after a single serve, we write it here. Any future query — from any
-// model, any session, any user — can read from it first. Cost curves
-// toward near-zero over time. No provider owns the knowledge. REI does.
+// Session-scoped, CARDO-gated response cache.
 //
-// Architecture:
-//   READ  → exact-hash fast path (O(1), sub-millisecond, no ML)
-//   WRITE → only CARDO-verified responses; fire-and-forget, never blocks caller
-//   FUZZY → semantic cosine similarity runs client-side (dkrClient.ts)
-//           where the ONNX embedder is already warm — NOT in serverless fns.
+// Tenant model:
+//   Tenant = "session:<X-Session-Id header>".
+//   If no session ID is supplied the DKR is entirely disabled for that
+//   request — there is NO fallback to a shared pool. This guarantees
+//   zero cross-user data leakage by design, not by policy.
+//
+// Cache-key model:
+//   hashMessages(messages) — SHA-256 of the FULL canonical messages array.
+//   Two requests are cache-equivalent only when every message (role + content)
+//   after normalization is identical. A single differing message produces a
+//   completely different hash, so short follow-up messages ('yes', 'go on')
+//   are never collapsed across conversations.
+//
+// Write discipline:
+//   Callers MUST await storeDkrEntry() — do not void it. On Vercel
+//   serverless the function container may freeze immediately after
+//   res.json(); a fire-and-forget write will silently never resolve.
 //
 // KV key patterns (all owned by this module):
 //   rei:dkr:{tenant}:{entryId}       → DkrEntry JSON (full response record)
@@ -56,9 +64,10 @@ export function normalizeQuery(text) {
 }
 
 /**
- * SHA-256 hex hash of a normalized query string. Deterministic — same input
- * always yields the same 64-character hex string. Uses Node's built-in `crypto`
- * module; zero additional dependencies.
+ * SHA-256 hex hash of a normalized query string.
+ * Kept for backwards-compatibility with existing tests and DKR unit coverage.
+ * For chat-completion caching, prefer hashMessages() which covers the full
+ * conversation context rather than a single normalised string.
  *
  * @param {string} normalized — output of normalizeQuery()
  * @returns {string} 64-char hex SHA-256
@@ -67,14 +76,41 @@ export function hashQuery(normalized) {
   return createHash("sha256").update(normalized, "utf8").digest("hex");
 }
 
+/**
+ * SHA-256 of the canonical full messages array.
+ *
+ * Covers the ENTIRE conversation context — role + normalised content of every
+ * message. Two requests are only cache-equivalent if their full history is
+ * identical. A single differing message (including short follow-ups like 'yes'
+ * or 'explain more') produces a completely different hash.
+ *
+ * The canonical form intentionally excludes metadata fields (name, tool_call_id,
+ * etc.) that do not affect the answer content. Only role and content matter.
+ *
+ * @param {Array<{role: string, content?: string}>} messages
+ * @returns {string} 64-char hex SHA-256, or "" for an empty/invalid array
+ */
+export function hashMessages(messages) {
+  if (!Array.isArray(messages) || messages.length === 0) return "";
+  const canonical = JSON.stringify(
+    messages.map((m) => ({
+      role: typeof m.role === "string" ? m.role.trim() : "",
+      content: normalizeQuery(m.content ?? ""),
+    }))
+  );
+  return createHash("sha256").update(canonical, "utf8").digest("hex");
+}
+
 // ── Write path ────────────────────────────────────────────────────────────────
 
 /**
  * Write a verified response to the DKR. Called ONLY after the CARDO gate
  * passes — do not call this for error responses or budget-refused requests.
  *
- * Fire-and-forget: callers must `void storeDkrEntry(...)` — do NOT await.
- * A failure here never affects the response returned to the user.
+ * Callers MUST await this function. On Vercel serverless the function
+ * container may freeze immediately after res.json() — a fire-and-forget
+ * write will silently not resolve. Accept the ~10–50ms write latency;
+ * it only applies to the first call for any unique conversation hash.
  *
  * @param {DkrEntry} entry
  * @returns {Promise<void>}

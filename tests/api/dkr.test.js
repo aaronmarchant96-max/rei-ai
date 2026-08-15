@@ -1,17 +1,17 @@
 /**
- * DKR (Dynamic Knowledge Repository) — unit + integration tests
+ * DKR (Dynamic Knowledge Repository) — unit tests
  *
  * Tests cover:
- *   - normalizeQuery / hashQuery determinism
+ *   - normalizeQuery determinism
+ *   - hashQuery determinism (single-string path)
+ *   - hashMessages determinism (full messages array path, used by completions.js)
  *   - storeDkrEntry + lookupDkrByHash round-trip
  *   - recordDkrHit increment
  *   - getDkrIndex ordering
  *   - Graceful degrade when KV is unavailable
- *   - completions.js: dkr_hit response on second identical query
- *   - completions.js: no DKR write on error response
  */
 
-import { normalizeQuery, hashQuery, storeDkrEntry, lookupDkrByHash, recordDkrHit, getDkrIndex } from "../../shared/lib/dkr.js";
+import { normalizeQuery, hashQuery, hashMessages, storeDkrEntry, lookupDkrByHash, recordDkrHit, getDkrIndex } from "../../shared/lib/dkr.js";
 
 // ── Mock KV layer ─────────────────────────────────────────────────────────────
 // Isolates DKR tests from real Vercel KV / network calls.
@@ -118,6 +118,55 @@ describe("hashQuery", () => {
     const h1 = hashQuery(normalizeQuery("  WHAT IS TYPESCRIPT  "));
     const h2 = hashQuery(normalizeQuery("what is typescript"));
     expect(h1).toBe(h2);
+  });
+});
+
+describe("hashMessages", () => {
+  const msg = (role, content) => ({ role, content });
+
+  test("returns a 64-character hex string", () => {
+    const h = hashMessages([msg("user", "hello")]);
+    expect(h).toHaveLength(64);
+    expect(h).toMatch(/^[0-9a-f]+$/);
+  });
+
+  test("is deterministic — same messages always yield the same hash", () => {
+    const msgs = [msg("system", "You are helpful."), msg("user", "Hi")];
+    expect(hashMessages(msgs)).toBe(hashMessages(msgs));
+  });
+
+  test("covers the FULL array — adding one message changes the hash", () => {
+    const base = [msg("user", "what is typescript")];
+    const extended = [msg("user", "what is typescript"), msg("assistant", "A typed superset."), msg("user", "yes")];
+    expect(hashMessages(base)).not.toBe(hashMessages(extended));
+  });
+
+  test("short follow-up messages ('yes', 'go on') do NOT collide across different conversations", () => {
+    const convoA = [msg("user", "explain neural networks"), msg("assistant", "A neural network is..."), msg("user", "yes")];
+    const convoB = [msg("user", "explain quantum physics"), msg("assistant", "Quantum physics is..."), msg("user", "yes")];
+    // Same final message ('yes') but different context → must produce different hashes
+    expect(hashMessages(convoA)).not.toBe(hashMessages(convoB));
+  });
+
+  test("is case and whitespace normalised (via normalizeQuery on content)", () => {
+    const h1 = hashMessages([msg("user", "  WHAT IS TYPESCRIPT  ")]);
+    const h2 = hashMessages([msg("user", "what is typescript")]);
+    expect(h1).toBe(h2);
+  });
+
+  test("role is included in the hash — same content different role yields different hash", () => {
+    const h1 = hashMessages([msg("user", "hello")]);
+    const h2 = hashMessages([msg("assistant", "hello")]);
+    expect(h1).not.toBe(h2);
+  });
+
+  test("returns empty string for empty array", () => {
+    expect(hashMessages([])).toBe("");
+  });
+
+  test("returns empty string for non-array input", () => {
+    expect(hashMessages(null)).toBe("");
+    expect(hashMessages(undefined)).toBe("");
   });
 });
 
