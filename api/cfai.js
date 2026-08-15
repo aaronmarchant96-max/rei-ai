@@ -100,20 +100,23 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
   }
 }
 
-async function callGemini(messages, maxTokens, temperature = 0.7) {
+async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7) {
   const key = process.env.GEMINI_API_KEY;
   if (!key || key.includes("your_gemini_api_key_here")) return null;
 
   const candidateModels = [
+    modelOverride,
     process.env.GEMINI_MODEL,
-    "gemini-3.6-flash",
-    "gemini-3.1-pro-preview",
     "gemini-2.5-flash",
-    "gemini-3.5-flash-lite",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
   ].filter(Boolean);
 
-  for (let m = 0; m < candidateModels.length; m++) {
-    const model = candidateModels[m];
+  const uniqueCandidates = Array.from(new Set(candidateModels));
+
+  for (let m = 0; m < uniqueCandidates.length; m++) {
+    const model = uniqueCandidates[m];
     const controller = new AbortController();
     const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
     try {
@@ -134,8 +137,8 @@ async function callGemini(messages, maxTokens, temperature = 0.7) {
         }
         const errText = await res.text().catch(function () { return ""; });
         console.warn("Gemini model " + model + " returned " + res.status + ": " + errText.slice(0, 200));
-        // If 404 model not found, continue to next candidate model
-        if (res.status === 404 && m < candidateModels.length - 1) {
+        // If 404 (not found) or 400 (unsupported/invalid model), continue to next candidate model
+        if ((res.status === 404 || res.status === 400) && m < uniqueCandidates.length - 1) {
           continue;
         }
         return null;
@@ -387,12 +390,13 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   // as a fallback it must use the default model (a non-Groq routed model
   // like deepseek-v4-flash would be rejected by Groq's API).
   const groqModel = primaryBackend === "groq" ? primaryModel : null;
+  const geminiModel = primaryBackend === "gemini" ? primaryModel : null;
 
   // Map of available backends (each accepts an optional message override so
   // the continuation loop can re-call the SAME backend with appended turns)
   var backends = {};
   if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxTokens, temperature); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, temperature); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature); };
   if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs) { return callGLM(msgs || messages, maxTokens, temperature); };
   if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxTokens, groqModel, temperature); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxTokens, temperature); };
@@ -454,7 +458,7 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
 
   var backends = {};
   if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxT, temp); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxT, temp); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxT, model, temp); };
   if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxT, model, temp); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxT, temp); };
 
