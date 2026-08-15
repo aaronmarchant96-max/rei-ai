@@ -136,21 +136,31 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
           await recordThrottle("gemini", res);
           return null;
         }
-        const errText = await res.text().catch(function () { return ""; });
-        console.warn("Gemini model " + model + " returned " + res.status + ": " + errText.slice(0, 200));
-        
-        // Only advance to the next candidate model if the error indicates a model-name or availability issue
-        // (404 Not Found, or 400 containing model/not found/unsupported/INVALID_ARGUMENT indicators).
-        // Generic request body or safety errors will not cascade.
-        const isModelIssue = res.status === 404 || (res.status === 400 && (
-          errText.toLowerCase().includes("model") ||
-          errText.toLowerCase().includes("not found") ||
-          errText.toLowerCase().includes("unknown") ||
-          errText.toLowerCase().includes("unsupported") ||
-          errText.includes("INVALID_ARGUMENT")
-        ));
 
-        if (isModelIssue && m < uniqueCandidates.length - 1) {
+        let errObj = null;
+        let errRaw = "";
+        try {
+          errRaw = await res.text();
+          errObj = JSON.parse(errRaw);
+        } catch {
+          // errRaw is raw string if non-JSON
+        }
+
+        const errDetail = errObj?.error || {};
+        const errStatus = errDetail.status || "";
+        const errCode = errDetail.code || res.status;
+        const errMsg = errDetail.message || errRaw;
+
+        console.warn(`Gemini model ${model} returned HTTP ${res.status} [status=${errStatus || "N/A"}]: ${errMsg.slice(0, 200)}`);
+
+        // Only cascade to the next candidate model if the error specifically indicates
+        // that this model is not found / unsupported on the endpoint.
+        // Structured checks: HTTP 404, status === "NOT_FOUND", or code === 404.
+        // Blanket 400 INVALID_ARGUMENT (malformed body, bad params, safety filters)
+        // must fail fast and NOT cascade through candidates.
+        const isNotFound = res.status === 404 || errStatus === "NOT_FOUND" || errCode === 404;
+
+        if (isNotFound && m < uniqueCandidates.length - 1) {
           continue;
         }
         return null;
