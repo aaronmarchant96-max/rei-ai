@@ -107,10 +107,11 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
   const candidateModels = [
     modelOverride,
     process.env.GEMINI_MODEL,
+    "gemini-3.6-flash",
+    "gemini-3.1-pro-preview",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
+    "gemini-3.5-flash-lite",
   ].filter(Boolean);
 
   const uniqueCandidates = Array.from(new Set(candidateModels));
@@ -137,8 +138,19 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
         }
         const errText = await res.text().catch(function () { return ""; });
         console.warn("Gemini model " + model + " returned " + res.status + ": " + errText.slice(0, 200));
-        // If 404 (not found) or 400 (unsupported/invalid model), continue to next candidate model
-        if ((res.status === 404 || res.status === 400) && m < uniqueCandidates.length - 1) {
+        
+        // Only advance to the next candidate model if the error indicates a model-name or availability issue
+        // (404 Not Found, or 400 containing model/not found/unsupported/INVALID_ARGUMENT indicators).
+        // Generic request body or safety errors will not cascade.
+        const isModelIssue = res.status === 404 || (res.status === 400 && (
+          errText.toLowerCase().includes("model") ||
+          errText.toLowerCase().includes("not found") ||
+          errText.toLowerCase().includes("unknown") ||
+          errText.toLowerCase().includes("unsupported") ||
+          errText.includes("INVALID_ARGUMENT")
+        ));
+
+        if (isModelIssue && m < uniqueCandidates.length - 1) {
           continue;
         }
         return null;
