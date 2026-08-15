@@ -1,6 +1,6 @@
 // REI Dynamic Knowledge Repository (DKR)
 //
-// Session-scoped, CARDO-gated response cache.
+// Session-scoped response cache.
 //
 // Tenant model:
 //   Tenant = "session:<X-Session-Id header>".
@@ -16,9 +16,10 @@
 //   are never collapsed across conversations.
 //
 // Write discipline:
-//   Callers MUST await storeDkrEntry() — do not void it. On Vercel
-//   serverless the function container may freeze immediately after
-//   res.json(); a fire-and-forget write will silently never resolve.
+//   On Vercel Serverless, callers pass storeDkrEntry() to waitUntil() so
+//   the response returns immediately without KV write latency overhead,
+//   while guaranteeing the asynchronous write finishes before container teardown.
+//   In non-serverless environments, callers can await storeDkrEntry().
 //
 // KV key patterns (all owned by this module):
 //   rei:dkr:{tenant}:{entryId}       → DkrEntry JSON (full response record)
@@ -104,13 +105,11 @@ export function hashMessages(messages) {
 // ── Write path ────────────────────────────────────────────────────────────────
 
 /**
- * Write a verified response to the DKR. Called ONLY after the CARDO gate
- * passes — do not call this for error responses or budget-refused requests.
+ * Write a successful model response to the DKR.
  *
- * Callers MUST await this function. On Vercel serverless the function
- * container may freeze immediately after res.json() — a fire-and-forget
- * write will silently not resolve. Accept the ~10–50ms write latency;
- * it only applies to the first call for any unique conversation hash.
+ * In serverless environments, pass this promise to `waitUntil(storeDkrEntry(...))`
+ * so the HTTP response is not delayed by KV write latency while still ensuring
+ * the write completes before function termination.
  *
  * @param {DkrEntry} entry
  * @returns {Promise<void>}

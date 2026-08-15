@@ -5,6 +5,7 @@
 // model: "rei-auto" triggers auto-routing. A real model name bypasses the router.
 
 import "dotenv/config";
+import { waitUntil } from "@vercel/functions";
 import { handleCfaiRequest, callModelDirect } from "../../cfai.js";
 import { storeTrace } from "../../../shared/lib/kv.js";
 import { projectedCost, maxCostPerQuery, isOverBudget } from "../../../shared/lib/costModel.js";
@@ -284,31 +285,36 @@ export default async function handler(req, res) {
     void tracePromise;
 
     // ── DKR session-scoped cache (write path) ────────────────────────────────
-    // Writes only when: session ID present + CARDO success + text response.
-    // Awaited — NOT void. On Vercel serverless the container may freeze the
-    // instant res.json() is called; a fire-and-forget write silently disappears.
-    // The ~10–50ms write latency applies only to the first call for any unique
-    // conversation hash; subsequent identical calls are served from cache.
+    // Writes when: session ID is present (X-Session-Id header), msgHash is computed,
+    // handleCfaiRequest succeeded (result.success === true), and result.result is a valid string.
+    // Note: result.success checks execution/transport success of the router & model API call
+    // (claimGateway verification is browser-resident).
     //
-    // queryText is intentionally omitted — the hash alone is sufficient for
+    // Uses waitUntil from @vercel/functions so the response returns immediately without
+    // KV write latency overhead while ensuring the async persistence completes before
+    // the serverless execution context terminates.
+    //
+    // queryText is intentionally omitted — the full-message hash alone is sufficient for
     // lookup; storing raw conversation text is an unnecessary privacy surface.
     if (dkrTenant && msgHash && result.success && typeof result.result === "string") {
-      await storeDkrEntry({
-        entryId: crypto.randomUUID(),
-        queryHash: msgHash,
-        queryText: "",
-        queryVector: [],
-        response: result.result,
-        model: routerDecision?.model || selectedModel,
-        provider: resolveProvider(result.model || selectedModel),
-        routeId: routerDecision?.id || null,
-        estimatedCost: routerDecision?.estimatedCost ?? 0,
-        tenantId: dkrTenant,
-        timestamp: new Date().toISOString(),
-        policyVersion: POLICY_VERSION,
-        hitCount: 0,
-        lastHitAt: null,
-      });
+      waitUntil(
+        storeDkrEntry({
+          entryId: crypto.randomUUID(),
+          queryHash: msgHash,
+          queryText: "",
+          queryVector: [],
+          response: result.result,
+          model: routerDecision?.model || selectedModel,
+          provider: resolveProvider(result.model || selectedModel),
+          routeId: routerDecision?.id || null,
+          estimatedCost: routerDecision?.estimatedCost ?? 0,
+          tenantId: dkrTenant,
+          timestamp: new Date().toISOString(),
+          policyVersion: POLICY_VERSION,
+          hitCount: 0,
+          lastHitAt: null,
+        })
+      );
     }
 
     return res.status(200).json({
