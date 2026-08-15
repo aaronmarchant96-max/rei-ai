@@ -8,6 +8,7 @@ import "dotenv/config";
 import { handleCfaiRequest, callModelDirect } from "../../cfai.js";
 import { storeTrace } from "../../../shared/lib/kv.js";
 import { projectedCost, maxCostPerQuery, isOverBudget } from "../../../shared/lib/costModel.js";
+import { normalizeQuery, hashQuery, lookupDkrByHash, storeDkrEntry, recordDkrHit } from "../../../shared/lib/dkr.js";
 
 const ERROR_CODES = {
   CF_INVALID_REQUEST: "CF_INVALID_REQUEST",
@@ -118,6 +119,40 @@ export default async function handler(req, res) {
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return errorReply(res, 400, ERROR_CODES.CF_INVALID_REQUEST, "'messages' must be a non-empty array");
+    }
+
+    // ── DKR exact-hash lookup (read path) ────────────────────────────────────
+    // Check the Dynamic Knowledge Repository before spending any provider tokens.
+    // Sub-millisecond O(1) hash lookup — no ML, no LLM call on a cache hit.
+    // Only runs for auto-routed requests; explicit model calls bypass DKR.
+    const rawQuery = messages?.at(-1)?.content ?? "";
+    const normalizedQuery = normalizeQuery(rawQuery);
+    const queryHash = hashQuery(normalizedQuery);
+
+    if (!model || model === "rei-auto") {
+      const dkrHit = await lookupDkrByHash(PILOT_TENANT, queryHash);
+      if (dkrHit && dkrHit.response) {
+        void recordDkrHit(PILOT_TENANT, dkrHit.entryId);
+        return res.status(200).json({
+          id: `chatcmpl-dkr-${Date.now()}`,
+          object: "chat.completion",
+          created: Math.floor(Date.now() / 1000),
+          model: dkrHit.model || "unknown",
+          usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+          choices: [{
+            index: 0,
+            message: { role: "assistant", content: dkrHit.response },
+            finish_reason: "stop",
+          }],
+          rei: {
+            routed: false,
+            dkr_hit: true,
+            dkr_entry_id: dkrHit.entryId,
+            dkr_hit_count: dkrHit.hitCount ?? 0,
+            savings_usd: dkrHit.estimatedCost ?? 0,
+          },
+        });
+      }
     }
 
     // Build flattened prompt for routing text features
@@ -239,6 +274,29 @@ export default async function handler(req, res) {
       result: result,
     }));
     void tracePromise;
+
+    // ── DKR write path (CARDO-gated) ─────────────────────────────────────────
+    // Only verified, successful responses write to the DKR. Error responses,
+    // budget-refused requests, and fallback results are never stored.
+    // Fire-and-forget — never blocks the response to the user.
+    if (result.result && typeof result.result === "string") {
+      void storeDkrEntry({
+        entryId: crypto.randomUUID(),
+        queryHash,
+        queryText: normalizedQuery,
+        queryVector: [], // populated on fuzzy pass by client-side dkrClient.ts
+        response: result.result,
+        model: routerDecision?.model || selectedModel,
+        provider: resolveProvider(result.model || selectedModel),
+        routeId: routerDecision?.id || null,
+        estimatedCost: routerDecision?.estimatedCost ?? 0,
+        tenantId: PILOT_TENANT,
+        timestamp: new Date().toISOString(),
+        policyVersion: POLICY_VERSION,
+        hitCount: 0,
+        lastHitAt: null,
+      });
+    }
 
     return res.status(200).json({
       id: `chatcmpl-${Date.now()}`,

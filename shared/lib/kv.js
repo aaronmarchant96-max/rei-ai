@@ -6,6 +6,9 @@
 //   trace:{tenant}:{requestId}   → TraceEntry JSON
 //   eval:{tenant}:{requestId}    → EvalEntry JSON
 //   trace:index:{tenant}         → Sorted Set (member=requestId, score=timestamp epoch ms)
+//   dkr:{tenant}:{entryId}       → DkrEntry JSON
+//   dkr:hash:{tenant}:{hash}     → entryId string (exact-match fast path)
+//   dkr:index:{tenant}           → Sorted Set (member=entryId, score=timestamp epoch ms)
 //
 // See docs/POLICY_LOOP.md for the evaluation plane boundary.
 
@@ -130,5 +133,69 @@ export async function getTracesWithEvals(tenant, fromISO, toISO) {
   } catch (e) {
     console.warn("[eval-plane] Failed to read traces:", e.message);
     return { traces: [], evals: [] };
+  }
+}
+
+// ── DKR primitives ───────────────────────────────────────────────────────────
+// Thin, gracefully-degrading wrappers consumed exclusively by shared/lib/dkr.js.
+// No business logic lives here — this layer only owns KV I/O.
+
+/**
+ * Set a raw KV key to a JSON-stringified value. No-op when KV is unavailable.
+ */
+export async function kvSet(kvKey, value) {
+  if (!(await isAvailable())) return;
+  try {
+    var k = await getKv();
+    await k.set(kvKey, JSON.stringify(value));
+  } catch (e) {
+    console.warn("[dkr] kvSet failed for", kvKey, ":", e.message);
+  }
+}
+
+/**
+ * Get a raw KV key and JSON-parse it. Returns null on miss or KV unavailability.
+ */
+export async function kvGet(kvKey) {
+  if (!(await isAvailable())) return null;
+  try {
+    var k = await getKv();
+    const raw = await k.get(kvKey);
+    if (raw === null || raw === undefined) return null;
+    if (typeof raw === "string") {
+      try { return JSON.parse(raw); } catch { return raw; }
+    }
+    return raw;
+  } catch (e) {
+    console.warn("[dkr] kvGet failed for", kvKey, ":", e.message);
+    return null;
+  }
+}
+
+/**
+ * Add a scored member to a sorted set. No-op when KV is unavailable.
+ */
+export async function kvZadd(kvKey, score, member) {
+  if (!(await isAvailable())) return;
+  try {
+    var k = await getKv();
+    await k.zadd(kvKey, { score: score, member: member });
+  } catch (e) {
+    console.warn("[dkr] kvZadd failed for", kvKey, ":", e.message);
+  }
+}
+
+/**
+ * Range query a sorted set by score. Returns member strings or [] on failure.
+ */
+export async function kvZrange(kvKey, min, max) {
+  if (!(await isAvailable())) return [];
+  try {
+    var k = await getKv();
+    const members = await k.zrange(kvKey, min, max, { byScore: true });
+    return Array.isArray(members) ? members : [];
+  } catch (e) {
+    console.warn("[dkr] kvZrange failed for", kvKey, ":", e.message);
+    return [];
   }
 }
