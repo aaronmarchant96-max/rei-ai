@@ -1,10 +1,16 @@
-// REI Dynamic Knowledge Repository (DKR)
+// REI Session Response Cache
 //
-// Session-scoped response cache.
+// Idempotent session-scoped response cache.
+// Caches identical full-conversation model responses within a user session (TTL: 24h)
+// to avoid redundant provider spend on duplicate requests.
+//
+// Note: This is a transport/execution-level model response cache, not a
+// CARDO-verified knowledge repository. Downstream consumers should treat
+// cached responses with the same confidence as fresh model outputs.
 //
 // Tenant model:
 //   Tenant = "session:<X-Session-Id header>".
-//   If no session ID is supplied the DKR is entirely disabled for that
+//   If no session ID is supplied the cache is entirely disabled for that
 //   request — there is NO fallback to a shared pool. This guarantees
 //   zero cross-user data leakage by design, not by policy.
 //
@@ -21,9 +27,12 @@
 //   while guaranteeing the asynchronous write finishes before container teardown.
 //   In non-serverless environments, callers can await storeDkrEntry().
 //
+// TTL:
+//   All session entries and hash lookup pointers expire after 24 hours (86400s).
+//
 // KV key patterns (all owned by this module):
-//   rei:dkr:{tenant}:{entryId}       → DkrEntry JSON (full response record)
-//   rei:dkr:hash:{tenant}:{hash}     → entryId string (exact-match fast path)
+//   rei:dkr:{tenant}:{entryId}       → DkrEntry JSON (full response record, TTL: 24h)
+//   rei:dkr:hash:{tenant}:{hash}     → entryId string (exact-match fast path, TTL: 24h)
 //   rei:dkr:index:{tenant}           → Sorted Set (score=ts ms, member=entryId)
 //
 // Degrades gracefully when KV is unconfigured — all reads return null,
@@ -34,6 +43,7 @@ import { kvSet, kvGet, kvZadd, kvZrange } from "./kv.js";
 
 const PREFIX = "rei";
 const DKR_TYPE = "dkr";
+const SESSION_TTL_SECONDS = 86400; // 24-hour expiration for session cache entries
 
 // ── Key builders ─────────────────────────────────────────────────────────────
 
@@ -105,7 +115,7 @@ export function hashMessages(messages) {
 // ── Write path ────────────────────────────────────────────────────────────────
 
 /**
- * Write a successful model response to the DKR.
+ * Write a successful model response to the session cache (TTL: 24h).
  *
  * In serverless environments, pass this promise to `waitUntil(storeDkrEntry(...))`
  * so the HTTP response is not delayed by KV write latency while still ensuring
@@ -122,14 +132,14 @@ export async function storeDkrEntry(entry) {
   ) return;
   try {
     const ts = Date.parse(entry.timestamp) || Date.now();
-    // 1. Store the full entry JSON
-    await kvSet(entryKey(entry.tenantId, entry.entryId), entry);
-    // 2. Store the hash→entryId pointer for the O(1) exact-match fast path
-    await kvSet(hashKey(entry.tenantId, entry.queryHash), entry.entryId);
-    // 3. Add to temporal sorted-set index (for analytics + fuzzy seed loading)
+    // 1. Store the full entry JSON with 24h TTL
+    await kvSet(entryKey(entry.tenantId, entry.entryId), entry, { ex: SESSION_TTL_SECONDS });
+    // 2. Store the hash→entryId pointer for the O(1) exact-match fast path with 24h TTL
+    await kvSet(hashKey(entry.tenantId, entry.queryHash), entry.entryId, { ex: SESSION_TTL_SECONDS });
+    // 3. Add to temporal sorted-set index (for analytics)
     await kvZadd(indexKey(entry.tenantId), ts, entry.entryId);
   } catch (e) {
-    // Silent — never let a DKR write failure surface to the caller
+    // Silent — never let a cache write failure surface to the caller
     console.warn("[dkr] storeDkrEntry failed:", e.message);
   }
 }
@@ -140,10 +150,10 @@ export async function storeDkrEntry(entry) {
  * Exact-hash lookup. Returns the full DkrEntry or null on miss.
  *
  * This is the server-side fast path: sub-millisecond, zero ML, safe to call
- * on every serverless request. Semantic/fuzzy matching runs client-side only.
+ * on every serverless request.
  *
  * @param {string} tenant
- * @param {string} queryHash — output of hashQuery()
+ * @param {string} queryHash — output of hashMessages() or hashQuery()
  * @returns {Promise<DkrEntry | null>}
  */
 export async function lookupDkrByHash(tenant, queryHash) {
@@ -163,7 +173,7 @@ export async function lookupDkrByHash(tenant, queryHash) {
 // ── Hit accounting ────────────────────────────────────────────────────────────
 
 /**
- * Increment hitCount and update lastHitAt for a served DKR entry.
+ * Increment hitCount and update lastHitAt for a served session cache entry.
  * Fire-and-forget — callers must `void recordDkrHit(...)`.
  *
  * @param {string} tenant
@@ -180,7 +190,7 @@ export async function recordDkrHit(tenant, entryId) {
       hitCount: (typeof existing.hitCount === "number" ? existing.hitCount : 0) + 1,
       lastHitAt: new Date().toISOString(),
     };
-    await kvSet(entryKey(tenant, entryId), updated);
+    await kvSet(entryKey(tenant, entryId), updated, { ex: SESSION_TTL_SECONDS });
   } catch (e) {
     console.warn("[dkr] recordDkrHit failed:", e.message);
   }

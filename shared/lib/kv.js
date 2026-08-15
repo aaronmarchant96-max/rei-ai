@@ -6,7 +6,7 @@
 //   trace:{tenant}:{requestId}   → TraceEntry JSON
 //   eval:{tenant}:{requestId}    → EvalEntry JSON
 //   trace:index:{tenant}         → Sorted Set (member=requestId, score=timestamp epoch ms)
-//   dkr:{tenant}:{entryId}       → DkrEntry JSON
+//   dkr:{tenant}:{entryId}       → DkrEntry JSON (session-scoped response cache)
 //   dkr:hash:{tenant}:{hash}     → entryId string (exact-match fast path)
 //   dkr:index:{tenant}           → Sorted Set (member=entryId, score=timestamp epoch ms)
 //
@@ -141,13 +141,18 @@ export async function getTracesWithEvals(tenant, fromISO, toISO) {
 // No business logic lives here — this layer only owns KV I/O.
 
 /**
- * Set a raw KV key to a JSON-stringified value. No-op when KV is unavailable.
+ * Set a raw KV key to a JSON-stringified value with optional config (e.g. TTL { ex: seconds }).
+ * No-op when KV is unavailable.
  */
-export async function kvSet(kvKey, value) {
+export async function kvSet(kvKey, value, options) {
   if (!(await isAvailable())) return;
   try {
     var k = await getKv();
-    await k.set(kvKey, JSON.stringify(value));
+    if (options && typeof options === "object") {
+      await k.set(kvKey, JSON.stringify(value), options);
+    } else {
+      await k.set(kvKey, JSON.stringify(value));
+    }
   } catch (e) {
     console.warn("[dkr] kvSet failed for", kvKey, ":", e.message);
   }

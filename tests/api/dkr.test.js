@@ -193,6 +193,23 @@ describe("storeDkrEntry + lookupDkrByHash", () => {
     expect(result).toBeNull();
   });
 
+  test("stores entry with 24-hour TTL (86400s) on both entry and hash keys", async () => {
+    const { kvSet } = await import("../../shared/lib/kv.js");
+    const entry = makeEntry();
+    await storeDkrEntry(entry);
+
+    expect(kvSet).toHaveBeenCalledWith(
+      expect.stringContaining(entry.entryId),
+      entry,
+      { ex: 86400 }
+    );
+    expect(kvSet).toHaveBeenCalledWith(
+      expect.stringContaining(entry.queryHash),
+      entry.entryId,
+      { ex: 86400 }
+    );
+  });
+
   test("is a no-op for entries missing entryId or queryHash", async () => {
     const { kvSet } = await import("../../shared/lib/kv.js");
     await storeDkrEntry({ entryId: "", queryHash: "abc", response: "x", tenantId: "pilot" });
