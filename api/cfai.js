@@ -107,11 +107,11 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
   const candidateModels = [
     modelOverride,
     process.env.GEMINI_MODEL,
-    "gemini-3.6-flash",
-    "gemini-3.1-pro-preview",
     "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
-    "gemini-3.5-flash-lite",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-2.5-pro",
+    "gemini-1.5-pro",
   ].filter(Boolean);
 
   const uniqueCandidates = Array.from(new Set(candidateModels));
@@ -155,10 +155,12 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
 
         // Only cascade to the next candidate model if the error specifically indicates
         // that this model is not found / unsupported on the endpoint.
-        // Structured checks: HTTP 404, status === "NOT_FOUND", or code === 404.
-        // Blanket 400 INVALID_ARGUMENT (malformed body, bad params, safety filters)
-        // must fail fast and NOT cascade through candidates.
-        const isNotFound = res.status === 404 || errStatus === "NOT_FOUND" || errCode === 404;
+        // Google v1beta/openai returns HTTP 400 INVALID_ARGUMENT or HTTP 404 NOT_FOUND for unknown models.
+        const isNotFound =
+          res.status === 404 ||
+          errStatus === "NOT_FOUND" ||
+          errCode === 404 ||
+          (res.status === 400 && /not found|not supported|is not available|unsupported/i.test(errMsg));
 
         if (isNotFound && m < uniqueCandidates.length - 1) {
           continue;
