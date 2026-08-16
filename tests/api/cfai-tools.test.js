@@ -1,4 +1,4 @@
-import { isPrivateIpOrHost, cleanHtmlToText, executeFetchUrl, AVAILABLE_TOOLS } from "../../api/cfai.js";
+import { isPrivateIpOrHost, cleanHtmlToText, executeFetchUrl, extractToolCalls, AVAILABLE_TOOLS } from "../../api/cfai.js";
 
 describe("URL Fetching Tool & SSRF Security", () => {
   describe("isPrivateIpOrHost", () => {
@@ -147,6 +147,52 @@ describe("URL Fetching Tool & SSRF Security", () => {
 
       const res = await executeFetchUrl("https://example.com/start-loop");
       expect(JSON.parse(res).error).toContain("Too many redirects");
+    });
+  });
+
+  describe("extractToolCalls Parser", () => {
+    it("extracts native OpenAI tool_calls array", () => {
+      const input = {
+        tool_calls: [
+          {
+            id: "call_123",
+            type: "function",
+            function: { name: "fetch_url", arguments: '{"url":"https://example.com"}' }
+          }
+        ]
+      };
+      const tools = extractToolCalls(input);
+      expect(tools).toHaveLength(1);
+      expect(tools[0].function.name).toBe("fetch_url");
+    });
+
+    it("extracts in-text LLaMA <function=fetch_url> tags from content", () => {
+      const input = {
+        content: `
+          To review your repository, let me fetch it.
+          <function=fetch_url>{"url": "https://github.com/aaronmarchant96-max/family-archive"}</function>
+        `
+      };
+      const tools = extractToolCalls(input);
+      expect(tools).toHaveLength(1);
+      expect(tools[0].function.name).toBe("fetch_url");
+      expect(JSON.parse(tools[0].function.arguments).url).toBe("https://github.com/aaronmarchant96-max/family-archive");
+    });
+
+    it("extracts in-text <tool_call> JSON tags from content", () => {
+      const input = {
+        content: `
+          <tool_call>{"name": "fetch_url", "arguments": {"url": "https://example.com/api"}}</tool_call>
+        `
+      };
+      const tools = extractToolCalls(input);
+      expect(tools).toHaveLength(1);
+      expect(tools[0].function.name).toBe("fetch_url");
+    });
+
+    it("returns null when no tool calls are present", () => {
+      expect(extractToolCalls({ content: "Just a standard text response" })).toBeNull();
+      expect(extractToolCalls(null)).toBeNull();
     });
   });
 

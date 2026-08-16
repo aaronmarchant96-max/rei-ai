@@ -533,24 +533,77 @@ async function completeWithContinuation(runBackend, messages, firstResult) {
 
 const MAX_TOOL_ROUNDS = 3;
 
+export function extractToolCalls(result) {
+  if (!result) return null;
+  if (result.tool_calls && Array.isArray(result.tool_calls) && result.tool_calls.length > 0) {
+    return result.tool_calls;
+  }
+
+  const content = result.content || "";
+  if (!content) return null;
+
+  const toolCalls = [];
+  // Catch <function=fetch_url>{"url": "..."}</function> (LLaMA/Groq raw text format)
+  const functionCallRegex = /<function=([a-zA-Z0-9_-]+)>([\s\S]*?)<\/function>/g;
+  let match;
+  while ((match = functionCallRegex.exec(content)) !== null) {
+    toolCalls.push({
+      id: `call_${Date.now()}_${toolCalls.length}`,
+      type: "function",
+      function: {
+        name: match[1],
+        arguments: match[2].trim(),
+      },
+    });
+  }
+
+  // Catch <tool_call>{"name": "fetch_url", "arguments": ...}</tool_call>
+  const toolCallTagRegex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
+  while ((match = toolCallTagRegex.exec(content)) !== null) {
+    try {
+      const parsed = JSON.parse(match[1].trim());
+      if (parsed.name) {
+        toolCalls.push({
+          id: `call_${Date.now()}_${toolCalls.length}`,
+          type: "function",
+          function: {
+            name: parsed.name,
+            arguments: typeof parsed.arguments === "string" ? parsed.arguments : JSON.stringify(parsed.arguments || {}),
+          },
+        });
+      }
+    } catch {}
+  }
+
+  return toolCalls.length > 0 ? toolCalls : null;
+}
+
 async function completeWithToolsAndContinuation(runBackend, messages, firstResult) {
   let currentResult = firstResult;
   let currentMessages = messages.slice();
   let toolRounds = 0;
   let accumulatedUsage = sumUsage(null, firstResult.usage);
 
-  while (currentResult?.tool_calls && currentResult.tool_calls.length > 0 && toolRounds < MAX_TOOL_ROUNDS) {
+  let activeToolCalls = extractToolCalls(currentResult);
+
+  while (activeToolCalls && activeToolCalls.length > 0 && toolRounds < MAX_TOOL_ROUNDS) {
     toolRounds += 1;
+
+    // Clean inline XML tags from the assistant turn so the context stays clean
+    const cleanAssistantContent = (currentResult.content || "")
+      .replace(/<function=[a-zA-Z0-9_-]+>[\s\S]*?<\/function>/g, "")
+      .replace(/<tool_call>[\s\S]*?<\/tool_call>/g, "")
+      .trim();
 
     currentMessages = currentMessages.concat([
       {
         role: "assistant",
-        content: currentResult.content || null,
-        tool_calls: currentResult.tool_calls,
+        content: cleanAssistantContent || null,
+        tool_calls: activeToolCalls,
       }
     ]);
 
-    for (const toolCall of currentResult.tool_calls) {
+    for (const toolCall of activeToolCalls) {
       let output = "";
       if (toolCall.function?.name === "fetch_url") {
         let args = {};
@@ -582,6 +635,7 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
     }
     accumulatedUsage = sumUsage(accumulatedUsage, nextResult.usage);
     currentResult = nextResult;
+    activeToolCalls = extractToolCalls(currentResult);
   }
 
   if (currentResult?.truncated) {
@@ -597,7 +651,8 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
 }
 
 function finalizeResult(result, runBackend, messages, modelLabel, routerDecision) {
-  if (result && result.tool_calls && result.tool_calls.length > 0) {
+  const toolCalls = extractToolCalls(result);
+  if (toolCalls && toolCalls.length > 0) {
     return completeWithToolsAndContinuation(runBackend, messages, result).then(function (done) {
       return {
         content: done ? done.content : (result.content || ""),
