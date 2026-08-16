@@ -716,8 +716,8 @@ export const OBFUSCATION_PATTERNS = [
   { pattern: /[\u0400-\u04FF\u0370-\u03FF]/, label: "unicode_homoglyph", weight: 0.7 },
   // Excessive whitespace / hidden text
   { pattern: / {3,}|\t{2,}/, label: "excessive_whitespace", weight: 0.5 },
-  // Comment injection patterns
-  { pattern: /\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->|\/\/.*/g, label: "comment_injection", weight: 0.8 },
+  // Comment injection patterns (ignores :// in http:// and https:// URLs)
+  { pattern: /\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->|(?<!:)\/\/.*/g, label: "comment_injection", weight: 0.8 },
   // URL encoding
   { pattern: /%[0-9A-Fa-f]{2}(?:%[0-9A-Fa-f]{2}){3,}/, label: "url_encoded", weight: 0.6 },
   // Repeated character padding
