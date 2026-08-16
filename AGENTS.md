@@ -232,6 +232,11 @@ This adds almost no cost at commit time and over months produces a dataset showi
 
 Standing rules for anything touching claims, economics, analytics, accuracy, or security:
 
+**Anti-Fabrication & Empirical Invariant.** Never fabricate, extrapolate, or retroactively rationalize test counts, file counts, or performance metrics. When citing any test suite results or file counts:
+1. Always cite only the exact, literal stdout numbers returned by the executed command in the current turn.
+2. Never synthesize or layer arithmetic justifications when challenged on a discrepancy. If challenged or uncertain, run the literal measurement command immediately and report only what the machine prints.
+3. Never substitute an estimate into a verification claim.
+
 **Claim before code.** Before implementing, answer: *"What claim will this change allow us to make?"*
 If the answer is unclear → STOP, define the measurement first. Then the order is:
 
