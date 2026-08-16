@@ -100,18 +100,23 @@ describe("handler", function () {
     expect(res._status).toBe(405);
   });
 
-  it("routes to Gemini API when Gemini is primary or model is gemini-2.5-flash", async function () {
+  it("routes to Gemini API across all domains (Generalist, Engineer, Archivist, Storyteller, Legal)", async function () {
     process.env.GROQ_API_KEY = undefined;
     process.env.DEEPSEEK_API_KEY = undefined;
     process.env.GEMINI_API_KEY = "sk-gemini-valid";
     mockFetch({ choices: [{ message: { content: "gemini response ok" } }] });
 
     var handler = (await import("../../api/cfai.js")).default;
-    var req = { method: "POST", body: { command: "score", input: "debug this react component", domain: "coding" } };
-    var res = { _status: null, _body: null, status: function (code) { this._status = code; return this; }, json: function (data) { this._body = data; }, setHeader: function () {} };
-    await handler(req, res);
-    expect(res._status).toBe(200);
-    expect(res._body.result).toContain("gemini response ok");
+    var domains = ["assistant", "coding", "genealogy", "story", "legal"];
+
+    for (var i = 0; i < domains.length; i++) {
+      var d = domains[i];
+      var req = { method: "POST", body: { command: "score", input: "test query for " + d, domain: d } };
+      var res = { _status: null, _body: null, status: function (code) { this._status = code; return this; }, json: function (data) { this._body = data; }, setHeader: function () {} };
+      await handler(req, res);
+      expect(res._status).toBe(200);
+      expect(res._body.result).toContain("gemini response ok");
+    }
   });
 
   it("resolves domain prompts", async function () {
