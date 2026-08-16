@@ -63,19 +63,130 @@ function getBackendForModel(model) {
   return "deepseek";
 }
 
+// ── Tools & Autonomous Function Calling ──
+
+export const AVAILABLE_TOOLS = [
+  {
+    type: "function",
+    function: {
+      name: "fetch_url",
+      description: "Fetches and reads the text content of a public web page or document URL. Use when you need real-time data, web content, articles, or documentation from a specific link.",
+      parameters: {
+        type: "object",
+        properties: {
+          url: {
+            type: "string",
+            description: "The full HTTP/HTTPS URL of the web page to fetch."
+          }
+        },
+        required: ["url"]
+      }
+    }
+  }
+];
+
+const URL_TIMEOUT_MS = 8000;
+const MAX_FETCH_CHARS = 6000;
+
+export function isPrivateIpOrHost(hostname) {
+  if (!hostname) return true;
+  const h = hostname.toLowerCase();
+  if (h === "localhost" || h.endsWith(".local") || h.endsWith(".internal")) return true;
+  if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h)) return true;
+  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h)) return true;
+  if (h === "0.0.0.0" || h === "::1" || /^fc00:/i.test(h)) return true;
+  return false;
+}
+
+export function cleanHtmlToText(html) {
+  if (!html) return "";
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+  const title = titleMatch ? titleMatch[1].trim() : "";
+
+  let cleaned = html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+    .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, "")
+    .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, "");
+
+  cleaned = cleaned
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'");
+
+  cleaned = cleaned.replace(/\s+/g, " ").trim();
+  const truncated = cleaned.slice(0, MAX_FETCH_CHARS);
+  return title ? `Title: ${title}\n\n${truncated}` : truncated;
+}
+
+export async function executeFetchUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== "string") {
+    return JSON.stringify({ error: "Invalid or empty URL provided." });
+  }
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(rawUrl);
+  } catch {
+    return JSON.stringify({ error: "Malformed URL. Must be a valid http:// or https:// URL." });
+  }
+
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    return JSON.stringify({ error: "Only http and https protocols are supported." });
+  }
+
+  if (isPrivateIpOrHost(parsedUrl.hostname)) {
+    return JSON.stringify({ error: "Access to local, internal, and private IP addresses is blocked for security." });
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), URL_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(parsedUrl.href, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 REI-Bot/1.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
+      }
+    });
+
+    if (!res.ok) {
+      return JSON.stringify({ error: `HTTP ${res.status} ${res.statusText} from server.` });
+    }
+
+    const text = await res.text();
+    const cleanContent = cleanHtmlToText(text);
+    return JSON.stringify({ url: parsedUrl.href, content: cleanContent });
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      return JSON.stringify({ error: `URL fetch timed out after ${URL_TIMEOUT_MS}ms.` });
+    }
+    return JSON.stringify({ error: `Failed to fetch URL: ${err.message || String(err)}` });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ── Per-backend callers ──
 
-async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
+async function callDeepSeek(messages, maxTokens, temperature = 0.7, tools = null) {
   const key = process.env.DEEPSEEK_API_KEY || process.env.deepseek;
   if (!key) return null;
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {
+    const payload = { model: "deepseek-v4-flash", messages: messages, temperature: temperature, max_tokens: maxTokens };
+    if (tools && tools.length > 0) payload.tools = tools;
     const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "deepseek-v4-flash", messages: messages, temperature: temperature, max_tokens: maxTokens }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       if (res.status === 429) { await recordThrottle("deepseek", res); }
@@ -87,7 +198,14 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
     }
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
-    return { content: data.choices?.[0]?.message?.content || "No content from DeepSeek.", model: "deepseek-v4-flash", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+    return {
+      content: data.choices?.[0]?.message?.content || "",
+      model: "deepseek-v4-flash",
+      usage: data.usage || null,
+      truncated: finishReason === "length",
+      finishReason: finishReason,
+      tool_calls: data.choices?.[0]?.message?.tool_calls || null
+    };
   } catch (err) {
     if (err && err.name === "AbortError") {
       console.warn("DeepSeek timed out after " + PROVIDER_TIMEOUT_MS + "ms");
@@ -100,7 +218,7 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7) {
   }
 }
 
-async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7) {
+async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7, tools = null) {
   const key = process.env.GEMINI_API_KEY;
   if (!key || key.includes("your_gemini_api_key_here")) return null;
 
@@ -121,6 +239,8 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
     const controller = new AbortController();
     const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
     try {
+      const payload = { model: model, messages: messages, temperature: temperature, max_tokens: maxTokens };
+      if (tools && tools.length > 0) payload.tools = tools;
       const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
         signal: controller.signal,
@@ -129,7 +249,7 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
           "x-goog-api-key": key,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ model: model, messages: messages, temperature: temperature, max_tokens: maxTokens }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         if (res.status === 429) {
@@ -153,9 +273,6 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
 
         console.warn(`Gemini model ${model} returned HTTP ${res.status} [status=${errStatus || "N/A"}]: ${errMsg.slice(0, 200)}`);
 
-        // Only cascade to the next candidate model if the error specifically indicates
-        // that this model is not found / unsupported on the endpoint.
-        // Google v1beta/openai returns HTTP 400 INVALID_ARGUMENT or HTTP 404 NOT_FOUND for unknown models.
         const isNotFound =
           res.status === 404 ||
           errStatus === "NOT_FOUND" ||
@@ -169,7 +286,14 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
       }
       const data = await res.json();
       var finishReason = data.choices?.[0]?.finish_reason || null;
-      return { content: data.choices?.[0]?.message?.content || "No content from Gemini.", model: model, usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+      return {
+        content: data.choices?.[0]?.message?.content || "",
+        model: model,
+        usage: data.usage || null,
+        truncated: finishReason === "length",
+        finishReason: finishReason,
+        tool_calls: data.choices?.[0]?.message?.tool_calls || null
+      };
     } catch (err) {
       if (err && err.name === "AbortError") {
         console.warn("Gemini timed out after " + PROVIDER_TIMEOUT_MS + "ms");
@@ -185,17 +309,19 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7)
   return null;
 }
 
-async function callGroq(messages, maxTokens, model, temperature = 0.7) {
+async function callGroq(messages, maxTokens, model, temperature = 0.7, tools = null) {
   const key = process.env.GROQ_API_KEY;
   if (!key || key.includes("your_groq_api_key_here")) return null;
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {
+    const payload = { model: model || "llama-3.3-70b-versatile", messages: messages, temperature: temperature, max_tokens: maxTokens };
+    if (tools && tools.length > 0) payload.tools = tools;
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: model || "llama-3.3-70b-versatile", messages: messages, temperature: temperature, max_tokens: maxTokens }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       if (res.status === 429) { await recordThrottle("groq", res); }
@@ -204,7 +330,14 @@ async function callGroq(messages, maxTokens, model, temperature = 0.7) {
     }
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
-    return { content: data.choices?.[0]?.message?.content || "No content from Groq.", model: model || "llama-3.3-70b-versatile", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+    return {
+      content: data.choices?.[0]?.message?.content || "",
+      model: model || "llama-3.3-70b-versatile",
+      usage: data.usage || null,
+      truncated: finishReason === "length",
+      finishReason: finishReason,
+      tool_calls: data.choices?.[0]?.message?.tool_calls || null
+    };
   } catch (err) {
     if (err && err.name === "AbortError") {
       console.warn("Groq timed out after " + PROVIDER_TIMEOUT_MS + "ms");
@@ -217,17 +350,19 @@ async function callGroq(messages, maxTokens, model, temperature = 0.7) {
   }
 }
 
-async function callOpenAI(messages, maxTokens, temperature = 0.7) {
+async function callOpenAI(messages, maxTokens, temperature = 0.7, tools = null) {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {
+    const payload = { model: "gpt-4o", messages: messages, temperature: temperature, max_tokens: maxTokens };
+    if (tools && tools.length > 0) payload.tools = tools;
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "gpt-4o", messages: messages, temperature: temperature, max_tokens: maxTokens }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       if (res.status === 429) { await recordThrottle("openai", res); }
@@ -235,7 +370,14 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7) {
     }
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
-    return { content: data.choices?.[0]?.message?.content || "No content from OpenAI.", model: "gpt-4o", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+    return {
+      content: data.choices?.[0]?.message?.content || "",
+      model: "gpt-4o",
+      usage: data.usage || null,
+      truncated: finishReason === "length",
+      finishReason: finishReason,
+      tool_calls: data.choices?.[0]?.message?.tool_calls || null
+    };
   } catch (err) {
     if (err && err.name === "AbortError") {
       console.warn("OpenAI timed out after " + PROVIDER_TIMEOUT_MS + "ms");
@@ -248,18 +390,20 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7) {
   }
 }
 
-async function callGLM(messages, maxTokens, temperature = 0.7) {
+async function callGLM(messages, maxTokens, temperature = 0.7, tools = null) {
   const key = process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN;
   if (!key || key.includes("your_glm_api_key_here")) return null;
   const baseUrl = process.env.GLM_BASE_URL || "https://ai-gateway.vercel.sh/v1/chat/completions";
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {
+    const payload = { model: "zai/glm-5.2", messages: messages, temperature: temperature, max_tokens: maxTokens };
+    if (tools && tools.length > 0) payload.tools = tools;
     const res = await fetch(baseUrl, {
       method: "POST",
       signal: controller.signal,
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "zai/glm-5.2", messages: messages, temperature: temperature, max_tokens: maxTokens }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       if (res.status === 429) { await recordThrottle("glm", res); }
@@ -271,7 +415,14 @@ async function callGLM(messages, maxTokens, temperature = 0.7) {
     }
     const data = await res.json();
     var finishReason = data.choices?.[0]?.finish_reason || null;
-    return { content: data.choices?.[0]?.message?.content || "No content from GLM.", model: "zai/glm-5.2", usage: data.usage || null, truncated: finishReason === "length", finishReason: finishReason };
+    return {
+      content: data.choices?.[0]?.message?.content || "",
+      model: "zai/glm-5.2",
+      usage: data.usage || null,
+      truncated: finishReason === "length",
+      finishReason: finishReason,
+      tool_calls: data.choices?.[0]?.message?.tool_calls || null
+    };
   } catch (err) {
     if (err && err.name === "AbortError") {
       console.warn("GLM timed out after " + PROVIDER_TIMEOUT_MS + "ms");
@@ -285,15 +436,6 @@ async function callGLM(messages, maxTokens, temperature = 0.7) {
 }
 
 // ── Controlled continuation (NEVER SILENTLY TRUNCATE) ──
-// When a provider returns finish_reason === "length", the model hit its
-// OUTPUT token cap mid-response. Rather than silently returning a cut-off
-// answer, REI continues the SAME model on the SAME backend, feeding the
-// partial assistant turn back into context with a deterministic "Continue
-// exactly where you left off" instruction. This is a controlled fallback:
-// capped at MAX_CONTINUATION_CHUNKS total chunks, sticky to the original
-// route/model/provider (never re-routed per chunk), and if the cap is hit
-// while still truncated the final response is surfaced honestly as
-// truncated rather than presented as complete.
 
 const MAX_CONTINUATION_CHUNKS = 3;
 const CONTINUATION_INSTRUCTION =
@@ -315,15 +457,11 @@ function appendContinuationTurns(messages, partialContent) {
   ]);
 }
 
-// firstResult is an already-obtained truncated chunk. Continues on the SAME
-// backend (runBackend) up to MAX_CONTINUATION_CHUNKS total chunks.
 async function completeWithContinuation(runBackend, messages, firstResult) {
   var full = firstResult.content || "";
   var usage = sumUsage(null, firstResult.usage);
   var chunks = 1;
   var truncatedChunks = 1;
-  // We only enter here when the first chunk is truncated, so the response
-  // stays "truncated" until a continuation chunk completes cleanly.
   var stillTruncated = true;
   var finishReason = firstResult.finishReason || null;
   var currentMessages = appendContinuationTurns(messages, firstResult.content || "");
@@ -331,8 +469,6 @@ async function completeWithContinuation(runBackend, messages, firstResult) {
   while (chunks < MAX_CONTINUATION_CHUNKS) {
     var result = await runBackend(currentMessages);
     if (!result) {
-      // Provider error mid-continuation: keep the partial, stay truncated,
-      // never fabricate a completion.
       break;
     }
     chunks += 1;
@@ -343,7 +479,7 @@ async function completeWithContinuation(runBackend, messages, firstResult) {
     if (result.truncated) {
       truncatedChunks += 1;
       if (chunks >= MAX_CONTINUATION_CHUNKS) {
-        break; // hit the cap while still truncated
+        break;
       }
       currentMessages = appendContinuationTurns(currentMessages, result.content || "");
     } else {
@@ -361,7 +497,88 @@ async function completeWithContinuation(runBackend, messages, firstResult) {
   };
 }
 
+// ── Autonomous Tool-Execution Loop ──
+
+const MAX_TOOL_ROUNDS = 3;
+
+async function completeWithToolsAndContinuation(runBackend, messages, firstResult) {
+  let currentResult = firstResult;
+  let currentMessages = messages.slice();
+  let toolRounds = 0;
+  let accumulatedUsage = sumUsage(null, firstResult.usage);
+
+  while (currentResult?.tool_calls && currentResult.tool_calls.length > 0 && toolRounds < MAX_TOOL_ROUNDS) {
+    toolRounds += 1;
+
+    currentMessages = currentMessages.concat([
+      {
+        role: "assistant",
+        content: currentResult.content || null,
+        tool_calls: currentResult.tool_calls,
+      }
+    ]);
+
+    for (const toolCall of currentResult.tool_calls) {
+      let output = "";
+      if (toolCall.function?.name === "fetch_url") {
+        let args = {};
+        try {
+          args = typeof toolCall.function.arguments === "string"
+            ? JSON.parse(toolCall.function.arguments)
+            : (toolCall.function.arguments || {});
+        } catch {
+          args = {};
+        }
+        output = await executeFetchUrl(args.url);
+      } else {
+        output = JSON.stringify({ error: `Unknown tool: ${toolCall.function?.name}` });
+      }
+
+      currentMessages = currentMessages.concat([
+        {
+          role: "tool",
+          tool_call_id: toolCall.id || `call_${Date.now()}`,
+          name: toolCall.function?.name || "fetch_url",
+          content: output,
+        }
+      ]);
+    }
+
+    const nextResult = await runBackend(currentMessages);
+    if (!nextResult) {
+      break;
+    }
+    accumulatedUsage = sumUsage(accumulatedUsage, nextResult.usage);
+    currentResult = nextResult;
+  }
+
+  if (currentResult?.truncated) {
+    const contResult = await completeWithContinuation(runBackend, currentMessages, currentResult);
+    contResult.usage = sumUsage(accumulatedUsage, contResult.usage);
+    return contResult;
+  }
+
+  if (currentResult) {
+    currentResult.usage = accumulatedUsage;
+  }
+  return currentResult;
+}
+
 function finalizeResult(result, runBackend, messages, modelLabel, routerDecision) {
+  if (result && result.tool_calls && result.tool_calls.length > 0) {
+    return completeWithToolsAndContinuation(runBackend, messages, result).then(function (done) {
+      return {
+        content: done ? done.content : (result.content || ""),
+        model: modelLabel,
+        routerDecision: routerDecision,
+        usage: done && done.usage ? done.usage : (result.usage || null),
+        truncated: done ? (done.truncated || false) : false,
+        finishReason: done ? (done.finishReason || null) : null,
+        continuation: done && done.continuation ? done.continuation : { attempted: false, chunks: 1, truncatedChunks: 0, finalTruncated: false },
+      };
+    });
+  }
+
   if (result && result.truncated) {
     return completeWithContinuation(runBackend, messages, result).then(function (done) {
       return {
@@ -417,13 +634,13 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   const geminiModel = primaryBackend === "gemini" ? primaryModel : null;
 
   // Map of available backends (each accepts an optional message override so
-  // the continuation loop can re-call the SAME backend with appended turns)
+  // the continuation & tool loops can re-call the SAME backend with appended turns)
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxTokens, temperature); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature); };
-  if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs) { return callGLM(msgs || messages, maxTokens, temperature); };
-  if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxTokens, groqModel, temperature); };
-  if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxTokens, temperature); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxTokens, temperature, AVAILABLE_TOOLS); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature, AVAILABLE_TOOLS); };
+  if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs) { return callGLM(msgs || messages, maxTokens, temperature, AVAILABLE_TOOLS); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxTokens, groqModel, temperature, AVAILABLE_TOOLS); };
+  if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxTokens, temperature, AVAILABLE_TOOLS); };
 
   // Try primary backend first (unless in cooldown)
   if (primaryBackend && backends[primaryBackend]) {
