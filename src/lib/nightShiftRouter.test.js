@@ -377,5 +377,38 @@ describe("nightShiftRouter", () => {
       expect(isSimpleGreeting("")).toBe(false);
     });
 
+    it("routes GitHub repository URLs to coding-hinge on Gemini even when repo name contains genealogy keywords", () => {
+      const decision = buildRouterDecision({
+        input: "i need a review of my github https://github.com/aaronmarchant96-max/family-archive",
+        domain: "assistant"
+      });
+      expect(decision.id).toBe("coding-hinge");
+      expect(decision.model).toBe("gemini-2.5-flash");
+    });
+
+    it("routes single-keyword domain requests cleanly without ambiguity", () => {
+      const decision = buildRouterDecision({
+        input: "Find the 1880 census records for John Marchant",
+        domain: "assistant"
+      });
+      expect(decision.id).toBe("genealogy-deep-dive");
+    });
+
+    it("leaves tied domain collisions in The Generalist rather than arbitrary capture", () => {
+      const decision = buildRouterDecision({
+        input: "Compare the narrative precedent in this case",
+        domain: "assistant"
+      });
+      expect(decision.id).toBe("structured-reasoning");
+    });
+
+    it("escalates high-complexity or high-hinge Generalist queries to Gemini", () => {
+      const decision = buildRouterDecision({
+        input: "Evaluate the operational trade-offs of migrating our legacy monolithic architecture to microservices under failure probability and preventive maintenance risk",
+        domain: "assistant"
+      });
+      expect(decision.id).toBe("structured-reasoning");
+      expect(decision.model).toBe("gemini-2.5-flash");
+    });
   });
 });

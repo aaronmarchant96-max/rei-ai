@@ -111,20 +111,56 @@ function keywordMatches(text: string, term = ""): boolean {
   return pattern.test(text);
 }
 
-function getCatalogRouteMatch(text: string): FingerprintEntry | null {
-  for (const entry of ROUTER_CATALOG) {
-    const terms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
-    if (terms.some((term) => keywordMatches(text, term))) {
-      return entry;
-    }
+export function stripUrlsFromText(text: string): string {
+  return String(text || "").replace(/https?:\/\/[^\s]+/gi, " ").trim();
+}
+
+export function hasCodeHostUrl(text: string): boolean {
+  return /https?:\/\/(?:www\.)?(?:github\.com|raw\.githubusercontent\.com|gitlab\.com|bitbucket\.org|npmjs\.com|pypi\.org|gist\.github\.com)\b/i.test(text);
+}
+
+export function getRankedDomainMatch(text: string): FingerprintEntry | null {
+  const cleanText = stripUrlsFromText(text);
+  if (!cleanText) return null;
+
+  const domainMap: Record<string, string> = {
+    "coding-hinge": "coding",
+    "legal-hinge": "legal",
+    "genealogy-deep-dive": "genealogy",
+    "story-architect": "story",
+  };
+
+  const scored = Object.entries(domainMap).map(([id, domainKey]) => {
+    const entry = getCatalogEntry(id);
+    const catalogTerms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
+    const domainTerms = getDomainMatchTerms(domainKey);
+    const allTerms = Array.from(new Set([...catalogTerms, ...domainTerms]));
+    const hits = allTerms.filter((term: string) => keywordMatches(cleanText, term)).length;
+    return { entry, score: hits };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored[0];
+  const runnerUp = scored[1];
+
+  // Mathematical Margin Rule:
+  // Top domain wins if it has at least 1 hit AND strictly beats the runner-up.
+  // Tied scores (e.g. 1 vs 1) represent ambiguity and return null to remain in Generalist.
+  if (top && top.score > 0 && (!runnerUp || top.score > runnerUp.score)) {
+    return top.entry;
   }
   return null;
 }
 
+function getCatalogRouteMatch(text: string): FingerprintEntry | null {
+  return getRankedDomainMatch(text);
+}
+
 function actualMatchedTerms(id: string, text: string): string[] {
+  const cleanText = stripUrlsFromText(text);
   const entry = getCatalogEntry(id);
   const terms = Array.isArray(entry?.matchTerms) ? entry.matchTerms : [];
-  return terms.filter((term) => keywordMatches(text, term));
+  return terms.filter((term) => keywordMatches(cleanText, term));
 }
 
 function domainKeywordMatches(text: string, domainId: string): boolean {
@@ -239,8 +275,8 @@ function getComplexityTier(text: string): string {
   const questionMarks = (text.match(/\?/g) || []).length;
   const uncertaintyHits = UNCERTAINTY_TERMS.filter((term) => text.includes(term)).length;
   const score = words * 2 + questionMarks * 8 + uncertaintyHits * 10;
-  if (score >= 40) return "high";
-  if (score >= 20) return "medium";
+  if (score >= 30) return "high";
+  if (score >= 15) return "medium";
   return "low";
 }
 
@@ -388,7 +424,26 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "coding" || (domainName === "assistant" && !hasComparisonFraming(text) && !hasNarrativeFraming(text) && (catalogRoute?.id === "coding-hinge" || domainKeywordMatches(text, "coding")))) {
+  // 3. Structural Code Host & Technical Review Gate:
+  // Runs before lexical domain keyword checks so code hosting platforms (github.com, gitlab.com)
+  // route cleanly to The Engineer / Gemini even if repo names contain domain terms (like family-archive).
+  if (hasCodeHostUrl(text)) {
+    const routeTerms = actualMatchedTerms("coding-hinge", text);
+    const decision = buildDecision("coding-hinge", {
+      rationale: "Code repository host detected; route through the verification-first coding path.",
+      model: "gemini-2.5-flash",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: routeTerms.length > 0 ? routeTerms : ["github.com"],
+        highStructureSignals,
+        storedPreference,
+      } as RoutingSignals,
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
+  if (domainName === "coding" || (domainName === "assistant" && !hasComparisonFraming(text) && !hasNarrativeFraming(text) && catalogRoute?.id === "coding-hinge")) {
     const routeTerms = actualMatchedTerms("coding-hinge", text);
     const decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",
@@ -403,7 +458,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "legal" || (domainName === "assistant" && (catalogRoute?.id === "legal-hinge" || domainKeywordMatches(text, "legal")))) {
+  if (domainName === "legal" || (domainName === "assistant" && catalogRoute?.id === "legal-hinge")) {
     const routeTerms = actualMatchedTerms("legal-hinge", text);
     const decision = buildDecision("legal-hinge", {
       rationale: "Legal case analysis or precedent evaluation detected; enforce verified-index grounding.",
@@ -418,7 +473,7 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "genealogy" || (domainName === "assistant" && (catalogRoute?.id === "genealogy-deep-dive" || domainKeywordMatches(text, "genealogy")))) {
+  if (domainName === "genealogy" || (domainName === "assistant" && catalogRoute?.id === "genealogy-deep-dive")) {
     const routeTerms = actualMatchedTerms("genealogy-deep-dive", text);
     const decision = buildDecision("genealogy-deep-dive", {
       rationale: "Genealogy or archival evidence language detected; enforce evidence-tiered reasoning.",
@@ -433,13 +488,13 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "story" || (domainName === "assistant" && (catalogRoute?.id === "story-architect" || domainKeywordMatches(text, "story")))) {
+  if (domainName === "story" || hasNarrativeFraming(text) || (domainName === "assistant" && catalogRoute?.id === "story-architect")) {
     const routeTerms = actualMatchedTerms("story-architect", text);
     const decision = buildDecision("story-architect", {
       rationale: "Story or narrative language detected; route through the storytelling blueprint path.",
       routingSignals: {
         complexityTier,
-        matchedTerms: routeTerms,
+        matchedTerms: routeTerms.length > 0 ? routeTerms : ["story"],
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
@@ -448,11 +503,26 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (highStructureSignals.length > 0 || complexityTier === "high") {
+  if (storedPreference) {
+    const decision = buildDecision(storedPreference, {
+      rationale: "Recent interaction history suggests this route should be preferred for the current request.",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: actualMatchedTerms(storedPreference, text),
+        highStructureSignals,
+        storedPreference,
+      } as RoutingSignals,
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
+  if (highStructureSignals.length > 0 || complexityTier === "high" || (hingeResult && hingeResult.hs >= 0.50)) {
     const decision = buildDecision("structured-reasoning", {
-      rationale: "High-structure or uncertain reasoning request detected; use a stricter evaluation gate.",
+      rationale: "High-complexity or high-hinge reasoning request detected in Generalist; route through Gemini.",
+      model: "gemini-2.5-flash",
       qualityGate: "Hinge + Facts + Move + challenge test",
-      maxTokens: 800,
+      maxTokens: 1500,
       temperature: 0.2,
       fallbackPriority: "adversarial-validation",
       routingSignals: {

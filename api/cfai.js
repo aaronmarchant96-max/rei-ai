@@ -333,13 +333,7 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
 
         console.warn(`Gemini model ${model} returned HTTP ${res.status} [status=${errStatus || "N/A"}]: ${errMsg.slice(0, 200)}`);
 
-        const isNotFound =
-          res.status === 404 ||
-          errStatus === "NOT_FOUND" ||
-          errCode === 404 ||
-          (res.status === 400 && /not found|not supported|is not available|unsupported/i.test(errMsg));
-
-        if (isNotFound && m < uniqueCandidates.length - 1) {
+        if (res.status !== 401 && res.status !== 403 && m < uniqueCandidates.length - 1) {
           continue;
         }
         return null;
