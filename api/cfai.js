@@ -155,6 +155,32 @@ export async function executeFetchUrl(rawUrl) {
         return JSON.stringify({ error: "Access to local, internal, and private IP addresses is blocked for security." });
       }
 
+      // GitHub repository fast-path: fetch raw README.md directly for instant 200ms parsing
+      if (parsedUrl.hostname === "github.com") {
+        const ghMatch = parsedUrl.pathname.match(/^\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)\/?$/);
+        if (ghMatch) {
+          const owner = ghMatch[1];
+          const repo = ghMatch[2];
+          try {
+            const rawReadmeUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`;
+            const rawRes = await fetch(rawReadmeUrl, {
+              signal: controller.signal,
+              headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36" }
+            });
+            if (rawRes.ok) {
+              const rawText = await rawRes.text();
+              const truncated = rawText.slice(0, MAX_FETCH_CHARS);
+              return JSON.stringify({
+                url: parsedUrl.href,
+                content: `GitHub Repository: ${owner}/${repo}\n\nREADME.md Content:\n${truncated}`
+              });
+            }
+          } catch {
+            // Fall through to standard HTML fetch
+          }
+        }
+      }
+
       const res = await fetch(parsedUrl.href, {
         signal: controller.signal,
         redirect: "manual",
