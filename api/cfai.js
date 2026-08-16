@@ -6,11 +6,13 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
 
+export const maxDuration = 60;
+
 const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH;
 
 const MAX_INPUT_CHARS = 14000;
-const PROVIDER_TIMEOUT_MS = 30000;
+const PROVIDER_TIMEOUT_MS = 25000;
 
 var providerCooldown = new Map();
 var THROTTLE_COOLDOWN_MS = 15000;
