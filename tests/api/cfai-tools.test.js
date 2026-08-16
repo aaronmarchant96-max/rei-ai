@@ -79,18 +79,74 @@ describe("URL Fetching Tool & SSRF Security", () => {
       expect(JSON.parse(res2).error).toContain("blocked for security");
     });
 
-    it("fetches public URLs and returns clean text content", async () => {
-      const mockFetch = jest.fn().mockResolvedValue({
-        ok: true,
-        text: () => Promise.resolve("<html><head><title>Demo Site</title></head><body><p>Hello world from demo!</p></body></html>"),
+    it("blocks 302 redirect-based SSRF attempts to AWS metadata and localhost", async () => {
+      // Step 1: Public URL responds with 302 Location: http://169.254.169.254/latest/meta-data/
+      const mockFetchRedirectAws = jest.fn().mockResolvedValue({
+        status: 302,
+        ok: false,
+        headers: {
+          get: (name) => (name.toLowerCase() === "location" ? "http://169.254.169.254/latest/meta-data/" : null)
+        }
       });
-      global.fetch = mockFetch;
+      global.fetch = mockFetchRedirectAws;
 
-      const res = await executeFetchUrl("https://example.com/article");
+      const resAws = await executeFetchUrl("https://innocent-looking-site.com/redirect");
+      expect(JSON.parse(resAws).error).toContain("blocked for security");
+
+      // Step 2: Public URL responds with 302 Location: http://127.0.0.1:8080/admin
+      const mockFetchRedirectLocal = jest.fn().mockResolvedValue({
+        status: 302,
+        ok: false,
+        headers: {
+          get: (name) => (name.toLowerCase() === "location" ? "http://127.0.0.1:8080/admin" : null)
+        }
+      });
+      global.fetch = mockFetchRedirectLocal;
+
+      const resLocal = await executeFetchUrl("https://innocent-looking-site.com/redirect2");
+      expect(JSON.parse(resLocal).error).toContain("blocked for security");
+    });
+
+    it("follows legitimate public-to-public redirects successfully", async () => {
+      let callCount = 0;
+      global.fetch = jest.fn().mockImplementation((url) => {
+        callCount += 1;
+        if (callCount === 1) {
+          return Promise.resolve({
+            status: 301,
+            ok: false,
+            headers: {
+              get: (name) => (name.toLowerCase() === "location" ? "https://example.com/final-destination" : null)
+            }
+          });
+        }
+        return Promise.resolve({
+          status: 200,
+          ok: true,
+          headers: { get: () => null },
+          text: () => Promise.resolve("<html><head><title>Final Page</title></head><body>Target reached</body></html>")
+        });
+      });
+
+      const res = await executeFetchUrl("https://example.com/initial-page");
       const parsed = JSON.parse(res);
-      expect(parsed.url).toBe("https://example.com/article");
-      expect(parsed.content).toContain("Title: Demo Site");
-      expect(parsed.content).toContain("Hello world from demo!");
+      expect(parsed.url).toBe("https://example.com/final-destination");
+      expect(parsed.content).toContain("Title: Final Page");
+      expect(parsed.content).toContain("Target reached");
+      expect(callCount).toBe(2);
+    });
+
+    it("aborts when redirect limit (MAX_REDIRECTS) is exceeded", async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        status: 302,
+        ok: false,
+        headers: {
+          get: (name) => (name.toLowerCase() === "location" ? "https://example.com/infinite-loop" : null)
+        }
+      });
+
+      const res = await executeFetchUrl("https://example.com/start-loop");
+      expect(JSON.parse(res).error).toContain("Too many redirects");
     });
   });
 

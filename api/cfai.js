@@ -123,45 +123,77 @@ export function cleanHtmlToText(html) {
   return title ? `Title: ${title}\n\n${truncated}` : truncated;
 }
 
+const MAX_REDIRECTS = 3;
+
 export async function executeFetchUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== "string") {
     return JSON.stringify({ error: "Invalid or empty URL provided." });
   }
 
-  let parsedUrl;
-  try {
-    parsedUrl = new URL(rawUrl);
-  } catch {
-    return JSON.stringify({ error: "Malformed URL. Must be a valid http:// or https:// URL." });
-  }
-
-  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
-    return JSON.stringify({ error: "Only http and https protocols are supported." });
-  }
-
-  if (isPrivateIpOrHost(parsedUrl.hostname)) {
-    return JSON.stringify({ error: "Access to local, internal, and private IP addresses is blocked for security." });
-  }
+  let currentUrl = rawUrl;
+  let redirectsFollowed = 0;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), URL_TIMEOUT_MS);
 
   try {
-    const res = await fetch(parsedUrl.href, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 REI-Bot/1.0",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
+    while (redirectsFollowed <= MAX_REDIRECTS) {
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(currentUrl);
+      } catch {
+        return JSON.stringify({ error: "Malformed URL. Must be a valid http:// or https:// URL." });
       }
-    });
 
-    if (!res.ok) {
-      return JSON.stringify({ error: `HTTP ${res.status} ${res.statusText} from server.` });
+      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+        return JSON.stringify({ error: "Only http and https protocols are supported." });
+      }
+
+      if (isPrivateIpOrHost(parsedUrl.hostname)) {
+        return JSON.stringify({ error: "Access to local, internal, and private IP addresses is blocked for security." });
+      }
+
+      const res = await fetch(parsedUrl.href, {
+        signal: controller.signal,
+        redirect: "manual",
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 REI-Bot/1.0",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,text/plain;q=0.8,*/*;q=0.5",
+        }
+      });
+
+      // Handle redirects manually to prevent SSRF bypass via 301/302/307/308
+      if (res.status >= 300 && res.status < 400) {
+        const location = res.headers.get("location");
+        if (!location) {
+          return JSON.stringify({ error: `Received HTTP ${res.status} redirect without a Location header.` });
+        }
+
+        redirectsFollowed += 1;
+        if (redirectsFollowed > MAX_REDIRECTS) {
+          return JSON.stringify({ error: `Too many redirects (exceeded limit of ${MAX_REDIRECTS}).` });
+        }
+
+        // Resolve relative redirects against current URL
+        try {
+          const nextUrl = new URL(location, parsedUrl.href);
+          currentUrl = nextUrl.href;
+          continue;
+        } catch {
+          return JSON.stringify({ error: `Invalid redirect target URL: ${location}` });
+        }
+      }
+
+      if (!res.ok) {
+        return JSON.stringify({ error: `HTTP ${res.status} ${res.statusText || "Error"} from server.` });
+      }
+
+      const text = await res.text();
+      const cleanContent = cleanHtmlToText(text);
+      return JSON.stringify({ url: parsedUrl.href, content: cleanContent });
     }
 
-    const text = await res.text();
-    const cleanContent = cleanHtmlToText(text);
-    return JSON.stringify({ url: parsedUrl.href, content: cleanContent });
+    return JSON.stringify({ error: "Too many redirects." });
   } catch (err) {
     if (err && err.name === "AbortError") {
       return JSON.stringify({ error: `URL fetch timed out after ${URL_TIMEOUT_MS}ms.` });
