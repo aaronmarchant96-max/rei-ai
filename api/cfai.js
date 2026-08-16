@@ -642,14 +642,16 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   if (messagesOverride && Array.isArray(messagesOverride) && messagesOverride.length > 0) {
     messages = messagesOverride;
   } else {
-    const formattedHistory = history.map(function (msg) {
+    const formattedHistory = (history || []).map(function (msg) {
       return {
         role: msg.role === "assistant" || msg.role === "system" ? msg.role : "user",
         content: msg.content,
       };
     });
+    const toolDirective = "\n\n[CAPABILITIES & TOOLS]: You have access to the fetch_url tool. When the user provides a web URL (such as a GitHub repository link, website, article, or documentation) or asks to inspect/review an online resource, call fetch_url to retrieve and review the live content directly rather than saying you cannot access the link.";
+    const activeSystemPrompt = (systemPrompt || REI_SYSTEM_PROMPT) + toolDirective;
     messages = [
-      { role: "system", content: systemPrompt || REI_SYSTEM_PROMPT },
+      { role: "system", content: activeSystemPrompt },
       ...formattedHistory,
       { role: "user", content: prompt },
     ];
