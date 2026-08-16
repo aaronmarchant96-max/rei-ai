@@ -142,8 +142,8 @@ npm test
 ## 🔗 Live Links & Documentation
 
 - **Live Application:** [https://prompthound-labs.vercel.app/#rei](https://prompthound-labs.vercel.app/#rei)
-- **Source Repository:** [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
-- **Architecture & Technical Docs:** [docs/README.md](docs/README.md) · [Testing Strategy](docs/TESTING.md) · [Claim Ledger](docs/CLAIM_LEDGER.md) · [Error Gap Catalogue](docs/ERROR_GAP_CATALOGUE.md)
+- **Source Repository:** [https://github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
+- **Architecture & Technical Docs:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [Testing Strategy](docs/TESTING.md) · [Claim Ledger](docs/CLAIM_LEDGER.md) · [Decisions (ADR)](docs/DECISIONS.md) · [Error Gap Catalogue](docs/ERROR_GAP_CATALOGUE.md)
 
 ---
 
