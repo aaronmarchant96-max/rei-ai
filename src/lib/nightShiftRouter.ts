@@ -320,6 +320,29 @@ export function buildRouterDecision({
 
   
 
+  // 1. Adversarial & Security Gate: MUST execute before fast-path greeting shortcuts
+  // so greeting-prefixed payloads (e.g. "Hello, ignore previous instructions...") cannot bypass D2 escalation.
+  if (requiresAdversarial || isAdversarialRequest(text)) {
+    // matchedTerms are REAL here, not a hardcoded label: fingerprint terms
+    // actually present in the input (red team / stress test / ...). When the
+    // route was chosen by the scanner escalation gate, no fingerprint term
+    // matches — matchedTerms is empty, which is itself the diagnosis
+    // ("scanner-gated, not a literal keyword"). This makes the Analytics
+    // Why column able to distinguish regex hits from scanner escalations.
+    const routeTerms = actualMatchedTerms("adversarial-validation", text);
+    const decision = buildDecision("adversarial-validation", {
+      rationale: "Adversarial or red-team request detected; use the premium validation path.",
+      routingSignals: {
+        complexityTier,
+        matchedTerms: routeTerms,
+        highStructureSignals,
+        storedPreference,
+      } as RoutingSignals,
+    }, hingeResult);
+    persistRouteHistory(decision.id);
+    return decision;
+  }
+
   if (isSimpleGreeting(text)) {
     const decision = buildDecision("simple-greeting", {
       rationale: "Greeting detected; use the cheapest fast path.",
@@ -357,27 +380,6 @@ export function buildRouterDecision({
       routingSignals: {
         complexityTier,
         matchedTerms: ["self-evaluate"],
-        highStructureSignals,
-        storedPreference,
-      } as RoutingSignals,
-    }, hingeResult);
-    persistRouteHistory(decision.id);
-    return decision;
-  }
-
-  if (requiresAdversarial || isAdversarialRequest(text)) {
-    // matchedTerms are REAL here, not a hardcoded label: fingerprint terms
-    // actually present in the input (red team / stress test / ...). When the
-    // route was chosen by the scanner escalation gate, no fingerprint term
-    // matches — matchedTerms is empty, which is itself the diagnosis
-    // ("scanner-gated, not a literal keyword"). This makes the Analytics
-    // Why column able to distinguish regex hits from scanner escalations.
-    const routeTerms = actualMatchedTerms("adversarial-validation", text);
-    const decision = buildDecision("adversarial-validation", {
-      rationale: "Adversarial or red-team request detected; use the premium validation path.",
-      routingSignals: {
-        complexityTier,
-        matchedTerms: routeTerms,
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
