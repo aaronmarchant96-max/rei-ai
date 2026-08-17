@@ -419,6 +419,9 @@ export default function REI({ initialPrompt } = {}) {
           hadIngestedRecord: Boolean(ingestedRecord),
           recordSourceType: ingestedRecord ? recordSourceType : null,
           routerDecision: { ...(data.routerDecision || routerDecision), model: data.model || routerDecision?.model },
+          usage: data.usage || null,
+          rawTrace: data.rawTrace || null,
+          redTeamResult: inputScan || null,
           truncated: data.truncated || false,
         }
       }

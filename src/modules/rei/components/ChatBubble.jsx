@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { parseAssistantStyleReply } from "../../../lib/replyParser.js";
+import { buildRequestEvidence } from "../../../lib/evidenceEngine";
+import TelemetryCapsule from "./TelemetryCapsule.jsx";
+import CardoComparisonToggle from "./CardoComparisonToggle.jsx";
 
 export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport, domainLabel = "REI.ai" }) {
   const [copied, setCopied] = useState(false);
@@ -21,6 +24,21 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
   const hasChange = sections?.ChangeMind && sections.ChangeMind.trim();
   const hasMove = sections?.Move && sections.Move.trim();
   const isStructured = hasHinge || hasFacts || hasAssumptions || hasEval || hasChange || hasMove;
+
+  const evidence = useMemo(() => {
+    if (msg.sender !== "rei") return null;
+    if (msg.evidence) return msg.evidence;
+    return buildRequestEvidence({
+      requestId: msg.rawJson?.requestId || msg.requestId,
+      timestamp: msg.timestamp || msg.rawJson?.timestamp,
+      routerDecision: msg.rawJson?.routerDecision,
+      rawTrace: msg.rawJson?.rawTrace,
+      usage: msg.rawJson?.usage,
+      responseText: msg.text,
+      redTeamResult: msg.rawJson?.redTeamResult,
+    });
+  }, [msg]);
+
   const exportPayload = {
     sections,
     routerDecision: msg.rawJson?.routerDecision,
@@ -41,29 +59,8 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
         </div>
       )}
 
-      {msg.sender === "rei" && msg.rawJson?.routerDecision && (
-        <div className="rei-router-badge" style={{ marginBottom: "6px" }}>
-          <span style={{ fontSize: "11px" }}>⚡</span>
-          <span>{msg.rawJson.routerDecision.label}</span>
-          <span style={{ margin: "0 2px" }}>·</span>
-          <span style={{ color: "var(--amber-text)", fontWeight: 700 }}>
-            {msg.rawJson.routerDecision.model}
-          </span>
-          {msg.rawJson.routerDecision.hingeScore != null && (
-            <span style={{ fontSize: "10px", color: "var(--amber-badge-tx)", background: "var(--amber-badge-bg)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }}
-              title={"HingeScore: " + msg.rawJson.routerDecision.hingeScore.toFixed(2)}>
-              {msg.rawJson.routerDecision.hingeScore < 0.3 ? "Low" : msg.rawJson.routerDecision.hingeScore < 0.55 ? "Med" : "High"}
-            </span>
-          )}
-          {msg.rawJson?.truncated && (
-            <span style={{ fontSize: "10px", color: "#DC2626", background: "rgba(220,38,38,0.12)", padding: "1px 6px", borderRadius: "4px", marginLeft: "6px", fontWeight: 600 }} title={"Response truncated by model — finish_reason: " + (msg.rawJson?.routerDecision?.finishReason || "length")}>⚠️ Truncated</span>
-          )}
-          {msg.rawJson?.rateLimited && (
-            <span style={{ fontSize: "10px", color: "var(--text-muted)", marginLeft: "4px" }}>
-              ({msg.rawJson.attemptedModel || "model"} busy · retry {msg.rawJson.retryAfter || "soon"})
-            </span>
-          )}
-        </div>
+      {msg.sender === "rei" && evidence && (
+        <TelemetryCapsule evidence={evidence} />
       )}
 
       <div
@@ -150,11 +147,28 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                     <div style={{ fontSize: "14px", color: "var(--text)", fontWeight: 600, lineHeight: "1.45" }}>{sections.Move}</div>
                   </div>
                 )}
+
+                {msg.sender === "rei" && (
+                  <CardoComparisonToggle
+                    responseText={msg.text}
+                    sections={sections}
+                    verificationSignals={evidence?.verificationSignals}
+                  />
+                )}
               </div>
             );
           })()
         ) : (
-          <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>
+          <div>
+            <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>
+            {msg.sender === "rei" && evidence && (
+              <CardoComparisonToggle
+                responseText={msg.text}
+                sections={null}
+                verificationSignals={evidence.verificationSignals}
+              />
+            )}
+          </div>
         )}
 
         {/* Collapsible Telemetry Dropdown */}
@@ -166,13 +180,13 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
             <div className="rei-router-panel__grid" style={{ marginTop: "8px" }}>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Route:</span> {msg.rawJson.routerDecision?.label || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Model:</span> {msg.rawJson.routerDecision?.model || msg.rawJson.model || "n/a"}</div>
-              <div class="rei-router-panel__item"><span class="rei-router-panel__label">Hinge score:</span> {msg.rawJson.routerDecision?.hingeScore?.toFixed(2) || "n/a"}</div>
-              <div class="rei-router-panel__item"><span class="rei-router-panel__label">Matched terms:</span> {msg.rawJson.routerDecision?.matchedTerms?.join(", ") || "none"}</div>
+              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Hinge score:</span> {msg.rawJson.routerDecision?.hingeScore?.toFixed(2) || "n/a"}</div>
+              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Matched terms:</span> {msg.rawJson.routerDecision?.matchedTerms?.join(", ") || "none"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Max tokens:</span> {msg.rawJson.routerDecision?.maxTokens || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Quality gate:</span> {msg.rawJson.routerDecision?.qualityGate || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Escalation:</span> {msg.rawJson.routerDecision?.escalation?.escalate ? "⚠️ Recommended — " + msg.rawJson.routerDecision.escalation.reason : "Not recommended • routing cost within threshold"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Enforcement:</span> {msg.rawJson.routerDecision?.enforce || "none"}</div>
-              <div class="rei-router-panel__item"><span class="rei-router-panel__label">Rationale:</span> {msg.rawJson.routerDecision?.rationale || "n/a"}</div>
+              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Rationale:</span> {msg.rawJson.routerDecision?.rationale || "n/a"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Est. cost:</span> ${msg.rawJson.routerDecision?.estimatedCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Premium cost:</span> ${msg.rawJson.routerDecision?.premiumCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Savings:</span> {msg.rawJson.routerDecision?.premiumCost > 0
