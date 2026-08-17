@@ -1,8 +1,25 @@
 const React = require("react");
 
 const makeEl = (tag) =>
-  React.forwardRef(({ children, ...props }, ref) =>
-    React.createElement(tag, { ref, ...props }, children)
+  React.forwardRef(
+    (
+      {
+        children,
+        initial,
+        animate,
+        exit,
+        whileHover,
+        whileTap,
+        whileInView,
+        viewport,
+        variants,
+        transition,
+        layout,
+        layoutId,
+        ...props
+      },
+      ref
+    ) => React.createElement(tag, { ref, ...props }, children)
   );
 
 const motion = new Proxy(
