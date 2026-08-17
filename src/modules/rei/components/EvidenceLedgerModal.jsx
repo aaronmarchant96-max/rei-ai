@@ -70,30 +70,52 @@ export default function EvidenceLedgerModal({ onClose }) {
           Every economic claim in REI.ai is anchored to immutable, version-controlled machine telemetry. Below is the verified ledger summary from production telemetry:
         </p>
 
-        {/* 4 Metric Cards */}
+        {/* 4 Metric Cards with Explicit Epistemic Provenance */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
           <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <div style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Total Tokens Tracked</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Tokens Tracked</span>
+              <span style={{ fontSize: "10px", color: "#71717a", background: "rgba(255,255,255,0.06)", padding: "1px 5px", borderRadius: "3px" }}>Observed</span>
+            </div>
             <div style={{ fontSize: "18px", fontWeight: 700, color: "#f4f4f5", marginTop: "4px" }}>1,848,473,560</div>
-            <div style={{ fontSize: "11px", color: "#71717a" }}>1.79B hit / 48.8M miss</div>
+            <div style={{ fontSize: "11px", color: "#71717a" }}>1.79B hit / 48.8M miss / 4.77M out</div>
           </div>
 
           <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <div style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Input Cache Hit Rate</div>
-            <div style={{ fontSize: "18px", fontWeight: 700, color: "#60a5fa", marginTop: "4px" }}>97.35%</div>
-            <div style={{ fontSize: "11px", color: "#71717a" }}>KV-cache prefix matching</div>
-          </div>
-
-          <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <div style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Actual Billed Cost</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Actual Billed Spend</span>
+              <span style={{ fontSize: "10px", color: "#4ade80", background: "rgba(74, 222, 128, 0.1)", padding: "1px 5px", borderRadius: "3px" }}>Observed</span>
+            </div>
             <div style={{ fontSize: "18px", fontWeight: 700, color: "#4ade80", marginTop: "4px" }}>$23.52</div>
-            <div style={{ fontSize: "11px", color: "#71717a" }}>Observed provider spend</div>
+            <div style={{ fontSize: "11px", color: "#71717a" }}>239 production batches billed</div>
           </div>
 
           <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <div style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Net Cache Savings</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Cache Hit Rate</span>
+              <span style={{ fontSize: "10px", color: "#60a5fa", background: "rgba(96, 165, 250, 0.1)", padding: "1px 5px", borderRadius: "3px" }}>Derived</span>
+            </div>
+            <div style={{ fontSize: "18px", fontWeight: 700, color: "#60a5fa", marginTop: "4px" }}>97.35%</div>
+            <div style={{ fontSize: "11px", color: "#71717a" }}>Hit tokens ÷ (Hit + Miss)</div>
+          </div>
+
+          <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#a1a1aa", fontSize: "11px", textTransform: "uppercase", fontWeight: 600 }}>Modeled Savings</span>
+              <span style={{ fontSize: "10px", color: "var(--amber-text, #f0c965)", background: "rgba(240, 201, 101, 0.1)", padding: "1px 5px", borderRadius: "3px" }}>Derived</span>
+            </div>
             <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--amber-text, #f0c965)", marginTop: "4px" }}>$567.06 (96%)</div>
-            <div style={{ fontSize: "11px", color: "#71717a" }}>vs $590.57 counterfactual</div>
+            <div style={{ fontSize: "11px", color: "#71717a" }}>vs $590.57 modeled no-cache</div>
+          </div>
+        </div>
+
+        {/* Explicit Calculation Chain Breakdown */}
+        <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "8px", padding: "12px", marginBottom: "16px", fontSize: "12.5px" }}>
+          <div style={{ fontWeight: 600, color: "#f4f4f5", marginBottom: "6px" }}>
+            Audit Calculation Chain:
+          </div>
+          <div style={{ color: "#d4d4d8", lineHeight: "1.5" }}>
+            <code>1.848B tokens observed ($23.52 billed)</code> ──► <code>Modeled no-cache equivalent ($590.57)</code> ──► <code>Net derived savings = $567.06 (96.0%)</code>
           </div>
         </div>
 

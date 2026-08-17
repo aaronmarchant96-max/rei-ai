@@ -46,4 +46,39 @@ describe("TelemetryCapsule.jsx & TraceStepper.jsx (Evidence Invariant Tests)", (
     expect(screen.getByText("Rule: DAS-RULE-42")).toBeInTheDocument();
     expect(screen.getByText("Rule: Not recorded in trace")).toBeInTheDocument();
   });
+
+  it("ADVERSARIAL/PATHOLOGICAL SCENARIO: Degrades gracefully with zero manufactured values", () => {
+    const pathologicalEvidence = buildRequestEvidence({
+      requestId: "pathological-001",
+      routerDecision: { model: "unknown-custom-model" },
+      rawTrace: [],
+      usage: null,
+      responseText: null,
+      redTeamResult: null,
+    });
+
+    // Directly override routeTrace to simulate completely empty trace stream
+    pathologicalEvidence.routeTrace = [];
+
+    render(<TelemetryCapsule evidence={pathologicalEvidence} />);
+
+    // 1. Model is displayed truthfully
+    expect(screen.getByText("unknown-custom-model")).toBeInTheDocument();
+
+    // 2. Cost displays "Cost unavailable" and NEVER $0.00
+    expect(screen.getByText("Cost unavailable")).toBeInTheDocument();
+    expect(screen.queryByText("$0.00")).not.toBeInTheDocument();
+    expect(screen.queryByText("0.00%")).not.toBeInTheDocument();
+
+    // 3. No bogus Flagship Equivalent or Savings rendered
+    expect(screen.queryByText(/Flagship equiv:/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Saved/i)).not.toBeInTheDocument();
+
+    // 4. No bogus Cache Hit badge rendered
+    expect(screen.queryByText(/Cache Hit/i)).not.toBeInTheDocument();
+
+    // 5. TraceStepper with empty trace displays graceful fallback
+    const { container: stepperContainer } = render(<TraceStepper routeTrace={[]} />);
+    expect(screen.getByText("No runtime trace recorded for this request.")).toBeInTheDocument();
+  });
 });
