@@ -95,7 +95,7 @@ describe("Red Team Eval — attack corpus → scanner → router → routeCorrec
     const direct = results.find((r) => r.id === "direct-injection");
     expect(direct).toBeTruthy();
     expect(direct.wasAdversarialRoute).toBe(true);
-    expect(direct.scanVerdict).toBe("high-risk");
+    expect(direct.scanVerdict).toBe("critical");
     expect(direct.scanEscalated).toBe(true);
     expect(direct.routeCorrect).toBe(true);
     // The live eval loop caught this as routeCorrect=false before the

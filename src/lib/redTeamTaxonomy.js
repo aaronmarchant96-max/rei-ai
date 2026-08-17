@@ -799,6 +799,73 @@ export const PROXIMITY_PATTERNS = [
   }
 ];
 
+// ── Structural Attack Grammar & Semantic Patterns ────────────────────────────
+// Structural regexes detect invariant attack templates across infinite paraphrases:
+// 1. Procedural Security Evasion: [Evasion Verb] + [Security/Compliance Gate Noun]
+// 2. Unverified Authority Pretexting: [Authority Role] + [Informal/Verbal Claim] + [Approval]
+// 3. System Prompt Extraction Paraphrase: [Extraction Verb] + [Internal/Foundational] + [System/Rules Noun]
+// 4. Virtualized Persona Jailbreak: [Roleplay Directive] + [Unrestricted/God Mode]
+// 5. Credential Exfiltration Harvesting: [Request Verb] + [Secret/Key/Token Noun]
+
+export const STRUCTURAL_ATTACK_PATTERNS = [
+  {
+    pattern: /\b(?:skip|bypass|omit|waive|drop|ignore|override|circumvent|disregard|without|leave\s+out)\b[^.?!;]{1,40}\b(?:verification|approval|auth(?:entication)?|2fa|mfa|check|confirmation|compliance|clearance|ticket|logging|audit|sign-?off|permission|procedure|gate|protocol)\b/i,
+    category: "policy_bypass",
+    label: "Policy Bypass (Procedural Evasion)",
+    severity: "high",
+    weight: 0.95,
+    riskImpact: "Attempt to bypass procedural verification, authentication, or compliance checks via directive evasion."
+  },
+  {
+    pattern: /\b(?:verification|approval|auth(?:entication)?|2fa|mfa|check|confirmation|compliance|clearance|ticket|logging|audit|sign-?off|permission|procedure|gate|protocol)\b[^.?!;]{1,30}\b(?:is\s+not\s+needed|not\s+required|optional|unnecessary|can\s+be\s+skipped|can\s+be\s+bypassed|was\s+waived|is\s+waived|skip\s+it)\b/i,
+    category: "policy_bypass",
+    label: "Policy Bypass (Gate Dismissal)",
+    severity: "high",
+    weight: 0.95,
+    riskImpact: "Attempt to declare a security or verification gate unnecessary or waived."
+  },
+  {
+    pattern: /\b(?:manager|supervisor|director|vp|boss|admin|executive|legal|compliance|lead|customer|client|user)\b[^.?!;]{1,35}\b(?:verbally|over\s+the\s+phone|via\s+slack|in\s+chat|offline|informally|already|directly|orally)\b[^.?!;]{1,35}\b(?:approved|authorized|permitted|cleared|signed\s+off|consented|agreed)\b/i,
+    category: "social_engineering",
+    label: "Social Engineering (Unverified Authority)",
+    severity: "high",
+    weight: 0.9,
+    riskImpact: "Manufactured informal authority claim to coerce privileged or unverified actions."
+  },
+  {
+    pattern: /\b(?:manager|supervisor|director|vp|boss|admin|executive|legal|compliance|lead)\b[^.?!;]{1,25}\b(?:already\s+approved|verbally\s+approved|said\s+it(?:'s|\s+is)\s+ok|authorized\s+this|gave\s+permission|waived\s+this)\b/i,
+    category: "social_engineering",
+    label: "Social Engineering (Pretexted Approval)",
+    severity: "high",
+    weight: 0.9,
+    riskImpact: "Manufactured verbal or informal approval pretexting from an authority figure."
+  },
+  {
+    pattern: /\b(?:output|display|print|reveal|show|dump|echo|expose|leak|repeat|transcribe|read\s+out|provide)\b[^.?!;]{1,45}\b(?:exact|initial|hidden|first\s+\d+|raw|full|true|internal|foundational|original|core|starting|system)\b[^.?!;]{1,35}\b(?:prompt|message|instructions?|rules?|programming|configuration|guidelines?|constraints?|guardrails?|directives?)\b/i,
+    category: "system_prompt_extraction",
+    label: "System Prompt Extraction (Semantic Paraphrase)",
+    severity: "critical",
+    weight: 1.0,
+    riskImpact: "Attempt to extract system instructions or foundational prompts via semantic paraphrase."
+  },
+  {
+    pattern: /\b(?:you\s+are\s+now|pretend\s+to\s+be|simulate|act\s+as|roleplay\s+as|assume\s+the\s+role\s+of|switch\s+to|operate\s+as)\b[^.?!;]{1,35}\b(?:unrestricted|unfiltered|uncensored|dan|jailbroken|god\s+mode|root|developer\s+mode|chaos|evil)\b/i,
+    category: "roleplay_jailbreak",
+    label: "Roleplay Jailbreak (Virtualized Persona)",
+    severity: "high",
+    weight: 0.9,
+    riskImpact: "Virtualization or persona shift designed to disable safety boundaries."
+  },
+  {
+    pattern: /\b(?:give\s+me|send\s+me|show\s+me|what\s+is|what\s+are|provide|reveal|leak|export)\b[^.?!;]{1,35}\b(?:your|the|internal|admin|secret|hidden|environment|system)\b[^.?!;]{1,35}\b(?:api\s*key|api\s*token|password|auth\s*token|credential|secret\s*key|private\s*key|bearer\s*token)\b/i,
+    category: "credential_leakage",
+    label: "Credential Leakage (Secret Harvesting)",
+    severity: "critical",
+    weight: 1.0,
+    riskImpact: "Direct harvesting of credentials, API tokens, or secrets."
+  }
+];
+
 function keywordMatch(normalizedInput, keyword) {
   const key = String(keyword).toLowerCase();
   if (!key) {
@@ -854,7 +921,33 @@ export function getCategoryByKeyword(input) {
     }
   }
 
-  // 2. Regex pattern matching (obfuscation detection)
+  // 2. Structural Semantic Pattern Matching (Invariant Attack Templates)
+  for (const structPattern of STRUCTURAL_ATTACK_PATTERNS) {
+    const match = normalizedInput.match(structPattern.pattern);
+    if (match) {
+      const excerpt = match[0].trim();
+      const existingMatch = matches.find(m => m.category === structPattern.category);
+      if (existingMatch) {
+        existingMatch.score += structPattern.weight;
+        existingMatch.matchedKeywords.push(excerpt);
+        if (!existingMatch.riskImpact && structPattern.riskImpact) {
+          existingMatch.riskImpact = structPattern.riskImpact;
+        }
+      } else {
+        matches.push({
+          category: structPattern.category,
+          label: structPattern.label,
+          severity: structPattern.severity,
+          riskImpact: structPattern.riskImpact,
+          score: structPattern.weight,
+          matchedKeywords: [excerpt],
+          matchType: "structural_pattern"
+        });
+      }
+    }
+  }
+
+  // 3. Regex pattern matching (obfuscation detection)
   for (const regexPattern of OBFUSCATION_PATTERNS) {
     const regex = new RegExp(regexPattern.pattern, "gi");
     const obfMatches = normalizedInput.match(regex);
@@ -877,7 +970,7 @@ export function getCategoryByKeyword(input) {
     }
   }
 
-  // 3. Phrase proximity matching
+  // 4. Phrase proximity matching
   for (const proxPattern of PROXIMITY_PATTERNS) {
     const words = normalizedInput.split(/\s+/);
     for (let i = 0; i < words.length; i++) {
@@ -891,7 +984,7 @@ export function getCategoryByKeyword(input) {
           backWindow.some(w => w.includes(t)) || forwardWindow.some(w => w.includes(t))
         );
         if (targetMatch) {
-          const existingMatch = matches.find(m => m.category === `proximity_${proxPattern.label?.replace("proximity_", "")}`);
+          const existingMatch = matches.find(m => m.category === proxPattern.label);
           if (existingMatch) {
             existingMatch.score += proxPattern.weight;
             existingMatch.matchedKeywords.push(`${termMatch}...${targetMatch}`);
