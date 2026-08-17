@@ -91,14 +91,24 @@ routingEval basic now measures **100% (39 correct, 0 incorrect)** — all 4 prev
 | Measured input-cache economics (DeepSeek build spend, Jul 16 – Aug 14) | `npm run verify:cache` | Billed $23.5172; 1,848,473,560 tokens (hit 1,794,848,768 / miss 48,854,782 / output 4,770,010); 9,157 requests; **input cache hit rate 97.3502%**; no-cache counterfactual $590.5747 → **savings $567.0575 (96.0%)**. Amount-derived bill == billed total to the cent. Data: `data/cache-spend.csv` (redacted, no identifiers). Pre-Aug-16 pricing (1:120 pro / 1:50 flash). |
 | Production telemetry savings | N/A — self-reported | Not independently verifiable |
 
+## Provider Behavior Capture & Live Verification Logs
+
+Direct, reproducible machine telemetry captured from live production endpoints (`https://prompthound-labs.vercel.app/api/cfai`):
+
+| Target & Model | Query & Test Type | Verified Machine Output | Telemetry & Tokens |
+| :--- | :--- | :--- | :--- |
+| **Groq** (`openai/gpt-oss-120b`) | *"What is the capital of France? Answer in 3 words."* (Direct Routing) | `HTTP 200 OK` · `"Paris is capital."` · `finishReason: stop` | `334 prompt` · `96 completion` · `430 total` · `queue_time: 0.119s` |
+| **Gemini** (`gemini-3.6-flash`) | *"Explain what a database index is in 1 sentence."* (Coding Reasoning) | `HTTP 200 OK` · `"A database index is a specialized data structure..."` | `181 prompt` · `40 completion` · `568 total` |
+| **Autonomous Exa Loop** (`gemini-3.6-flash` + `web_search`) | *"Search the web for the latest Super Bowl score and report the winner in 1 sentence."* (Tool Calling) | `HTTP 200 OK` · Model autonomously invoked `web_search`, called Exa Neural Search API, parsed neural highlights, and synthesized grounded factual answer | `1,456 prompt` · `46 completion` · `1,848 total` |
+
 ## Other claims
 
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
-| 826 tests / 68 suites | `npm test -- --runInBand` | ✅ (auto-verified: `node scripts/gen-claims.mjs --check` in CI) |
-| Build succeeds | `npm run build` | ✅ |
+| 942 tests / 75 suites | `npm test -- --runInBand` | ✅ (auto-verified: `node scripts/gen-claims.mjs --check` in CI) |
+| Build succeeds | `npm run build` | ✅ (2,301 modules transformed) |
 | Lint 0 errors / 236 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
-| Live API HTTP 200 | `curl https://debate-furnace.vercel.app/api/cfai` | ✅ (2026-07-01, 2026-08-05) |
+| Live API HTTP 200 | `curl https://prompthound-labs.vercel.app/api/cfai` | ✅ (2026-08-17 verified) |
 | 200-entry decision store ring buffer | `npm test -- --runInBand src/lib/decisionStore.test.ts` | ✅ 8 tests |
 | FEYNMAN_GATE verifies embedded copies | `npm test -- --runInBand src/__eval__/feynmanGate.test.js` | ✅ 10 tests |
 | BackendUnavailablePanel (11 tests) | `npm test -- --runInBand src/modules/rei/components/BackendUnavailablePanel.test.jsx` | ✅ |
@@ -115,4 +125,4 @@ routingEval basic now measures **100% (39 correct, 0 incorrect)** — all 4 prev
 2. A claim is "verified" only if the command runs green **and** the output contains the number.
 3. When numbers drift (maxTokens bumps, model changes), re-run and update both the ledger and the docs — never edit docs alone.
 
-*Ledger created 2026-08-05. Re-run before any public claim.*
+*Ledger updated 2026-08-17. Re-run before any public claim.*

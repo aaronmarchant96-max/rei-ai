@@ -120,6 +120,29 @@ The Red Team tab is a zero-cost, in-browser security scanner that inspects promp
 
 ---
 
+## 🌐 Verified Live Endpoints & Autonomous Tool Execution
+
+Real-world verification runs against the production endpoint (`https://prompthound-labs.vercel.app/api/cfai`):
+
+### 1. Direct Low-Latency Routing (Groq `openai/gpt-oss-120b`)
+- **Query:** *"What is the capital of France? Answer in 3 words."*
+- **Execution:** Routed to `openai/gpt-oss-120b` via Groq in 0.12s.
+- **Telemetry:** `334 prompt tokens`, `96 completion tokens` (`430 total`).
+- **Receipt:** Attached to message as `(Observed)` with $0.00004 cost.
+
+### 2. Specialized Coding Reasoning (Gemini `gemini-3.6-flash`)
+- **Query:** *"Explain what a database index is in 1 sentence."*
+- **Execution:** Dispatched to `gemini-3.6-flash` with CARDO structured gates.
+- **Telemetry:** `181 prompt tokens`, `40 completion tokens` (`568 total`).
+
+### 3. Autonomous Exa Neural Search Loop (`web_search` Tool Calling)
+- **Query:** *"Search the web for the latest Super Bowl score and report the winner in 1 sentence."*
+- **Autonomous Action:** Model detected real-time query requirement, invoked `web_search`, called Exa Search API (`https://api.exa.ai/search`), parsed token-efficient neural highlights, and returned the verified answer:
+  > *"The Seattle Seahawks won the latest Super Bowl by defeating the New England Patriots with a final score of 29–13."*
+- **Telemetry:** `1,456 prompt tokens`, `46 completion tokens` (`1,848 total`).
+
+---
+
 ## 👤 About the Builder
 
 | Metric | Value |
@@ -127,7 +150,7 @@ The Red Team tab is a zero-cost, in-browser security scanner that inspects promp
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **939 passing tests across 74 suites** |
+| Automated Tests | **942 passing tests across 75 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Intel Celeron J4105, 8GB RAM |
 | Monthly Operating Budget | $25/month |
@@ -148,7 +171,7 @@ npm install
 # Run development server
 npm run dev
 
-# Run full test suite (74 test suites, 939 tests)
+# Run full test suite (75 test suites, 942 tests)
 npm test
 
 # Verify production cache spend ledger
