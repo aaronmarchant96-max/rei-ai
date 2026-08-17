@@ -477,9 +477,8 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
 
   const candidateModels = [
     modelOverride,
-    "openai/gpt-oss-120b",
-    "llama-3.1-8b-instant",
     "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
     "qwen/qwen3.6-27b",
   ].filter(Boolean);
 
@@ -874,7 +873,9 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
     ];
   }
 
-  const maxTokens = routerDecision?.maxTokens || 2048;
+  const isGreeting = routerDecision?.id === "simple-greeting";
+  const maxTokens = Math.max(routerDecision?.maxTokens || 2048, isGreeting ? 200 : 50);
+  const toolsToPass = isGreeting ? null : AVAILABLE_TOOLS;
   const primaryModel = routerDecision?.model || "deepseek-v4-flash";
   const primaryBackend = getBackendForModel(primaryModel);
   const temperature = routerDecision?.temperature ?? 0.7;
@@ -887,11 +888,11 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   // Map of available backends (each accepts an optional message override so
   // the continuation & tool loops can re-call the SAME backend with appended turns)
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxTokens, temperature, AVAILABLE_TOOLS); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature, AVAILABLE_TOOLS); };
-  if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs) { return callGLM(msgs || messages, maxTokens, temperature, AVAILABLE_TOOLS); };
-  if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxTokens, groqModel, temperature, AVAILABLE_TOOLS); };
-  if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxTokens, temperature, AVAILABLE_TOOLS); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxTokens, temperature, toolsToPass); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature, toolsToPass); };
+  if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs) { return callGLM(msgs || messages, maxTokens, temperature, toolsToPass); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxTokens, groqModel, temperature, toolsToPass); };
+  if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxTokens, temperature, toolsToPass); };
 
   // Try primary backend first (unless in cooldown)
   if (primaryBackend && backends[primaryBackend]) {
