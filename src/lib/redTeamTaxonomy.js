@@ -266,7 +266,21 @@ export const RED_TEAM_CATEGORIES = {
       "waive the requirement",
       "skip the check",
       "bypass the check",
-      "ignore the restriction"
+      "ignore the restriction",
+      "skip the verification",
+      "skip verification",
+      "skip the verification step",
+      "skip the approval",
+      "skip approval",
+      "bypass the approval",
+      "bypass verification",
+      "already approved verbally",
+      "approved it verbally",
+      "verbally approved",
+      "verbal approval",
+      "process without verification",
+      "process without approval",
+      "process a refund now and skip"
     ],
     weight: 0.85,
     riskImpact: "Circumvents safety guardrails to generate content the system was designed to refuse."
@@ -729,10 +743,17 @@ export const OBFUSCATION_PATTERNS = [
 // Phrase proximity patterns — detect related terms within N words
 export const PROXIMITY_PATTERNS = [
   {
-    terms: ["ignore", "disregard", "forget", "override", "bypass"],
-    targets: ["instruction", "rule", "policy", "restriction", "constraint", "guideline", "training", "safety", "filter", "guardrail"],
+    terms: ["ignore", "disregard", "forget", "override", "bypass", "skip", "waive", "circumvent"],
+    targets: ["instruction", "rule", "policy", "restriction", "constraint", "guideline", "training", "safety", "filter", "guardrail", "verification", "approval", "compliance", "authorization"],
     maxDistance: 5,
-    label: "proximity_instruction_override",
+    label: "policy_bypass",
+    weight: 0.9
+  },
+  {
+    terms: ["skip", "waive", "bypass", "override", "ignore", "without"],
+    targets: ["verification", "approval", "check", "manager", "policy", "limit", "compliance", "authorization", "audit", "step"],
+    maxDistance: 6,
+    label: "policy_bypass",
     weight: 0.9
   },
   {
@@ -743,8 +764,8 @@ export const PROXIMITY_PATTERNS = [
     weight: 0.8
   },
   {
-    terms: ["developer", "admin", "creator", "built", "created", "trained", "management", "company"],
-    targets: ["says", "says to", "requests", "requires", "orders", "commands", "authorized", "permission"],
+    terms: ["developer", "admin", "creator", "built", "created", "trained", "management", "company", "manager", "supervisor"],
+    targets: ["says", "says to", "requests", "requires", "orders", "commands", "authorized", "permission", "approved", "allowed"],
     maxDistance: 5,
     label: "proximity_authority",
     weight: 0.85
