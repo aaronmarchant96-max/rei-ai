@@ -277,9 +277,10 @@ export async function executeWebSearch(query, numResults = 3) {
         },
         body: JSON.stringify({
           query: query,
+          type: "auto",
           numResults: limit,
           contents: {
-            text: { maxCharacters: 1200 }
+            highlights: true
           }
         }),
       });
@@ -292,11 +293,11 @@ export async function executeWebSearch(query, numResults = 3) {
           url: r.url,
           publishedDate: r.publishedDate || null,
           author: r.author || null,
-          snippet: (r.text || "").slice(0, 800),
+          highlights: Array.isArray(r.highlights) ? r.highlights.join("\n") : (r.text || "").slice(0, 800),
         }));
 
         return JSON.stringify({
-          engine: "Exa Neural Search (AI Gateway)",
+          engine: "Exa Neural Search",
           query,
           count: results.length,
           results,

@@ -43,7 +43,7 @@ describe("Exa Web Search & Tool Execution Integration", () => {
     const res = await executeWebSearch("AI copyright fair use", 3);
     const parsed = JSON.parse(res);
 
-    expect(parsed.engine).toBe("Exa Neural Search (AI Gateway)");
+    expect(parsed.engine).toBe("Exa Neural Search");
     expect(parsed.count).toBe(1);
     expect(parsed.results[0].title).toBe("AI Copyright Law Update 2026");
     expect(parsed.results[0].url).toBe("https://example.com/ai-copyright");
