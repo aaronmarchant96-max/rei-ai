@@ -15,7 +15,14 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
     }
   };
 
-  const isAssistantStructuredReply = selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback;
+  const isSystemNotice = Boolean(
+    msg.isSystemNotice ||
+    !msg.text ||
+    msg.text.startsWith("System initialized") ||
+    msg.text.startsWith("[REI.AI NOTICE]")
+  );
+
+  const isAssistantStructuredReply = !isSystemNotice && selectedDomain === "assistant" && msg.sender === "rei" && !msg.rawJson?.fallback;
   const sections = isAssistantStructuredReply ? parseAssistantStyleReply(msg.text) : null;
   const hasHinge = sections?.Hinge && sections.Hinge.trim();
   const hasFacts = sections?.Facts && sections.Facts.trim();
@@ -26,8 +33,9 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
   const isStructured = hasHinge || hasFacts || hasAssumptions || hasEval || hasChange || hasMove;
 
   const evidence = useMemo(() => {
-    if (msg.sender !== "rei") return null;
+    if (msg.sender !== "rei" || isSystemNotice) return null;
     if (msg.evidence) return msg.evidence;
+    if (!msg.rawJson?.routerDecision && !msg.rawJson?.model) return null;
     return buildRequestEvidence({
       requestId: msg.rawJson?.requestId || msg.requestId,
       timestamp: msg.timestamp || msg.rawJson?.timestamp,
@@ -37,7 +45,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
       responseText: msg.text,
       redTeamResult: msg.rawJson?.redTeamResult,
     });
-  }, [msg]);
+  }, [msg, isSystemNotice]);
 
   const exportPayload = {
     sections,
@@ -59,7 +67,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
         </div>
       )}
 
-      {msg.sender === "rei" && evidence && (
+      {msg.sender === "rei" && !isSystemNotice && evidence && (
         <TelemetryCapsule evidence={evidence} />
       )}
 
@@ -148,7 +156,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                   </div>
                 )}
 
-                {msg.sender === "rei" && (
+                {msg.sender === "rei" && !isSystemNotice && evidence && isStructured && (
                   <CardoComparisonToggle
                     responseText={msg.text}
                     sections={sections}
@@ -161,18 +169,11 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
         ) : (
           <div>
             <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>
-            {msg.sender === "rei" && evidence && (
-              <CardoComparisonToggle
-                responseText={msg.text}
-                sections={null}
-                verificationSignals={evidence.verificationSignals}
-              />
-            )}
           </div>
         )}
 
         {/* Collapsible Telemetry Dropdown */}
-        {msg.rawJson && (
+        {msg.rawJson && !isSystemNotice && (
           <details style={{ marginTop: "14px", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "8px" }}>
             <summary style={{ fontSize: "11.5px", color: "var(--text-muted)", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
               🔍 View Night Shift Routing Telemetry ({msg.rawJson.routerDecision?.model || "auto"})
@@ -190,27 +191,14 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Est. cost:</span> ${msg.rawJson.routerDecision?.estimatedCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Premium cost:</span> ${msg.rawJson.routerDecision?.premiumCost?.toFixed(4) || "—"}</div>
               <div className="rei-router-panel__item"><span className="rei-router-panel__label">Savings:</span> {msg.rawJson.routerDecision?.premiumCost > 0
-                ? Math.round((1 - msg.rawJson.routerDecision.estimatedCost / msg.rawJson.routerDecision.premiumCost) * 100) + "% vs gpt-4o"
+                ? `${Math.round((1 - (msg.rawJson.routerDecision.estimatedCost || 0) / msg.rawJson.routerDecision.premiumCost) * 100)}%`
                 : "—"}</div>
             </div>
           </details>
         )}
 
-        <div className="rei-bubble-actions">
-          {onExport && isStructured && (
-            <button
-              type="button"
-              onClick={() => onExport(exportPayload)}
-              className="rei-copy-btn touch-target"
-              aria-label="Export Report decision"
-              onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-              onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-              title="Export Report decision"
-            >
-              Export Report
-            </button>
-          )}
-
+        {/* Bubble Bottom Actions */}
+        <div style={{ position: "absolute", bottom: "10px", right: "12px", display: "flex", gap: "6px" }}>
           <button
             onClick={() => handleCopy(msg.text)}
             className="rei-copy-btn touch-target"
@@ -221,7 +209,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
           >
             {copied ? "Copied ✓" : "Copy"}
           </button>
-          {msg.sender === "rei" && (() => {
+          {msg.sender === "rei" && !isSystemNotice && (() => {
             const s = parseAssistantStyleReply(msg.text);
             if (!s.Hinge && !s.Facts) return null;
             const report = [
@@ -247,13 +235,13 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                   {copied ? "Copied ✓" : "Report"}
                 </button>
                 <button
-                  onClick={() => onExport && onExport({ sections: s, routerDecision: msg.rawJson?.routerDecision, timestamp: msg.timestamp })}
+                  onClick={() => onExport && onExport({ sections: s, routerDecision: msg.rawJson?.routerDecision, timestamp: msg.timestamp, domainLabel })}
                   className="rei-copy-btn touch-target"
-                  aria-label="Export Report decision document"
+                  aria-label="Export Report decision"
                   style={{ fontSize: "9px" }}
                   onMouseOver={(e) => e.currentTarget.style.opacity = 1}
                   onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
-                  title="Download CARDO decision report"
+                  title="Export Report decision"
                 >
                   📄 Export Report
                 </button>
