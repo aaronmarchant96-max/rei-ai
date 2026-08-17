@@ -864,7 +864,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
         content: msg.content,
       };
     });
-    const toolDirective = "\n\n[CAPABILITIES & TOOLS]: You have access to the fetch_url tool. When the user provides a web URL (such as a GitHub repository link, website, article, or documentation) or asks to inspect/review an online resource, call fetch_url to retrieve and review the live content directly rather than saying you cannot access the link.";
+    const toolDirective = "\n\n[CAPABILITIES & TOOLS]: You have access to two autonomous tools:\n1. web_search: Searches the live web via Exa neural search. Use it whenever you need authentic historical facts, real-world locations, period details, technical terminology, current events, or lore to ground your response.\n2. fetch_url: Fetches and reads live web pages or GitHub repository documentation from URLs.\nAlways execute tool calls directly when real-world facts or links are relevant.";
     const activeSystemPrompt = (systemPrompt || REI_SYSTEM_PROMPT) + toolDirective;
     messages = [
       { role: "system", content: activeSystemPrompt },
