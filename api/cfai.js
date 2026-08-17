@@ -240,7 +240,17 @@ export async function executeFetchUrl(rawUrl) {
 
       const text = await res.text();
       const cleanContent = cleanHtmlToText(text);
-      return JSON.stringify({ url: parsedUrl.href, content: cleanContent });
+      return JSON.stringify({
+        provider: "direct_fetch",
+        transport: "direct_api",
+        url: parsedUrl.href,
+        content: cleanContent,
+        results: [{
+          title: parsedUrl.hostname,
+          url: parsedUrl.href,
+          snippet: cleanContent.slice(0, 350),
+        }]
+      });
     }
 
     return JSON.stringify({ error: "Too many redirects." });
@@ -287,16 +297,15 @@ export async function executeWebSearch(query, numResults = 3) {
 
       if (res.ok) {
         const data = await res.json();
-        const results = (data.results || []).map((r, i) => ({
-          index: i + 1,
+        const results = (data.results || []).slice(0, 3).map((r, i) => ({
           title: r.title || "Untitled",
           url: r.url,
-          publishedDate: r.publishedDate || null,
-          author: r.author || null,
-          highlights: Array.isArray(r.highlights) ? r.highlights.join("\n") : (r.text || "").slice(0, 800),
+          highlights: Array.isArray(r.highlights) ? r.highlights.join(" ").slice(0, 350) : (r.text || "").slice(0, 350),
         }));
 
         return JSON.stringify({
+          provider: "exa",
+          transport: "direct_api",
           engine: "Exa Neural Search",
           query,
           count: results.length,
@@ -320,11 +329,18 @@ export async function executeWebSearch(query, numResults = 3) {
 
     if (res.ok) {
       const html = await res.text();
-      const cleanSnippet = cleanHtmlToText(html).slice(0, 2000);
+      const cleanSnippet = cleanHtmlToText(html).slice(0, 1000);
       return JSON.stringify({
-        engine: "Web Search Fallback",
+        provider: "duckduckgo",
+        transport: "direct_api",
+        engine: "DuckDuckGo HTML Fallback",
         query,
-        summary: cleanSnippet.slice(0, 1500),
+        count: 1,
+        results: [{
+          title: "DuckDuckGo Web Result",
+          url: ddgUrl,
+          snippet: cleanSnippet.slice(0, 350),
+        }],
       });
     }
   } catch (err) {
@@ -334,6 +350,8 @@ export async function executeWebSearch(query, numResults = 3) {
   }
 
   return JSON.stringify({
+    provider: "unavailable",
+    transport: "direct_api",
     engine: "web_search",
     query,
     error: "Web search query timed out or returned no results.",
@@ -489,7 +507,9 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
     const controller = new AbortController();
     const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
     try {
-      const payload = { model: model, messages: messages, temperature: temperature, max_tokens: maxTokens };
+      const hasToolsOrFollowUp = Array.isArray(messages) && messages.some(m => m.role === "tool" || m.tool_calls);
+      const effectiveMaxTokens = hasToolsOrFollowUp ? Math.min(maxTokens, 2048) : maxTokens;
+      const payload = { model: model, messages: messages, temperature: temperature, max_tokens: effectiveMaxTokens };
       if (tools && tools.length > 0) payload.tools = tools;
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
@@ -729,11 +749,38 @@ export function extractToolCalls(result) {
   return toolCalls.length > 0 ? toolCalls : null;
 }
 
-async function completeWithToolsAndContinuation(runBackend, messages, firstResult) {
+async function completeWithToolsAndContinuation(runBackend, messages, firstResult, routerDecision) {
   let currentResult = firstResult;
   let currentMessages = messages.slice();
   let toolRounds = 0;
   let accumulatedUsage = sumUsage(null, firstResult.usage);
+
+  const initialReason =
+    routerDecision?.domain === "coding"
+      ? "url_verification_required"
+      : routerDecision?.domain === "genealogy"
+      ? "external_source_required"
+      : routerDecision?.domain === "story"
+      ? "domain_grounding_required"
+      : "freshness_required";
+
+  const executedResearch = {
+    invoked: false,
+    status: "not_required",
+    provider: null,
+    transport: "direct_api",
+    reason: initialReason,
+    queries: [],
+    sources: [],
+    resultCount: 0,
+    budget: {
+      excerptCharacters: 0,
+      excerptTokensEstimated: 0,
+      tokenAccounting: "measured",
+      truncationApplied: false,
+    },
+    provenance: "observed",
+  };
 
   let activeToolCalls = extractToolCalls(currentResult);
 
@@ -780,6 +827,39 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
         output = JSON.stringify({ error: `Unknown tool: ${toolCall.function?.name}` });
       }
 
+      // Lossless multi-tool accumulation in exact execution order
+      let parsed = null;
+      try {
+        parsed = JSON.parse(output);
+      } catch {}
+
+      if (parsed) {
+        executedResearch.invoked = true;
+        executedResearch.status = "executed";
+        if (parsed.provider && parsed.provider !== "unavailable") {
+          executedResearch.provider = parsed.provider;
+        }
+        if (parsed.transport) {
+          executedResearch.transport = parsed.transport;
+        }
+        const recordedQuery = parsed.query || parsed.url || toolCall.function?.arguments;
+        if (recordedQuery && typeof recordedQuery === "string") {
+          executedResearch.queries.push(recordedQuery);
+        }
+        if (Array.isArray(parsed.results)) {
+          for (const s of parsed.results) {
+            executedResearch.sources.push({
+              title: s.title || "Untitled",
+              url: s.url || undefined,
+              publishedDate: s.publishedDate || null,
+              author: s.author || null,
+              highlights: s.highlights || s.snippet || undefined,
+              snippet: s.snippet || s.highlights || undefined,
+            });
+          }
+        }
+      }
+
       currentMessages = currentMessages.concat([
         {
           role: "tool",
@@ -799,14 +879,30 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
     activeToolCalls = extractToolCalls(currentResult);
   }
 
+  if (executedResearch.invoked) {
+    executedResearch.resultCount = executedResearch.sources.length;
+    const totalChars = executedResearch.sources.reduce(
+      (acc, s) => acc + ((s.highlights || s.snippet || "").length),
+      0
+    );
+    executedResearch.budget = {
+      excerptCharacters: totalChars,
+      excerptTokensEstimated: Math.round(totalChars / 4),
+      tokenAccounting: "estimated",
+      truncationApplied: false,
+    };
+  }
+
   if (currentResult?.truncated) {
     const contResult = await completeWithContinuation(runBackend, currentMessages, currentResult);
     contResult.usage = sumUsage(accumulatedUsage, contResult.usage);
+    contResult.research = executedResearch;
     return contResult;
   }
 
   if (currentResult) {
     currentResult.usage = accumulatedUsage;
+    currentResult.research = executedResearch;
   }
   return currentResult;
 }
@@ -814,12 +910,13 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
 function finalizeResult(result, runBackend, messages, modelLabel, routerDecision) {
   const toolCalls = extractToolCalls(result);
   if (toolCalls && toolCalls.length > 0) {
-    return completeWithToolsAndContinuation(runBackend, messages, result).then(function (done) {
+    return completeWithToolsAndContinuation(runBackend, messages, result, routerDecision).then(function (done) {
       return {
         content: done ? done.content : (result.content || ""),
         model: modelLabel,
         routerDecision: routerDecision,
         usage: done && done.usage ? done.usage : (result.usage || null),
+        research: done && done.research ? done.research : null,
         truncated: done ? (done.truncated || false) : false,
         finishReason: done ? (done.finishReason || null) : null,
         continuation: done && done.continuation ? done.continuation : { attempted: false, chunks: 1, truncatedChunks: 0, finalTruncated: false },
@@ -1013,6 +1110,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
         model: response.model,
         routerDecision: response.routerDecision || routerDecision,
         usage: response.usage || null,
+        research: response.research || null,
         truncated: response.truncated || false,
         finishReason: response.finishReason || null,
         continuation: response.continuation || { attempted: false, chunks: 1, truncatedChunks: 0, finalTruncated: false },

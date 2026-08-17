@@ -95,6 +95,57 @@ export default function WhyThisRouteModal({ evidence, onClose }) {
             </div>
           </div>
 
+          {evidence.research && evidence.research.invoked && (
+            <div style={{ background: "rgba(16, 185, 129, 0.05)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                <div style={{ color: "#34d399", fontSize: "11px", textTransform: "uppercase", fontWeight: 700, display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span>🌐</span>
+                  <span>External Research & Evidence ({evidence.research.provider || "web"})</span>
+                </div>
+                <span style={{ fontSize: "10px", color: "#10b981" }}>({evidence.research.provenance})</span>
+              </div>
+              <div style={{ fontSize: "12px", color: "#d4d4d8", marginBottom: "6px" }}>
+                <strong>Reason:</strong> {evidence.research.reason.replace(/_/g, " ")}
+              </div>
+              {evidence.research.queries.length > 0 && (
+                <div style={{ fontSize: "12px", color: "#a1a1aa", marginBottom: "6px" }}>
+                  <strong>Queries:</strong> {evidence.research.queries.map((q, i) => (
+                    <span key={i} style={{ background: "rgba(255,255,255,0.06)", padding: "1px 6px", borderRadius: "4px", margin: "0 4px", color: "#f4f4f5" }}>
+                      "{q}"
+                    </span>
+                  ))}
+                </div>
+              )}
+              {evidence.research.sources.length > 0 && (
+                <div style={{ display: "grid", gap: "4px", marginTop: "6px" }}>
+                  <div style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: 600 }}>Sources Retrieved ({evidence.research.resultCount}):</div>
+                  {evidence.research.sources.map((s, idx) => (
+                    <div key={idx} style={{ fontSize: "11.5px", padding: "4px 8px", background: "rgba(0,0,0,0.2)", borderRadius: "4px" }}>
+                      {s.url ? (
+                        <a href={s.url} target="_blank" rel="noreferrer" style={{ color: "#60a5fa", textDecoration: "none", fontWeight: 600 }}>
+                          🔗 {s.title || s.url}
+                        </a>
+                      ) : (
+                        <span style={{ color: "#e4e4e7" }}>📄 {s.title}</span>
+                      )}
+                      {(s.highlights || s.snippet) && (
+                        <div style={{ color: "#9ca3af", fontSize: "11px", marginTop: "2px", lineHeight: "1.3" }}>
+                          {(s.highlights || s.snippet).slice(0, 140)}...
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {evidence.research.budget && (
+                <div style={{ marginTop: "6px", fontSize: "10.5px", color: "#6ee7b7", display: "flex", gap: "12px" }}>
+                  <span>Excerpt: {evidence.research.budget.excerptCharacters} chars</span>
+                  <span>Estimated tokens: ~{evidence.research.budget.excerptTokensEstimated} ({evidence.research.budget.tokenAccounting})</span>
+                </div>
+              )}
+            </div>
+          )}
+
           {economics.counterfactual.costUsd != null && (
             <div style={{ background: "rgba(240, 201, 101, 0.05)", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(240, 201, 101, 0.15)" }}>
               <div style={{ color: "var(--amber-text, #f0c965)", fontSize: "11px", textTransform: "uppercase", fontWeight: 600, marginBottom: "4px" }}>

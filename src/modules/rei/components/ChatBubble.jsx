@@ -44,6 +44,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
       usage: msg.rawJson?.usage,
       responseText: msg.text,
       redTeamResult: msg.rawJson?.redTeamResult,
+      research: msg.rawJson?.research || msg.research,
     });
   }, [msg, isSystemNotice]);
 

@@ -87,6 +87,36 @@ export default function TelemetryCapsule({ evidence }) {
               🎯 {tokens.cacheHitRatePct}% Cache Hit
             </div>
           )}
+
+          {/* Research Invoked Badge */}
+          {evidence.research && evidence.research.invoked && (
+            <div
+              style={{
+                background: "rgba(16, 185, 129, 0.15)",
+                color: "#34d399",
+                padding: "1px 6px",
+                borderRadius: "4px",
+                fontSize: "11px",
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <span>🌐</span>
+              <span>
+                {evidence.research.provider === "exa"
+                  ? "Exa Research"
+                  : evidence.research.provider === "direct_fetch"
+                  ? "URL Fetch"
+                  : "Web Research"}{" "}
+                ({evidence.research.resultCount} sources)
+              </span>
+              {evidence.research.provenance === "observed" && (
+                <span style={{ fontSize: "10px", color: "#10b981", marginLeft: "2px" }}>(Observed)</span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action Controls */}

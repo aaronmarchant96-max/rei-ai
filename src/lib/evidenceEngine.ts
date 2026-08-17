@@ -12,6 +12,70 @@ import { getModelCosts, computeActualCost } from "./costHelpers";
 import { detectAISlop } from "./detectAISlop.js";
 
 export type EpistemicProvenance = "observed" | "derived" | "modeled" | "replayed" | "unavailable";
+export type ResearchStatus = "executed" | "not_required" | "unavailable";
+export type ResearchReason =
+  | "freshness_required"
+  | "external_source_required"
+  | "user_requested_research"
+  | "domain_grounding_required"
+  | "url_verification_required"
+  | "none";
+
+export interface ResearchSource {
+  title?: string;
+  url?: string;
+  publishedDate?: string | null;
+  author?: string | null;
+  highlights?: string;
+  snippet?: string;
+}
+
+export interface ResearchBudget {
+  excerptCharacters: number;
+  excerptTokensEstimated: number | null;
+  tokenAccounting: "measured" | "estimated" | "unavailable";
+  truncationApplied: boolean;
+}
+
+export interface ResearchEvidence {
+  invoked: boolean;
+  status: ResearchStatus;
+  provider?: "exa" | "duckduckgo" | "direct_fetch" | "unavailable" | string;
+  transport?: "direct_api" | "ai_gateway" | "browser" | string;
+  reason: ResearchReason;
+  queries: string[];
+  resultCount: number;
+  sources: ResearchSource[];
+  budget: ResearchBudget;
+  provenance: EpistemicProvenance;
+}
+
+export interface ResearchSourceInput {
+  title?: string;
+  url?: string;
+  publishedDate?: string | null;
+  author?: string | null;
+  highlights?: string;
+  snippet?: string;
+}
+
+export interface ResearchEvidenceInput {
+  invoked?: boolean;
+  status?: ResearchStatus | string;
+  provider?: string;
+  transport?: string;
+  reason?: ResearchReason | string;
+  queries?: string[];
+  resultCount?: number;
+  sources?: ResearchSourceInput[];
+  budget?: {
+    excerptCharacters?: number;
+    excerptTokensEstimated?: number | null;
+    tokenAccounting?: "measured" | "estimated" | "unavailable";
+    truncationApplied?: boolean;
+  };
+  provenance?: EpistemicProvenance;
+}
 
 export interface RouteTraceEvent {
   stageId: "red-team" | "intent-classification" | "complexity-scoring" | "model-selection" | "dispatch" | "verification" | string;
@@ -30,6 +94,8 @@ export interface RequestEvidence {
   model: string;
   
   routeTrace: RouteTraceEvent[];
+
+  research: ResearchEvidence;
 
   tokens: {
     inputTokens: number | null;
@@ -110,6 +176,7 @@ export interface BuildEvidenceInput {
     category?: string;
     [key: string]: any;
   } | null;
+  research?: ResearchEvidenceInput | null;
 }
 
 const GPT4O_RATES = {
@@ -215,12 +282,98 @@ export function buildRequestEvidence(input: BuildEvidenceInput): RequestEvidence
     cardoCompliant = slopCheck.verdict === "clean" || slopCheck.verdict === "minor";
   }
 
+  // 6. Normalize Research & External Evidence Telemetry (Lossless with respect to runtime telemetry)
+  let research: ResearchEvidence;
+  const rawResearch = input.research;
+
+  if (
+    rawResearch &&
+    (rawResearch.status === "executed" ||
+      rawResearch.invoked === true ||
+      (Array.isArray(rawResearch.queries) && rawResearch.queries.length > 0))
+  ) {
+    const queries = Array.isArray(rawResearch.queries)
+      ? rawResearch.queries.filter((q): q is string => typeof q === "string" && q.trim().length > 0)
+      : [];
+    const rawSources = Array.isArray(rawResearch.sources) ? rawResearch.sources : [];
+    const sources: ResearchSource[] = rawSources.map((s) => ({
+      title: s.title || "Untitled",
+      url: s.url || undefined,
+      publishedDate: s.publishedDate || null,
+      author: s.author || null,
+      highlights: s.highlights || s.snippet || undefined,
+      snippet: s.snippet || s.highlights || undefined,
+    }));
+
+    const rawBudget = rawResearch.budget;
+    const excerptCharacters =
+      typeof rawBudget?.excerptCharacters === "number"
+        ? rawBudget.excerptCharacters
+        : sources.reduce((acc, s) => acc + (s.highlights?.length || s.snippet?.length || 0), 0);
+    const excerptTokensEstimated =
+      typeof rawBudget?.excerptTokensEstimated === "number"
+        ? rawBudget.excerptTokensEstimated
+        : Math.round(excerptCharacters / 4);
+
+    research = {
+      invoked: true, // Invariant: status === "executed" -> invoked === true
+      status: "executed",
+      provider: rawResearch.provider || "exa",
+      transport: rawResearch.transport || "direct_api",
+      reason: (rawResearch.reason as ResearchReason) || "domain_grounding_required",
+      queries,
+      resultCount: typeof rawResearch.resultCount === "number" ? rawResearch.resultCount : sources.length,
+      sources,
+      budget: {
+        excerptCharacters,
+        excerptTokensEstimated,
+        tokenAccounting: rawBudget?.tokenAccounting || "estimated",
+        truncationApplied: Boolean(rawBudget?.truncationApplied),
+      },
+      provenance: rawResearch.provenance || "observed",
+    };
+  } else if (rawResearch && rawResearch.status === "unavailable") {
+    research = {
+      invoked: false, // Invariant: status !== "executed" -> invoked === false
+      status: "unavailable",
+      reason: "none",
+      queries: [],
+      resultCount: 0,
+      sources: [],
+      budget: {
+        excerptCharacters: 0,
+        excerptTokensEstimated: null,
+        tokenAccounting: "unavailable",
+        truncationApplied: false,
+      },
+      provenance: "unavailable",
+    };
+  } else {
+    // Default: research was not required for this request (observed)
+    research = {
+      invoked: false, // Invariant: status !== "executed" -> invoked === false
+      status: "not_required",
+      reason: "none",
+      queries: [],
+      resultCount: 0,
+      sources: [],
+      budget: {
+        excerptCharacters: 0,
+        excerptTokensEstimated: 0,
+        tokenAccounting: "measured",
+        truncationApplied: false,
+      },
+      provenance: "observed",
+    };
+  }
+
   return {
     requestId,
     timestamp,
     route,
     model,
     routeTrace,
+    research,
     tokens: {
       inputTokens: promptTokens,
       outputTokens: completionTokens,
