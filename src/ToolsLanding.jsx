@@ -154,9 +154,13 @@ export default function ToolsLanding({ onOpenTool }) {
           Your AI bill is leaking money — <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">quietly</span>.
         </h1>
         
-        <p className="relative text-[#EDEFF5] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-8 md:mb-10 leading-relaxed font-light z-10">
+        <p className="relative text-[#EDEFF5] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light z-10">
           Every request you send to an expensive model that a cheaper one could answer is money straight down the drain. REI routes each request to the right model — and shows you the receipt. No guessing, no claimed headline numbers.
         </p>
+
+        <div className="relative z-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#18181b] border border-[var(--amber)]/30 text-xs sm:text-sm text-[#EDEFF5] font-mono mb-8 max-w-2xl text-center shadow-lg">
+          🎯 Built for teams running multi-model stacks (OpenAI, Gemini, Groq, DeepSeek) who need cost control without losing reasoning quality.
+        </div>
 
         {/* The catch — what wrong routing actually costs */}
         <div className="relative z-10 w-full max-w-3xl mx-auto mb-7 md:mb-8">
@@ -191,9 +195,9 @@ export default function ToolsLanding({ onOpenTool }) {
 
         <button
           onClick={() => onOpenTool({ tool: "rei" })}
-          className="relative z-10 group flex items-center gap-2 bg-[var(--amber)] text-[#1A1300] px-7 md:px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.03] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300"
+          className="relative z-10 group flex items-center gap-2 bg-[var(--amber)] text-[#1A1300] px-6 sm:px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300 text-xs sm:text-sm"
         >
-          LAUNCH REI.AI <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
+          Launch REI.ai — Route a real request & see what you would have paid <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
         </button>
 
         <div className="relative z-10 flex items-center justify-center gap-3 mt-4">
@@ -507,21 +511,49 @@ export default function ToolsLanding({ onOpenTool }) {
         </p>
       </motion.section>
 
-      {/* ── 2.6. Why trust this? ── */}
+      {/* ── 2.6. Why trust this? (How REI differs from ChatGPT) ── */}
       <motion.section 
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
-        className="relative z-10 max-w-3xl mx-auto py-16 text-center"
+        className="relative z-10 max-w-4xl mx-auto py-16 px-4 text-center"
       >
-        <p className="text-[#E2E8F0] text-lg md:text-xl leading-relaxed font-light">
-          ChatGPT gives you an answer.<br/>
-          <span className="text-hinge-bright font-bold">REI.ai gives you the reasoning, the evidence, and what would change the conclusion.</span>
+        <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-3">
+          Architectural Difference
+        </div>
+        <h2 className="font-heading text-2xl md:text-4xl font-bold mb-4">
+          How REI.ai differs from ChatGPT
+        </h2>
+        <p className="text-[#94A3B8] text-sm md:text-base max-w-2xl mx-auto mb-8 font-light">
+          ChatGPT gives you an answer. <strong className="text-white font-medium">REI.ai gives you the reasoning, the evidence, and what would change the conclusion.</strong>
         </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+          <div className="bg-[#18181b]/90 border border-red-500/20 rounded-xl p-5 shadow-lg">
+            <div className="flex items-center gap-2 text-red-400 font-bold text-sm mb-3">
+              <span>❌</span> Standard Chatbot (e.g. ChatGPT)
+            </div>
+            <ul className="text-xs text-gray-400 space-y-3 leading-relaxed">
+              <li>• <strong>One-size-fits-all:</strong> Blindly sends simple queries to expensive flagship models at premium rates.</li>
+              <li>• <strong>Opaque answers:</strong> Produces confident outputs without separating verified facts from unproven assumptions.</li>
+              <li>• <strong>Unchecked slop:</strong> No client-side pre-flight checks against prompt injections, corporate padding, or AI hedging.</li>
+            </ul>
+          </div>
+          <div className="bg-[#18181b]/90 border border-[var(--amber)]/30 rounded-xl p-5 shadow-lg">
+            <div className="flex items-center gap-2 text-[var(--amber)] font-bold text-sm mb-3">
+              <span>⚡</span> REI.ai Cognitive Control System
+            </div>
+            <ul className="text-xs text-gray-300 space-y-3 leading-relaxed">
+              <li>• <strong>Deterministic routing:</strong> Routes to the cheapest capable model (-85.7% measured cost delta on representative workloads).</li>
+              <li>• <strong>Structured CARDO reasoning:</strong> Explicit epistemic provenance separating known facts, risks, and the decision hinge.</li>
+              <li>• <strong>Auditable receipts:</strong> Full execution trace, anti-slop gating, and reproducible verification telemetry.</li>
+            </ul>
+          </div>
+        </div>
         <a 
           href={`${REPO_URL}/blob/main/docs/CASE_STUDY.md`}
           target="_blank" rel="noopener noreferrer"
-          className="inline-block mt-5 text-sm text-[#94A3B8] hover:text-hinge-bright transition-colors underline underline-offset-4"
+          className="inline-block mt-8 text-sm text-[#94A3B8] hover:text-hinge-bright transition-colors underline underline-offset-4"
         >
-          See case studies →
+          See case studies & research evidence →
         </a>
       </motion.section>
 
@@ -565,11 +597,11 @@ export default function ToolsLanding({ onOpenTool }) {
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
         className="relative z-10 max-w-6xl mx-auto py-20 border-t-2 border-border"
       >
-        <div className="mb-12">
-          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">The Originals</div>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold">Domain Experiments</h2>
-          <p className="text-sm text-[#94A3B8] max-w-2xl mx-auto mt-4 leading-relaxed">
-            These were the first-place experiments that proved the CARDO pipeline across domains. REI.ai bundles them as specialized personas — not the other way around.
+        <div className="mb-12 text-center">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">Laboratory & Stress Tests</div>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold">Experiments & Benchmarks</h2>
+          <p className="text-sm text-[#94A3B8] max-w-2xl mx-auto mt-3 leading-relaxed">
+            <strong>REI.ai</strong> is the flagship multi-model router. <strong>Experiments</strong> are the domain lab stress tests, radar signal replays, and adversarial red-team proving grounds that validated the CARDO methodology.
           </p>
         </div>
 
