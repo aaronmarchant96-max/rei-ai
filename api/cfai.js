@@ -72,6 +72,27 @@ export const AVAILABLE_TOOLS = [
   {
     type: "function",
     function: {
+      name: "web_search",
+      description: "Searches the live web via Exa neural search for real-time information, breaking news, legal precedents, court rulings, documentation, benchmarks, and current facts.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The specific search query string to look up on the web."
+          },
+          num_results: {
+            type: "number",
+            description: "Number of top results to return (default 3, max 5)."
+          }
+        },
+        required: ["query"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
       name: "fetch_url",
       description: "Fetches and reads the text content of a public web page or document URL. Use when you need real-time data, web content, articles, or documentation from a specific link.",
       parameters: {
@@ -231,6 +252,92 @@ export async function executeFetchUrl(rawUrl) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+export async function executeWebSearch(query, numResults = 3) {
+  if (!query || typeof query !== "string") {
+    return JSON.stringify({ error: "Invalid or empty search query." });
+  }
+
+  const exaKey = (process.env.EXA_API_KEY || "").replace(/^"|"$/g, "").trim();
+  const limit = Math.min(Math.max(Number(numResults) || 3, 1), 5);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), URL_TIMEOUT_MS);
+
+  // 1. Primary: Exa Neural Search (AI Gateway)
+  if (exaKey) {
+    try {
+      const res = await fetch("https://api.exa.ai/search", {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "x-api-key": exaKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: query,
+          numResults: limit,
+          contents: {
+            text: { maxCharacters: 1200 }
+          }
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const results = (data.results || []).map((r, i) => ({
+          index: i + 1,
+          title: r.title || "Untitled",
+          url: r.url,
+          publishedDate: r.publishedDate || null,
+          author: r.author || null,
+          snippet: (r.text || "").slice(0, 800),
+        }));
+
+        return JSON.stringify({
+          engine: "Exa Neural Search (AI Gateway)",
+          query,
+          count: results.length,
+          results,
+        });
+      }
+    } catch (err) {
+      console.warn("Exa Search error, falling back:", err?.message || err);
+    }
+  }
+
+  // 2. Resilient Fallback: DuckDuckGo HTML Instant Search
+  try {
+    const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    const res = await fetch(ddgUrl, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 REI-Bot/1.0"
+      }
+    });
+
+    if (res.ok) {
+      const html = await res.text();
+      const cleanSnippet = cleanHtmlToText(html).slice(0, 2000);
+      return JSON.stringify({
+        engine: "Web Search Fallback",
+        query,
+        summary: cleanSnippet.slice(0, 1500),
+      });
+    }
+  } catch (err) {
+    console.warn("Web search fallback error:", err?.message || err);
+  } finally {
+    clearTimeout(timer);
+  }
+
+  return JSON.stringify({
+    engine: "web_search",
+    query,
+    error: "Web search query timed out or returned no results.",
+    results: []
+  });
 }
 
 // ── Per-backend callers ──
@@ -651,7 +758,17 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
 
     for (const toolCall of activeToolCalls) {
       let output = "";
-      if (toolCall.function?.name === "fetch_url") {
+      if (toolCall.function?.name === "web_search") {
+        let args = {};
+        try {
+          args = typeof toolCall.function.arguments === "string"
+            ? JSON.parse(toolCall.function.arguments)
+            : (toolCall.function.arguments || {});
+        } catch {
+          args = {};
+        }
+        output = await executeWebSearch(args.query, args.num_results);
+      } else if (toolCall.function?.name === "fetch_url") {
         let args = {};
         try {
           args = typeof toolCall.function.arguments === "string"
