@@ -1,13 +1,24 @@
 # REI.ai — Smart AI Routing & Structured Reasoning
 
-> **"The future of AI isn't just about better models — it's about better systems."**
->
+> **"You're not just saving money. You're building better, faster."**
+> 
+> *Route each task to the right model, verify the result, and keep the evidence.*
+> 
 > Built by a self-taught developer who started building AI systems in 2026.
 > No CS degree. No tech background. Just a $25/month budget, an Intel Celeron J4105 with 8GB RAM, and a question: *can one person build something real in AI this year?*
 
-REI.ai is the answer — a smart, budget-friendly AI orchestration platform that inspects prompts locally and routes each request to the cheapest model capable of producing high-quality reasoning.
+REI.ai is the answer — a deterministic AI orchestration platform that inspects prompts locally and routes each request to the cheapest model capable of producing high-quality reasoning.
 
-Backed by **930 automated unit tests across 71 test suites**, REI.ai enforces measurable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
+Backed by **939 automated unit tests across 74 test suites**, REI.ai enforces verifiable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
+
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          THE REI.AI EVIDENCE LOOP                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Give us a request ──► Watch what we do ──► Inspect why we did it ──►        │
+│                       See what it cost  ──► Verify the claim                │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -15,12 +26,13 @@ Backed by **930 automated unit tests across 71 test suites**, REI.ai enforces me
 
 **What this is:**
 - **A Deterministic AI Router:** Inspects prompt semantics locally and routes to the cheapest capable model. Cost savings are cleanly decomposed into *provider-price optimization* and *free-tier capacity*, reported separately, and stress-tested across model pricing landscapes. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for exact benchmark numbers and producing commands.
+- **Evidence & Provenance Architecture:** Emits canonical `RequestEvidence` objects downstream of execution with explicit epistemic tiers (`observed`, `derived`, `modeled`, `replayed`, `unavailable`). Missing telemetry renders "Evidence unavailable" — zero substitution of `$0.00`.
 - **Prompt-Freeze & Deterministic Caching:** Sustains a 90%+ prompt cache hit rate across LLM providers (Gemini caching discounts, DeepSeek prompt caching) by freezing prefix order and generating deterministic cache keys.
-- **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified evidence from assumptions.
+- **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Batch Routing:** Queues non-urgent background inference to off-peak pricing windows and free-tier capacities.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 930 automated unit tests across 71 test suites to guarantee routing logic, security guards, and cost contracts never drift.
+- **Empirical Rigor:** Backed by 939 automated unit tests across 74 test suites to guarantee routing logic, security guards, and cost contracts never drift.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -59,7 +71,7 @@ flowchart TD
     C -->|7. High Complexity| I[Structured Reasoning<br/>CARDO REI]
     C -->|8. Stored Context| J[Recall Last Domain]
     C -->|9. Fallback| I
-    E --> K[Verified Output + Cost Tracepoint]
+    E --> K[Verified Output + Canonical RequestEvidence]
     F --> K
     G --> K
     H --> K
@@ -74,24 +86,27 @@ Cascade priority is economically optimized: simple greetings run *before* heavy 
 
 ## ⚡ Core Platform Engines
 
-### 1. Night Shift Batch Router (`src/lib/nightShiftRouter.ts`)
+### 1. The Evidence & Live Demonstration Layer (`src/lib/evidenceEngine.ts`)
+- **Downstream-Only Observer:** Strictly normalizes execution traces without re-running classification or routing.
+- **Telemetry Capsule:** Displays real-time model badge, observed cost (`(Observed)`), modeled flagship baseline (`(Modeled — GPT-4o)`), and derived savings (`(Derived)`).
+- **"Why This Route?" Inspector:** Reveals the task classification, complexity score, adversarial scan result, and exact selection constraints.
+- **Trace-Driven Route Stepper:** Renders only recorded stages; unrecorded rules display `"Rule: Not recorded in trace"` (zero cosmetic fabrication).
+- **Baseline vs. CARDO Comparator:** Objective before/after comparison tracking hedge marker counts and structured fact separation.
+
+### 2. Night Shift Batch Router (`src/lib/nightShiftRouter.ts`)
 - Automatically identifies asynchronous, non-blocking background tasks (evaluations, document indexations, batch summaries).
 - Batches and dispatches jobs during provider off-peak pricing windows and available free-tier token allocations.
 
-### 2. Anti-Slop & De-Roboticize Filter (`src/lib/detectAISlop.js`, `src/lib/deRoboticize.js`)
+### 3. Anti-Slop & De-Roboticize Filter (`src/lib/detectAISlop.js`, `src/lib/deRoboticize.js`)
 - Scans model outputs for hollow corporate AI buzzwords (*"delve"*, *"testament"*, *"tapestry"*, *"vital role"*) and passive hedge phrases.
 - Enforces concise, direct, human-first writing.
-
-### 3. Feynman Claim Gateway & Tracepoints (`src/lib/claimGateway.ts`, `src/lib/tracepoint.js`)
-- Full observability pipeline capturing token usage, latency, provider cost deltas, and counterfactual savings.
-- Replayable verification logs preventing regression against baseline pricing.
 
 ### 4. Evaluating the Evaluator (Meta-Evaluation Loop)
 REI tracks the reliability of its own defenses over time:
 ```text
 Architecture ──> Router ──> Evaluation ──> Error Gaps ──> [caught: tag] ──> Error Catalogue ──> Better System
 ```
-Every bugfix or test failure logs a machine-parseable tag (`[caught: test]`, `[caught: claim-gate]`, `[caught: manual]`), generating a living dataset in `docs/ERROR_GAP_CATALOGUE.md` showing which layers catch defects.
+Every bugfix or test failure logs a machine-parseable tag (`[caught: test]`, `[caught: ai-cross-check]`, `[caught: manual]`), generating a living dataset in `docs/ERROR_GAP_CATALOGUE.md` showing which layers catch defects.
 
 ---
 
@@ -110,9 +125,9 @@ The Red Team tab is a zero-cost, in-browser security scanner that inspects promp
 | Metric | Value |
 | :--- | :--- |
 | Total API Spend | **$14.66** |
-| Tokens Processed | **1.35+ billion** |
+| Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **930 passing tests across 71 suites** |
+| Automated Tests | **939 passing tests across 74 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Intel Celeron J4105, 8GB RAM |
 | Monthly Operating Budget | $25/month |
@@ -133,8 +148,11 @@ npm install
 # Run development server
 npm run dev
 
-# Run full test suite (71 test suites, 930 tests)
+# Run full test suite (74 test suites, 939 tests)
 npm test
+
+# Verify production cache spend ledger
+node scripts/verify-cache-spend.mjs
 ```
 
 ---
@@ -143,7 +161,7 @@ npm test
 
 - **Live Application:** [https://prompthound-labs.vercel.app/#rei](https://prompthound-labs.vercel.app/#rei)
 - **Source Repository:** [https://github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
-- **Architecture & Technical Docs:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [Testing Strategy](docs/TESTING.md) · [Claim Ledger](docs/CLAIM_LEDGER.md) · [Decisions (ADR)](docs/DECISIONS.md) · [Error Gap Catalogue](docs/ERROR_GAP_CATALOGUE.md)
+- **Architecture & Governance:** [Defense-in-Depth Control Matrix](docs/DEFENSE_IN_DEPTH_CONTROL_MATRIX.md) · [Architecture Spec](docs/ARCHITECTURE.md) · [Testing Strategy](docs/TESTING.md) · [Claim Ledger](docs/CLAIM_LEDGER.md) · [Decisions (ADR)](docs/DECISIONS.md) · [Error Gap Catalogue](docs/ERROR_GAP_CATALOGUE.md)
 
 ---
 
