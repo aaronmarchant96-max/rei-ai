@@ -12,7 +12,7 @@ const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH;
 
 const MAX_INPUT_CHARS = 14000;
-const PROVIDER_TIMEOUT_MS = 8000;
+const PROVIDER_TIMEOUT_MS = 25000;
 
 var providerCooldown = new Map();
 var THROTTLE_COOLDOWN_MS = 15000;
@@ -393,11 +393,10 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
   const key = rawKey.replace(/^"|"$/g, "").trim();
 
   const candidateModels = [
-    modelOverride,
-    "gemini-3.6-flash",
-    process.env.GEMINI_MODEL,
+    modelOverride === "gemini-3.6-flash" || modelOverride === "gemini-3.6-pro" ? modelOverride : "gemini-3.6-flash",
     "gemini-3.6-pro",
-    "gemini-2.5-flash",
+    modelOverride,
+    process.env.GEMINI_MODEL,
   ].filter(Boolean);
 
   const uniqueCandidates = Array.from(new Set(candidateModels));
@@ -479,9 +478,9 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
   const candidateModels = [
     modelOverride,
     "openai/gpt-oss-120b",
+    "llama-3.1-8b-instant",
     "openai/gpt-oss-20b",
     "qwen/qwen3.6-27b",
-    "llama-3.1-8b-instant",
   ].filter(Boolean);
 
   const uniqueCandidates = Array.from(new Set(candidateModels));

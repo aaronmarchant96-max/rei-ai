@@ -15,14 +15,14 @@ export default {
     id: "story-architect",
     jobType: "story-architect",
     label: "Story Architect",
-    model: "llama-3.3-70b-versatile",
-    maxTokens: 600,
+    model: "openai/gpt-oss-120b",
+    maxTokens: 4096,
     costPer1k: 1.0,
     qualityGate: "Character hinge + timeline",
     enforce: "NARRATIVE_BLUEPRINT",
     description: "Narrative planning, outlines, and story architecture.",
     matchTerms: ["story", "plot", "character", "scene", "narrative", "outline", "dialogue", "arc", "worldbuilding", "conflict", "hero", "villain"],
-    temperature: 0.5,
+    temperature: 0.7,
     fallbackPriority: "structured-reasoning"
   },
   components: {}

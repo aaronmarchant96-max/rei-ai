@@ -74,7 +74,7 @@
     "id": "coding-hinge",
     "jobType": "coding-hinge",
     "label": "The Engineer",
-    "model": "gemini-2.5-flash",
+    "model": "gemini-3.6-flash",
     "maxTokens": 4000,
     "costPer1k": 1,
     "qualityGate": "Phase 0 + HARD STOP",
@@ -164,8 +164,8 @@
     "id": "story-architect",
     "jobType": "story-architect",
     "label": "Story Architect",
-    "model": "gemini-2.5-flash",
-    "maxTokens": 8192,
+    "model": "openai/gpt-oss-120b",
+    "maxTokens": 4096,
     "costPer1k": 1,
     "qualityGate": "Character hinge + timeline",
     "enforce": "NARRATIVE_BLUEPRINT",
@@ -184,7 +184,7 @@
       "hero",
       "villain"
     ],
-    "temperature": 0.5,
+    "temperature": 0.7,
     "fallbackPriority": "structured-reasoning",
     "costPer1kInput": 0.0001,
     "costPer1kOutput": 0.0004
