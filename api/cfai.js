@@ -57,12 +57,13 @@ export function clearProviderCooldown() {
 
 function getBackendForModel(model) {
   if (!model) return null;
+  if (model.startsWith("openai/gpt-oss") || model.includes("gpt-oss") || model.includes("qwen") || model.startsWith("groq/")) return "groq";
   if (model.startsWith("gpt-")) return "openai";
   if (model.startsWith("deepseek")) return "deepseek";
   if (model.includes("gemini") || model.includes("gemma")) return "gemini";
   if (model.includes("glm") || model.includes("zai")) return "glm";
   if (model.includes("llama") || model.includes("mixtral")) return "groq";
-  return "deepseek";
+  return "groq";
 }
 
 // ── Tools & Autonomous Function Calling ──
@@ -363,45 +364,68 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
   return null;
 }
 
-async function callGroq(messages, maxTokens, model, temperature = 0.7, tools = null) {
-  const key = process.env.GROQ_API_KEY;
-  if (!key || key.includes("your_groq_api_key_here")) return null;
-  const controller = new AbortController();
-  const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
-  try {
-    const payload = { model: model || "llama-3.3-70b-versatile", messages: messages, temperature: temperature, max_tokens: maxTokens };
-    if (tools && tools.length > 0) payload.tools = tools;
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      signal: controller.signal,
-      headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("groq", res); }
-      else { console.warn("Groq status " + res.status); }
+async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, tools = null) {
+  const rawKey = process.env.GROQ_API_KEY;
+  if (!rawKey || rawKey.includes("your_groq_api_key_here")) return null;
+  const key = rawKey.replace(/^"|"$/g, "");
+
+  const candidateModels = [
+    modelOverride,
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.6-27b",
+    "llama-3.3-70b-versatile",
+  ].filter(Boolean);
+
+  const uniqueCandidates = Array.from(new Set(candidateModels));
+
+  for (let m = 0; m < uniqueCandidates.length; m++) {
+    const model = uniqueCandidates[m];
+    const controller = new AbortController();
+    const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+    try {
+      const payload = { model: model, messages: messages, temperature: temperature, max_tokens: maxTokens };
+      if (tools && tools.length > 0) payload.tools = tools;
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        signal: controller.signal,
+        headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        if (res.status === 429) {
+          await recordThrottle("groq", res);
+          return null;
+        }
+        if (res.status === 404) {
+          // Model deprecated on Groq — try next candidate model
+          continue;
+        }
+        console.warn("Groq status " + res.status);
+        continue;
+      }
+      const data = await res.json();
+      var finishReason = data.choices?.[0]?.finish_reason || null;
+      return {
+        content: data.choices?.[0]?.message?.content || "",
+        model: model,
+        usage: data.usage || null,
+        truncated: finishReason === "length",
+        finishReason: finishReason,
+        tool_calls: data.choices?.[0]?.message?.tool_calls || null
+      };
+    } catch (err) {
+      if (err && err.name === "AbortError") {
+        console.warn("Groq timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+      } else {
+        console.warn("Groq request error: " + (err && err.message ? err.message : err));
+      }
       return null;
+    } finally {
+      clearTimeout(timer);
     }
-    const data = await res.json();
-    var finishReason = data.choices?.[0]?.finish_reason || null;
-    return {
-      content: data.choices?.[0]?.message?.content || "",
-      model: model || "llama-3.3-70b-versatile",
-      usage: data.usage || null,
-      truncated: finishReason === "length",
-      finishReason: finishReason,
-      tool_calls: data.choices?.[0]?.message?.tool_calls || null
-    };
-  } catch (err) {
-    if (err && err.name === "AbortError") {
-      console.warn("Groq timed out after " + PROVIDER_TIMEOUT_MS + "ms");
-    } else {
-      console.warn("Groq request error: " + (err && err.message ? err.message : err));
-    }
-    return null;
-  } finally {
-    clearTimeout(timer);
   }
+  return null;
 }
 
 async function callOpenAI(messages, maxTokens, temperature = 0.7, tools = null) {
