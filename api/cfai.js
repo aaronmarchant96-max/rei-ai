@@ -424,7 +424,8 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
     const controller = new AbortController();
     const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
     try {
-      const payload = { model: model, messages: messages, temperature: temperature, max_tokens: maxTokens };
+      const effectiveMaxTokens = Math.min(maxTokens, 2048);
+      const payload = { model: model, messages: messages, temperature: temperature, max_tokens: effectiveMaxTokens };
       if (tools && tools.length > 0) payload.tools = tools;
       const res = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
         method: "POST",
@@ -522,8 +523,8 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
           await recordThrottle("groq", res);
           return null;
         }
-        if (res.status === 404) {
-          // Model deprecated on Groq — try next candidate model
+        if (res.status === 404 || res.status === 413) {
+          // Model deprecated on Groq or payload too large — try next candidate model
           continue;
         }
         console.warn("Groq status " + res.status);
@@ -955,10 +956,15 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   if (messagesOverride && Array.isArray(messagesOverride) && messagesOverride.length > 0) {
     messages = messagesOverride;
   } else {
-    const formattedHistory = (history || []).map(function (msg) {
+    const formattedHistory = (history || []).slice(-6).map(function (msg, idx, arr) {
+      let content = msg.content || "";
+      // If this is an older turn (not the immediate prior turn) and has massive content, truncate to 1,500 chars to conserve context
+      if (idx < arr.length - 2 && content.length > 1500) {
+        content = content.slice(0, 1500) + "... [prior story context compressed]";
+      }
       return {
         role: msg.role === "assistant" || msg.role === "system" ? msg.role : "user",
-        content: msg.content,
+        content: content,
       };
     });
     const toolDirective = "\n\n[CAPABILITIES & TOOLS]: You have access to two autonomous tools:\n1. web_search: Searches the live web via Exa neural search. Use it whenever you need authentic historical facts, real-world locations, period details, technical terminology, current events, or lore to ground your response.\n2. fetch_url: Fetches and reads live web pages or GitHub repository documentation from URLs.\nAlways execute tool calls directly when real-world facts or links are relevant.";
