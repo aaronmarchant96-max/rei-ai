@@ -280,17 +280,17 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7, tools = null
 }
 
 async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7, tools = null) {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key || key.includes("your_gemini_api_key_here")) return null;
+  const rawKey = process.env.GEMINI_API_KEY;
+  if (!rawKey || rawKey.includes("your_gemini_api_key_here")) return null;
+  const key = rawKey.replace(/^"|"$/g, "").trim();
 
   const candidateModels = [
     modelOverride,
     process.env.GEMINI_MODEL,
+    "gemini-3.6-flash",
+    "gemini-3.6-pro",
     "gemini-2.5-flash",
-    "gemini-2.0-flash",
     "gemini-1.5-flash",
-    "gemini-2.5-pro",
-    "gemini-1.5-pro",
   ].filter(Boolean);
 
   const uniqueCandidates = Array.from(new Set(candidateModels));
