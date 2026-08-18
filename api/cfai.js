@@ -945,19 +945,32 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
         }
       ];
 
-      const fallbackList = ["groq", "gemini", "glm", "deepseek", "openai"];
-      for (let i = 0; i < fallbackList.length; i++) {
-        const b = fallbackList[i];
-        if (backends[b]) {
-          try {
-            const synthResult = await backends[b](synthesisMessages, null);
-            const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
-            if (synthClean && synthClean.length > 20) {
-              accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
-              currentResult = { ...synthResult, content: synthClean };
-              break;
-            }
-          } catch {}
+      if (backends.groq) {
+        try {
+          const synthResult = await backends.groq(synthesisMessages, null, "openai/gpt-oss-20b");
+          const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
+          if (synthClean && synthClean.length > 20) {
+            accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
+            currentResult = { ...synthResult, content: synthClean };
+          }
+        } catch {}
+      }
+
+      if (!currentResult || !currentResult.content || currentResult.content.trim().length < 20) {
+        const fallbackList = ["gemini", "glm", "deepseek", "openai"];
+        for (let i = 0; i < fallbackList.length; i++) {
+          const b = fallbackList[i];
+          if (backends[b]) {
+            try {
+              const synthResult = await backends[b](synthesisMessages, null);
+              const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
+              if (synthClean && synthClean.length > 20) {
+                accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
+                currentResult = { ...synthResult, content: synthClean };
+                break;
+              }
+            } catch {}
+          }
         }
       }
     }
@@ -1063,7 +1076,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs, passTools) { return callDeepSeek(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs, passTools) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs, passTools) { return callGLM(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
-  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools) { return callGroq(msgs || messages, maxTokens, groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools, modelOverride) { return callGroq(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs, passTools) { return callOpenAI(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
 
   // Try primary backend first (unless in cooldown)
