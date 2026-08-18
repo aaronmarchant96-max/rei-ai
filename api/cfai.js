@@ -782,7 +782,7 @@ export function extractToolCalls(result) {
   return toolCalls.length > 0 ? toolCalls : null;
 }
 
-async function completeWithToolsAndContinuation(runBackend, messages, firstResult, routerDecision) {
+async function completeWithToolsAndContinuation(runBackend, messages, firstResult, routerDecision, backends) {
   let currentResult = firstResult;
   let currentMessages = messages.slice();
   let toolRounds = 0;
