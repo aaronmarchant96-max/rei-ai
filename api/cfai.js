@@ -927,18 +927,23 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
   }
 
   // Fallback: If tool completion step returned empty content or only thinking tags, synthesize final response from gathered research evidence
-  const cleanContent = (currentResult?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+  const cleanContent = (currentResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
   if (!cleanContent || cleanContent.length < 20) {
     if (executedResearch.sources.length > 0 && backends) {
       const researchSnippets = executedResearch.sources
         .map(function (s, idx) { return `[SOURCE ${idx + 1}: ${s.title}] (${s.url || "web"}):\n${s.highlights || s.snippet || ""}`; })
         .join("\n\n");
-      const synthesisMessages = messages.concat([
+      const synthesisMessages = [
+        {
+          role: "system",
+          content: "You are The Storyteller. Narrative architecture generating story blueprints and rich cinematic prose. Do not output reasoning or <think> tags. Write the completed narrative blueprint and story directly."
+        },
+        ...messages.filter(m => m.role !== "system"),
         {
           role: "user",
-          content: `[VERIFIED RESEARCH EVIDENCE]:\n${researchSnippets}\n\nPlease generate the full, detailed requested story/response now using this verified background evidence. Output only the finished story prose and blueprint directly.`
+          content: `[VERIFIED RESEARCH EVIDENCE]:\n${researchSnippets}\n\nPlease generate the full, detailed requested story/response now using this verified background evidence. Output the finished story prose directly.`
         }
-      ]);
+      ];
 
       const fallbackList = ["groq", "gemini", "glm", "deepseek", "openai"];
       for (let i = 0; i < fallbackList.length; i++) {
@@ -946,7 +951,7 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
         if (backends[b]) {
           try {
             const synthResult = await backends[b](synthesisMessages, null);
-            const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+            const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
             if (synthClean && synthClean.length > 20) {
               accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
               currentResult = { ...synthResult, content: synthClean };
