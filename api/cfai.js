@@ -927,10 +927,11 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
   }
 
   // Fallback: If tool completion step returned empty content or only thinking tags, synthesize final response from gathered research evidence
+  // Fallback: If tool completion step returned empty content or only thinking tags, synthesize final response
   const cleanContent = (currentResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
   if (!cleanContent || cleanContent.length < 20) {
-    if (executedResearch.sources.length > 0 && backends) {
-      const researchSnippets = executedResearch.sources
+    if (backends) {
+      const researchSnippets = (executedResearch?.sources || [])
         .map(function (s, idx) { return `[SOURCE ${idx + 1}: ${s.title}] (${s.url || "web"}):\n${s.highlights || s.snippet || ""}`; })
         .join("\n\n");
       const synthesisMessages = [
@@ -939,10 +940,13 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
           content: "You are The Storyteller. Narrative architecture generating story blueprints and rich cinematic prose. Do not output reasoning or <think> tags. Write the completed narrative blueprint and story directly."
         },
         ...messages.filter(m => m.role !== "system"),
-        {
+        ...(researchSnippets ? [{
           role: "user",
           content: `[VERIFIED RESEARCH EVIDENCE]:\n${researchSnippets}\n\nPlease generate the full, detailed requested story/response now using this verified background evidence. Output the finished story prose directly.`
-        }
+        }] : [{
+          role: "user",
+          content: "Please generate the full, detailed requested story/response now. Output the finished narrative blueprint and story prose directly without preamble."
+        }])
       ];
 
       if (backends.groq) {
@@ -994,8 +998,10 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
   const toolCalls = extractToolCalls(result);
   if (toolCalls && toolCalls.length > 0) {
     return completeWithToolsAndContinuation(runBackend, messages, result, routerDecision, backends).then(function (done) {
+      const rawText = done ? done.content : (result.content || "");
+      const cleanText = rawText.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
       return {
-        content: done ? done.content : (result.content || ""),
+        content: cleanText || rawText,
         model: modelLabel,
         routerDecision: routerDecision,
         usage: done && done.usage ? done.usage : (result.usage || null),
@@ -1009,8 +1015,10 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
 
   if (result && result.truncated) {
     return completeWithContinuation(runBackend, messages, result).then(function (done) {
+      const rawText = done.content || "";
+      const cleanText = rawText.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
       return {
-        content: done.content,
+        content: cleanText || rawText,
         model: modelLabel,
         routerDecision: routerDecision,
         usage: done.usage || null,
@@ -1020,8 +1028,11 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
       };
     });
   }
+
+  const rawContent = result ? result.content : "";
+  const cleanFinal = rawContent.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
   return Promise.resolve({
-    content: result ? result.content : "",
+    content: cleanFinal || rawContent,
     model: modelLabel,
     routerDecision: routerDecision,
     usage: result && result.usage ? result.usage : null,
