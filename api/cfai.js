@@ -12,7 +12,7 @@ const execAsync = promisify(exec);
 const CFAI_PATH = process.env.CFAI_PATH;
 
 const MAX_INPUT_CHARS = 14000;
-const PROVIDER_TIMEOUT_MS = 25000;
+const PROVIDER_TIMEOUT_MS = 10000;
 
 var providerCooldown = new Map();
 var THROTTLE_COOLDOWN_MS = 15000;
@@ -109,7 +109,7 @@ export const AVAILABLE_TOOLS = [
   }
 ];
 
-const URL_TIMEOUT_MS = 8000;
+const URL_TIMEOUT_MS = 3500;
 const MAX_FETCH_CHARS = 6000;
 
 export function isPrivateIpOrHost(hostname) {
