@@ -317,7 +317,37 @@ export async function executeWebSearch(query, numResults = 3) {
     }
   }
 
-  // 2. Resilient Fallback: DuckDuckGo HTML Instant Search
+  // 2. Authoritative Fallback: Wikipedia Direct API (instant, structured, zero CAPTCHAs)
+  try {
+    const wikiUrl = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" + encodeURIComponent(query) + "&utf8=&format=json&srlimit=" + limit;
+    const res = await fetch(wikiUrl, {
+      signal: controller.signal,
+      headers: { "User-Agent": "REI-Bot/1.0 (https://prompthound-labs.vercel.app)" }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const wikiResults = (data.query?.search || []).map(r => ({
+        title: r.title,
+        url: "https://en.wikipedia.org/wiki/" + encodeURIComponent(r.title.replace(/ /g, "_")),
+        highlights: (r.snippet || "").replace(/<[^>]+>/g, "").replace(/&quot;/g, "\"").replace(/&#039;/g, "'").slice(0, 350),
+        snippet: (r.snippet || "").replace(/<[^>]+>/g, "").replace(/&quot;/g, "\"").replace(/&#039;/g, "'").slice(0, 350),
+      }));
+      if (wikiResults.length > 0) {
+        return JSON.stringify({
+          provider: "wikipedia",
+          transport: "direct_api",
+          engine: "Wikipedia Reference API",
+          query,
+          count: wikiResults.length,
+          results: wikiResults,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Wikipedia search fallback error:", err?.message || err);
+  }
+
+  // 3. Resilient Fallback: DuckDuckGo HTML Instant Search
   try {
     const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
     const res = await fetch(ddgUrl, {
@@ -329,19 +359,21 @@ export async function executeWebSearch(query, numResults = 3) {
 
     if (res.ok) {
       const html = await res.text();
-      const cleanSnippet = cleanHtmlToText(html).slice(0, 1000);
-      return JSON.stringify({
-        provider: "duckduckgo",
-        transport: "direct_api",
-        engine: "DuckDuckGo HTML Fallback",
-        query,
-        count: 1,
-        results: [{
-          title: "DuckDuckGo Web Result",
-          url: ddgUrl,
-          snippet: cleanSnippet.slice(0, 350),
-        }],
-      });
+      if (!html.toLowerCase().includes("captcha") && !html.toLowerCase().includes("bots use duckduckgo")) {
+        const cleanSnippet = cleanHtmlToText(html).slice(0, 1000);
+        return JSON.stringify({
+          provider: "duckduckgo",
+          transport: "direct_api",
+          engine: "DuckDuckGo HTML Fallback",
+          query,
+          count: 1,
+          results: [{
+            title: "DuckDuckGo Web Result",
+            url: ddgUrl,
+            snippet: cleanSnippet.slice(0, 350),
+          }],
+        });
+      }
     }
   } catch (err) {
     console.warn("Web search fallback error:", err?.message || err);
@@ -894,8 +926,9 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
     };
   }
 
-  // Fallback: If tool completion step returned empty content, synthesize final response from gathered research evidence
-  if (!currentResult || !currentResult.content || currentResult.content.trim() === "") {
+  // Fallback: If tool completion step returned empty content or only thinking tags, synthesize final response from gathered research evidence
+  const cleanContent = (currentResult?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+  if (!cleanContent || cleanContent.length < 20) {
     if (executedResearch.sources.length > 0 && backends) {
       const researchSnippets = executedResearch.sources
         .map(function (s, idx) { return `[SOURCE ${idx + 1}: ${s.title}] (${s.url || "web"}):\n${s.highlights || s.snippet || ""}`; })
@@ -903,7 +936,7 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
       const synthesisMessages = messages.concat([
         {
           role: "user",
-          content: `[VERIFIED RESEARCH EVIDENCE]:\n${researchSnippets}\n\nPlease generate the full, detailed requested response now using this research evidence.`
+          content: `[VERIFIED RESEARCH EVIDENCE]:\n${researchSnippets}\n\nPlease generate the full, detailed requested story/response now using this verified background evidence. Output only the finished story prose and blueprint directly.`
         }
       ]);
 
@@ -913,9 +946,10 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
         if (backends[b]) {
           try {
             const synthResult = await backends[b](synthesisMessages, null);
-            if (synthResult && synthResult.content && synthResult.content.trim().length > 0) {
+            const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+            if (synthClean && synthClean.length > 20) {
               accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
-              currentResult = synthResult;
+              currentResult = { ...synthResult, content: synthClean };
               break;
             }
           } catch {}
