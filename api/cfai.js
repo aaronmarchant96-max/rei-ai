@@ -940,7 +940,17 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
       ]);
     }
 
-    const nextResult = await runBackend(currentMessages, null);
+    // Generate follow-up prose with tools disabled. Use 20B for fast 2s generation without thinking delay
+    let nextResult = null;
+    if (backends?.groq) {
+      try {
+        nextResult = await backends.groq(currentMessages, null, "openai/gpt-oss-20b");
+      } catch {}
+    }
+    if (!nextResult) {
+      nextResult = await runBackend(currentMessages, null);
+    }
+
     if (!nextResult) {
       break;
     }
