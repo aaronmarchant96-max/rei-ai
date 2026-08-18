@@ -748,8 +748,8 @@ export function extractToolCalls(result) {
 
   const toolCalls = [];
 
-  // 1. Catch <function=name> <parameter=key>val</parameter> </function> or JSON inner
-  const functionCallRegex = /<function=([a-zA-Z0-9_-]+)>([\s\S]*?)<\/function>/g;
+  // 1. Catch <function=name> <parameter=key>val</parameter> </function> or function=name>...
+  const functionCallRegex = /<?function=([a-zA-Z0-9_-]+)>([\s\S]*?)<\/function>/gi;
   let match;
   while ((match = functionCallRegex.exec(content)) !== null) {
     const fnName = match[1];
