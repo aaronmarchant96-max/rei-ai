@@ -747,36 +747,73 @@ export function extractToolCalls(result) {
   if (!content) return null;
 
   const toolCalls = [];
-  // Catch <function=fetch_url>{"url": "..."}</function> (LLaMA/Groq raw text format)
+
+  // 1. Catch <function=name> <parameter=key>val</parameter> </function> or JSON inner
   const functionCallRegex = /<function=([a-zA-Z0-9_-]+)>([\s\S]*?)<\/function>/g;
   let match;
   while ((match = functionCallRegex.exec(content)) !== null) {
-    toolCalls.push({
-      id: `call_${Date.now()}_${toolCalls.length}`,
-      type: "function",
-      function: {
-        name: match[1],
-        arguments: match[2].trim(),
-      },
-    });
+    const fnName = match[1];
+    const inner = match[2].trim();
+
+    const paramRegex = /<parameter=([a-zA-Z0-9_-]+)>([\s\S]*?)<\/parameter>/g;
+    let paramMatch;
+    let params = {};
+    let hasParams = false;
+    while ((paramMatch = paramRegex.exec(inner)) !== null) {
+      hasParams = true;
+      let val = paramMatch[2].trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      } else if (!isNaN(Number(val))) {
+        val = Number(val);
+      }
+      params[paramMatch[1]] = val;
+    }
+
+    if (hasParams) {
+      toolCalls.push({
+        id: `call_${Date.now()}_${toolCalls.length}`,
+        type: "function",
+        function: {
+          name: fnName,
+          arguments: JSON.stringify(params),
+        },
+      });
+    } else {
+      let parsedArgs = inner;
+      try {
+        parsedArgs = JSON.parse(inner);
+      } catch {}
+      toolCalls.push({
+        id: `call_${Date.now()}_${toolCalls.length}`,
+        type: "function",
+        function: {
+          name: fnName,
+          arguments: typeof parsedArgs === "string" ? parsedArgs : JSON.stringify(parsedArgs || {}),
+        },
+      });
+    }
   }
 
-  // Catch <tool_call>{"name": "fetch_url", "arguments": ...}</tool_call>
+  // 2. Catch <tool_call>{"name": "fetch_url", "arguments": ...}</tool_call>
   const toolCallTagRegex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
   while ((match = toolCallTagRegex.exec(content)) !== null) {
-    try {
-      const parsed = JSON.parse(match[1].trim());
-      if (parsed.name) {
-        toolCalls.push({
-          id: `call_${Date.now()}_${toolCalls.length}`,
-          type: "function",
-          function: {
-            name: parsed.name,
-            arguments: typeof parsed.arguments === "string" ? parsed.arguments : JSON.stringify(parsed.arguments || {}),
-          },
-        });
-      }
-    } catch {}
+    const inner = match[1].trim();
+    if (!inner.includes("<function=")) {
+      try {
+        const parsed = JSON.parse(inner);
+        if (parsed.name) {
+          toolCalls.push({
+            id: `call_${Date.now()}_${toolCalls.length}`,
+            type: "function",
+            function: {
+              name: parsed.name,
+              arguments: typeof parsed.arguments === "string" ? parsed.arguments : JSON.stringify(parsed.arguments || {}),
+            },
+          });
+        }
+      } catch {}
+    }
   }
 
   return toolCalls.length > 0 ? toolCalls : null;
@@ -999,7 +1036,10 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
   if (toolCalls && toolCalls.length > 0) {
     return completeWithToolsAndContinuation(runBackend, messages, result, routerDecision, backends).then(function (done) {
       const rawText = done ? done.content : (result.content || "");
-      const cleanText = rawText.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
+      const cleanText = rawText
+        .replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "")
+        .replace(/<tool_call>[\s\S]*?(?:<\/tool_call>|$)/gi, "")
+        .trim();
       return {
         content: cleanText || rawText,
         model: modelLabel,
@@ -1016,7 +1056,10 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
   if (result && result.truncated) {
     return completeWithContinuation(runBackend, messages, result).then(function (done) {
       const rawText = done.content || "";
-      const cleanText = rawText.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
+      const cleanText = rawText
+        .replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "")
+        .replace(/<tool_call>[\s\S]*?(?:<\/tool_call>|$)/gi, "")
+        .trim();
       return {
         content: cleanText || rawText,
         model: modelLabel,
@@ -1030,7 +1073,10 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
   }
 
   const rawContent = result ? result.content : "";
-  const cleanFinal = rawContent.replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
+  const cleanFinal = rawContent
+    .replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "")
+    .replace(/<tool_call>[\s\S]*?(?:<\/tool_call>|$)/gi, "")
+    .trim();
   return Promise.resolve({
     content: cleanFinal || rawContent,
     model: modelLabel,
