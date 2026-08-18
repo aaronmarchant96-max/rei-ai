@@ -894,6 +894,36 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
     };
   }
 
+  // Fallback: If tool completion step returned empty content, synthesize final response from gathered research evidence
+  if (!currentResult || !currentResult.content || currentResult.content.trim() === "") {
+    if (executedResearch.sources.length > 0 && backends) {
+      const researchSnippets = executedResearch.sources
+        .map(function (s, idx) { return `[SOURCE ${idx + 1}: ${s.title}] (${s.url || "web"}):\n${s.highlights || s.snippet || ""}`; })
+        .join("\n\n");
+      const synthesisMessages = messages.concat([
+        {
+          role: "user",
+          content: `[VERIFIED RESEARCH EVIDENCE]:\n${researchSnippets}\n\nPlease generate the full, detailed requested response now using this research evidence.`
+        }
+      ]);
+
+      const fallbackList = ["groq", "gemini", "glm", "deepseek", "openai"];
+      for (let i = 0; i < fallbackList.length; i++) {
+        const b = fallbackList[i];
+        if (backends[b]) {
+          try {
+            const synthResult = await backends[b](synthesisMessages);
+            if (synthResult && synthResult.content && synthResult.content.trim().length > 0) {
+              accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
+              currentResult = synthResult;
+              break;
+            }
+          } catch {}
+        }
+      }
+    }
+  }
+
   if (currentResult?.truncated) {
     const contResult = await completeWithContinuation(runBackend, currentMessages, currentResult);
     contResult.usage = sumUsage(accumulatedUsage, contResult.usage);
@@ -908,10 +938,10 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
   return currentResult;
 }
 
-function finalizeResult(result, runBackend, messages, modelLabel, routerDecision) {
+function finalizeResult(result, runBackend, messages, modelLabel, routerDecision, backends) {
   const toolCalls = extractToolCalls(result);
   if (toolCalls && toolCalls.length > 0) {
-    return completeWithToolsAndContinuation(runBackend, messages, result, routerDecision).then(function (done) {
+    return completeWithToolsAndContinuation(runBackend, messages, result, routerDecision, backends).then(function (done) {
       return {
         content: done ? done.content : (result.content || ""),
         model: modelLabel,
@@ -1006,7 +1036,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
       var result = await backends[primaryBackend]();
       if (result) {
         providerCooldown.delete(primaryBackend);
-        return await finalizeResult(result, backends[primaryBackend], messages, primaryModel, routerDecision);
+        return await finalizeResult(result, backends[primaryBackend], messages, primaryModel, routerDecision, backends);
       }
     }
   }
@@ -1025,7 +1055,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", routerDecision);
+        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", routerDecision, backends);
       }
       await sleep(INTER_FALLBACK_MS);
     }
@@ -1066,7 +1096,7 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
       var result = await backends[primaryBackend]();
       if (result) {
         providerCooldown.delete(primaryBackend);
-        return await finalizeResult(result, backends[primaryBackend], messages, model, null);
+        return await finalizeResult(result, backends[primaryBackend], messages, model, null, backends);
       }
     }
   }
@@ -1084,7 +1114,7 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", null);
+        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", null, backends);
       }
       await sleep(INTER_FALLBACK_MS);
     }
