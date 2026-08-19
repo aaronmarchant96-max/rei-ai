@@ -54,8 +54,14 @@ function key(type, tenant, id) {
  */
 export async function storeTrace(tenant, requestId, entry) {
   if (!(await isAvailable())) {
-    if (process.env.NODE_ENV !== "test") {
-      console.warn("[eval-plane] KV not configured — trace not persisted for", requestId);
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
+      const dir = path.resolve(process.cwd(), "data");
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.appendFileSync(path.join(dir, "proxy_telemetry.jsonl"), JSON.stringify(entry) + "\n", "utf8");
+    } catch {
+      // Gracefully no-ops in read-only or browser environments
     }
     return;
   }
