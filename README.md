@@ -9,7 +9,7 @@
 
 REI.ai is the answer — a deterministic AI orchestration platform that inspects prompts locally and routes each request to the cheapest model capable of producing high-quality reasoning.
 
-Backed by **939 automated unit tests across 74 test suites**, REI.ai enforces verifiable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
+Backed by **952 automated unit tests across 76 test suites**, REI.ai enforces verifiable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -25,14 +25,14 @@ Backed by **939 automated unit tests across 74 test suites**, REI.ai enforces ve
 ## 📊 What This Is (And Isn't)
 
 **What this is:**
-- **A Deterministic AI Router:** Inspects prompt semantics locally and routes to the cheapest capable model. Cost savings are cleanly decomposed into *provider-price optimization* and *free-tier capacity*, reported separately, and stress-tested across model pricing landscapes. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for exact benchmark numbers and producing commands.
+- **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally and routes to the cheapest capable model. Serves standard OpenAI-compatible `/v1/chat/completions` for drop-in agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for exact benchmark numbers and producing commands.
 - **Evidence & Provenance Architecture:** Emits canonical `RequestEvidence` objects downstream of execution with explicit epistemic tiers (`observed`, `derived`, `modeled`, `replayed`, `unavailable`). Missing telemetry renders "Evidence unavailable" — zero substitution of `$0.00`.
 - **Prompt-Freeze & Deterministic Caching:** Sustains a 90%+ prompt cache hit rate across LLM providers (Gemini caching discounts, DeepSeek prompt caching) by freezing prefix order and generating deterministic cache keys.
 - **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Batch Routing:** Queues non-urgent background inference to off-peak pricing windows and free-tier capacities.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 939 automated unit tests across 74 test suites to guarantee routing logic, security guards, and cost contracts never drift.
+- **Empirical Rigor:** Backed by 952 automated unit tests across 76 test suites to guarantee routing logic, security guards, and cost contracts never drift.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -143,6 +143,27 @@ Real-world verification runs against the production endpoint (`https://prompthou
 
 ---
 
+## 🔌 OpenAI-Compatible Cognitive Proxy (`/v1/chat/completions`)
+
+REI.ai runs as a drop-in local model proxy gateway for any agent, CLI, or IDE extension (Cursor, Cline, Agy, Aider, OpenCode) supporting the OpenAI API specification:
+
+```bash
+# 1. Start the local cognitive proxy (port 3000)
+npm run server
+
+# 2. Configure your agent / CLI environment
+export OPENAI_BASE_URL="http://localhost:3000/v1"
+export OPENAI_API_KEY="local-dev-key"
+
+# 3. Pass model="rei-auto"
+# - Routine shell checks, status polls, and small diffs route to LLaMA 3.1 8B ($0.05/MTok)
+# - Standard refactors and tests route to GPT-OSS 20B ($0.15/MTok)
+# - High-complexity architectural plans escalate to GPT-OSS 120B / Gemini ($0.90/MTok)
+# - Deep algorithmic reasoning escalates to DeepSeek Reasoner
+```
+
+---
+
 ## 👤 About the Builder
 
 | Metric | Value |
@@ -150,7 +171,7 @@ Real-world verification runs against the production endpoint (`https://prompthou
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **942 passing tests across 75 suites** |
+| Automated Tests | **952 passing tests across 76 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Intel Celeron J4105, 8GB RAM |
 | Monthly Operating Budget | $25/month |
@@ -168,14 +189,17 @@ cd rei-ai
 # Install dependencies
 npm install
 
-# Run development server
-npm run dev
+# Run the full development suite (Vite UI + Local Cognitive Proxy)
+npm run dev:full
 
-# Run full test suite (75 test suites, 942 tests)
+# Or run the headless cognitive proxy gateway alone
+npm run server
+
+# Run full test suite (76 test suites, 952 tests)
 npm test
 
-# Verify production cache spend ledger
-node scripts/verify-cache-spend.mjs
+# Run offline counterfactual replay simulator (zero API spend)
+npx tsx scripts/replay-cost-savings.mjs
 ```
 
 ---
