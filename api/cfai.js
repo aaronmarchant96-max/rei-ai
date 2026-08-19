@@ -940,17 +940,56 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
       ]);
     }
 
-    // Generate follow-up prose with tools disabled. Use 20B for fast 2s generation without thinking delay
-    let nextResult = null;
-    if (backends?.groq) {
-      try {
-        nextResult = await backends.groq(currentMessages, null, "openai/gpt-oss-20b");
-      } catch {}
-    }
-    if (!nextResult) {
-      nextResult = await runBackend(currentMessages, null);
+    // Flatten tool results into clean synthesis messages to guarantee fast, direct prose generation
+    if (executedResearch.invoked && executedResearch.sources.length > 0) {
+      const researchSnippets = executedResearch.sources
+        .map(function (s, idx) { return `[SOURCE ${idx + 1}: ${s.title}] (${s.url || "web"}):\n${s.highlights || s.snippet || ""}`; })
+        .join("\n\n");
+      const activeSys = messages.find(m => m.role === "system")?.content || REI_SYSTEM_PROMPT;
+      const cleanSys = activeSys.replace(/\[CAPABILITIES & TOOLS\][\s\S]*$/, "").trim();
+      const synthesisMessages = [
+        {
+          role: "system",
+          content: cleanSys + "\n\nOutput the requested narrative blueprint and finished story prose directly without thinking tags or preamble."
+        },
+        ...messages.filter(m => m.role !== "system"),
+        {
+          role: "user",
+          content: `[VERIFIED RESEARCH EVIDENCE]:\n${researchSnippets}\n\nPlease generate the full, detailed requested story/response now using this verified background evidence.`
+        }
+      ];
+
+      let synthDone = false;
+      if (backends?.groq) {
+        try {
+          const synthResult = await backends.groq(synthesisMessages, null, "openai/gpt-oss-20b");
+          const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
+          if (synthClean && synthClean.length > 20) {
+            accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
+            currentResult = { ...synthResult, content: synthClean };
+            synthDone = true;
+          }
+        } catch {}
+      }
+
+      if (!synthDone) {
+        try {
+          const synthResult = await runBackend(synthesisMessages, null);
+          const synthClean = (synthResult?.content || "").replace(/<think>[\s\S]*?(?:<\/think>|$)/gi, "").trim();
+          if (synthClean && synthClean.length > 20) {
+            accumulatedUsage = sumUsage(accumulatedUsage, synthResult.usage);
+            currentResult = { ...synthResult, content: synthClean };
+            synthDone = true;
+          }
+        } catch {}
+      }
+
+      if (synthDone) {
+        break;
+      }
     }
 
+    const nextResult = await runBackend(currentMessages, null);
     if (!nextResult) {
       break;
     }
