@@ -8,6 +8,7 @@ import evalResultHandler from "./api/eval/result.js";
 import evalStatusHandler from "./api/eval/status.js";
 import chatCompletionsHandler from "./api/v1/chat/completions.js";
 import modelsHandler from "./api/v1/models.js";
+import healthHandler from "./api/health.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -58,11 +59,25 @@ const handleModels = async (req, res) => {
   }
 };
 
+const handleHealth = async (req, res) => {
+  try {
+    await healthHandler(req, res);
+  } catch (error) {
+    if (!res.headersSent) {
+      res.status(500).json({ status: "error", message: error.message });
+    }
+  }
+};
+
 // Mount both standard /v1 and /api/v1 prefixes
 app.post("/v1/chat/completions", handleChatCompletions);
 app.post("/api/v1/chat/completions", handleChatCompletions);
 app.get("/v1/models", handleModels);
 app.get("/api/v1/models", handleModels);
+
+// Mount health checks
+app.get("/health", handleHealth);
+app.get("/api/health", handleHealth);
 
 // ── Native REI.ai Endpoints ──
 app.post("/api/cfai", async (req, res) => {
