@@ -3,7 +3,7 @@ import { getDomainProfiles } from "./domains/_index.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck } from "lucide-react";
+import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck, Terminal } from "lucide-react";
 import claimsData from "./data/claims.json";
 import { verifyAll } from "./lib/claimGateway";
 import "./__eval__/claimRegistry";
@@ -19,6 +19,7 @@ function ToolIcon({ id, size = 24, className = "" }) {
   case "storm-replay": return <Activity {...iconProps} />;
   case "cardo-guard": return <ShieldCheck {...iconProps} />;
   case "tracepoint": return <Crosshair {...iconProps} />;
+  case "openai-proxy": return <Terminal {...iconProps} />;
   case "rei": return <Scale {...iconProps} />;
   default: return <Scale {...iconProps} />;
   }
@@ -63,6 +64,9 @@ const CASE_STUDIES = [
   { id: "analytics", toolId: "analytics", label: "Analytics", subtitle: "Routing + Evidence",
     description: "Routing observability, evidence outcomes, CARDO decision audit",
     hinge: "Rescue Rate • Truncation • Real-vs-Estimate Savings", badge: "NEW" },
+  { id: "openai-proxy", toolId: "rei", label: "OpenAI Proxy Gateway", subtitle: "/v1/chat/completions",
+    description: "Drop-in proxy gateway for Cursor, Cline, Aider, & Agy. Routes internal agent turns to LLaMA-8B ($0.05/M) and escalates complex reasoning.",
+    hinge: "model: 'rei-auto' • 94%+ cost reduction • spec-compliant", badge: "NEW" },
   { id: "red-team", toolId: "red-team", label: "Red Team", subtitle: "Prompt Injection Proving Ground",
     description: "Framework-agnostic adversarial scanner — pre-flight checks, jailbreak validation, open-source detection blueprint",
     hinge: "14 D1 categories • $0 per scan • public taxonomy", badge: "NEW" },
