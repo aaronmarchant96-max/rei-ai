@@ -11,9 +11,29 @@ async function runSmokeTests() {
 
   let allPassed = true;
 
-  // 1. Check Frontend Web App
+  // 1. Check Subsystem Health & Internal State Probes
   try {
-    process.stdout.write("1. Testing Frontend Web App (GET /)... ");
+    process.stdout.write("1. Testing Subsystem State Probes (GET /api/health)... ");
+    const t0 = Date.now();
+    const res = await fetch(`${PROD_URL}/api/health`);
+    const latency = Date.now() - t0;
+    if (res.status === 200) {
+      const data = await res.json();
+      const hinge = data.subsystems?.hingeClassifier?.status || "ok";
+      const dim = data.subsystems?.semanticCentroids?.vectorDim || 0;
+      console.log(`✅ PASS (HTTP 200, ${latency}ms, Hinge: ${hinge}, Centroids: ${dim}d)`);
+    } else {
+      console.log(`❌ FAIL (HTTP ${res.status})`);
+      allPassed = false;
+    }
+  } catch (err) {
+    console.log(`❌ ERROR: ${err.message}`);
+    allPassed = false;
+  }
+
+  // 2. Check Frontend Web App
+  try {
+    process.stdout.write("2. Testing Frontend Web App (GET /)... ");
     const t0 = Date.now();
     const res = await fetch(PROD_URL);
     const latency = Date.now() - t0;
@@ -28,9 +48,9 @@ async function runSmokeTests() {
     allPassed = false;
   }
 
-  // 2. Check OpenAI-Compatible Models Endpoint
+  // 3. Check OpenAI-Compatible Models Endpoint
   try {
-    process.stdout.write("2. Testing OpenAI Proxy Endpoint (GET /api/v1/models)... ");
+    process.stdout.write("3. Testing OpenAI Proxy Endpoint (GET /api/v1/models)... ");
     const t0 = Date.now();
     const res = await fetch(`${PROD_URL}/api/v1/models`);
     const latency = Date.now() - t0;
@@ -47,9 +67,9 @@ async function runSmokeTests() {
     allPassed = false;
   }
 
-  // 3. Check Native CFAI Reasoning Router
+  // 4. Check Native CFAI Reasoning Router
   try {
-    process.stdout.write("3. Testing Native Router Endpoint (POST /api/cfai)... ");
+    process.stdout.write("4. Testing Native Router Endpoint (POST /api/cfai)... ");
     const t0 = Date.now();
     const res = await fetch(`${PROD_URL}/api/cfai`, {
       method: "POST",
@@ -74,8 +94,8 @@ async function runSmokeTests() {
     allPassed = false;
   }
 
-  // 4. Telemetry Secret Leak Audit
-  process.stdout.write("4. Auditing Local Telemetry Files for Key Leaks... ");
+  // 5. Telemetry Secret Leak Audit
+  process.stdout.write("5. Auditing Local Telemetry Files for Key Leaks... ");
   const telemetryPath = "data/proxy_telemetry.jsonl";
   if (fs.existsSync(telemetryPath)) {
     const raw = fs.readFileSync(telemetryPath, "utf8");
