@@ -1,7 +1,7 @@
 # CARDO REI — Formal methodology for trustworthy AI development
 
 > **Purpose:** the one-sheet specification of the CARDO REI method, kept in-repo
-> so any agent or reader can orient without the external `PROMPTHOUND-DOCS/CARDO-REI.md`.
+> so any agent or reader can orient without the external `CARDO_REI.md`.
 > **CARDO Method** is the framework (find the hinge). **CARDO REI** is the
 > product that makes it visible, auditable, and cost-aware.
 

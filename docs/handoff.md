@@ -26,13 +26,13 @@ PromptHound Labs is an applied AI engineering lab. Everything in this repo is an
 - Three-layer architecture: fast-path regex gates → weighted catalog matching → decision tree with rationale
 - Fixed false-positive routing caused by generic words (`record`, `will`) in hardcoded genealogy regex
 - 19 unit tests, batch route script for fingerprinting custom inputs
-- [Full lab report](docs/experiments/night-shift-routing.md)
+- [Full lab report](experiments/night-shift-routing.md)
 
 ### Prompt Evaluation Suite — v1 complete
 - 22 deterministic tests for domain prompt structure and response parser robustness
 - Caught 2 regressions during development: null input crash and section-header-without-inline-content bug
 - Zero inference cost, sub-second execution
-- [Full lab report](docs/experiments/prompt-eval-suite.md)
+- [Full lab report](experiments/prompt-eval-suite.md)
 
 ### State Extraction (REI.jsx → 4 hooks)
 - Extracted `useChatHistory`, `useSessionTracker`, `useThriftyMode`, `useDomainHint` from the main chat component
@@ -69,7 +69,7 @@ PromptHound Labs is an applied AI engineering lab. Everything in this repo is an
 | `src/AppShell.jsx` | Lazy-loaded tool shell (7 tools) |
 | `src/hooks/` | 4 state-extraction hooks |
 | `src/__eval__/promptEval.test.js` | Prompt evaluation suite (22 tests) |
-| `docs/experiments/` | Structured lab reports |
+| `experiments/` | Structured lab reports |
 | `docs/lab-report-template.md` | Lab report template |
 | `scripts/batchRoute.cjs` | Batch route tester (28 sample inputs) |
 | `.gitlab-ci.yml` | CI pipeline (typecheck, app-build-drift, seed-harness-drift, ci) |

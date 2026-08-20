@@ -29,7 +29,7 @@ The user clicks 👍 (helpful) or 👎 (not helpful) on any REI response. These 
 
 ### Step B: Local Storage Mitigation (Instant)
 
-On 👎 to a non-premium response, the handler writes the current route ID to the `night-shift-user-fingerprint` array in `localStorage`. This array already exists and is read by `getStoredRoutePreference()` in `nightShiftRouter.js:173-185`.
+On 👎 to a non-premium response, the handler writes the current route ID to the `night-shift-user-fingerprint` array in `localStorage`. This array already exists and is read by `getStoredRoutePreference()` in `nightShiftRouter.ts:173-185`.
 
 The next time the user sends a query that matches domain-specific signals for that stored route, the router automatically elevates it to a higher-confidence pathway.
 
@@ -70,7 +70,7 @@ Stored preferences live in `localStorage` — client-controlled. The escalation 
 
 | Component | Status |
 |-----------|--------|
-| `storedPreference` mechanism | ✅ Exists — `nightShiftRouter.js:155-190` |
+| `storedPreference` mechanism | ✅ Exists — `nightShiftRouter.ts:155-190` |
 | Thumbs up/down UI buttons | ✅ This PR |
 | Escalation handler with cap | ✅ This PR |
 | Router reads storedPreference | ✅ Already works |

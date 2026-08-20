@@ -18,7 +18,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 **Trade-off:** Limited to predefined patterns. New greeting variants require pattern updates. But the catalog is versioned and auditable, and the patterns are exact — no false positives from a classifier that "mostly works."
 
-**Code:** `src/lib/deterministicEngine.js`, wired into `nightShiftRouter.js:buildRouterDecision()` as the first check before any catalog matching.
+**Code:** `src/lib/deterministicEngine.js`, wired into `nightShiftRouter.ts:buildRouterDecision()` as the first check before any catalog matching.
 
 ---
 
@@ -36,7 +36,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 **Trade-off:** Keywords miss semantic intent (e.g., "parents of Josiah Ramsey" doesn't match genealogy keywords because "parents" isn't in the catalog). Cannot detect sarcasm or indirect requests. But the fallback path (structured reasoning) handles unmatched queries gracefully.
 
-**Code:** `src/lib/nightShiftRouter.js:getCatalogRouteMatch()`, `data/fingerprints.json`
+**Code:** `src/lib/nightShiftRouter.ts:getCatalogRouteMatch()`, `data/fingerprints.json`
 
 ---
 
@@ -89,7 +89,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 **Trade-off:** The fingerprint thresholds (0.72 for "cheap" on structured-reasoning) are estimates, not calibrated measurements. But they're explicit, versioned, and better than 0%.
 
-**Code:** `src/lib/nightShiftRouter.js:494-501`
+**Code:** `src/lib/nightShiftRouter.ts:494-501`
 
 ---
 
@@ -107,7 +107,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 **Trade-off:** Domain continuity is lost across turns — if a user asks a follow-up genealogy question after a structured reasoning answer, the router won't stay in genealogy mode automatically. The explicit domain tab is the user's only way to persist domain selection.
 
-**Code:** `src/lib/nightShiftRouter.js:425,435,445`
+**Code:** `src/lib/nightShiftRouter.ts:425,435,445`
 
 ---
 
@@ -178,7 +178,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 
 **Trade-off:** Escalation updates the model, cost, and pathway but remains a point-in-time check. It doesn't re-evaluate after the model responds. A feedback loop (check quality → escalate if poor) would be more robust but adds cost and complexity.
 
-**Code:** `src/lib/cardoGuard.js:shouldEscalateToRemote()`, wired into `nightShiftRouter.js:509-523`
+**Code:** `src/lib/cardoGuard.js:shouldEscalateToRemote()`, wired into `nightShiftRouter.ts:509-523`
 
 ---
 
@@ -195,7 +195,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 **Alternatives considered:**
 - A. Server-side feedback endpoint — robust but requires backend infrastructure, data store, rate limiting. Over-engineered for MVP
 - B. Automatic quality scoring — complex, unreliable for a demo
-- C. Wire existing `storedPreference` mechanism to a 👍/👎 UI — zero new backend, zero API changes, already exists in `nightShiftRouter.js:155-190`
+- C. Wire existing `storedPreference` mechanism to a 👍/👎 UI — zero new backend, zero API changes, already exists in `nightShiftRouter.ts:155-190`
 
 **Choice:** C — thumbs UI + localStorage write. When a user 👎s a non-premium response, the current route ID is appended to `night-shift-user-fingerprint` in localStorage. On the next query, `getStoredRoutePreference()` reads this array and elevates matching queries to a higher-confidence pathway.
 
@@ -217,7 +217,7 @@ Each entry captures: what problem was being solved, what alternatives were consi
 2. **Drop-in Proxy API (`proxy.rei.ai`)**: Provide a serverless OpenAI/Groq-compatible proxy endpoint where developers change `baseURL` to instantly reduce API spend by 78% without code rewrites.
 3. **Enterprise Specialized Slices**: Dual-license domain-specific high-value engines (Legal Hinge Analyzer, Math Solver, Red Team Scanner).
 
-**Code & Specs:** `docs/ROADMAP.md`, `src/ToolsLanding.jsx`, `src/lib/nightShiftRouter.js`
+**Code & Specs:** `docs/ROADMAP.md`, `src/ToolsLanding.jsx`, `src/lib/nightShiftRouter.ts`
 
 ---
 

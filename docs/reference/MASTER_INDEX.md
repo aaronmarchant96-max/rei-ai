@@ -13,7 +13,7 @@
 
 | Need | Go To | Key Files |
 |------|-------|-----------|
-| CARDO REI methodology | [Methodology](#-methodology) | `PROMPTHOUND-DOCS/CARDO-REI.md` |
+| CARDO REI methodology | [Methodology](#-methodology) | `../CARDO_REI.md` |
 | Battle Arena contexts | [Battle Arena](#-battle-arena-contexts) | `PROMPTHOUND-DOCS/PROJECTS/` |
 | REI app surface | [REI Source](#-rei-app-surface) | `debate-furnace/src/REI.jsx` |
 | Night Shift / Fingerprint Router | [Night Shift](#-night-shift--rei-fingerprint-router) | `debate-furnace/docs/groq_router_v2_plan.md` |
@@ -25,7 +25,7 @@
 ## 🧠 METHODOLOGY *(Core Framework)*
 
 ### CARDO REI
-- **File:** `PROMPTHOUND-DOCS/CARDO-REI.md`
+- **File:** `../CARDO_REI.md`
 - **Purpose:** 8-step reasoning framework
 - **Steps:** Collect → Analyze → Record → Distinguish → Organize → Review → Evaluate → Iterate
 - **Confidence Tiers:** 🟢 Primary Source | 🔵 Strong Evidence | 🟠 Needs Review | 🟡 Family Memory | ⚪ Unverified
@@ -432,7 +432,7 @@ npm run token-audit
 ### Methodology
 | File | Purpose | Status |
 |------|---------|--------|
-| `PROMPTHOUND-DOCS/CARDO-REI.md` | 8-step framework | ✅ |
+| `../CARDO_REI.md` | 8-step framework | ✅ |
 | `PROMPTHOUND-DOCS/CLI-HANDBOOK.md` | CLI workflow | ✅ |
 | `TOKEN_SAVERS.md` | Token optimization guide | ✅ |
 | `docs/GRANT_APPENDIX.md` | Sprint case study (2026-07-03) | ✅ New |

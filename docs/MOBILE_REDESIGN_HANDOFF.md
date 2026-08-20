@@ -296,7 +296,7 @@ npm run token-audit
 - **Master Index:** `docs/REI_VIBE_MASTER_INDEX_TEMPLATE.md`
 - **Token Savers:** `TOKEN_SAVERS.md`
 - **Deployment Verification:** `PROMPTHOUND-DOCS/DEPLOYMENT_VERIFICATION.md`
-- **CARDO REI Methodology:** `PROMPTHOUND-DOCS/CARDO-REI.md`
+- **CARDO REI Methodology:** `CARDO_REI.md`
 
 ---
 

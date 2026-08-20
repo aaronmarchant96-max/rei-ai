@@ -1,6 +1,6 @@
 <!--
 CARDO REI methodology applied to this document.
-Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+Reference: [CARDO REI Methodology](../CARDO_REI.md)
 -->
 
 # Improved ChatGPT Prompt for Hinge Meter (v2)

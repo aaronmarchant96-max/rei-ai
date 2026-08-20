@@ -1,6 +1,6 @@
 <!--
 CARDO REI methodology applied to this document.
-Reference: [CARDO REI Methodology](PROMPTHOUND-DOCS/CARDO-REI.md)
+Reference: [CARDO REI Methodology](CARDO_REI.md)
 -->
 
 # CARDO GUARD Calibration Spec
@@ -30,12 +30,12 @@ The core idea stays the same:
 
 ### Current CARDO GUARD UI
 
-- [`src/CardoGuard.jsx`](/home/potatoking/debate-furnace/src/CardoGuard.jsx)
+- [`src/CardoGuard.jsx`](../src/CardoGuard.jsx)
   - Renders the human-first UI
   - Reads the evaluation result
   - Shows the recommendation, hinge, and explanation
 
-- [`src/lib/cardoGuard.js`](/home/potatoking/debate-furnace/src/lib/cardoGuard.js)
+- [`src/lib/cardoGuard.js`](../src/lib/cardoGuard.js)
   - Current synthetic decision math
   - Scenario presets
   - Human-readable explanation helpers

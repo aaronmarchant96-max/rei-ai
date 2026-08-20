@@ -1,3 +1,18 @@
+---
+status: historical
+authority_scope: none
+owner: Aaron Marchant
+last_verified: null
+verified_against_commit: null
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: docs/README.md
+archived_at: 2026-08-20
+---
+
+> ⚠️ **HISTORICAL DOCUMENT — POINT-IN-TIME DEPLOYMENT HANDBOOK**  
+> *This document preserves early deployment instructions for the pre-pivot Debate Furnace repository. For current production deployment procedures, see [`docs/README.md`](README.md).*
+
 # Vibe Vercel Deployment Handbook: PromptHound Labs
 
 This handbook is designed specifically for **Vibe CLI** to pick up, evaluate, and directly execute live deployments for the `debate-furnace` repository.
@@ -14,8 +29,8 @@ This handbook is designed specifically for **Vibe CLI** to pick up, evaluate, an
 
 - **Vercel Project Name:** `debate-furnace`
 - **Vercel Team Scope:** `prompthound-s-projects`
-- **Live App URL:** `https://prompthound-labs.vercel.app.vercel.app`
-- **Hash Route Targets:** `#rei` (REI.AI Chatbot), `#hinge-meter` (SVG Pivot Visualizer)
+- **Live App URL:** `https://prompthound-labs.vercel.app`
+- **Hash Route Targets:** `#rei` (REI.AI Chatbot), `#cardo-guard` (Cost & Risk Evaluator)
 
 ---
 
@@ -31,7 +46,7 @@ Always run the Jest test suite to ensure no regressions:
 npm test
 ```
 
-All 42 tests across 9 test suites must pass 100% green before proceeding.
+All tests across test suites must pass 100% green before proceeding.
 
 ### Step 2: Configure Environment Variables
 
@@ -69,8 +84,8 @@ git push origin main
 
 When executing changes, modify only these key files:
 
-- [src/REI.jsx](file:///home/potatoking/debate-furnace/src/REI.jsx) — Chatbot Layout & active domain profile rules.
-- [src/HingeMeter.jsx](file:///home/potatoking/debate-furnace/src/HingeMeter.jsx) — Needle angle & weight slider calculations.
-- [src/AppShell.jsx](file:///home/potatoking/debate-furnace/src/AppShell.jsx) — Core router & tab list.
-- [src/ToolsLanding.jsx](file:///home/potatoking/debate-furnace/src/ToolsLanding.jsx) — Tool description cards catalog.
-- [api/cfai/route.js](file:///home/potatoking/debate-furnace/api/cfai/route.js) — Node.js Serverless API endpoints mapping requests to the `cfai` CLI.
+- [src/REI.jsx](../src/REI.jsx) — Chatbot Layout & active domain profile rules.
+- [src/CardoGuard.jsx](../src/CardoGuard.jsx) — Risk & breakeven gate calculations.
+- [src/AppShell.jsx](../src/AppShell.jsx) — Core router & tab list.
+- [src/ToolsLanding.jsx](../src/ToolsLanding.jsx) — Tool description cards catalog.
+- [api/cfai.js](../api/cfai.js) — Node.js Serverless API endpoints.
