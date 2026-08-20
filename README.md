@@ -9,7 +9,7 @@
 
 REI.ai is the answer — a deterministic AI orchestration platform that inspects prompts locally and routes each request to the cheapest model capable of producing high-quality reasoning.
 
-Backed by **963 automated tests across 78 test suites** (generated from the test runner), REI.ai enforces verifiable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
+Backed by **967 automated tests across 79 test suites** (generated from the test runner), REI.ai enforces verifiable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -32,7 +32,7 @@ Backed by **963 automated tests across 78 test suites** (generated from the test
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 963 automated tests across 78 test suites to catch routing, security, and cost-contract regressions.
+- **Empirical Rigor:** Backed by 967 automated tests across 79 test suites to catch routing, security, and cost-contract regressions.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -171,7 +171,7 @@ export OPENAI_API_KEY="local-dev-key"
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **963 passing tests across 78 suites** |
+| Automated Tests | **967 passing tests across 79 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Intel Celeron J4105, 8GB RAM |
 | Monthly Operating Budget | $25/month |
@@ -198,7 +198,7 @@ npm run dev:full
 # Or run the headless cognitive proxy gateway alone
 npm run server
 
-# Run full test suite (78 test suites, 963 tests)
+# Run full test suite (79 test suites, 967 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

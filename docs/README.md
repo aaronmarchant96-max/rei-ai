@@ -12,7 +12,7 @@
 | [**Defense-in-Depth Control Matrix**](DEFENSE_IN_DEPTH_CONTROL_MATRIX.md) | **Authoritative.** 8-stage control pipeline mapping human, multi-model, and machine verification to neutralize LLM cognitive failure modes | Canonical |
 | [**Information-Theoretic Architecture**](INFORMATION_THEORETIC_ARCHITECTURE.md) | **Authoritative.** Formal spec: CARDO REI 8-phase loop, complexity index, CARDO GUARD equation, claim stratification, testable hypotheses | Canonical |
 | [**Architecture Decision Records**](DECISIONS.md) | **Authoritative.** Dated ADRs with trade-offs, alternatives, and code references | Canonical |
-| [**Testing Strategy**](TESTING.md) | 78 suites, 963 tests, testing philosophy, how to write new tests | Active |
+| [**Testing Strategy**](TESTING.md) | 79 suites, 967 tests, testing philosophy, how to write new tests | Active |
 | [**Claim Ledger**](CLAIM_LEDGER.md) | Reproducible evidence map: every public metric tied to a command | Active |
 
 ## 📋 Detailed references
@@ -25,6 +25,7 @@
 | [**Red Team Scanner Spec**](RED_TEAM_SPEC.md) | 16-category threat detection taxonomy | Deployed |
 | [**Commercial Pilot Specification**](COMMERCIAL_PILOT_SPEC.md) | BYOK architecture, 3-stage pilot funnel, and non-dilutive credit strategy | Active |
 | [**Pilot Agreement Template**](PILOT_AGREEMENT_TEMPLATE.md) | 1-page commercial agreement, security invariants, and bounded risk caps | Active |
+| [**Investor Diligence Memo**](INVESTOR_DILIGENCE_MEMO.md) | Scorecard, FinOps commercial thesis, ICP definition, and 90-day execution plan | Active |
 | [**Prompt Caching Protocol**](CACHING_RULES.md) | Prefix-freeze rules, deterministic SHA-256 keys, and telemetry reconstruction | Active |
 | [**Product Roadmap**](ROADMAP.md) | 30-day launch plan, open-core architecture | Active |
 | [**Common Mistakes**](COMMON_MISTAKES.md) | Troubleshooting matrix: deployment, build, API, routing | Active |

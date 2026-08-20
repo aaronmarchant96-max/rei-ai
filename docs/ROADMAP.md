@@ -1,18 +1,18 @@
 # REI.ai — Product Roadmap & Strategic Vision
 
-> **"The only router that thinks before it spends."**
+> **"The Inference FinOps & Policy Control Plane for Production AI Agents."**
 
-This document outlines the strategic product vision, open-core architecture model, commercial proxy API roadmap, and domain slice expansion strategy for **REI.ai**.
+This document outlines the strategic product vision, open-core architecture model, commercial proxy API roadmap, and 90-day customer validation plan for **REI.ai**.
 
 ---
 
 ## 🎯 Strategic Vision
 
-Most AI deployments suffer from two cost-performance failures:
-1. **Cost-Bleed**: Blindly routing simple queries to expensive frontier models ($15k+/month API bills).
-2. **Quality-Bleed**: Blindly routing complex reasoning to low-cost models (resulting in hallucinations).
+Most production AI agent stacks suffer from two critical operational failures:
+1. **Cost-Bleed**: Blindly routing routine reasoning to expensive frontier models ($15k+/month API spend).
+2. **Unverified Optimization**: Lack of empirical evaluation or non-inferiority proof when adopting cheaper models.
 
-REI.ai solves this by placing a **zero-inference deterministic engine** and **complexity router** before the first LLM call, reducing inference spend by **~92%** (measured, ceiling-based vs always-premium gpt-4o baseline) without compromising output quality.
+REI.ai solves this with a **zero-inference deterministic routing engine** and **epistemic evidence plane**, reducing inference spend by **~85–92%** (measured ceiling & replayed baseline) without compromising output quality.
 
 ---
 
@@ -24,71 +24,46 @@ REI.ai solves this by placing a **zero-inference deterministic engine** and **co
 │  - CARDO REI 8-Phase Loop                               │
 │  - Layer 0 Deterministic Engine                         │
 │  - Complexity Index R(T) Calculator                     │
-│  - Community Fingerprint Catalog (rei-ai/fingerprints)  │
+│  - Community Fingerprint Catalog (data/fingerprints.json│
 └────────────────────────────┬────────────────────────────┘
                              │
             ┌────────────────┴────────────────┐
             ▼                                 ▼
 ┌──────────────────────┐           ┌──────────────────────┐
 │  DROP-IN PROXY API   │           │   ENTERPRISE SLICES  │
-│  - OpenAI Compatible │           │  - Legal Hinge       │
-│  - proxy.rei.ai      │           │  - Math Solver       │
+│  - OpenAI Compatible │           │  - VPC Sidecar Proxy │
+│  - BYOK Credentials  │           │  - Evidence Vault    │
 │  - Cost Dashboard    │           │  - Red Team Scanner  │
 └──────────────────────┘           └──────────────────────┘
 ```
 
-### 1. Open-Source Engine (MIT / Apache 2.0)
-- **Core Router & Fingerprints**: The core Night Shift router algorithm, zero-inference fingerprint matcher, and R(T) calculator are 100% open-source.
-- **Community Fingerprint Catalog (`rei-ai/fingerprints`)**: A crowdsourced repository of regex and complexity rules allowing developers to define custom domain triggers.
-
-### 2. Commercial Drop-in Proxy API (`proxy.rei.ai`)
-- **Zero-Code Integration**: Point any OpenAI SDK or LLM client `baseURL` to `https://proxy.rei.ai/v1` to cut API spend by ~92% (measured, ceiling-based lab benchmark).
-- **Live Cost Savings Dashboard**: Real-time telemetry tracking dollars saved, query distribution, and Layer 0 deflection rates.
-
-### 3. Enterprise Specialized Slices
-- 🛡️ **Red Team Security**: 16-category threat detection scanner for prompt injection, jailbreaks, and context poisoning.
-- 📜 **Archival Genealogy**: High-precision record disambiguation engine using explicit evidence tiering (🟢 Primary, 🔵 Strong, 🟠 Review, 🟡 Memory).
-- ⚖️ **Legal Hinge Analyzer**: Isolate load-bearing precedent pivots in case law.
-- 🧮 **Math Solver**: Multi-step mathematical proof verification without symbolic hallucination.
-
 ---
 
-## 🗓️ 30-Day Launch Roadmap
+## 🗓️ 90-Day Commercial Execution Plan
 
-### Phase 1: Proxy Handler & Core Polish (Week 1)
-- [x] Integrate Pro Relume flagship landing page & sticky glass navigation.
+### Days 0–30: Buyer Discovery & Design Partners
+- [x] Integrate Pro Relume flagship landing page & sticky navigation.
 - [x] Rename cost gate to **CARDO Guard**.
-- [ ] Build serverless `/api/v1/chat/completions` proxy route handler.
-- [ ] Implement `X-REI-Savings` & `X-REI-Pathway` HTTP response headers.
+- [x] Build serverless `/api/v1/chat/completions` proxy route handler.
+- [x] Implement `X-REI-Savings` & `X-REI-Pathway` HTTP response headers.
+- [ ] Conduct 15 structured customer discovery interviews with AI engineering leads.
+- [ ] Sign 3 Design Partners for Stage 1 Offline Replay Audits.
 
-### Phase 2: Open-Source Catalog & SDK Release (Week 2)
-- [ ] Create public **`rei-ai/fingerprints`** catalog repository with contribution guidelines.
-- [ ] Release Python SDK (`pip install rei-ai`).
-- [ ] Release TypeScript / Node SDK (`npm install @rei-ai/sdk`).
+### Days 31–60: Customer Evidence Production
+- [ ] Complete first customer replay audit on 10,000 anonymized production logs.
+- [ ] Execute bounded A/B non-inferiority validation ($\delta \le 3\%$) on customer workload.
+- [ ] Publish first customer case study with reconciled billing evidence.
+- [ ] Package containerized VPC Sidecar Proxy for customer-hosted deployments.
 
-### Phase 3: Cost Savings Dashboard & Analytics (Week 3)
-- [x] Build user telemetry dashboard displaying real-time dollar savings vs. frontier baselines.
-- [x] Implement token budget ceiling controls (`max_cost_per_query`).
-
-### Phase 4: Public Launch & Case Studies (Week 4)
-- [ ] Publish reproducible 57-prompt benchmark study ([`INFORMATION_THEORETIC_ARCHITECTURE.md`](INFORMATION_THEORETIC_ARCHITECTURE.md)).
-- [ ] Public launch on Hacker News, ProductHunt, and GitHub Trending.
-
----
-
-## 🧠 Next Generation Architecture (v4.0 Roadmap)
-
-### Local ONNX / Semantic Embedding Classifier (Zero-Shot Upgrade)
-- **Problem Statement:** Current lexical/keyword feature extraction (`Night Shift v3`) achieves **60-80% deterministic accuracy** on labeled holdout sets (`routingEval`, `routingEvalBlind`, `routingEvalML`, `routingEvalBlindV3`). The semantic embedding variant (`routingEvalBlindV2`) cannot be measured in CI (ONNX unavailable — hash-noise fallback, ~12%).
-- **Architectural Milestone (v4.0):** Integrate local, zero-dependency ONNX embeddings (`@xenova/transformers` with `all-MiniLM-L6-v2` or `bge-small-en-v1.5`) directly into the local JS runtime.
-- **Zero-Latency Invariant:** Execute local vector similarity scoring in <25ms in WebAssembly/Node environments without external API calls.
-- **Target Accuracy:** Elevate out-of-sample holdout accuracy from the current **60-80%** band to **> 85.0%**.
+### Days 61–90: Commercial Conversion & Scaling
+- [ ] Convert at least 1 design partner into a recurring paid contract ($500–$1,500/mo base + value share).
+- [ ] Release public Python and TypeScript SDKs.
+- [ ] Launch on ProductHunt, Hacker News, and AI FinOps communities.
 
 ---
 
 ## 📊 Target Benchmarks (Empirically Verified)
-- **Cost Reduction Baseline**: **~92% reduction** (measured, ceiling-based) vs. always-premium gpt-4o baseline across general catalog queries.
-- **V1 Holdout Accuracy**: **63.0%** across 27 blind prompts (`routingEvalML.test.js`, the only suite with a hard ≥60% CI gate).
-- **Semantic Embedding Accuracy**: NOT MEASURABLE IN CI — `routingEvalBlindV2.test.js` requires ONNX + model download; without it the suite measures hash-noise (~12%) and prints a warning that results do not validate semantic accuracy.
-- **v4.0 Zero-Shot Embedding Target**: **> 85.0%** target via local ONNX semantic vector classifier.
-- **Test Suite Integrity**: Maintain 100% pass rate across all **312 automated unit and integration tests across 21 test suites**. Current canonical stats are tracked in [`data/telemetry.json`](../data/telemetry.json).
+
+- **Cost Reduction Baseline**: **-85.7%** (replayed demo) / **~92%** (ceiling-based modeled) vs. always-premium gpt-4o baseline.
+- **Holdout Accuracy**: **72.8%** deterministic accuracy across 136 unique pooled calibration samples.
+- **Empirical Rigor**: Backed by **967 automated tests across 79 test suites**. Canonical verification is tracked in [`src/data/claims.json`](../src/data/claims.json).

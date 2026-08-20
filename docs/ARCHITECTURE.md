@@ -109,10 +109,10 @@ When a commit fixes or documents an error, one tag is included in the commit bod
 
 ## 5. Summary & Verification
 
-Run the full verification suite across all 78 test suites:
+Run the full verification suite across all 79 test suites:
 
 ```bash
-npm test                             # 963 passing tests across 78 suites
+npm test                             # 967 passing tests across 79 suites
 node scripts/gen-claims.mjs --check  # Verify claims.json integrity
 node scripts/extract-error-gaps.mjs # Update error gap catalogue
 ```

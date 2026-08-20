@@ -10,6 +10,7 @@ import { handleCfaiRequest, callModelDirect } from "../../cfai.js";
 import { storeTrace } from "../../../shared/lib/kv.js";
 import { projectedCost, maxCostPerQuery, isOverBudget } from "../../../shared/lib/costModel.js";
 import { hashMessages, lookupDkrByHash, storeDkrEntry, recordDkrHit } from "../../../shared/lib/dkr.js";
+import { buildRouterDecision } from "../../../src/lib/nightShiftRouter.ts";
 
 const ERROR_CODES = {
   CF_INVALID_REQUEST: "CF_INVALID_REQUEST",
@@ -21,10 +22,10 @@ const ERROR_CODES = {
   CF_INTERNAL_ERROR: "CF_INTERNAL_ERROR",
 };
 
-// Auto-routed proxy traffic is served on this model unless a client-side router
-// decision is supplied (it currently never is from this endpoint). Its ceiling
-// rate is the cost basis for the auto-route budget projection before spend.
-const AUTO_ROUTE_MODEL = "deepseek-v4-flash";
+// Conservative model rate basis used exclusively for pre-inference budget projection
+// when auto-routing (isAutoRoute === true). The actual model is selected dynamically
+// by handleCfaiRequest / buildRouterDecision downstream.
+const AUTO_ROUTE_BUDGET_BASIS_MODEL = "deepseek-v4-flash";
 
 const PILOT_TENANT = "pilot";
 const POLICY_VERSION = "v1";
@@ -183,7 +184,7 @@ export default async function handler(req, res) {
     const ceiling = maxCostPerQuery();
     if (ceiling !== null) {
       const projectedForEnforcement = projectedCost({
-        model: useAutoRoute ? AUTO_ROUTE_MODEL : model,
+        model: useAutoRoute ? AUTO_ROUTE_BUDGET_BASIS_MODEL : model,
         maxTokens: max_tokens,
       });
       if (isOverBudget(projectedForEnforcement, ceiling)) {
@@ -244,20 +245,21 @@ export default async function handler(req, res) {
 
     // ── Auto-route through CARDO ──
     // Pass the structured messages as messagesOverride so the inference-visible
-    // array preserves the original multi-turn structure.  The router still runs
+    // array preserves the original multi-turn structure. The router still runs
     // on the flattened userPrompt for text-feature extraction (hinge, terms, DAS).
-    const result = await handleCfaiRequest("chat", [], userPrompt, systemPrompt, [], null, messages);
+    const routerDecision = buildRouterDecision(userPrompt);
+    const result = await handleCfaiRequest("chat", [], userPrompt, systemPrompt, [], routerDecision, messages);
 
     if (!result.success) {
       return errorReply(res, 500, ERROR_CODES.CF_INTERNAL_ERROR, result.error || "Routing error");
     }
 
-    const routerDecision = result.routerDecision;
-    const selectedModel = result.model || "unknown";
-    const reiPathway = routerDecision?.id || "unknown";
+    const effectiveRouterDecision = result.routerDecision || routerDecision;
+    const selectedModel = result.model || effectiveRouterDecision?.model || "unknown";
+    const reiPathway = effectiveRouterDecision?.id || "unknown";
     const reiSavings = computeSavings(
-      routerDecision?.estimatedCost,
-      routerDecision?.premiumCost
+      effectiveRouterDecision?.estimatedCost,
+      effectiveRouterDecision?.premiumCost
     );
 
     const usage = result.usage || {
@@ -315,6 +317,11 @@ export default async function handler(req, res) {
           lastHitAt: null,
         })
       );
+    }
+
+    if (typeof res.setHeader === "function") {
+      res.setHeader("X-REI-Pathway", reiPathway);
+      res.setHeader("X-REI-Savings", String(reiSavings));
     }
 
     return res.status(200).json({

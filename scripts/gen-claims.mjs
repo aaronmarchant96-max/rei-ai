@@ -162,6 +162,15 @@ const DOC_TARGETS = [
         replacement: () => `npm test                             # ${testCount} passing tests across ${suiteCount} suites`
       }
     ]
+  },
+  {
+    relPath: "docs/ROADMAP.md",
+    transforms: [
+      {
+        pattern: /Backed by \*\*\d+ automated tests across \d+ test suites\*\*/g,
+        replacement: () => `Backed by **${testCount} automated tests across ${suiteCount} test suites**`
+      }
+    ]
   }
 ];
 

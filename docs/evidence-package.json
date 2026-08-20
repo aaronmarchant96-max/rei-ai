@@ -1,22 +1,22 @@
 {
   "$schema": "https://rei.ai/schemas/evidence-package-v1.json",
   "metadata": {
-    "generatedAt": "2026-08-20T11:43:18.571Z",
-    "gitCommit": "3fee5de3b6b49324e11b2d636b3e00b70cc20cb1",
+    "generatedAt": "2026-08-20T12:00:13.121Z",
+    "gitCommit": "4dc9821ae38cf2f82a606285c07f8378a57ef8b0",
     "gitBranch": "main",
     "nodeVersion": "v20.20.2",
     "platform": "linux"
   },
   "freshTestRunnerExecution": {
-    "executedAt": "2026-08-20T11:43:18.572Z",
-    "durationMs": 118434,
+    "executedAt": "2026-08-20T12:00:13.122Z",
+    "durationMs": 86886,
     "exitCode": 0,
     "status": "PASS",
-    "totalSuites": 78,
-    "passedSuites": 78,
+    "totalSuites": 79,
+    "passedSuites": 79,
     "failedSuites": 0,
-    "totalTests": 963,
-    "passedTests": 963,
+    "totalTests": 967,
+    "passedTests": 967,
     "failedTests": 0
   },
   "routerBenchmark": {

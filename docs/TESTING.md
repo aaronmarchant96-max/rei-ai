@@ -1,6 +1,6 @@
 # Testing Strategy
 
-REI.ai currently has 78 test suites with 963 tests passing. The generated count is recorded in `src/data/claims.json`. This document explains the testing philosophy, what each category covers, and how to write new tests.
+REI.ai currently has 79 test suites with 967 tests passing. The generated count is recorded in `src/data/claims.json`. This document explains the testing philosophy, what each category covers, and how to write new tests.
 
 ## Philosophy
 
@@ -53,7 +53,7 @@ npx jest src/lib/nightShiftRouter.test.js   # one suite
 npx jest --verbose                          # verbose output
 ```
 
-Latest verified full-suite result (2026-08-20): **78/78 suites**, **963/963 tests**.
+Latest verified full-suite result (2026-08-20): **79/79 suites**, **967/967 tests**.
 
 ## Auditing the test system itself
 
