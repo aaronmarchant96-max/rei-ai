@@ -1,10 +1,9 @@
-// CFai API Route for Vercel Deployment
-// Handles web requests and calls the CFai CLI tool or falls back to direct API routing.
 import "dotenv/config";
 import { REI_SYSTEM_PROMPT } from "../data/prompts/reiSystem.js";
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
+import { parseToolCalls, extractThinkingAndContent, isPrivateHostname } from "../src/lib/toolParser.ts";
 
 export const maxDuration = 60;
 
@@ -113,13 +112,7 @@ const URL_TIMEOUT_MS = 3500;
 const MAX_FETCH_CHARS = 6000;
 
 export function isPrivateIpOrHost(hostname) {
-  if (!hostname) return true;
-  const h = hostname.toLowerCase();
-  if (h === "localhost" || h.endsWith(".local") || h.endsWith(".internal")) return true;
-  if (/^127\./.test(h) || /^10\./.test(h) || /^192\.168\./.test(h) || /^169\.254\./.test(h)) return true;
-  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h)) return true;
-  if (h === "0.0.0.0" || h === "::1" || /^fc00:/i.test(h)) return true;
-  return false;
+  return isPrivateHostname(hostname);
 }
 
 export function cleanHtmlToText(html) {
@@ -133,6 +126,15 @@ export function cleanHtmlToText(html) {
     .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, "")
     .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, "");
 
+  // Structure-preserving tag replacements
+  cleaned = cleaned
+    .replace(/<li[^>]*>/gi, "\n• ")
+    .replace(/<\/li>/gi, "")
+    .replace(/<tr[^>]*>/gi, "\n")
+    .replace(/<\/(td|th)>/gi, " | ")
+    .replace(/<\/(h[1-6]|p|div|article|section|header)>/gi, "\n\n")
+    .replace(/<br\s*\/?>/gi, "\n");
+
   cleaned = cleaned
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/gi, " ")
@@ -142,7 +144,11 @@ export function cleanHtmlToText(html) {
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'");
 
-  cleaned = cleaned.replace(/\s+/g, " ").trim();
+  cleaned = cleaned
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n\s*\n\s*\n+/g, "\n\n")
+    .trim();
+
   const truncated = cleaned.slice(0, MAX_FETCH_CHARS);
   return title ? `Title: ${title}\n\n${truncated}` : truncated;
 }
@@ -746,85 +752,8 @@ async function completeWithContinuation(runBackend, messages, firstResult) {
 const MAX_TOOL_ROUNDS = 3;
 
 export function extractToolCalls(result) {
-  if (!result) return null;
-  if (result.tool_calls && Array.isArray(result.tool_calls) && result.tool_calls.length > 0) {
-    return result.tool_calls;
-  }
-
-  const content = result.content || "";
-  if (!content) return null;
-
-  const toolCalls = [];
-
-  // 1. Catch <function=name> <parameter=key>val</parameter> </function> or function=name>...
-  const functionCallRegex = /<?function=([a-zA-Z0-9_-]+)>([\s\S]*?)<\/function>/gi;
-  let match;
-  while ((match = functionCallRegex.exec(content)) !== null) {
-    const fnName = match[1];
-    const inner = match[2].trim();
-
-    const paramRegex = /<parameter=([a-zA-Z0-9_-]+)>([\s\S]*?)<\/parameter>/g;
-    let paramMatch;
-    let params = {};
-    let hasParams = false;
-    while ((paramMatch = paramRegex.exec(inner)) !== null) {
-      hasParams = true;
-      let val = paramMatch[2].trim();
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-        val = val.slice(1, -1);
-      } else if (!isNaN(Number(val))) {
-        val = Number(val);
-      }
-      params[paramMatch[1]] = val;
-    }
-
-    if (hasParams) {
-      toolCalls.push({
-        id: `call_${Date.now()}_${toolCalls.length}`,
-        type: "function",
-        function: {
-          name: fnName,
-          arguments: JSON.stringify(params),
-        },
-      });
-    } else {
-      let parsedArgs = inner;
-      try {
-        parsedArgs = JSON.parse(inner);
-      } catch {}
-      toolCalls.push({
-        id: `call_${Date.now()}_${toolCalls.length}`,
-        type: "function",
-        function: {
-          name: fnName,
-          arguments: typeof parsedArgs === "string" ? parsedArgs : JSON.stringify(parsedArgs || {}),
-        },
-      });
-    }
-  }
-
-  // 2. Catch <tool_call>{"name": "fetch_url", "arguments": ...}</tool_call>
-  const toolCallTagRegex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
-  while ((match = toolCallTagRegex.exec(content)) !== null) {
-    const inner = match[1].trim();
-    if (!inner.includes("<function=")) {
-      try {
-        const parsed = JSON.parse(inner);
-        if (parsed.name) {
-          toolCalls.push({
-            id: `call_${Date.now()}_${toolCalls.length}`,
-            type: "function",
-            function: {
-              name: parsed.name,
-              arguments: typeof parsed.arguments === "string" ? parsed.arguments : JSON.stringify(parsed.arguments || {}),
-            },
-          });
-        }
-      } catch {}
-    }
-  }
-
-  return toolCalls.length > 0 ? toolCalls : null;
+  const parsed = parseToolCalls(result);
+  return parsed.validToolCalls.length > 0 ? parsed.validToolCalls : null;
 }
 
 async function completeWithToolsAndContinuation(runBackend, messages, firstResult, routerDecision, backends) {
@@ -860,46 +789,47 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
     provenance: "observed",
   };
 
-  let activeToolCalls = extractToolCalls(currentResult);
+  while (toolRounds < MAX_TOOL_ROUNDS) {
+    const parseResult = parseToolCalls(currentResult);
+    const activeToolCalls = parseResult.validToolCalls;
 
-  while (activeToolCalls && activeToolCalls.length > 0 && toolRounds < MAX_TOOL_ROUNDS) {
+    if (activeToolCalls.length === 0) {
+      if (parseResult.validationErrors.length > 0 && toolRounds === 0) {
+        toolRounds += 1;
+        const retryPrompt = `Tool execution rejected: ${parseResult.validationErrors.join("; ")}. Please provide valid arguments or respond directly.`;
+        currentMessages = currentMessages.concat([
+          {
+            role: "assistant",
+            content: parseResult.cleanContent || null,
+          },
+          {
+            role: "user",
+            content: retryPrompt,
+          }
+        ]);
+        currentResult = await runBackend(currentMessages, currentResult.systemPrompt || null, currentResult.model || null);
+        accumulatedUsage = sumUsage(accumulatedUsage, currentResult.usage);
+        continue;
+      }
+      break;
+    }
+
     toolRounds += 1;
-
-    // Clean inline XML tags from the assistant turn so the context stays clean
-    const cleanAssistantContent = (currentResult.content || "")
-      .replace(/<function=[a-zA-Z0-9_-]+>[\s\S]*?<\/function>/g, "")
-      .replace(/<tool_call>[\s\S]*?<\/tool_call>/g, "")
-      .trim();
 
     currentMessages = currentMessages.concat([
       {
         role: "assistant",
-        content: cleanAssistantContent || null,
+        content: parseResult.cleanContent || null,
         tool_calls: activeToolCalls,
       }
     ]);
 
     for (const toolCall of activeToolCalls) {
       let output = "";
+      const args = toolCall.parsedArgs || {};
       if (toolCall.function?.name === "web_search") {
-        let args = {};
-        try {
-          args = typeof toolCall.function.arguments === "string"
-            ? JSON.parse(toolCall.function.arguments)
-            : (toolCall.function.arguments || {});
-        } catch {
-          args = {};
-        }
         output = await executeWebSearch(args.query, args.num_results);
       } else if (toolCall.function?.name === "fetch_url") {
-        let args = {};
-        try {
-          args = typeof toolCall.function.arguments === "string"
-            ? JSON.parse(toolCall.function.arguments)
-            : (toolCall.function.arguments || {});
-        } catch {
-          args = {};
-        }
         output = await executeFetchUrl(args.url);
       } else {
         output = JSON.stringify({ error: `Unknown tool: ${toolCall.function?.name}` });
@@ -1003,7 +933,6 @@ async function completeWithToolsAndContinuation(runBackend, messages, firstResul
     }
     accumulatedUsage = sumUsage(accumulatedUsage, nextResult.usage);
     currentResult = nextResult;
-    activeToolCalls = extractToolCalls(currentResult);
   }
 
   if (executedResearch.invoked) {
