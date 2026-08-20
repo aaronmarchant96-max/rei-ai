@@ -3,7 +3,7 @@ import { REI_SYSTEM_PROMPT } from "../data/prompts/reiSystem.js";
 import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
-import { parseToolCalls, extractThinkingAndContent, isPrivateHostname } from "../src/lib/toolParser.ts";
+import { parseToolCalls, extractThinkingAndContent, isPrivateHostname } from "../shared/lib/toolParser.js";
 
 export const maxDuration = 60;
 
@@ -543,6 +543,9 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
 
   const candidateModels = [
     modelOverride,
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.6-27b",
     "llama-3.3-70b-versatile",
     "llama-3.1-8b-instant",
   ].filter(Boolean);

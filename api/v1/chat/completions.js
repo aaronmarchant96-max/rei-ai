@@ -10,7 +10,7 @@ import { handleCfaiRequest, callModelDirect } from "../../cfai.js";
 import { storeTrace } from "../../../shared/lib/kv.js";
 import { projectedCost, maxCostPerQuery, isOverBudget } from "../../../shared/lib/costModel.js";
 import { hashMessages, lookupDkrByHash, storeDkrEntry, recordDkrHit } from "../../../shared/lib/dkr.js";
-import { buildRouterDecision } from "../../../src/lib/nightShiftRouter.ts";
+import { buildRouterDecision } from "../../../src/lib/nightShiftRouter.js";
 
 const ERROR_CODES = {
   CF_INVALID_REQUEST: "CF_INVALID_REQUEST",
