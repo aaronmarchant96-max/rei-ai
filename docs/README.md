@@ -12,7 +12,7 @@
 | [**Defense-in-Depth Control Matrix**](DEFENSE_IN_DEPTH_CONTROL_MATRIX.md) | **Authoritative.** 8-stage control pipeline mapping human, multi-model, and machine verification to neutralize LLM cognitive failure modes | Canonical |
 | [**Information-Theoretic Architecture**](INFORMATION_THEORETIC_ARCHITECTURE.md) | **Authoritative.** Formal spec: CARDO REI 8-phase loop, complexity index, CARDO GUARD equation, claim stratification, testable hypotheses | Canonical |
 | [**Architecture Decision Records**](DECISIONS.md) | **Authoritative.** Dated ADRs with trade-offs, alternatives, and code references | Canonical |
-| [**Testing Strategy**](TESTING.md) | 79 suites, 967 tests, testing philosophy, how to write new tests | Active |
+| [**Testing Strategy**](TESTING.md) | 80 suites, 975 tests, testing philosophy, how to write new tests | Active |
 | [**Claim Ledger**](CLAIM_LEDGER.md) | Reproducible evidence map: every public metric tied to a command | Active |
 
 ## 📋 Detailed references
@@ -27,6 +27,7 @@
 | [**Commercial Pilot Brief**](COMMERCIAL_PILOT_BRIEF.md) | 1-page customer executive summary, data invariants, and advancement gates | Active |
 | [**Pilot Agreement Template**](PILOT_AGREEMENT_TEMPLATE.md) | 1-page commercial agreement, security invariants, and bounded risk caps | Active |
 | [**Investor Diligence Memo**](INVESTOR_DILIGENCE_MEMO.md) | Scorecard, FinOps commercial thesis, ICP definition, and 90-day execution plan | Active |
+| [**Family Archive Porting Spec**](FAMILY_ARCHIVE_PORTING_SPEC.md) | Evidence tiers, same-name disambiguation hinge, and transcript caching for family-archive | Active |
 | [**Prompt Caching Protocol**](CACHING_RULES.md) | Prefix-freeze rules, deterministic SHA-256 keys, and telemetry reconstruction | Active |
 | [**Product Roadmap**](ROADMAP.md) | 30-day launch plan, open-core architecture | Active |
 | [**Common Mistakes**](COMMON_MISTAKES.md) | Troubleshooting matrix: deployment, build, API, routing | Active |
