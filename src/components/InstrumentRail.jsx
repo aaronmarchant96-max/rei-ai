@@ -40,14 +40,17 @@ export default function InstrumentRail({
 
   return (
     <aside className="rei-instrument-rail" aria-label="Session instrumentation">
-      <button
-        onClick={() => setIsCollapsed(true)}
-        className="rei-instrument-rail__toggle-btn"
-        aria-label="Collapse sidebar"
-        title="Collapse sidebar"
-      >
-        &#8250;
-      </button>
+      <div className="rei-instrument-rail__header">
+        <span className="rei-instrument-rail__title">Live Telemetry</span>
+        <button
+          onClick={() => setIsCollapsed(true)}
+          className="rei-instrument-rail__toggle-btn"
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
+        >
+          &#8250;
+        </button>
+      </div>
 
       <div className="rei-side-card">
         <div className="rei-side-card__heading">This Session</div>

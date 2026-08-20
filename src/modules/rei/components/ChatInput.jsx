@@ -97,13 +97,11 @@ export default function ChatInput() {
               type="button"
               className="rei-clip-btn"
               onClick={() => fileInputRef.current?.click()}
-              title="Attach text/code files"
+              title="Attach text/code files (up to 4 files, max 500KB each)"
+              aria-label="Attach text/code files"
             >
               <Paperclip size={16} />
             </button>
-            <span className="rei-file-hint">
-              Up to 4 text/code files (500KB each)
-            </span>
             <textarea
               ref={inputRef}
               className="rei-input-area"

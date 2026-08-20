@@ -780,9 +780,9 @@ export default function REI({ initialPrompt } = {}) {
                 type="button"
                 onClick={() => setSelectedDomain(dom.id)}
                 className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
+                title={getDomain(dom.id)?.subtitle || dom.label}
               >
                 <span className="rei-domain-tab__label">{dom.label}</span>
-                <span className="rei-domain-tab__sub">{getDomain(dom.id)?.subtitle || ""}</span>
               </button>
             ))}
           </div>
@@ -839,7 +839,7 @@ export default function REI({ initialPrompt } = {}) {
         <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, height: "100%", overflow: "hidden" }}>
             <main className="flex-1 overflow-y-auto px-4 py-4 rei-main-content">
-              {(!mobile || messages.length > 1 || isTyping) && (
+              {(messages.length > 1 || isTyping || selectedDomain !== "assistant") && (
                 <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
               )}
 
@@ -882,7 +882,16 @@ export default function REI({ initialPrompt } = {}) {
                   }}>×</button>
                 </div>
               )}
-              <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
+              <ChatHistory
+                messages={messages}
+                selectedDomain={selectedDomain}
+                isTyping={isTyping}
+                chatEndRef={chatEndRef}
+                mobile={mobile}
+                onCopy={copyText}
+                onExport={handleExport}
+                domainLabel={currentDomain?.label || "REI.ai"}
+              />
 
               {backendError && (
                 <BackendUnavailablePanel
