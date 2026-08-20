@@ -55,6 +55,14 @@ npx jest --verbose                          # verbose output
 
 Latest verified full-suite result (2026-08-20): **83/83 suites**, **997/997 tests**.
 
+## Test Suite Milestones & Historical Progression
+
+| Milestone | Date | Test Suites | Test Count | Key Additions |
+| :--- | :--- | :--- | :--- | :--- |
+| **v1.0 (Initial MVP)** | June 2026 | 43 suites | 558 tests | Core router cascade, initial debate furnace, cost helpers |
+| **v2.0 (FinOps & Provenance)** | July 2026 | 72 suites | 890 tests | OpenAI proxy `/v1`, DKR session caching, claims ledger |
+| **v3.0 (Hardened Architecture)** | August 2026 | **83 suites** | **997 tests** | Archivist engine, fallback resilience, schema-validated toolParser, replyParser |
+
 ## Auditing the test system itself
 
 When you need to audit test integrity (not just pass/fail), run this sequence:

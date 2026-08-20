@@ -4,11 +4,26 @@
 > **CARDO REI is the methodology — finding the hinge that changes the answer. REI is the artifact — making the reasoning visible, auditable, and cost-aware.**
 > **The artifact proposes (bootstrapper suggests keyword improvements), the human decides (review before applying). Together they close the Engelbart loop.**
 
+---
+
+## 🚀 Start Here
+
+If you are evaluating this repository for the first time, follow this reading path:
+
+1. [**Portfolio Overview**](PORTFOLIO_OVERVIEW.md) — 3-pillar engineering index, flagship project case studies & verified metrics
+2. [**REI.ai Flagship Platform**](../README.md) — Drop-in OpenAI proxy (`/v1`), <1ms dynamic routing, token FinOps
+3. [**Claim Ledger**](CLAIM_LEDGER.md) — Machine-reproducible evidence map & producing commands
+4. [**Testing Strategy**](TESTING.md) — 83 suites / 997 tests, verification philosophy & failure gap taxonomy
+5. [**Arena Harness & Family Archive**](PORTFOLIO_OVERVIEW.md#2-arena-harness--adversarial-ai-evaluation--benchmarking) — Adversarial security and full-stack product proofs
+
+---
+
 ## 📐 Canonical specifications (read these first)
 
 | Document | What it covers | Status |
 | :--- | :--- | :--- |
 | [**CARDO REI Methodology**](CARDO_REI.md) | **One-sheet.** Formal method spec: find the hinge → test/measure/trace → verified evidence → human gate → iterate | Canonical |
+| [**Portfolio Overview**](PORTFOLIO_OVERVIEW.md) | **Authoritative.** 3-pillar engineering portfolio index (REI.ai, Arena Harness, Family Archive) | Canonical |
 | [**Defense-in-Depth Control Matrix**](DEFENSE_IN_DEPTH_CONTROL_MATRIX.md) | **Authoritative.** 8-stage control pipeline mapping human, multi-model, and machine verification to neutralize LLM cognitive failure modes | Canonical |
 | [**Information-Theoretic Architecture**](INFORMATION_THEORETIC_ARCHITECTURE.md) | **Authoritative.** Formal spec: CARDO REI 8-phase loop, complexity index, CARDO GUARD equation, claim stratification, testable hypotheses | Canonical |
 | [**Architecture Decision Records**](DECISIONS.md) | **Authoritative.** Dated ADRs with trade-offs, alternatives, and code references | Canonical |
