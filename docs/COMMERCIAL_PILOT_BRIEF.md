@@ -80,7 +80,7 @@ Live routing in Stage 3 is constrained by explicit, customer-approved boundaries
 
 - **$0 Platform Fee**: 30-day Stage 3 live routing is free of platform charges. Customer pays upstream providers directly.
 - **Zero-Penalty Disconnect**: Disconnect from the proxy at any time with zero financial penalty or continuing obligation.
-- **Post-Pilot Commercial Transition**: Structured to guarantee ongoing net savings. Zero variable fees apply unless quality and billing reconciliation gates are verified.
+- **Post-Pilot Commercial Transition**: Structured to target net customer savings with a shared-value fee. Zero variable fees apply unless quality and billing reconciliation gates are verified.
 
 ---
 

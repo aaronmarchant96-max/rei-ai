@@ -152,7 +152,7 @@ Live production routing with customer-approved bounded-risk engineering controls
 
 ## 7. Exit Reconciliation Package
 
-At the end of Stage 3, the customer receives an **Audited Evidence Reconciliation Package** reporting three separate evidence blocks:
+At the end of Stage 3, the customer receives an **Evidence Reconciliation Package** reporting three separate evidence blocks:
 1. **Stage 1 Block (Modeled Replay Evidence)**: Replayed routing distribution and modeled counterfactual savings under versioned rate cards.
 2. **Stage 2 Block (Experimental Quality Evidence)**: Statistical non-inferiority evaluation, win/tie/loss counts, and objective metric reports.
 3. **Stage 3 Block (Observed Live Evidence)**: Reconciled observed provider charges, observed latency distribution ($P50/P95$), observed availability, rescue rate ($\le 5\%$), and fallback frequency.
