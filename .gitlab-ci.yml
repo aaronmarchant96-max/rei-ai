@@ -42,10 +42,7 @@ typecheck:
   stage: verify
   image: node:${NODE_VERSION}
   script:
-    # --legacy-peer-deps required: react@18 runtime vs @types/react@19
-    # declarations hit ERESOLVE under strict peer resolution (same as all
-    # other install jobs in this file). See package.json.
-    - npm ci --legacy-peer-deps
+    - npm ci
     # tsc statically resolves the dynamic import of sourceIndex.json, which is
     # a gitignored prebuild artifact — generate it before typechecking.
     - node scripts/index-source.mjs
@@ -57,7 +54,7 @@ app-build-drift:
   stage: verify
   image: node:${NODE_VERSION}
   script:
-    - npm ci --legacy-peer-deps
+    - npm ci
     - npm run build
     - npm run app:validate
   rules:
@@ -67,7 +64,7 @@ seed-harness-drift:
   stage: verify
   image: node:${NODE_VERSION}
   script:
-    - npm ci --legacy-peer-deps
+    - npm ci
     - npm run seeds:validate
     - npm run seeds:build
     - git diff --exit-code -- data/inspiration-seeds.batch.jsonl data/inspiration-seeds.manifest.json
@@ -80,7 +77,7 @@ ci:
   stage: test
   image: node:${NODE_VERSION}
   script:
-    - npm ci --legacy-peer-deps
+    - npm ci
     - npm run lint
     - npm test
     # Claims freshness gate: the landing-page test-count badge is generated from

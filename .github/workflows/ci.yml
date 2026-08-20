@@ -1,0 +1,38 @@
+name: CI Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  verify-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test Suite (79 suites, 967 tests)
+        run: npm test -- --runInBand
+
+      - name: Claims & Documentation Synchronization Gate
+        run: npm run claims:check
+
+      - name: Evidence Package Verification
+        run: npm run evidence:pack
+
+      - name: Production Build
+        run: npm run build
