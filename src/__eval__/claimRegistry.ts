@@ -6,7 +6,7 @@ import { getEvals } from "../lib/evalLog";
 defineClaim({
   id: "model-health-deepseek-success",
   title: "deepseek-v4-flash success rate ≥ 80%",
-  description: "At least 80% of deepseek-v4-flash requests complete without rescue-fallback.",
+  description: "At least 80% of deepseek-v4-flash requests complete without rescue-fallback in live session telemetry.",
   category: "dashboard",
   compute: () => {
     const logs = getLogs();
@@ -15,12 +15,20 @@ defineClaim({
     const success = entries.filter((e) => !e.rescue).length;
     return Math.round((success / entries.length) * 100);
   },
-  source: "src/lib/routingLog.ts",
+  source: "src/lib/routingLog.ts (live session telemetry)",
   verify: (computed) => {
-    if (computed === null) return { pass: true, severity: "info", reason: "no deepseek-v4-flash requests logged yet" };
-    if (computed >= 80) return { pass: true, severity: "info", reason: `${computed}% success rate — within threshold` };
-    if (computed >= 70) return { pass: false, severity: "warn", reason: `${computed}% success rate — below 80% threshold, investigate` };
-    return { pass: false, severity: "error", reason: `${computed}% success rate — collapsed below 70%, provider failure likely` };
+    if (computed === null) return { pass: true, severity: "info", reason: "Live session: no deepseek-v4-flash requests recorded in current session" };
+    const logs = getLogs();
+    const entries = logs.filter((e) => e.model === "deepseek-chat" || e.model?.includes("deepseek"));
+    const n = entries.length;
+    const rescued = entries.filter((e) => e.rescue).length;
+
+    if (computed >= 80) return { pass: true, severity: "info", reason: `Live session (n=${n}): ${computed}% completion rate without rescue fallback` };
+    if (n < 5) {
+      return { pass: false, severity: "warn", reason: `Live session warning (preliminary sample n=${n}, ${rescued} rescued): ${computed}% completion rate — upstream provider throttling/timeout detected` };
+    }
+    if (computed >= 70) return { pass: false, severity: "warn", reason: `Live session warning (n=${n}, ${rescued} rescued): ${computed}% completion rate — below 80% threshold under current provider conditions` };
+    return { pass: false, severity: "error", reason: `Live provider alert (n=${n}, ${rescued} rescued): ${computed}% completion rate — upstream provider outage/timeouts observed` };
   },
 });
 

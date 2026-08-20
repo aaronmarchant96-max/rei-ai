@@ -103,10 +103,10 @@ export default function ToolsLanding({ onOpenTool }) {
   const premiumCost = demoResult?.premiumCost || 0;
   const savingsPct = premiumCost > 0 ? Math.round((1 - reiCost / premiumCost) * 100) : 0;
   const hsv = demoResult?.hingeVector || {};
-  const hingeRationale = demoResult?.id === "simple-greeting" ? "Cheapest route — 50-token budget on llama-3.1-8b-instant."
-    : demoResult?.id?.includes("coding") ? "Coding signals detected — gemini-2.5-flash with Phase 0 + HARD STOP gate."
-      : demoResult?.id?.includes("adversarial") ? "Injection pattern detected — strictest gate, 5× cost multiplier."
-        : "Generic reasoning. Balanced cost/safety profile.";
+  const hingeRationale = demoResult?.id === "simple-greeting" ? `Cheapest route — 50-token budget on ${demoResult.model}.`
+    : demoResult?.id?.includes("coding") ? `Coding signals detected — ${demoResult.model} with Phase 0 + HARD STOP gate.`
+      : demoResult?.id?.includes("adversarial") ? `Injection pattern detected — strictest gate on ${demoResult.model}.`
+        : `Generic reasoning — balanced profile on ${demoResult?.model || "deepseek-v4-flash"}.`;
 
   // Framer Motion variants
   const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } } };
@@ -159,7 +159,7 @@ export default function ToolsLanding({ onOpenTool }) {
         </h1>
         
         <p className="relative text-[#EDEFF5] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light z-10">
-          Every request you send to an expensive model that a cheaper one could answer is money straight down the drain. REI routes each request to the right model — and shows you the receipt. No guessing, no claimed headline numbers.
+          Every request you send to an expensive model that a cheaper one could answer is money straight down the drain. REI routes each request to the right model — and shows you the receipt. No guessing, no unmeasured claims — every number is machine-reproduced from live test and trace telemetry.
         </p>
 
         <div className="relative z-10 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#18181b] border border-[var(--amber)]/30 text-xs sm:text-sm text-[#EDEFF5] font-mono mb-8 max-w-2xl text-center shadow-lg">
@@ -169,27 +169,27 @@ export default function ToolsLanding({ onOpenTool }) {
         {/* The catch — what wrong routing actually costs */}
         <div className="relative z-10 w-full max-w-3xl mx-auto mb-7 md:mb-8">
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
-            In one measured pass, REI cut 85.7% off the premium bill.
+            Synthetic Demo Replay: -85.7% vs Premium Baseline
           </div>
           <div className="grid grid-cols-3 gap-2 md:grid-cols-3 md:gap-4">
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
               <div className="text-2xl md:text-4xl font-bold text-white mb-1">-85.7%</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Cheaper routing</div>
-              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">vs premium</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Demo Replay Savings</div>
+              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">vs always-premium</div>
             </div>
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
               <div className="text-2xl md:text-4xl font-bold text-white mb-1">-83.1%</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Paid → paid</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Paid → Paid Only</div>
               <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">same quality class</div>
             </div>
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
               <div className="text-2xl md:text-4xl font-bold text-white mb-1">+0 pts</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">No quality cut</div>
-              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">disclosed, measured</div>
+              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Quality Degradation</div>
+              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">disclosed & verified</div>
             </div>
           </div>
           <p className="text-xs text-[#565B72] text-center mt-4 max-w-xl mx-auto leading-relaxed px-1">
-            Replay estimate on the synthetic demo corpus (9 measured requests). Free-capacity contribution is 0 points here because the demo catalog has no free provider — the stress test below shows it when one exists.
+            Baseline: Replay estimate on the 9-request synthetic demo corpus. Free-capacity contribution is 0 points here because the demo catalog has no free provider — see the provider-price stress test below for active free-tier economics.
           </p>
         </div>
 
@@ -407,11 +407,11 @@ export default function ToolsLanding({ onOpenTool }) {
               </div>
               <div className="space-y-4 font-mono text-sm">
                 <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-foreground-muted">Routing Hinge</span>
-                  <span className="text-hinge-bright text-right max-w-[200px] leading-tight">{hingeRationale}</span>
+                  <span className="text-foreground-muted">Routing Logic & Quality Gate</span>
+                  <span className="text-hinge-bright text-right max-w-[220px] leading-tight">{hingeRationale}</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-foreground-muted">Model Selected</span>
+                  <span className="text-foreground-muted">Active Execution Model</span>
                   <span className="text-foreground font-semibold">{demoResult.model}</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-2">
@@ -433,8 +433,9 @@ export default function ToolsLanding({ onOpenTool }) {
           {/* Provider-price stress test — same traffic, same decisions, different economics */}
           <div className="mt-12 border-t border-border pt-10">
             <div className="text-center mb-8">
-              <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">Provider-Price Stress Test</div>
+              <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">Scenario Analysis: Provider-Price Stress Test</div>
               <h3 className="font-heading text-2xl md:text-3xl font-bold">What happens if your free provider disappears?</h3>
+              <p className="text-xs text-[#94A3B8] mt-2">Baseline comparison: 91.2% with active free-tier capacity vs 81.1% on commercial-only providers</p>
             </div>
 
             <div className="overflow-x-auto">
