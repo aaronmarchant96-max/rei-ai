@@ -8,7 +8,7 @@
 
 ## 🎯 Profile & Core Competencies
 
-- **Inference Optimization & FinOps**: Deterministic `< 1ms` pre-flight model selection, OpenAI-compatible proxy gateways, and prompt-freeze caching achieving **96% spend reduction** ($1.84B+ tokens processed for $14.66 total API spend).
+- **Inference Optimization & FinOps**: Deterministic `< 1ms` pre-flight model selection, OpenAI-compatible proxy gateways, and prompt-freeze caching achieving **96.0% build spend reduction** ($23.52 billed vs $590.57 no-cache counterfactual across 1.848B tokens).
 - **Adversarial Security & Evaluation**: 14-category prompt-injection detection, ground-truth benchmarking, and formal epistemic claim ledgers.
 - **Full-Stack AI Engineering**: End-to-end React/TypeScript interfaces, serverless streaming backends, structured reasoning pipelines, and complex provenance architectures.
 - **Empirical Rigor**: **997 automated tests across 83 suites** (100% green CI) with machine-reproducible claim verification.
@@ -32,7 +32,7 @@
 ### 1. REI.ai — AI FinOps Proxy & Dynamic Inference Router
 **Repository:** [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai) · **Live:** [prompthound-labs.vercel.app](https://prompthound-labs.vercel.app)
 
-* **Problem**: Engineering teams waste 90%+ of their inference budgets by routing simple, routine agent queries to expensive flagship models (e.g. GPT-4o, Claude 3.5 Sonnet) when sub-cent models (e.g. LLaMA 3.1 8B, Gemini 2.5 Flash) provide identical accuracy.
+* **Problem**: Engineering teams waste 80%+ of their inference budgets by routing simple, routine agent queries to expensive flagship models (e.g. GPT-4o, Claude 3.5 Sonnet) when sub-cent models (e.g. LLaMA 3.1 8B, Gemini 2.5 Flash) provide identical accuracy.
 * **Architecture**:
   - **OpenAI-Compatible Gateway (`/v1/chat/completions`)**: Drop-in proxy for Cursor, Cline, Aider, and LangChain.
   - **Deterministic 9-Stage Decision Cascade**: Classifies prompt semantics locally in **`< 1ms`** without calling an LLM to route an LLM.
@@ -40,8 +40,8 @@
   - **Epistemic Trace Receipts**: Every turn outputs audit headers stamped with explicit evidence tiers (`(Observed)`, `(Derived)`, `(Modeled)`). Missing telemetry explicitly renders `"Evidence unavailable"`—zero synthetic data.
 * **Measured Result**:
   - **997 passing automated tests** across 83 test suites.
-  - **$14.66 total spend** to process **1.84+ billion tokens** across 1,000+ deployments.
-  - **94–96% paid routing savings** isolated from free-tier quotas.
+  - **1.848B development-agent tokens** processed through OpenCode/DeepSeek build workflow for **$23.52** (saving $567.06 vs $590.57 no-cache counterfactual).
+  - **81–92% modeled and replayed inference savings** across documented provider scenarios (workload-specific quality preservation requires bounded non-inferiority evaluation).
   - **< 40ms end-to-end routing latency** (< 1ms in-memory resolution).
 * **Reproduce from Clean Checkout**:
   ```bash
@@ -111,8 +111,8 @@
 | **Automated Passing Tests** | **997 tests** (83 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
 | **Input Cache Hit Rate** | **97.35%** | `npm run verify:cache` · `data/cache-spend.csv` |
 | **Effective Multi-Turn Cache Ratio** | **88.0%** | Reconstructed $N=1,500$ model turns · `docs/CACHING_RULES.md` |
-| **Paid Routing Spend Reduction** | **94–96%** | Production telemetry ($N=174$ turns) · `docs/CLAIM_LEDGER.md` |
-| **Total Build API Spend** | **$14.66** | Complete development ledger (1.84B+ tokens processed) |
+| **Modeled & Replayed Savings** | **81–92%** | Provider scenario sensitivity · `docs/CLAIM_LEDGER.md` |
+| **Build Workflow API Spend** | **$23.52** | 1.848B tokens processed ($567.06 saved vs no-cache) |
 | **Router Decision Latency** | **< 1ms** | In-memory TypeScript cascade (`nightShiftRouter.ts`) |
 | **Production Decision Latency** | **< 40ms** (39.52ms avg) | Serverless proxy execution trace log |
 | **Production Deployments** | **1,000+** | Vercel production deployment log |

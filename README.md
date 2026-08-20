@@ -5,13 +5,13 @@
 > *Route each task to the right model, verify the result, and keep the evidence.*
 > 
 > Built on a $25/month budget and an Intel Celeron J4105 with 8GB RAM:
-> **Processed 1.84+ billion tokens for $14.66 total API spend across 1,000+ deployments.**
+> **1.848B development & evaluation tokens processed through the OpenCode/DeepSeek build workflow for $23.52, with 97.35% measured input-cache hits across 1,000+ deployments.**
 
 ---
 
 ## 🎯 What is REI.ai?
 
-**The Primary Product:** An **OpenAI-compatible FinOps proxy and dynamic inference router** (`/v1/chat/completions`). It sits in front of your AI agents, coding assistants (Cursor, Cline, Aider), and backend pipelines to automatically route routine requests to sub-cent fast models while reserving expensive frontier models for complex architectural reasoning — saving **90%+ on inference spend** with zero quality loss.
+**The Primary Product:** An **OpenAI-compatible FinOps proxy and dynamic inference router** (`/v1/chat/completions`). It sits in front of your AI agents, coding assistants (Cursor, Cline, Aider), and backend pipelines to automatically route routine requests to sub-cent fast models while reserving expensive frontier models for complex architectural reasoning — demonstrated **81–92% modeled and replayed inference savings** across documented provider scenarios (workload-specific quality preservation requires bounded non-inferiority evaluation).
 
 **The Underlying Methodology:** Powered by **CARDO REI**, a formal cognitive architecture that enforces pre-flight quality gates, isolates the decisive "Hinge" of every prompt, separates verified facts from assumptions, and returns auditable execution receipts.
 

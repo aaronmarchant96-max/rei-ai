@@ -10,7 +10,7 @@ The lab spans 6 active repositories across AI engineering, evaluation, computer 
 
 | Repository | Focus | Language | Status |
 |-----------|-------|----------|--------|
-| [aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai) | AI reasoning, routing, evaluation | JavaScript/React | Active |
+| [aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai) | AI reasoning, routing, evaluation | JavaScript/React | Active |
 | [llm-adversarial-testing](https://github.com/aaronmarchant96-max/llm-adversarial-testing) | LLM evaluation & red-teaming harness | Python | Active |
 | [family-archive](https://github.com/aaronmarchant96-max/family-archive) | Private genealogy archive with confidence labels | TypeScript/Next.js | Active |
 | [uap-footage-analyzer](https://github.com/aaronmarchant96-max/uap-footage-analyzer) | Multi-source video anomaly detection | Python/OpenCV | Maintenance |

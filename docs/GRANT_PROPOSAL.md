@@ -164,7 +164,7 @@ The requested $10,000–$25,000 would close the gap between prototype validation
 - **Research index:** [RESEARCH_INDEX.md](RESEARCH_INDEX.md)
 - **Published lab reports:** `docs/experiments/night-shift-routing.md`, `docs/experiments/prompt-eval-suite.md`
 - **Lab report template:** `docs/lab-report-template.md`
-- **Primary repository (REI.ai):** https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
+- **Primary repository (REI.ai):** https://github.com/aaronmarchant96-max/rei-ai
 - **LLM evaluation harness:** https://github.com/aaronmarchant96-max/llm-adversarial-testing
 - **Family archive:** https://github.com/aaronmarchant96-max/family-archive
 - **UAP footage analyzer:** https://github.com/aaronmarchant96-max/uap-footage-analyzer

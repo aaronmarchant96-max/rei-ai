@@ -441,7 +441,7 @@ Verify every claim in this paper in under 3 minutes:
 ### 1. Reproduce the Pipeline Walkthrough
 
 ```bash
-git clone https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
+git clone https://github.com/aaronmarchant96-max/rei-ai
 cd aaronmarchant96-max/rei-ai
 npm ci --legacy-peer-deps
 node scripts/demo.mjs "what should I consider before quitting my job to start a company"
@@ -495,7 +495,7 @@ A design claim is only as good as its verification. REI's verification is determ
 | Development cost | $6.51 for 601M tokens | DeepSeek API dashboard |
 
 ```bash
-git clone https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
+git clone https://github.com/aaronmarchant96-max/rei-ai
 npm ci --legacy-peer-deps
 npm test -- --testPathPatterns=routingEval
 ```
@@ -507,7 +507,7 @@ npm test -- --testPathPatterns=routingEval
 > The REI Engine is deployed and publicly accessible. Every claim in this paper can be verified by entering your own query, toggling the 🔍 transparency mode, and inspecting the routing trace — the pipeline walkthrough from Section 5 reproduces identically.
 >
 > **URL:** https://rei-ai.vercel.app  
-> **Source:** https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai  
+> **Source:** https://github.com/aaronmarchant96-max/rei-ai  
 > **Benchmarks:** `npm test -- --testPathPatterns=routingEval`  
 > **Docker:** `docker compose up`
 >

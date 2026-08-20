@@ -67,7 +67,7 @@ Savings:                      $1.661989 (92.3%)
 
 **How to verify:**
 ```bash
-git clone https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
+git clone https://github.com/aaronmarchant96-max/rei-ai
 npm ci --legacy-peer-deps
 npm test -- --testPathPatterns=routingEval
 ```
@@ -151,7 +151,7 @@ REI's backend uses Groq API (primary, via `api.cfai.js:273`) for llama-3.1-8b-in
 
 ```bash
 # Clone and install
-git clone https://github.com/aaronmarchant96-max/aaronmarchant96-max/rei-ai
+git clone https://github.com/aaronmarchant96-max/rei-ai
 cd aaronmarchant96-max/rei-ai
 npm ci --legacy-peer-deps
 
