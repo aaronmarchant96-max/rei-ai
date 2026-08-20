@@ -14,12 +14,14 @@ const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 function ToolIcon({ id, size = 24, className = "" }) {
   const iconProps = { size, className: `text-hinge-bright ${className}`, strokeWidth: 1.5 };
   switch (id) {
+  case "openai-proxy": return <Terminal {...iconProps} />;
+  case "analytics": return <Activity {...iconProps} />;
+  case "red-team": return <ShieldCheck {...iconProps} />;
+  case "cardo-guard": return <ShieldCheck {...iconProps} />;
   case "furnace": return <MessageSquare {...iconProps} />;
+  case "tracepoint": return <Crosshair {...iconProps} />;
   case "story-forge": return <ExternalLink {...iconProps} />;
   case "storm-replay": return <Activity {...iconProps} />;
-  case "cardo-guard": return <ShieldCheck {...iconProps} />;
-  case "tracepoint": return <Crosshair {...iconProps} />;
-  case "openai-proxy": return <Terminal {...iconProps} />;
   case "rei": return <Scale {...iconProps} />;
   default: return <Scale {...iconProps} />;
   }
@@ -45,31 +47,84 @@ const DEMO_SCENARIOS = [
 ];
 
 const CASE_STUDIES = [
-  { id: "furnace", toolId: "furnace", label: "The Furnace", subtitle: "Adversarial Pressure Test",
-    description: "Argument Pressure Testing Engine",
-    hinge: "Ultimate Authorship vs Reason-Responsive Agency" },
-  { id: "story", toolId: "story-forge", label: "Story Forge", subtitle: "Narrative Blueprints",
-    description: "Old sources turn into story blueprints.",
-    hinge: "Character driver vs plot pressure" },
-  { id: "storm", toolId: "storm-replay", label: "Storm Replay", subtitle: "Radar Signal Review",
-    description: "Historical Radar Signal Review Pipeline",
-    hinge: "Motion 0.0162 | Graves Co 22:00 CST" },
-  { id: "cardo", toolId: "cardo-guard", label: "CARDO Guard", subtitle: "Cost-Weighted Gate",
+  {
+    id: "openai-proxy",
+    toolId: "rei",
+    iconId: "openai-proxy",
+    featured: true,
+    category: "Core Gateway",
+    label: "OpenAI Proxy Gateway",
+    subtitle: "/v1/chat/completions",
+    description: "Drop-in proxy gateway for Cursor, Cline, Aider, & Agy. Routes internal agent turns to LLaMA-8B ($0.05/M) and escalates complex reasoning.",
+    hinge: "model: 'rei-auto' • 94%+ cost reduction • spec-compliant",
+    badge: { label: "NEW", tone: "amber" },
+  },
+  {
+    id: "analytics",
+    toolId: "analytics",
+    category: "Observability",
+    label: "Analytics",
+    subtitle: "Routing + Evidence",
+    description: "Routing observability, evidence outcomes, CARDO decision audit",
+    hinge: "Rescue Rate • Truncation • Real-vs-Estimate Savings",
+    badge: { label: "NEW", tone: "amber" },
+  },
+  {
+    id: "red-team",
+    toolId: "red-team",
+    category: "Adversarial",
+    label: "Red Team",
+    subtitle: "Prompt Injection Proving Ground",
+    description: "Framework-agnostic adversarial scanner — pre-flight checks, jailbreak validation, open-source detection blueprint",
+    hinge: "14 D1 categories • $0 per scan • public taxonomy",
+    badge: { label: "NEW", tone: "amber" },
+  },
+  {
+    id: "cardo",
+    toolId: "cardo-guard",
+    category: "Risk Gate",
+    label: "CARDO Guard",
+    subtitle: "Cost-Weighted Gate",
     description: "AI Risk Decision Gate",
     hinge: "Act $42k | Miss $850k → ACT",
-    badge: `✅ ${claimsData.testCount}+ Tests Passing` },
-  { id: "trace", toolId: "tracepoint", label: "Tracepoint", subtitle: "Industrial Telemetry",
+    badge: { label: `✅ ${claimsData.testCount}+ Passing Tests`, tone: "verified" },
+  },
+  {
+    id: "trace",
+    toolId: "tracepoint",
+    category: "Telemetry",
+    label: "Tracepoint",
+    subtitle: "Industrial Telemetry",
     description: "Industrial Telemetry & Handover Review",
-    hinge: "P-204 Vibration +49.7% vs Baseline" },
-  { id: "analytics", toolId: "analytics", label: "Analytics", subtitle: "Routing + Evidence",
-    description: "Routing observability, evidence outcomes, CARDO decision audit",
-    hinge: "Rescue Rate • Truncation • Real-vs-Estimate Savings", badge: "NEW" },
-  { id: "openai-proxy", toolId: "rei", label: "OpenAI Proxy Gateway", subtitle: "/v1/chat/completions",
-    description: "Drop-in proxy gateway for Cursor, Cline, Aider, & Agy. Routes internal agent turns to LLaMA-8B ($0.05/M) and escalates complex reasoning.",
-    hinge: "model: 'rei-auto' • 94%+ cost reduction • spec-compliant", badge: "NEW" },
-  { id: "red-team", toolId: "red-team", label: "Red Team", subtitle: "Prompt Injection Proving Ground",
-    description: "Framework-agnostic adversarial scanner — pre-flight checks, jailbreak validation, open-source detection blueprint",
-    hinge: "14 D1 categories • $0 per scan • public taxonomy", badge: "NEW" },
+    hinge: "P-204 Vibration +49.7% vs Baseline",
+  },
+  {
+    id: "furnace",
+    toolId: "furnace",
+    category: "Pressure Test",
+    label: "The Furnace",
+    subtitle: "Adversarial Pressure Test",
+    description: "Argument Pressure Testing Engine",
+    hinge: "Ultimate Authorship vs Reason-Responsive Agency",
+  },
+  {
+    id: "story",
+    toolId: "story-forge",
+    category: "Narrative Blueprint",
+    label: "Story Forge",
+    subtitle: "Narrative Blueprints",
+    description: "Old sources turn into story blueprints.",
+    hinge: "Character driver vs plot pressure",
+  },
+  {
+    id: "storm",
+    toolId: "storm-replay",
+    category: "Radar & Motion",
+    label: "Storm Replay",
+    subtitle: "Radar Signal Review",
+    description: "Historical Radar Signal Review Pipeline",
+    hinge: "Motion 0.0162 | Graves Co 22:00 CST",
+  },
 ];
 
 export default function ToolsLanding({ onOpenTool }) {
@@ -605,58 +660,91 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="mb-12 text-center">
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">Laboratory & Stress Tests</div>
           <h2 className="font-heading text-3xl md:text-4xl font-bold">Experiments & Benchmarks</h2>
-          <p className="text-sm text-[#94A3B8] max-w-2xl mx-auto mt-3 leading-relaxed">
-            <strong>REI.ai</strong> is the flagship multi-model router. <strong>Experiments</strong> are the domain lab stress tests, radar signal replays, and adversarial red-team proving grounds that validated the CARDO methodology.
+          <p className="text-sm text-foreground-muted max-w-2xl mx-auto mt-3 leading-relaxed">
+            <strong className="text-foreground">REI.ai</strong> is the flagship multi-model router. <strong className="text-foreground">Experiments</strong> are the domain lab stress tests, radar signal replays, and adversarial red-team proving grounds that validated the CARDO methodology.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {CASE_STUDIES.map((cs) => (
-            <div key={cs.id} className="group bg-surface border-2 border-border p-6 rounded-md hover:border-hinge transition-colors">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-background border border-border rounded flex items-center justify-center">
-                    <ToolIcon id={cs.toolId} size={24} />
+          {CASE_STUDIES.map((cs) => {
+            const isFeatured = !!cs.featured;
+            return (
+              <button
+                key={cs.id}
+                type="button"
+                onClick={() => onOpenTool({ tool: cs.toolId })}
+                className={`group w-full text-left bg-surface border-2 rounded-lg p-6 flex flex-col justify-between transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hinge focus-visible:ring-offset-2 ${
+                  isFeatured
+                    ? "md:col-span-2 border-hinge/60 shadow-[0_0_24px_rgba(226,163,61,0.12)] hover:border-hinge"
+                    : "border-border hover:border-hinge hover:shadow-lg"
+                }`}
+              >
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-background border border-border rounded flex items-center justify-center shrink-0">
+                        <ToolIcon id={cs.iconId ?? cs.toolId} size={24} />
+                      </div>
+                      <div>
+                        {cs.category && (
+                          <div className="font-mono text-[10px] uppercase tracking-wider text-hinge-bright font-semibold">
+                            {cs.category}
+                          </div>
+                        )}
+                        <h3 className="font-heading font-bold text-xl text-foreground">{cs.label}</h3>
+                        <div className="font-mono text-xs text-foreground-muted">{cs.subtitle}</div>
+                      </div>
+                    </div>
+                    <span
+                      aria-hidden="true"
+                      className="p-2 bg-background border border-border rounded text-foreground-muted group-hover:text-hinge-bright group-hover:border-hinge group-hover:translate-x-1 transition-all"
+                    >
+                      <ArrowRight size={20} />
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="font-heading font-bold text-xl">{cs.label}</h3>
-                    <div className="font-mono text-xs text-foreground-muted">{cs.subtitle}</div>
+                  
+                  <div className="font-sans text-sm text-foreground/90 leading-relaxed mb-6">
+                    {cs.description}
                   </div>
                 </div>
-                <button 
-                  onClick={() => onOpenTool({ tool: cs.toolId })}
-                  className="p-2 bg-background border border-border rounded text-foreground-muted hover:text-hinge-bright hover:border-hinge-bright transition-colors"
-                >
-                  <ArrowRight size={20} />
-                </button>
-              </div>
-              
-              <div className="font-sans text-sm text-foreground/80 mb-4">{cs.description}</div>
-              
-              <div className="flex items-center justify-between">
-                <div className="font-mono text-xs bg-background px-3 py-2 border border-border rounded text-foreground-muted">
-                  <span className="text-hinge-bright font-bold">Hinge:</span> {cs.hinge}
+                
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/40">
+                  <div className="font-mono text-xs bg-background px-3 py-1.5 border border-border rounded text-foreground-muted max-w-full truncate">
+                    <span className="text-hinge-bright font-bold">Hinge:</span> {cs.hinge}
+                  </div>
+                  {cs.badge && (
+                    <div
+                      className={`font-mono text-xs px-2.5 py-1 rounded font-semibold shrink-0 ${
+                        cs.badge.tone === "amber"
+                          ? "border border-hinge/40 bg-hinge/10 text-hinge-bright"
+                          : "border border-green-500/30 bg-green-500/10 text-green-400"
+                      }`}
+                    >
+                      {cs.badge.label}
+                    </div>
+                  )}
                 </div>
-                {cs.badge && (
-                  <div className="font-mono text-xs text-green-400 font-bold">{cs.badge}</div>
-                )}
-              </div>
-            </div>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </motion.section>
 
       {/* ── Footer ── */}
-      <footer className="relative z-10 max-w-6xl mx-auto py-12 border-t-2 border-border text-center">
-        <div className="w-10 h-10 mx-auto border border-hinge/30 rounded flex items-center justify-center mb-4">
-          <HingeMark size={20} animated={false} color="#E2A33D" />
+      <footer className="relative z-10 max-w-6xl mx-auto pt-16 pb-12 text-center">
+        {/* Subtle Ambient Fade & Hinge Separator */}
+        <div className="flex flex-col items-center justify-center mb-6">
+          <div className="w-12 h-px bg-gradient-to-r from-transparent via-hinge/40 to-transparent mb-6" />
+          <div className="w-10 h-10 border border-hinge/30 rounded flex items-center justify-center shadow-[0_0_12px_rgba(226,163,61,0.15)] bg-surface">
+            <HingeMark size={20} animated={false} color="#E2A33D" />
+          </div>
         </div>
-        <div className="font-heading font-bold tracking-widest uppercase text-sm mb-2">
+        <div className="font-heading font-bold tracking-widest uppercase text-sm mb-2 text-foreground">
           REI.ai <span className="text-foreground-muted">by PromptHound</span>
         </div>
         <button
           onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
-          className="text-xs text-foreground-muted hover:text-hinge-bright transition-colors mb-3 px-3 py-1 rounded-full border border-border"
+          className="text-xs text-foreground-muted hover:text-hinge-bright transition-colors mb-3 px-3 py-1 rounded-full border border-border bg-surface"
         >
           {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
         </button>

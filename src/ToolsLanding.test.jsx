@@ -81,4 +81,64 @@ describe("ToolsLanding", () => {
     expect(screen.getByText(/github/i)).toBeInTheDocument();
     expect(screen.getByText(/rei\.ai by prompthound/i)).toBeInTheDocument();
   });
+
+  it("opens a tool from the full card surface", () => {
+    const onOpenTool = jest.fn();
+    render(<ToolsLanding onOpenTool={onOpenTool} />);
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /openai proxy gateway/i,
+      })
+    );
+
+    expect(onOpenTool).toHaveBeenCalledWith({
+      tool: "rei",
+    });
+  });
+
+  it("renders all eight tool cards as semantic buttons without nested interactive button controls", () => {
+    render(<ToolsLanding onOpenTool={jest.fn()} />);
+
+    const proxyBtn = screen.getByRole("button", { name: /core gateway\s*openai proxy gateway/i });
+    const analyticsBtn = screen.getByRole("button", { name: /observability\s*analytics/i });
+    const redTeamBtn = screen.getByRole("button", { name: /adversarial\s*red team/i });
+    const cardoBtn = screen.getByRole("button", { name: /risk gate\s*cardo guard/i });
+    const traceBtn = screen.getByRole("button", { name: /telemetry\s*tracepoint/i });
+    const furnaceBtn = screen.getByRole("button", { name: /pressure test\s*the furnace/i });
+    const storyBtn = screen.getByRole("button", { name: /narrative blueprint\s*story forge/i });
+    const stormBtn = screen.getByRole("button", { name: /radar & motion\s*storm replay/i });
+
+    expect(proxyBtn).toBeInTheDocument();
+    expect(analyticsBtn).toBeInTheDocument();
+    expect(redTeamBtn).toBeInTheDocument();
+    expect(cardoBtn).toBeInTheDocument();
+    expect(traceBtn).toBeInTheDocument();
+    expect(furnaceBtn).toBeInTheDocument();
+    expect(storyBtn).toBeInTheDocument();
+    expect(stormBtn).toBeInTheDocument();
+
+    // Verify there are no nested <button> elements inside card buttons
+    const toolButtons = [proxyBtn, analyticsBtn, redTeamBtn, cardoBtn, traceBtn, furnaceBtn, storyBtn, stormBtn];
+    for (const btn of toolButtons) {
+      expect(btn.querySelectorAll("button").length).toBe(0);
+    }
+  });
+
+  it("renders category taxonomy and normalized badge metadata", () => {
+    render(<ToolsLanding onOpenTool={jest.fn()} />);
+
+    expect(screen.getByText("Core Gateway")).toBeInTheDocument();
+    expect(screen.getByText("Observability")).toBeInTheDocument();
+    expect(screen.getByText("Adversarial")).toBeInTheDocument();
+    expect(screen.getByText("Risk Gate")).toBeInTheDocument();
+    expect(screen.getByText(`✅ ${claimsData.testCount}+ Passing Tests`)).toBeInTheDocument();
+  });
+
+  it("applies featured full-width layout to the primary OpenAI Proxy Gateway card", () => {
+    render(<ToolsLanding onOpenTool={jest.fn()} />);
+
+    const proxyBtn = screen.getByRole("button", { name: /openai proxy gateway/i });
+    expect(proxyBtn.className).toContain("md:col-span-2");
+  });
 });
