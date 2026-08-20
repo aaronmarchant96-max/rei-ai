@@ -134,6 +134,10 @@ export default function AppShell() {
         } catch (_) {}
       }
     }
+    const shellEl = document.querySelector(".shell-main");
+    if (shellEl) {
+      shellEl.scrollTop = 0;
+    }
     const resolvedPath = getToolPath(tool);
     if (`${window.location.pathname}${window.location.hash}` !== resolvedPath) {
       window.history.replaceState({}, "", resolvedPath);
@@ -159,7 +163,7 @@ export default function AppShell() {
   }, [tool]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${tool !== "tools" ? "is-workspace" : ""}`}>
       <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
         <a href="/" className="flex items-center gap-3 cursor-pointer rei-brand" onClick={(e) => {
           if (window.location.pathname === "/" && !window.location.hash) {
@@ -191,7 +195,7 @@ export default function AppShell() {
         )}
       </header>
 
-      <main className="shell-main">
+      <main className={`shell-main ${tool !== "tools" ? "shell-main--workspace" : ""}`}>
         <Suspense fallback={<LoadingShell />}>
           {tool === "tools" ? (
             <ErrorBoundary toolName="Tools">

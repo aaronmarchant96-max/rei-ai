@@ -140,7 +140,7 @@ export default function InstrumentRail({
       <div className="rei-side-card">
         <div className="rei-side-card__heading">Build</div>
         <div className="rei-side-chips">
-          <span className="rei-side-chip">v3.0</span>
+          <span className="rei-side-chip">CARDO v3.4</span>
           <span className="rei-side-chip">v3 Keyword</span>
           <span className="rei-side-chip">CARDO Guard</span>
         </div>

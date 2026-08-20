@@ -835,64 +835,68 @@ export default function REI({ initialPrompt } = {}) {
           )}
         </header>
 
-        {/* Scrollable Main Content with keyboard space */}
-        <div style={{ display: "flex", flex: 1, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-          <main className="flex-1 overflow-y-auto pb-32 rei-main-content">
-            {(!mobile || messages.length > 1 || isTyping) && (
-              <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
-            )}
+        {/* Unified workspace area: conversation + attached composer on left, instrument rail on right */}
+        <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, height: "100%", overflow: "hidden" }}>
+            <main className="flex-1 overflow-y-auto px-4 py-4 rei-main-content">
+              {(!mobile || messages.length > 1 || isTyping) && (
+                <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
+              )}
 
-            {(!mobile || messages.length > 1 || isTyping) && (
-              <IngestPanel
-                selectedDomain={selectedDomain}
-                rawRecordText={rawRecordText}
-                setRawRecordText={setRawRecordText}
-                showIngest={showIngest}
-                setShowIngest={setShowIngest}
-                recordSourceType={recordSourceType}
-                setRecordSourceType={setRecordSourceType}
-                maxRecordChars={MAX_RECORD_CHARS}
-                sourceTypes={SOURCE_TYPES}
-              />
-            )}
+              {(!mobile || messages.length > 1 || isTyping) && (
+                <IngestPanel
+                  selectedDomain={selectedDomain}
+                  rawRecordText={rawRecordText}
+                  setRawRecordText={setRawRecordText}
+                  showIngest={showIngest}
+                  setShowIngest={setShowIngest}
+                  recordSourceType={recordSourceType}
+                  setRecordSourceType={setRecordSourceType}
+                  maxRecordChars={MAX_RECORD_CHARS}
+                  sourceTypes={SOURCE_TYPES}
+                />
+              )}
 
-            {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
-              <WelcomePanel
-                onResume={(domainId) => {
-                  setSelectedDomain(domainId);
-                }}
-                onStart={(prompt) => {
-                  setInputMessage(prompt);
-                  handleSendMessage({ preventDefault: () => {} });
-                }} />
-            )}
+              {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
+                <WelcomePanel
+                  onResume={(domainId) => {
+                    setSelectedDomain(domainId);
+                  }}
+                  onStart={(prompt) => {
+                    setInputMessage(prompt);
+                    handleSendMessage({ preventDefault: () => {} });
+                  }} />
+              )}
 
+              {showRecap && sessionRecap && (
+                <div className="rei-session-recap" style={{
+                  padding: "10px 14px", borderRadius: "8px",
+                  background: "rgba(240, 201, 101, 0.04)", border: "1px solid rgba(240, 201, 101, 0.12)",
+                  margin: "0 16px 8px", display: "flex", justifyContent: "space-between", alignItems: "center",
+                  fontSize: "12px", color: "var(--text-secondary)",
+                }}>
+                  <span>{sessionRecap.decisions} {sessionRecap.decisions === 1 ? "decision" : "decisions"} • saved ${savingsVsPremium.toFixed(4)} vs premium</span>
+                  <button onClick={() => setShowRecap(false)} style={{
+                    background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer",
+                    fontSize: "16px", lineHeight: 1, padding: "0 2px",
+                  }}>×</button>
+                </div>
+              )}
+              <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
 
-            {showRecap && sessionRecap && (
-              <div className="rei-session-recap" style={{
-                padding: "10px 14px", borderRadius: "8px",
-                background: "rgba(240, 201, 101, 0.04)", border: "1px solid rgba(240, 201, 101, 0.12)",
-                margin: "0 16px 8px", display: "flex", justifyContent: "space-between", alignItems: "center",
-                fontSize: "12px", color: "var(--text-secondary)",
-              }}>
-                <span>{sessionRecap.decisions} {sessionRecap.decisions === 1 ? "decision" : "decisions"} • saved ${savingsVsPremium.toFixed(4)} vs premium</span>
-                <button onClick={() => setShowRecap(false)} style={{
-                  background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer",
-                  fontSize: "16px", lineHeight: 1, padding: "0 2px",
-                }}>×</button>
-              </div>
-            )}
-            <ChatHistory messages={messages} selectedDomain={selectedDomain} isTyping={isTyping} chatEndRef={chatEndRef} mobile={mobile} onCopy={copyText} onExport={handleExport} domainLabel={currentDomain?.label || "REI.ai"} />
+              {backendError && (
+                <BackendUnavailablePanel
+                  routerDecision={backendError.routerDecision}
+                  errorMessage={backendError.errorMessage}
+                  onRetry={handleRetry}
+                  onDismiss={() => setBackendError(null)}
+                />
+              )}
+            </main>
 
-            {backendError && (
-              <BackendUnavailablePanel
-                routerDecision={backendError.routerDecision}
-                errorMessage={backendError.errorMessage}
-                onRetry={handleRetry}
-                onDismiss={() => setBackendError(null)}
-              />
-            )}
-          </main>
+            <ChatInput />
+          </div>
+
           {!mobile && (
             <InstrumentRail
               sessionTokens={sessionTokens}
@@ -907,8 +911,6 @@ export default function REI({ initialPrompt } = {}) {
             />
           )}
         </div>
-
-        <ChatInput />
       
         <PhilosophyModal isOpen={isPhilosophyOpen} onClose={() => setIsPhilosophyOpen(false)} />
       </div>

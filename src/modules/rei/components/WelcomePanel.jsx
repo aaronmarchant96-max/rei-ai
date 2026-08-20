@@ -94,17 +94,16 @@ export default function WelcomePanel({ onStart, onResume }) {
 
   return (
     <div className="rei-chat-card">
-      <div className="rei-chat-intro">
-        <h1 className="rei-chat-intro__headline">
-          REI<span className="rei-chat-intro__suffix">.ai</span> &mdash; You're not just saving money. You're building better, faster.
-        </h1>
-        <p className="rei-chat-intro__text" style={{ fontSize: "14.5px", color: "var(--text-secondary, #d4d4d8)", margin: "8px 0" }}>
-          Route each task to the right model, verify the result, and keep the evidence.
-        </p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px", marginTop: "12px" }}>
-          <span className="rei-chat-intro__trust">
-            Give us a request. Watch what we do. Inspect why we did it. See what it cost. Verify the claim.
-          </span>
+      <div className="rei-chat-intro" style={{ padding: "18px 20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap" }}>
+          <div>
+            <h1 className="rei-chat-intro__headline" style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 4px" }}>
+              REI<span className="rei-chat-intro__suffix">.ai</span> Cognitive Engine
+            </h1>
+            <p className="rei-chat-intro__text" style={{ fontSize: "13.5px", color: "var(--text-secondary, #cbd5e1)", margin: "0 0 8px" }}>
+              Deterministic inference routing, prompt-cache optimization, and evidence-verified reasoning.
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => setShowLedger(true)}
@@ -113,7 +112,7 @@ export default function WelcomePanel({ onStart, onResume }) {
               border: "1px solid rgba(240, 201, 101, 0.3)",
               color: "var(--amber-text, #f0c965)",
               borderRadius: "6px",
-              padding: "4px 10px",
+              padding: "5px 12px",
               fontSize: "11.5px",
               fontWeight: 600,
               cursor: "pointer",
@@ -123,7 +122,7 @@ export default function WelcomePanel({ onStart, onResume }) {
             }}
           >
             <BarChart3 size={13} />
-            View Evidence Ledger
+            Evidence Ledger
           </button>
         </div>
       </div>

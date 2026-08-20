@@ -25,7 +25,7 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
             {currentDomain.label}
           </span>
           <span style={{
-            fontSize: "12px", color: "var(--text-muted)", fontWeight: 400,
+            fontSize: "12.5px", color: "var(--text-secondary, #cbd5e1)", fontWeight: 400,
             maxWidth: "360px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>
             {currentDomain.description}
@@ -33,11 +33,11 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "10px", color: "var(--text-dim)", fontFamily: "monospace" }}>
+          <span style={{ fontSize: "10.5px", color: "var(--text-muted, #94a3b8)", fontFamily: "monospace" }}>
             CARDO v3.4
           </span>
           <span style={{
-            fontSize: "11px", color: "var(--text-dim)", transition: "transform 0.2s",
+            fontSize: "11px", color: "var(--text-muted, #94a3b8)", transition: "transform 0.2s",
             transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
           }}>
             ▼
