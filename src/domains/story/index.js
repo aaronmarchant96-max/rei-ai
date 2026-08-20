@@ -15,7 +15,7 @@ export default {
     id: "story-architect",
     jobType: "story-architect",
     label: "Story Architect",
-    model: "openai/gpt-oss-120b",
+    model: "deepseek-v4-pro",
     maxTokens: 4096,
     costPer1k: 1.0,
     qualityGate: "Character hinge + timeline",
