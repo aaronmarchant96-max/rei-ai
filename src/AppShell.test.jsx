@@ -3,6 +3,7 @@ import AppShell from "./AppShell.jsx";
 
 describe("AppShell", () => {
   beforeEach(() => {
+    window.scrollTo = jest.fn();
     window.history.replaceState({}, "", "/");
     document.title = "";
   });

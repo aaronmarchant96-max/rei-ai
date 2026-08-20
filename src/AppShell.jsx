@@ -15,8 +15,10 @@ const RedTeam = lazy(() => import("./RedTeam.jsx"));
 
 function LoadingShell() {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
-      <div style={{ color: "#fb923c", fontSize: "14px", fontWeight: 600 }}>Loading…</div>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh", width: "100%" }}>
+      <div style={{ color: "#E2A33D", fontSize: "14px", fontWeight: 600, fontFamily: "monospace", letterSpacing: "0.05em" }}>
+        Loading…
+      </div>
     </div>
   );
 }
@@ -75,15 +77,15 @@ const TOP_LEVEL = [
 
 function getInitialTool() {
   if (typeof window === "undefined") return "tools";
-  const hash = window.location.hash;
-  if (hash && hash !== "") {
-    if (hash === "#story-forge") return "story-forge";
-    if (hash === "#storm-replay") return "storm-replay";
-    if (hash === "#cardo-guard") return "cardo-guard";
-    if (hash === "#tracepoint") return "tracepoint";
-    if (hash === "#analytics") return "analytics";
-    if (hash === "#red-team") return "red-team";
-  }
+  const hash = (window.location.hash || "").toLowerCase();
+  if (hash === "#rei" || hash === "#cfai") return "rei";
+  if (hash === "#furnace") return "furnace";
+  if (hash === "#story-forge") return "story-forge";
+  if (hash === "#storm-replay") return "storm-replay";
+  if (hash === "#cardo-guard") return "cardo-guard";
+  if (hash === "#tracepoint") return "tracepoint";
+  if (hash === "#analytics") return "analytics";
+  if (hash === "#red-team") return "red-team";
   return "tools";
 }
 
@@ -93,6 +95,7 @@ function getToolPath(tool) {
   if (tool === "storm-replay") return "/#storm-replay";
   if (tool === "cardo-guard") return "/#cardo-guard";
   if (tool === "rei") return "/#rei";
+  if (tool === "furnace") return "/#furnace";
   if (tool === "tracepoint") return "/#tracepoint";
   if (tool === "analytics") return "/#analytics";
   if (tool === "red-team") return "/#red-team";
@@ -104,8 +107,33 @@ export default function AppShell() {
   const [reiInitialPrompt, setReiInitialPrompt] = useState(null);
   const mobile = useMobile(45); // 45em = 720px
 
+  // Listen for browser navigation (back/forward and hash changes)
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const handleNav = () => {
+      const nextTool = getInitialTool();
+      setTool(nextTool);
+    };
+    window.addEventListener("hashchange", handleNav);
+    window.addEventListener("popstate", handleNav);
+    return () => {
+      window.removeEventListener("hashchange", handleNav);
+      window.removeEventListener("popstate", handleNav);
+    };
+  }, []);
+
+  // Update URL hash, title, and reset window scroll on tool transition
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (typeof window.scrollTo === "function") {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      } catch (_) {
+        try {
+          window.scrollTo(0, 0);
+        } catch (_) {}
+      }
+    }
     const resolvedPath = getToolPath(tool);
     if (`${window.location.pathname}${window.location.hash}` !== resolvedPath) {
       window.history.replaceState({}, "", resolvedPath);
