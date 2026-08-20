@@ -451,10 +451,11 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
   const key = rawKey.replace(/^"|"$/g, "").trim();
 
   const candidateModels = [
-    modelOverride === "gemini-3.6-flash" || modelOverride === "gemini-3.6-pro" ? modelOverride : "gemini-3.6-flash",
-    "gemini-3.6-pro",
     modelOverride,
     process.env.GEMINI_MODEL,
+    "gemini-2.5-flash",
+    "gemini-1.5-flash",
+    "gemini-2.5-pro",
   ].filter(Boolean);
 
   const uniqueCandidates = Array.from(new Set(candidateModels));
@@ -536,9 +537,8 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
 
   const candidateModels = [
     modelOverride,
-    "openai/gpt-oss-20b",
-    "openai/gpt-oss-120b",
-    "qwen/qwen3.6-27b",
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
   ].filter(Boolean);
 
   const uniqueCandidates = Array.from(new Set(candidateModels));

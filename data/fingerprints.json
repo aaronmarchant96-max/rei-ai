@@ -164,7 +164,7 @@
     "id": "story-architect",
     "jobType": "story-architect",
     "label": "Story Architect",
-    "model": "deepseek-v4-pro",
+    "model": "llama-3.3-70b-versatile",
     "maxTokens": 4096,
     "costPer1k": 1,
     "qualityGate": "Character hinge + timeline",
@@ -186,8 +186,8 @@
     ],
     "temperature": 0.7,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0.0001,
-    "costPer1kOutput": 0.0004
+    "costPer1kInput": 0.00059,
+    "costPer1kOutput": 0.00079
   },
   {
     "id": "adversarial-validation",
