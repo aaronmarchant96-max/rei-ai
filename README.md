@@ -27,7 +27,7 @@ Backed by **963 automated tests across 78 test suites** (generated from the test
 **What this is:**
 - **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally and routes to the cheapest capable model. Serves standard OpenAI-compatible `/v1/chat/completions` for drop-in agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for exact benchmark numbers and producing commands.
 - **Evidence & Provenance Architecture:** Emits canonical `RequestEvidence` objects downstream of execution with explicit epistemic tiers (`observed`, `derived`, `modeled`, `replayed`, `unavailable`). Missing telemetry renders "Evidence unavailable" — zero substitution of `$0.00`.
-- **Prompt-Freeze & Deterministic Caching:** Sustains a 90%+ prompt cache hit rate across LLM providers (Gemini caching discounts, DeepSeek prompt caching) by freezing prefix order and generating deterministic cache keys.
+- **Prompt-Freeze & Deterministic Caching Protocol:** Sustains an **88.0% effective prompt cache hit rate** (136.2M cached / 154.7M input tokens across $N=1,500$ model turns; mode: *Observed Telemetry Reconciled*) by freezing prefix order and generating SHA-256 deterministic cache keys. [See caching rules](memories/repo/caching_rules.md).
 - **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.

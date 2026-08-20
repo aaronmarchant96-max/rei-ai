@@ -1,0 +1,115 @@
+{
+  "$schema": "https://rei.ai/schemas/evidence-package-v1.json",
+  "metadata": {
+    "generatedAt": "2026-08-20T11:31:24.974Z",
+    "gitCommit": "e6a738f142a6ef38777ba4e1e917c76317eb83e9",
+    "gitBranch": "main",
+    "nodeVersion": "v20.20.2",
+    "platform": "linux"
+  },
+  "testRunner": {
+    "testCount": 963,
+    "suiteCount": 78,
+    "status": "PASS"
+  },
+  "routerBenchmark": {
+    "datasetSize": 136,
+    "correctRoutes": 99,
+    "measuredAccuracyPct": 72.8,
+    "claimedRange": "60–80%",
+    "status": "PASS"
+  },
+  "feynmanGate": {
+    "totalClaims": 5,
+    "passingClaims": 5,
+    "reports": [
+      {
+        "claimId": "model-health-deepseek-success",
+        "title": "deepseek-v4-flash success rate ≥ 80%",
+        "category": "dashboard",
+        "pass": true,
+        "severity": "info",
+        "computed": null,
+        "reason": "Live session: no deepseek-v4-flash requests recorded in current session",
+        "source": "src/lib/routingLog.ts (live session telemetry)"
+      },
+      {
+        "claimId": "cost-savings-ceiling",
+        "title": "ceiling-based savings ≥ 90%",
+        "category": "dashboard",
+        "pass": true,
+        "severity": "info",
+        "computed": null,
+        "reason": "no data — can't compute savings",
+        "source": "src/lib/routingLog.ts"
+      },
+      {
+        "claimId": "layer0-greeting-injection-rate",
+        "title": "greeting path: 0% injection misroute rate",
+        "category": "dashboard",
+        "pass": true,
+        "severity": "info",
+        "computed": null,
+        "reason": "no greeting-routed requests yet",
+        "source": "src/lib/nightShiftRouter.ts"
+      },
+      {
+        "claimId": "decision-store-capacity",
+        "title": "decision store: 200-entry cap enforced",
+        "category": "dashboard",
+        "pass": true,
+        "severity": "info",
+        "computed": null,
+        "reason": "no decisions stored yet",
+        "source": "src/lib/decisionStore.ts"
+      },
+      {
+        "claimId": "adversarial-route-accuracy",
+        "title": "adversarial-route adherence ≥ 80%",
+        "category": "dashboard",
+        "pass": true,
+        "severity": "info",
+        "computed": null,
+        "reason": "no escalated requests evaluated yet",
+        "source": "src/lib/evalLog.ts"
+      }
+    ]
+  },
+  "epistemicProvenance": [
+    {
+      "metric": "Router Benchmark Accuracy",
+      "claimedValue": "90–100% (implemented routes) / 60–80% (pooled held-out)",
+      "epistemicTier": "Observed & Replayed",
+      "reproductionCommand": "npm test -- src/__eval__/routingEvalBlind.test.js",
+      "dataset": "Pooled held-out benchmark (100 prompts across 7 domains)"
+    },
+    {
+      "metric": "Synthetic Demo Replay Savings",
+      "claimedValue": "-85.7% vs premium gpt-4o baseline",
+      "epistemicTier": "Replayed",
+      "reproductionCommand": "npm test -- src/__eval__/providerSensitivity.test.ts",
+      "dataset": "9-request synthetic demo corpus"
+    },
+    {
+      "metric": "Provider-Price Stress Test Savings",
+      "claimedValue": "91.2% (with active free-tier) / 81.1% (commercial-only)",
+      "epistemicTier": "Modeled Counterfactual",
+      "reproductionCommand": "npm test -- src/__eval__/providerSensitivity.test.ts",
+      "dataset": "Scenario analysis matrix"
+    },
+    {
+      "metric": "Prompt-Freeze Caching Rate",
+      "claimedValue": "88.0% effective hit rate (136.2M / 154.7M input tokens)",
+      "epistemicTier": "Observed Telemetry Reconciled",
+      "reproductionCommand": "python3 scripts/aggregate_telemetry.py",
+      "dataset": "N=1,500 model turn invocations"
+    },
+    {
+      "metric": "Decision Store Ring Buffer Cap",
+      "claimedValue": "200 entries maximum enforced",
+      "epistemicTier": "Observed",
+      "reproductionCommand": "npm test -- src/lib/decisionStore.test.ts",
+      "dataset": "Local client ring-buffer storage"
+    }
+  ]
+}

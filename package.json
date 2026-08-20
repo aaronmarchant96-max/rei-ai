@@ -26,7 +26,8 @@
     "verify:cache": "node scripts/verify-cache-spend.mjs",
     "usage:agy": "python3 scripts/agy-usage.py",
     "claims:gen": "node scripts/gen-claims.mjs",
-    "claims:check": "node scripts/gen-claims.mjs --check"
+    "claims:check": "node scripts/gen-claims.mjs --check",
+    "evidence:pack": "tsx scripts/export-evidence-package.mjs"
   },
   "dependencies": {
     "@azure/functions": "^4.7.0",
@@ -61,8 +62,8 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "babel-jest": "^30.4.1",

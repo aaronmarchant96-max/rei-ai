@@ -140,6 +140,28 @@ const DOC_TARGETS = [
         replacement: () => `Latest verified full-suite result (${todayIso}): **${suiteCount}/${suiteCount} suites**, **${testCount}/${testCount} tests**.`
       }
     ]
+  },
+  {
+    relPath: "CONTRIBUTING.md",
+    transforms: [
+      {
+        pattern: /Keep tests passing — \d+ suites, \d+ tests as the safety net/g,
+        replacement: () => `Keep tests passing — ${suiteCount} suites, ${testCount} tests as the safety net`
+      }
+    ]
+  },
+  {
+    relPath: "docs/ARCHITECTURE.md",
+    transforms: [
+      {
+        pattern: /Run the full verification suite across all \d+ test suites:/g,
+        replacement: () => `Run the full verification suite across all ${suiteCount} test suites:`
+      },
+      {
+        pattern: /npm test\s+# \d+ passing tests across \d+ suites/g,
+        replacement: () => `npm test                             # ${testCount} passing tests across ${suiteCount} suites`
+      }
+    ]
   }
 ];
 
