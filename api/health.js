@@ -1,20 +1,9 @@
 // REI.ai System Health & Subsystem State Verification Endpoint
 // Route: /api/health & /health
 
-import fs from "node:fs";
-import path from "node:path";
-
-function loadJsonSafe(relativePath) {
-  try {
-    const fullPath = path.resolve(process.cwd(), relativePath);
-    if (fs.existsSync(fullPath)) {
-      return JSON.parse(fs.readFileSync(fullPath, "utf8"));
-    }
-  } catch {
-    // Ignore and fallback
-  }
-  return null;
-}
+import ecsWeights from "../data/ml/ecs_weights.json" with { type: "json" };
+import centroids from "../data/ml/domain_centroids.json" with { type: "json" };
+import rates from "../src/data/modelRates.json" with { type: "json" };
 
 export default async function handler(req, res) {
   if (res.setHeader) {
@@ -25,16 +14,13 @@ export default async function handler(req, res) {
   const startTime = Date.now();
 
   // 1. Verify Hinge Classifier Weights
-  const ecsWeights = loadJsonSafe("data/ml/ecs_weights.json");
   const hingeOperational = !!(ecsWeights && ecsWeights.weights && typeof ecsWeights.weights.w0 === "number");
 
   // 2. Verify Semantic Domain Centroids
-  const centroids = loadJsonSafe("data/ml/domain_centroids.json");
   const centroidsOperational = !!(centroids && centroids.vectorDim === 384 && centroids.domains);
   const domainList = centroids?.domains ? Object.keys(centroids.domains) : [];
 
   // 3. Verify Pricing Catalog
-  const rates = loadJsonSafe("src/data/modelRates.json");
   const ratesOperational = !!(rates && typeof rates === "object");
 
   // 4. Memory Telemetry
