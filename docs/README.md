@@ -24,6 +24,7 @@
 | [**REI.ai v4 Semantic Router Plan**](REI_V4_SEMANTIC_ROUTER_PLAN.md) | v4 ONNX semantic routing plan (research, not production) | Research |
 | [**Red Team Scanner Spec**](RED_TEAM_SPEC.md) | 16-category threat detection taxonomy | Deployed |
 | [**Commercial Pilot Specification**](COMMERCIAL_PILOT_SPEC.md) | BYOK architecture, 3-stage pilot funnel, and non-dilutive credit strategy | Active |
+| [**Prompt Caching Protocol**](CACHING_RULES.md) | Prefix-freeze rules, deterministic SHA-256 keys, and telemetry reconstruction | Active |
 | [**Product Roadmap**](ROADMAP.md) | 30-day launch plan, open-core architecture | Active |
 | [**Common Mistakes**](COMMON_MISTAKES.md) | Troubleshooting matrix: deployment, build, API, routing | Active |
 

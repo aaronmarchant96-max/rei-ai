@@ -1,33 +1,44 @@
 {
   "$schema": "https://rei.ai/schemas/evidence-package-v1.json",
   "metadata": {
-    "generatedAt": "2026-08-20T11:31:24.974Z",
-    "gitCommit": "e6a738f142a6ef38777ba4e1e917c76317eb83e9",
+    "generatedAt": "2026-08-20T11:43:18.571Z",
+    "gitCommit": "3fee5de3b6b49324e11b2d636b3e00b70cc20cb1",
     "gitBranch": "main",
     "nodeVersion": "v20.20.2",
     "platform": "linux"
   },
-  "testRunner": {
-    "testCount": 963,
-    "suiteCount": 78,
-    "status": "PASS"
+  "freshTestRunnerExecution": {
+    "executedAt": "2026-08-20T11:43:18.572Z",
+    "durationMs": 118434,
+    "exitCode": 0,
+    "status": "PASS",
+    "totalSuites": 78,
+    "passedSuites": 78,
+    "failedSuites": 0,
+    "totalTests": 963,
+    "passedTests": 963,
+    "failedTests": 0
   },
   "routerBenchmark": {
-    "datasetSize": 136,
+    "dataset": "Pooled calibration corpus",
+    "uniqueScoredSamples": 136,
     "correctRoutes": 99,
     "measuredAccuracyPct": 72.8,
     "claimedRange": "60–80%",
     "status": "PASS"
   },
   "feynmanGate": {
-    "totalClaims": 5,
-    "passingClaims": 5,
+    "registeredClaims": 5,
+    "evaluatedClaims": 0,
+    "passingEvaluatedClaims": 0,
+    "unavailableClaims": 5,
+    "gateStatus": "NO_RUNTIME_DATA",
     "reports": [
       {
         "claimId": "model-health-deepseek-success",
         "title": "deepseek-v4-flash success rate ≥ 80%",
         "category": "dashboard",
-        "pass": true,
+        "status": "UNAVAILABLE_NO_DATA",
         "severity": "info",
         "computed": null,
         "reason": "Live session: no deepseek-v4-flash requests recorded in current session",
@@ -37,7 +48,7 @@
         "claimId": "cost-savings-ceiling",
         "title": "ceiling-based savings ≥ 90%",
         "category": "dashboard",
-        "pass": true,
+        "status": "UNAVAILABLE_NO_DATA",
         "severity": "info",
         "computed": null,
         "reason": "no data — can't compute savings",
@@ -47,7 +58,7 @@
         "claimId": "layer0-greeting-injection-rate",
         "title": "greeting path: 0% injection misroute rate",
         "category": "dashboard",
-        "pass": true,
+        "status": "UNAVAILABLE_NO_DATA",
         "severity": "info",
         "computed": null,
         "reason": "no greeting-routed requests yet",
@@ -57,7 +68,7 @@
         "claimId": "decision-store-capacity",
         "title": "decision store: 200-entry cap enforced",
         "category": "dashboard",
-        "pass": true,
+        "status": "UNAVAILABLE_NO_DATA",
         "severity": "info",
         "computed": null,
         "reason": "no decisions stored yet",
@@ -67,7 +78,7 @@
         "claimId": "adversarial-route-accuracy",
         "title": "adversarial-route adherence ≥ 80%",
         "category": "dashboard",
-        "pass": true,
+        "status": "UNAVAILABLE_NO_DATA",
         "severity": "info",
         "computed": null,
         "reason": "no escalated requests evaluated yet",
@@ -78,38 +89,47 @@
   "epistemicProvenance": [
     {
       "metric": "Router Benchmark Accuracy",
-      "claimedValue": "90–100% (implemented routes) / 60–80% (pooled held-out)",
+      "claimedValue": "60–80% deterministic accuracy on pooled calibration corpus",
       "epistemicTier": "Observed & Replayed",
-      "reproductionCommand": "npm test -- src/__eval__/routingEvalBlind.test.js",
-      "dataset": "Pooled held-out benchmark (100 prompts across 7 domains)"
+      "dataset": "Pooled calibration corpus combining held-out Blind V1, Blind V2, V3, and semantic benchmark fixtures",
+      "uniqueScoredSamples": 136,
+      "producingCode": "src/__eval__/hingeCalibrationDebate.js (buildPool + computeRouterScores)",
+      "measured": "99/136 = 72.8%",
+      "reproductionCommand": "npm test -- src/__eval__/claimsSync.test.js"
     },
     {
       "metric": "Synthetic Demo Replay Savings",
-      "claimedValue": "-85.7% vs premium gpt-4o baseline",
+      "claimedValue": "-85.7% vs always-premium baseline",
       "epistemicTier": "Replayed",
-      "reproductionCommand": "npm test -- src/__eval__/providerSensitivity.test.ts",
-      "dataset": "9-request synthetic demo corpus"
+      "dataset": "9-request synthetic demo corpus",
+      "producingCode": "src/lib/nightShiftRouter.ts",
+      "reproductionCommand": "npm test -- src/ToolsLanding.test.jsx"
     },
     {
       "metric": "Provider-Price Stress Test Savings",
-      "claimedValue": "91.2% (with active free-tier) / 81.1% (commercial-only)",
+      "claimedValue": "91.2% (active free-tier) / 81.1% (all-paid commercial)",
       "epistemicTier": "Modeled Counterfactual",
-      "reproductionCommand": "npm test -- src/__eval__/providerSensitivity.test.ts",
-      "dataset": "Scenario analysis matrix"
+      "dataset": "Scenario analysis matrix",
+      "producingCode": "src/lib/providerSensitivity.test.ts",
+      "reproductionCommand": "npm test -- src/lib/providerSensitivity.test.ts"
     },
     {
-      "metric": "Prompt-Freeze Caching Rate",
-      "claimedValue": "88.0% effective hit rate (136.2M / 154.7M input tokens)",
-      "epistemicTier": "Observed Telemetry Reconciled",
+      "metric": "Prompt-Freeze Development Cache Ratio",
+      "claimedValue": "88.0% reconstructed effective cache ratio (136.2M / 154.7M input tokens)",
+      "sampleSize": "N=1,500 reconstructed model turns",
+      "epistemicTier": "Reconstructed Development Telemetry",
+      "reconciliationStatus": "pending_provider_billing",
+      "producingCode": "scripts/aggregate_telemetry.py",
       "reproductionCommand": "python3 scripts/aggregate_telemetry.py",
-      "dataset": "N=1,500 model turn invocations"
+      "policyDoc": "docs/CACHING_RULES.md"
     },
     {
       "metric": "Decision Store Ring Buffer Cap",
       "claimedValue": "200 entries maximum enforced",
       "epistemicTier": "Observed",
-      "reproductionCommand": "npm test -- src/lib/decisionStore.test.ts",
-      "dataset": "Local client ring-buffer storage"
+      "dataset": "Local client ring-buffer storage",
+      "producingCode": "src/lib/decisionStore.ts",
+      "reproductionCommand": "npm test -- src/lib/decisionStore.test.ts"
     }
   ]
 }
