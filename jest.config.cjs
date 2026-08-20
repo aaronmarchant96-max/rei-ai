@@ -2,9 +2,9 @@ module.exports = {
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.cjs"],
   transform: {
-    "^.+\\.[jt]sx?$": "babel-jest",
+    "^.+\\.(?:[jt]sx?|mjs)$": "babel-jest",
   },
-  moduleFileExtensions: ["js", "jsx", "json", "ts", "tsx"],
+  moduleFileExtensions: ["js", "jsx", "json", "ts", "tsx", "mjs"],
   testMatch: ["<rootDir>/src/**/*.test.[jt]s?(x)", "<rootDir>/tests/**/*.test.[jt]s?(x)"],
   clearMocks: true,
   transformIgnorePatterns: [
