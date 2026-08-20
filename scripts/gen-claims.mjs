@@ -29,7 +29,7 @@ try {
   const stdout = execFileSync(
     "npx",
     ["jest", "--json", "--runInBand", "--silent"],
-    { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: 600000 }
+    { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: 600000, env: process.env }
   );
   // jest --json prints the JSON blob after any banner noise — take the
   // first line that parses as the reporter payload.
