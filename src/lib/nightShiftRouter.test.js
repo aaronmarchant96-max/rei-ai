@@ -177,6 +177,17 @@ describe("nightShiftRouter", () => {
       expect(decision.id).toBe("coding-hinge");
     });
 
+    it("normalizes object-shaped route history before scoring preferences", () => {
+      window.localStorage.setItem("night-shift-user-fingerprint", JSON.stringify([
+        { id: "coding-hinge", slot: 0 },
+        { id: "coding-hinge", slot: 1 },
+        { id: "coding-hinge", slot: 2 },
+      ]));
+      const decision = buildRouterDecision({ input: "help me debug this", domain: "assistant" });
+      expect(decision.id).toBe("coding-hinge");
+      expect(decision.routingSignals.storedPreference).toBe("coding-hinge");
+    });
+
     it("respects domain override over keyword match", () => {
       const decision = buildRouterDecision({ input: "what is the best plot twist", domain: "story" });
       expect(decision.id).toBe("story-architect");

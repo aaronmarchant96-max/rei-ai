@@ -1,12 +1,17 @@
 /**
- * gen-claims.mjs — generate src/data/claims.json from the live test suite.
+ * gen-claims.mjs — generate src/data/claims.json and synchronize all READMEs & doc files
+ * from the live test suite.
  *
- * The landing page badge ("558+ Passing Tests") must never be hand-edited
- * again: this script runs `jest --json`, writes the authoritative counts,
- * and CI fails if the checked-in file is stale (git diff after run).
+ * The landing page badge ("959+ Passing Tests") and documentation test counts must
+ * never be hand-edited or drift: this script runs `jest --json`, writes the authoritative
+ * counts to claims.json, and automatically syncs:
+ *   - README.md
+ *   - docs/README.md
+ *   - docs/CLAIM_LEDGER.md
+ *   - docs/TESTING.md
  *
  * Usage: node scripts/gen-claims.mjs [--check]
- *   --check  exit 1 if claims.json differs from what jest reports (CI gate)
+ *   --check  exit 1 if claims.json or any doc file differs from what jest reports (CI gate)
  */
 import { execFileSync } from "node:child_process";
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
@@ -60,9 +65,13 @@ try {
   }
 }
 
+const testCount = summary.numTotalTests;
+const suiteCount = summary.numTotalTestSuites;
+const todayIso = new Date().toISOString().split("T")[0];
+
 const claims = {
-  testCount: summary.numTotalTests,
-  suiteCount: summary.numTotalTestSuites,
+  testCount,
+  suiteCount,
   generatedAt: new Date().toISOString(),
 };
 
@@ -73,22 +82,121 @@ try {
   existing = existsSync(claimsPath) ? JSON.parse(readFileSync(claimsPath, "utf8")) : null;
 } catch { existing = null; }
 
-const countsMatch =
+const claimsJsonMatch =
   existing &&
   existing.testCount === claims.testCount &&
   existing.suiteCount === claims.suiteCount;
 
-if (countsMatch) {
-  console.log(`gen-claims: claims.json up to date (${claims.testCount} tests / ${claims.suiteCount} suites)`);
-  process.exit(0);
+// Documentation targets that must stay in sync with authoritative test counts
+const DOC_TARGETS = [
+  {
+    relPath: "README.md",
+    transforms: [
+      {
+        pattern: /Backed by \*\*\d+ automated tests across \d+ test suites\*\*/g,
+        replacement: () => `Backed by **${testCount} automated tests across ${suiteCount} test suites**`
+      },
+      {
+        pattern: /- \*\*Empirical Rigor:\*\* Backed by \d+ automated tests across \d+ test suites/g,
+        replacement: () => `- **Empirical Rigor:** Backed by ${testCount} automated tests across ${suiteCount} test suites`
+      },
+      {
+        pattern: /\| Automated Tests \| \*\*\d+ passing tests across \d+ suites\*\* \|/g,
+        replacement: () => `| Automated Tests | **${testCount} passing tests across ${suiteCount} suites** |`
+      },
+      {
+        pattern: /# Run full test suite \(\d+ test suites, \d+ tests\)/g,
+        replacement: () => `# Run full test suite (${suiteCount} test suites, ${testCount} tests)`
+      }
+    ]
+  },
+  {
+    relPath: "docs/README.md",
+    transforms: [
+      {
+        pattern: /\| \[(\*\*Testing Strategy\*\*)\]\(TESTING\.md\) \| \d+ suites, \d+ tests/g,
+        replacement: () => `| [**Testing Strategy**](TESTING.md) | ${suiteCount} suites, ${testCount} tests`
+      }
+    ]
+  },
+  {
+    relPath: "docs/CLAIM_LEDGER.md",
+    transforms: [
+      {
+        pattern: /\| \d+ tests \/ \d+ suites \| `npm test -- --runInBand` \|/g,
+        replacement: () => `| ${testCount} tests / ${suiteCount} suites | \`npm test -- --runInBand\` |`
+      }
+    ]
+  },
+  {
+    relPath: "docs/TESTING.md",
+    transforms: [
+      {
+        pattern: /REI\.ai currently has \d+ test suites with \d+ tests passing\./g,
+        replacement: () => `REI.ai currently has ${suiteCount} test suites with ${testCount} tests passing.`
+      },
+      {
+        pattern: /Latest verified full-suite result \([^)]+\): \*\*\d+\/\d+ suites\*\*, \*\*\d+\/\d+ tests\*\*\./g,
+        replacement: () => `Latest verified full-suite result (${todayIso}): **${suiteCount}/${suiteCount} suites**, **${testCount}/${testCount} tests**.`
+      }
+    ]
+  }
+];
+
+let staleDocs = [];
+const docUpdates = [];
+
+for (const target of DOC_TARGETS) {
+  const filePath = join(root, target.relPath);
+  if (!existsSync(filePath)) continue;
+
+  const originalContent = readFileSync(filePath, "utf8");
+  let updatedContent = originalContent;
+
+  for (const { pattern, replacement } of target.transforms) {
+    updatedContent = updatedContent.replace(pattern, replacement);
+  }
+
+  if (originalContent !== updatedContent) {
+    staleDocs.push(target.relPath);
+    docUpdates.push({ filePath, updatedContent, relPath: target.relPath });
+  }
 }
 
 if (checkOnly) {
-  console.error(
-    `gen-claims: STALE claims.json (file: ${existing ? existing.testCount + "/" + existing.suiteCount : "missing"}, suite: ${claims.testCount}/${claims.suiteCount}) — run \`node scripts/gen-claims.mjs\` and commit the update`
-  );
-  process.exit(1);
+  let hasError = false;
+  if (!claimsJsonMatch) {
+    console.error(
+      `gen-claims: STALE claims.json (file: ${existing ? existing.testCount + "/" + existing.suiteCount : "missing"}, suite: ${claims.testCount}/${claims.suiteCount})`
+    );
+    hasError = true;
+  }
+  if (staleDocs.length > 0) {
+    console.error(`gen-claims: STALE doc files detected (${staleDocs.join(", ")}) — run \`node scripts/gen-claims.mjs\` to update`);
+    hasError = true;
+  }
+
+  if (hasError) {
+    process.exit(1);
+  }
+
+  console.log(`gen-claims: claims.json and all documentation files up to date (${testCount} tests / ${suiteCount} suites)`);
+  process.exit(0);
 }
 
-writeFileSync(claimsPath, rendered);
-console.log(`gen-claims: wrote ${claims.testCount} tests / ${claims.suiteCount} suites → src/data/claims.json`);
+// Normal execution: write claims.json and all stale documentation files
+if (!claimsJsonMatch) {
+  writeFileSync(claimsPath, rendered);
+  console.log(`gen-claims: wrote ${testCount} tests / ${suiteCount} suites → src/data/claims.json`);
+} else {
+  console.log(`gen-claims: claims.json already up to date (${testCount} tests / ${suiteCount} suites)`);
+}
+
+for (const { filePath, updatedContent, relPath } of docUpdates) {
+  writeFileSync(filePath, updatedContent);
+  console.log(`gen-claims: synchronized doc file → ${relPath} (${testCount} tests / ${suiteCount} suites)`);
+}
+
+if (claimsJsonMatch && staleDocs.length === 0) {
+  console.log(`gen-claims: all claims and documentation files are fully synchronized (${testCount} tests / ${suiteCount} suites)`);
+}

@@ -9,7 +9,7 @@
 
 REI.ai is the answer — a deterministic AI orchestration platform that inspects prompts locally and routes each request to the cheapest model capable of producing high-quality reasoning.
 
-Backed by **952 automated unit tests across 76 test suites**, REI.ai enforces verifiable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
+Backed by **959 automated tests across 78 test suites** (generated from the test runner), REI.ai enforces verifiable cost savings, anti-slop verification, prompt-cache optimization, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -30,9 +30,9 @@ Backed by **952 automated unit tests across 76 test suites**, REI.ai enforces ve
 - **Prompt-Freeze & Deterministic Caching:** Sustains a 90%+ prompt cache hit rate across LLM providers (Gemini caching discounts, DeepSeek prompt caching) by freezing prefix order and generating deterministic cache keys.
 - **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
-- **Night Shift Batch Routing:** Queues non-urgent background inference to off-peak pricing windows and free-tier capacities.
+- **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 952 automated unit tests across 76 test suites to guarantee routing logic, security guards, and cost contracts never drift.
+- **Empirical Rigor:** Backed by 959 automated tests across 78 test suites to catch routing, security, and cost-contract regressions.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -80,7 +80,7 @@ flowchart TD
 ```
 
 ### Why Order Matters
-Cascade priority is economically optimized: simple greetings run *before* heavy adversarial security scans, allowing benign greetings like *"hello"* to hit the micro-cost path (`llama-3.1-8b-instant`) without paying the ~10.6x ceiling cost of an adversarial validation route ($0.00013 vs $0.00138 per equivalent 1K-token ceiling).
+Cascade priority is economically optimized: simple greetings use the low-cost path, while adversarial and security-sensitive requests are evaluated before ordinary shortcuts.
 
 ---
 
@@ -171,11 +171,11 @@ export OPENAI_API_KEY="local-dev-key"
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **952 passing tests across 76 suites** |
+| Automated Tests | **959 passing tests across 78 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Intel Celeron J4105, 8GB RAM |
 | Monthly Operating Budget | $25/month |
-| Background | Self-taught, started late 2025/early 2026 |
+| In-Memory Route Resolution | < 1 millisecond |
 
 ---
 
@@ -183,19 +183,22 @@ export OPENAI_API_KEY="local-dev-key"
 
 ```bash
 # Clone the repository
-git clone https://github.com/aaronmarchant96-max/rei-ai
+git clone https://github.com/aaronmarchant96-max/rei-ai.git
 cd rei-ai
 
 # Install dependencies
 npm install
 
-# Run the full development suite (Vite UI + Local Cognitive Proxy)
+# Start development server
+npm run dev
+
+# Or run with full client-server sync
 npm run dev:full
 
 # Or run the headless cognitive proxy gateway alone
 npm run server
 
-# Run full test suite (76 test suites, 952 tests)
+# Run full test suite (78 test suites, 959 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

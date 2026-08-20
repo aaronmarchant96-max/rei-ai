@@ -181,7 +181,20 @@ function getStoredRouteHistory(): string[] {
       return [];
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    // Support both the original string history format and newer ring entries
+    // ({ id, slot }). Invalid entries must not become "[object Object]" during
+    // preference scoring.
+    return parsed
+      .map((entry) => {
+        if (typeof entry === "string") return entry;
+        if (entry && typeof entry === "object" && typeof entry.id === "string") return entry.id;
+        return null;
+      })
+      .filter((routeId): routeId is string => Boolean(routeId));
   } catch {
     return [];
   }
@@ -528,20 +541,6 @@ export function buildRouterDecision({
       routingSignals: {
         complexityTier,
         matchedTerms: actualMatchedTerms("structured-reasoning", text),
-        highStructureSignals,
-        storedPreference,
-      } as RoutingSignals,
-    }, hingeResult);
-    persistRouteHistory(decision.id);
-    return decision;
-  }
-
-  if (storedPreference) {
-    const decision = buildDecision(storedPreference, {
-      rationale: "Recent interaction history suggests this route should be preferred for the current request.",
-      routingSignals: {
-        complexityTier,
-        matchedTerms: actualMatchedTerms(storedPreference, text),
         highStructureSignals,
         storedPreference,
       } as RoutingSignals,
