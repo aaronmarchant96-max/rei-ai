@@ -11,6 +11,8 @@
     "app:validate": "node scripts/validate-app-shell.mjs",
     "docs:validate": "node scripts/validate-docs.mjs",
     "test": "jest --runInBand",
+    "test:fast": "jest --onlyChanged",
+    "test:changed": "jest -o",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:visual": "node scripts/verify-workspace-layout.mjs",
