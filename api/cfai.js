@@ -400,7 +400,14 @@ async function callDeepSeek(messages, maxTokens, modelOverride, temperature = 0.
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {
     const requestedModel = modelOverride || "deepseek-v4-flash";
-    const payload = { model: requestedModel, messages: messages, temperature: temperature, max_tokens: maxTokens };
+    const payload = {
+      model: requestedModel,
+      messages: messages,
+      temperature: temperature,
+      max_tokens: maxTokens,
+      presence_penalty: 0.1,
+      frequency_penalty: 0.1,
+    };
     if (tools && tools.length > 0) payload.tools = tools;
     const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
@@ -1166,7 +1173,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   }
 
   const isGreeting = routerDecision?.id === "simple-greeting";
-  const maxTokens = Math.max(routerDecision?.maxTokens || 2048, isGreeting ? 200 : 50);
+  const maxTokens = Math.max(routerDecision?.maxTokens || 4096, isGreeting ? 200 : 50);
   const toolsToPass = isGreeting ? null : AVAILABLE_TOOLS;
   const primaryModel = routerDecision?.model || "deepseek-v4-flash";
   const primaryBackend = getBackendForModel(primaryModel);
