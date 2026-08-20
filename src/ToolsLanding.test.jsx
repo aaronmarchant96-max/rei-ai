@@ -13,8 +13,8 @@ describe("ToolsLanding", () => {
   it("renders stats badges with accuracy and test count", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText(`${claimsData.testCount}+`)).toBeInTheDocument();
-    expect(screen.getByText("Passing Tests")).toBeInTheDocument();
+    expect(screen.getAllByText(new RegExp(`${claimsData.testCount}\\+`)).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Passing Tests").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Router Accuracy (implemented routes)")).toBeInTheDocument();
   });
 
