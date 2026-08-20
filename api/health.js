@@ -68,7 +68,9 @@ export default async function handler(req, res) {
       },
       openaiProxy: {
         status: "operational",
-        supportedModels: 7,
+        primaryGateway: "deepseek",
+        deepseekConfigured: !!(process.env.DEEPSEEK_API_KEY || process.env.deepseek),
+        supportedModels: 8,
         routeEndpoint: "/v1/chat/completions",
       }
     },

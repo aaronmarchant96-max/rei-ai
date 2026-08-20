@@ -56,14 +56,14 @@ export function clearProviderCooldown() {
 // ── Backend dispatcher: model name → API provider ──
 
 function getBackendForModel(model) {
-  if (!model) return null;
+  if (!model) return "deepseek";
+  if (model.startsWith("deepseek") || model.includes("deepseek")) return "deepseek";
   if (model.startsWith("openai/gpt-oss") || model.includes("gpt-oss") || model.includes("qwen") || model.startsWith("groq/")) return "groq";
   if (model.startsWith("gpt-")) return "openai";
-  if (model.startsWith("deepseek")) return "deepseek";
   if (model.includes("gemini") || model.includes("gemma")) return "gemini";
   if (model.includes("glm") || model.includes("zai")) return "glm";
   if (model.includes("llama") || model.includes("mixtral")) return "groq";
-  return "groq";
+  return "deepseek";
 }
 
 // ── Tools & Autonomous Function Calling ──
@@ -393,13 +393,14 @@ export async function executeWebSearch(query, numResults = 3) {
 
 // ── Per-backend callers ──
 
-async function callDeepSeek(messages, maxTokens, temperature = 0.7, tools = null) {
+async function callDeepSeek(messages, maxTokens, modelOverride, temperature = 0.7, tools = null) {
   const key = process.env.DEEPSEEK_API_KEY || process.env.deepseek;
   if (!key) return null;
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {
-    const payload = { model: "deepseek-v4-flash", messages: messages, temperature: temperature, max_tokens: maxTokens };
+    const requestedModel = modelOverride || "deepseek-v4-flash";
+    const payload = { model: requestedModel, messages: messages, temperature: temperature, max_tokens: maxTokens };
     if (tools && tools.length > 0) payload.tools = tools;
     const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
@@ -419,7 +420,7 @@ async function callDeepSeek(messages, maxTokens, temperature = 0.7, tools = null
     var finishReason = data.choices?.[0]?.finish_reason || null;
     return {
       content: data.choices?.[0]?.message?.content || "",
-      model: "deepseek-v4-flash",
+      model: requestedModel,
       usage: data.usage || null,
       truncated: finishReason === "length",
       finishReason: finishReason,
@@ -1173,16 +1174,17 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   // Only pass the routed model to Groq when Groq IS the primary backend —
   // as a fallback it must use the default model (a non-Groq routed model
   // like deepseek-v4-flash would be rejected by Groq's API).
+  const deepseekModel = primaryBackend === "deepseek" ? primaryModel : "deepseek-v4-flash";
   const groqModel = primaryBackend === "groq" ? primaryModel : null;
   const geminiModel = primaryBackend === "gemini" ? primaryModel : null;
 
   // Map of available backends (each accepts an optional message override so
   // the continuation & tool loops can re-call the SAME backend with appended turns)
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs, passTools) { return callDeepSeek(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs, passTools, modelOverride) { return callDeepSeek(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : deepseekModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools, modelOverride) { return callGroq(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs, passTools) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs, passTools) { return callGLM(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
-  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools, modelOverride) { return callGroq(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs, passTools) { return callOpenAI(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
 
   // Try primary backend first (unless in cooldown)
@@ -1199,8 +1201,8 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
     }
   }
 
-  // Fallback: try remaining backends in priority order
-  var order = primaryBackend ? ["groq", "gemini", "glm", "deepseek", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["groq", "gemini", "glm", "deepseek", "openai"];
+  // Fallback: try remaining backends in priority order (DeepSeek #1)
+  var order = primaryBackend ? ["deepseek", "groq", "gemini", "glm", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["deepseek", "groq", "gemini", "glm", "openai"];
   for (var i = 0; i < order.length; i++) {
     var backend = order[i];
     if (backends[backend]) {
@@ -1241,9 +1243,9 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
   const primaryBackend = getBackendForModel(model);
 
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxT, temp); };
-  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxT, model, temp); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs) { return callDeepSeek(msgs || messages, maxT, model, temp); };
   if (process.env.GROQ_API_KEY) backends.groq = function (msgs) { return callGroq(msgs || messages, maxT, model, temp); };
+  if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs) { return callGemini(msgs || messages, maxT, model, temp); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs) { return callOpenAI(msgs || messages, maxT, temp); };
 
   if (primaryBackend && backends[primaryBackend]) {
@@ -1259,7 +1261,7 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
     }
   }
 
-  var order = primaryBackend ? ["groq", "gemini", "deepseek", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["groq", "gemini", "deepseek", "openai"];
+  var order = primaryBackend ? ["deepseek", "groq", "gemini", "openai"].filter(function (b) { return b !== primaryBackend; }) : ["deepseek", "groq", "gemini", "openai"];
   for (var i = 0; i < order.length; i++) {
     var backend = order[i];
     if (backends[backend]) {

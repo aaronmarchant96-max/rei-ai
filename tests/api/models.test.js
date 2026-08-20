@@ -25,6 +25,9 @@ describe("OpenAI-compatible models list endpoint", () => {
 
     const modelIds = jsonBody.data.map((m) => m.id);
     expect(modelIds).toContain("rei-auto");
+    expect(modelIds).toContain("deepseek-v4-flash");
+    expect(modelIds).toContain("deepseek-v4-pro");
+    expect(modelIds).toContain("deepseek-reasoner");
     expect(modelIds).toContain("llama-3.1-8b-instant");
     expect(modelIds).toContain("openai/gpt-oss-120b");
   });

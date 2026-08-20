@@ -12,7 +12,28 @@ export default async function handler(req, res) {
       object: "model",
       created: 1700000000,
       owned_by: "rei-ai",
-      description: "REI Dynamic Cognitive Router (Arbitrates between LLaMA-8B, GPT-OSS-20B/120B, Gemini, DeepSeek, and GLM)",
+      description: "REI Dynamic Cognitive Router (DeepSeek #1 Primary Gateway with multi-provider fallbacks)",
+    },
+    {
+      id: "deepseek-v4-flash",
+      object: "model",
+      created: 1700000000,
+      owned_by: "deepseek",
+      description: "DeepSeek primary high-throughput reasoning engine (~$0.14 / 1M input tokens)",
+    },
+    {
+      id: "deepseek-v4-pro",
+      object: "model",
+      created: 1700000000,
+      owned_by: "deepseek",
+      description: "DeepSeek flagship architectural reasoning engine",
+    },
+    {
+      id: "deepseek-reasoner",
+      object: "model",
+      created: 1700000000,
+      owned_by: "deepseek",
+      description: "DeepSeek mathematical and algorithmic reasoning engine",
     },
     {
       id: "llama-3.1-8b-instant",
@@ -41,13 +62,6 @@ export default async function handler(req, res) {
       created: 1700000000,
       owned_by: "google",
       description: "Long-context reasoning fallback engine",
-    },
-    {
-      id: "deepseek-reasoner",
-      object: "model",
-      created: 1700000000,
-      owned_by: "deepseek",
-      description: "Deep mathematical and algorithmic reasoning engine",
     },
     {
       id: "zai/glm-5.2",
