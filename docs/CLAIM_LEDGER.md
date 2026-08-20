@@ -1,3 +1,15 @@
+---
+status: canonical
+authority_scope: empirical-claims
+owner: Aaron Marchant
+last_verified: 2026-08-20
+verified_against_commit: 7247921
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: null
+archived_at: null
+---
+
 # Claim Ledger
 
 Every published claim maps to the command that produces it. If a claim has no command, it is retired or marked self-reported.

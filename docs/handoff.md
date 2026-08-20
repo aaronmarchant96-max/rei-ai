@@ -1,7 +1,19 @@
-Goal:
-Current state handoff for CLI agents working on PromptHound Labs experiments.
+---
+status: historical
+authority_scope: none
+owner: Aaron Marchant
+last_verified: null
+verified_against_commit: null
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: docs/PORTFOLIO_OVERVIEW.md
+archived_at: 2026-08-20
+---
 
-> **For every CLI session:** Start with `CLI_ENTRY.md` then `README.md`. This file supplements with the latest progress.
+> ⚠️ **HISTORICAL DOCUMENT — POINT-IN-TIME DEVELOPMENT SNAPSHOT (July 3, 2026)**  
+> *This handoff document reflects early repository state (95 tests). For current canonical architecture, testing strategy, and verified metrics, see [`docs/PORTFOLIO_OVERVIEW.md`](PORTFOLIO_OVERVIEW.md) and [`src/data/claims.json`](../src/data/claims.json).*
+
+# Archived Development Handoff (July 3, 2026)
 
 ## Context
 

@@ -1,3 +1,15 @@
+---
+status: historical
+authority_scope: none
+owner: Aaron Marchant
+last_verified: null
+verified_against_commit: null
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: docs/ARCHITECTURE.md
+archived_at: 2026-08-20
+---
+
 # CARDO REI: A Deterministic, Cost-Aware Routing Architecture for Multi-Domain LLM Reasoning
 
 **A cascading, zero-inference-first router with an explicit cost-benefit escalation gate,
@@ -5,13 +17,8 @@ validated across five task domains.**
 
 ---
 
-> **⚠️ SUPERSEDED CLAIMS — see `CLAIM_LEDGER.md` for current, verified figures.**
-> This document is a historical record of what was targeted/measured at the time of writing
-> (53.6% zero-shot, 88.9% in-sample, 78% savings, 162/227/312 test counts). Those numbers
-> have since been re-baselined: deterministic accuracy is measured at 60–80% (69.1% pooled
-> claimsSync gate), savings ~92% (ceiling-based, after honest 70B pricing fix), tests 560/44
-> suites (auto-verified by `node scripts/gen-claims.mjs --check` in CI). Do not quote this
-> document's figures in proposals, pitches, or diligence — use `CLAIM_LEDGER.md`.
+> ⚠️ **HISTORICAL DOCUMENT — POINT-IN-TIME DESIGN ARCHIVE**  
+> *This document preserves the early theoretical framing and pre-pivot complexity equations of CARDO REI. For current implemented system architecture, see [`docs/ARCHITECTURE.md`](ARCHITECTURE.md). For current empirical claims and reproducible benchmarks, see [`docs/CLAIM_LEDGER.md`](CLAIM_LEDGER.md). Do not use this document for active metrics or implementation behavior.*
 
 ## Claim Stratification
 

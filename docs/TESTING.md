@@ -1,3 +1,15 @@
+---
+status: canonical
+authority_scope: evaluation-and-test-taxonomy
+owner: Aaron Marchant
+last_verified: 2026-08-20
+verified_against_commit: 7247921
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: null
+archived_at: null
+---
+
 # Testing Strategy
 
 REI.ai currently has 83 test suites with 997 tests passing. The generated count is recorded in `src/data/claims.json`. This document explains the testing philosophy, what each category covers, and how to write new tests.

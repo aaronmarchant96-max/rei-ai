@@ -1,6 +1,19 @@
-# Session Handoff — 2026-08-14
+---
+status: historical
+authority_scope: none
+owner: Aaron Marchant
+last_verified: null
+verified_against_commit: null
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: docs/PORTFOLIO_OVERVIEW.md
+archived_at: 2026-08-20
+---
 
-## Current State
+> ⚠️ **HISTORICAL DOCUMENT — POINT-IN-TIME SESSION SNAPSHOT (August 14, 2026)**  
+> *This document preserves intermediate session state (684 tests). For current canonical architecture, testing strategy, and verified metrics, see [`docs/PORTFOLIO_OVERVIEW.md`](PORTFOLIO_OVERVIEW.md) and [`src/data/claims.json`](../src/data/claims.json).*
+
+# Archived Session Handoff — 2026-08-14
 
 - **Branch:** `main` at `725c71f`
 - **Repo (GitHub):** https://github.com/aaronmarchant96-max/rei-ai

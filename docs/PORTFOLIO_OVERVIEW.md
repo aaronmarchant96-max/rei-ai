@@ -1,3 +1,15 @@
+---
+status: canonical
+authority_scope: builder-story-and-case-studies
+owner: Aaron Marchant
+last_verified: 2026-08-20
+verified_against_commit: 7247921
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: null
+archived_at: null
+---
+
 # Engineering Portfolio Overview
 
 > **"I build evidence-driven systems for evaluating, securing, and optimizing AI."**

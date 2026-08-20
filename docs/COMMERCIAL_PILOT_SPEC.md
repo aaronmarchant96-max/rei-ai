@@ -1,3 +1,15 @@
+---
+status: canonical
+authority_scope: commercial-deployment-and-pilot-gates
+owner: Aaron Marchant
+last_verified: 2026-08-20
+verified_against_commit: 7247921
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: null
+archived_at: null
+---
+
 # REI.ai — Commercial Pilot Specification & BYOK Architecture
 
 ## 1. Commercial Architecture: Bring Your Own Key (BYOK)

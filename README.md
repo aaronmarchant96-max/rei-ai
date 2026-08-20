@@ -1,3 +1,15 @@
+---
+status: canonical
+authority_scope: public-entrypoint-and-headlines
+owner: Aaron Marchant
+last_verified: 2026-08-20
+verified_against_commit: 7247921
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: null
+archived_at: null
+---
+
 # REI.ai — OpenAI-Compatible AI FinOps Proxy & Inference Router
 
 > **"You're not just saving money. You're building better, faster."**

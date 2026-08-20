@@ -1,3 +1,15 @@
+---
+status: canonical
+authority_scope: implemented-system-behavior
+owner: Aaron Marchant
+last_verified: 2026-08-20
+verified_against_commit: 7247921
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: [docs/INFORMATION_THEORETIC_ARCHITECTURE.md]
+superseded_by: null
+archived_at: null
+---
+
 # REI.ai — Adaptive Inference Orchestrator Architecture
 
 > **"The future of AI isn't just about better models — it's about better systems."**
