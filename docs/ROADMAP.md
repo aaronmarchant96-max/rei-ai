@@ -10,7 +10,7 @@ This document outlines the strategic product vision, open-core architecture mode
 
 Most production AI agent stacks suffer from two critical operational failures:
 1. **Cost-Bleed**: Blindly routing routine reasoning to expensive frontier models ($15k+/month API spend).
-2. **Unverified Optimization**: Lack of empirical evaluation or non-inferiority proof when adopting cheaper models.
+2. **Unverified Optimization**: Lack of empirical evaluation or non-inferiority evidence when adopting cheaper models.
 
 REI.ai solves this with a **zero-inference deterministic routing engine** and **epistemic evidence plane**, reducing inference spend by **~85–92%** (measured ceiling & replayed baseline) without compromising output quality.
 

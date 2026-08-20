@@ -24,6 +24,7 @@
 | [**REI.ai v4 Semantic Router Plan**](REI_V4_SEMANTIC_ROUTER_PLAN.md) | v4 ONNX semantic routing plan (research, not production) | Research |
 | [**Red Team Scanner Spec**](RED_TEAM_SPEC.md) | 16-category threat detection taxonomy | Deployed |
 | [**Commercial Pilot Specification**](COMMERCIAL_PILOT_SPEC.md) | BYOK architecture, 3-stage pilot funnel, and non-dilutive credit strategy | Active |
+| [**Commercial Pilot Brief**](COMMERCIAL_PILOT_BRIEF.md) | 1-page customer executive summary, data invariants, and advancement gates | Active |
 | [**Pilot Agreement Template**](PILOT_AGREEMENT_TEMPLATE.md) | 1-page commercial agreement, security invariants, and bounded risk caps | Active |
 | [**Investor Diligence Memo**](INVESTOR_DILIGENCE_MEMO.md) | Scorecard, FinOps commercial thesis, ICP definition, and 90-day execution plan | Active |
 | [**Prompt Caching Protocol**](CACHING_RULES.md) | Prefix-freeze rules, deterministic SHA-256 keys, and telemetry reconstruction | Active |

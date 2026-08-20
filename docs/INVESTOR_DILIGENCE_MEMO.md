@@ -40,7 +40,7 @@ Companies deploying production AI agents face unpredictable model costs ($10k–
 1. **Drop-in Integration**: Point existing SDK/agent `baseURL` to REI proxy.
 2. **Deterministic Hinge Classification**: Inspects request complexity before token spend.
 3. **Cheapest Capable Route**: Dynamically routes to specialized cheaper models with automatic rescue fallbacks.
-4. **Epistemic Evidence Receipts**: Emits per-request cost attribution, token receipts, and non-inferiority proof.
+4. **Epistemic Evidence Receipts**: Emits per-request cost attribution, token receipts, and non-inferiority evidence.
 
 ---
 
