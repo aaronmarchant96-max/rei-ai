@@ -40,8 +40,23 @@ function resolveProvider(modelName) {
   return "unknown";
 }
 
-function errorReply(res, status, code, message) {
-  return res.status(status).json({ error: { code: code, message: message } });
+function errorTypeForStatus(status) {
+  if (status === 401) return "authentication_error";
+  if (status === 400 || status === 405) return "invalid_request_error";
+  if (status === 402) return "budget_exceeded_error";
+  if (status === 429) return "rate_limit_error";
+  return "server_error";
+}
+
+function errorReply(res, status, code, message, param = null) {
+  return res.status(status).json({
+    error: {
+      message: message,
+      type: errorTypeForStatus(status),
+      param: param,
+      code: code,
+    },
+  });
 }
 
 function extractCacheTokens(usage) {
@@ -91,6 +106,102 @@ function makeRequestId(req) {
   );
 }
 
+function normalizeUsage(rawUsage, userPrompt, contentText) {
+  const promptTok = typeof rawUsage?.prompt_tokens === "number" && rawUsage.prompt_tokens > 0
+    ? rawUsage.prompt_tokens
+    : Math.max(1, Math.ceil((userPrompt || "").length / 4));
+  const compTok = typeof rawUsage?.completion_tokens === "number" && rawUsage.completion_tokens > 0
+    ? rawUsage.completion_tokens
+    : Math.max(1, Math.ceil((contentText || "").length / 4));
+  const totalTok = typeof rawUsage?.total_tokens === "number" && rawUsage.total_tokens > 0
+    ? rawUsage.total_tokens
+    : promptTok + compTok;
+
+  const usageObj = {
+    prompt_tokens: promptTok,
+    completion_tokens: compTok,
+    total_tokens: totalTok,
+  };
+
+  const cacheHit = rawUsage?.prompt_cache_hit_tokens ?? rawUsage?.prompt_tokens_details?.cached_tokens;
+  if (typeof cacheHit === "number") {
+    usageObj.prompt_tokens_details = { cached_tokens: cacheHit };
+  }
+  return usageObj;
+}
+
+function sendStreamingResponse(res, completionId, createdTime, modelName, contentText, usage, reiMeta) {
+  if (typeof res.setHeader === "function") {
+    res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+    if (reiMeta?.pathway) res.setHeader("X-REI-Pathway", reiMeta.pathway);
+    if (reiMeta?.savings) res.setHeader("X-REI-Savings", String(reiMeta.savings));
+  }
+
+  // Initial role announcement chunk
+  const roleChunk = {
+    id: completionId,
+    object: "chat.completion.chunk",
+    created: createdTime,
+    model: modelName,
+    choices: [
+      {
+        index: 0,
+        delta: { role: "assistant", content: "" },
+        finish_reason: null,
+      },
+    ],
+  };
+  if (typeof res.write === "function") {
+    res.write(`data: ${JSON.stringify(roleChunk)}\n\n`);
+  }
+
+  // Content chunks (send in streamable fragments)
+  const chunks = contentText ? (contentText.match(/.{1,32}/gs) || [contentText]) : [""];
+  for (const chunk of chunks) {
+    const dataChunk = {
+      id: completionId,
+      object: "chat.completion.chunk",
+      created: createdTime,
+      model: modelName,
+      choices: [
+        {
+          index: 0,
+          delta: { content: chunk },
+          finish_reason: null,
+        },
+      ],
+    };
+    if (typeof res.write === "function") {
+      res.write(`data: ${JSON.stringify(dataChunk)}\n\n`);
+    }
+  }
+
+  // Final terminal chunk
+  const finalChunk = {
+    id: completionId,
+    object: "chat.completion.chunk",
+    created: createdTime,
+    model: modelName,
+    choices: [
+      {
+        index: 0,
+        delta: {},
+        finish_reason: "stop",
+      },
+    ],
+    usage: usage || null,
+  };
+  if (typeof res.write === "function") {
+    res.write(`data: ${JSON.stringify(finalChunk)}\n\n`);
+    res.write("data: [DONE]\n\n");
+  }
+  if (typeof res.end === "function") {
+    res.end();
+  }
+}
+
 function computeSavings(estimatedCost, premiumCost) {
   if (typeof estimatedCost !== "number" || typeof premiumCost !== "number" || premiumCost === 0) {
     return null;
@@ -117,7 +228,7 @@ export default async function handler(req, res) {
       return errorReply(res, 405, ERROR_CODES.CF_INVALID_REQUEST, "Method Not Allowed");
     }
 
-    const { model, messages, temperature, max_tokens } = req.body || {};
+    const { model, messages, temperature, max_tokens, stream } = req.body || {};
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return errorReply(res, 400, ERROR_CODES.CF_INVALID_REQUEST, "'messages' must be a non-empty array");
@@ -155,12 +266,21 @@ export default async function handler(req, res) {
       const dkrHit = await lookupDkrByHash(dkrTenant, msgHash);
       if (dkrHit && dkrHit.response) {
         void recordDkrHit(dkrTenant, dkrHit.entryId); // hit-count is analytics; void is fine
+        const completionId = `chatcmpl-dkr-${Date.now()}`;
+        const createdTime = Math.floor(Date.now() / 1000);
+        const usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+        if (stream) {
+          return sendStreamingResponse(res, completionId, createdTime, dkrHit.model || "unknown", dkrHit.response, usage, {
+            pathway: "dkr-cache",
+            savings: "100%",
+          });
+        }
         return res.status(200).json({
-          id: `chatcmpl-dkr-${Date.now()}`,
+          id: completionId,
           object: "chat.completion",
-          created: Math.floor(Date.now() / 1000),
+          created: createdTime,
           model: dkrHit.model || "unknown",
-          usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+          usage,
           choices: [{
             index: 0,
             message: { role: "assistant", content: dkrHit.response },
@@ -203,12 +323,9 @@ export default async function handler(req, res) {
         return errorReply(res, 503, code, directResult.content);
       }
 
-      const usage = directResult.usage || {
-        prompt_tokens: null,
-        completion_tokens: null,
-        total_tokens: null,
-        note: "Direct model proxy — token counts may not be available",
-      };
+      const usage = normalizeUsage(directResult.usage, userPrompt, directResult.content);
+      const completionId = `chatcmpl-${Date.now()}`;
+      const createdTime = Math.floor(Date.now() / 1000);
 
       const requestId = makeRequestId(req);
       const tracePromise = storeTrace(PILOT_TENANT, requestId, buildTraceEntry({
@@ -219,14 +336,21 @@ export default async function handler(req, res) {
         estimatedCost: null,
         premiumCost: null,
         responseModel: directResult.model || null,
-        result: { usage: directResult.usage || null },
+        result: { usage: usage },
       }));
       void tracePromise;
 
+      if (stream) {
+        return sendStreamingResponse(res, completionId, createdTime, directResult.model, directResult.content, usage, {
+          pathway: null,
+          savings: null,
+        });
+      }
+
       return res.status(200).json({
-        id: `chatcmpl-${Date.now()}`,
+        id: completionId,
         object: "chat.completion",
-        created: Math.floor(Date.now() / 1000),
+        created: createdTime,
         model: directResult.model,
         usage,
         choices: [
@@ -262,12 +386,9 @@ export default async function handler(req, res) {
       effectiveRouterDecision?.premiumCost
     );
 
-    const usage = result.usage || {
-      prompt_tokens: null,
-      completion_tokens: null,
-      total_tokens: null,
-      note: "Routing proxy — token counts available via provider API directly",
-    };
+    const usage = normalizeUsage(result.usage, userPrompt, result.result);
+    const completionId = `chatcmpl-${Date.now()}`;
+    const createdTime = Math.floor(Date.now() / 1000);
 
     // Persist a durable trace entry to the evaluation plane so the savings
     // dashboard can aggregate REAL dollar savings over proxy traffic. Mirrors
@@ -319,15 +440,22 @@ export default async function handler(req, res) {
       );
     }
 
+    if (stream) {
+      return sendStreamingResponse(res, completionId, createdTime, selectedModel, result.result, usage, {
+        pathway: reiPathway,
+        savings: reiSavings,
+      });
+    }
+
     if (typeof res.setHeader === "function") {
       res.setHeader("X-REI-Pathway", reiPathway);
       res.setHeader("X-REI-Savings", String(reiSavings));
     }
 
     return res.status(200).json({
-      id: `chatcmpl-${Date.now()}`,
+      id: completionId,
       object: "chat.completion",
-      created: Math.floor(Date.now() / 1000),
+      created: createdTime,
       model: selectedModel,
       usage,
       choices: [
