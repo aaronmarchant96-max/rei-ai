@@ -29,21 +29,49 @@ export function useSessionTracker() {
   savingsRef.current = savingsVsPremium;
   const premiumRef = useRef(0);
 
-  const trackMessage = useCallback((totalTokens, model, cost, premiumCost, wasEscalated, chunks) => {
-    setSessionTokens((prev) => prev + totalTokens);
-    setSessionMessages((prev) => prev + 1);
-    setSessionCost((prev) => prev + cost);
-    setSessionChunks((prev) => prev + (chunks || 1));
+  const trackMessage = useCallback((tokensOrObj, maybeModel, maybeCost, maybePremiumCost, maybeEscalated, maybeChunks) => {
+    let totalTokens = 0;
+    let model = "unknown";
+    let cost = 0;
+    let premiumCost = 0;
+    let wasEscalated = false;
+    let chunks = 1;
+
+    if (tokensOrObj && typeof tokensOrObj === "object") {
+      totalTokens = Number(tokensOrObj.tokens || tokensOrObj.totalTokens || 0);
+      model = tokensOrObj.model || "unknown";
+      cost = Number(tokensOrObj.cost || 0);
+      premiumCost = Number(tokensOrObj.premiumCost || 0);
+      wasEscalated = Boolean(tokensOrObj.escalation || tokensOrObj.wasEscalated);
+      chunks = Number(tokensOrObj.chunks || 1);
+    } else {
+      totalTokens = Number(tokensOrObj || 0);
+      model = maybeModel || "unknown";
+      cost = Number(maybeCost || 0);
+      premiumCost = Number(maybePremiumCost || 0);
+      wasEscalated = Boolean(maybeEscalated);
+      chunks = Number(maybeChunks || 1);
+    }
+
+    if (isNaN(cost)) cost = 0;
+    if (isNaN(premiumCost)) premiumCost = 0;
+    if (isNaN(totalTokens)) totalTokens = 0;
+    if (isNaN(chunks)) chunks = 1;
+
+    setSessionTokens((prev) => (Number(prev) || 0) + totalTokens);
+    setSessionMessages((prev) => (Number(prev) || 0) + 1);
+    setSessionCost((prev) => (Number(prev) || 0) + cost);
+    setSessionChunks((prev) => (Number(prev) || 0) + chunks);
     setModelBreakdown((prev) => ({
       ...prev,
-      [model]: (prev[model] || 0) + totalTokens,
+      [model]: ((prev && Number(prev[model])) || 0) + totalTokens,
     }));
     if (premiumCost) {
-      setSavingsVsPremium((prev) => prev + (premiumCost - cost));
+      setSavingsVsPremium((prev) => (Number(prev) || 0) + (premiumCost - cost));
       premiumRef.current += premiumCost;
     }
     if (wasEscalated) {
-      setEscalationCount((prev) => prev + 1);
+      setEscalationCount((prev) => (Number(prev) || 0) + 1);
     }
   }, []);
 

@@ -416,6 +416,7 @@ export default function REI({ initialPrompt } = {}) {
       });
       trackMessage({
         cost: actualCost,
+        premiumCost: routerDecision?.premiumCost || 0,
         tokens: (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0),
         model: modelUsed,
         chunks: data.chunks || 1,
