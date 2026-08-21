@@ -105,6 +105,11 @@ export function extractDeliverableAndScaffolding(text) {
   // 5. Strip any leading markdown horizontal rules (--- or ***) and leading whitespace
   raw = raw.replace(/^(?:\s*[-*_]{3,}\s*)+/g, "").trim();
 
+  // 6. Unescape accidental backslash-escaped markdown tokens (\###, \*\*, \`, \_)
+  raw = raw
+    .replace(/\\(#{1,6}\s)/g, "$1")
+    .replace(/\\(\*\*|__|\*|_|`{1,3}|\[|\])/g, "$1");
+
   const scaffolding = scaffoldingParts.join("\n\n").trim() || null;
 
   return {
