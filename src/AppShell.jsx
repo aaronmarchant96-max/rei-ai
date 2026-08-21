@@ -3,13 +3,14 @@ import { useMobile } from "./useMobile.js";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 
+import ToolsLanding from "./ToolsLanding.jsx";
+import REI from "./REI.jsx";
+
 const DebateFurnace = lazy(() => import("./DebateFurnace.jsx"));
 const CreativeEngine = lazy(() => import("./CreativeEngine.jsx"));
 const StormReplay = lazy(() => import("./StormReplay.jsx"));
 const CardoGuard = lazy(() => import("./CardoGuard.jsx"));
-const REI = lazy(() => import("./REI.jsx"));
 const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
-const ToolsLanding = lazy(() => import("./ToolsLanding.jsx"));
 const Analytics = lazy(() => import("./Analytics.jsx"));
 const RedTeam = lazy(() => import("./RedTeam.jsx"));
 
