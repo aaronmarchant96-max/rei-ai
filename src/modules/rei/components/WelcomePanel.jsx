@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Scale, Bug, ClipboardList, BookOpen, PenLine, Globe, Lightbulb, Swords, FlaskConical, Atom, Wrench, Microscope, Fingerprint, Search, ScrollText, Shield, BarChart3 } from "lucide-react";
+import { Scale, Bug, ClipboardList, BookOpen, PenLine, Globe, Lightbulb, Swords, FlaskConical, Atom, Wrench, Microscope, Fingerprint, Search, ScrollText, Shield, BarChart3, Pencil } from "lucide-react";
 import EvidenceLedgerModal from "./EvidenceLedgerModal.jsx";
 
 const ICON_MAP = {
@@ -51,12 +51,16 @@ const GENERIC_STARTERS = [
   { label: "Scan for prompt injections", sub: "Detect injection attacks before they reach a model", prompt: "Take me to the red team scanner — I want to test a prompt for adversarial patterns.", icon: "🛡️" },
 ];
 
-export default function WelcomePanel({ onStart, onResume }) {
-  const [activeDomain, setActiveDomain] = useState(null);
+export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: propDomain }) {
+  const [activeDomain, setActiveDomain] = useState(propDomain || null);
   const [recentTopics, setRecentTopics] = useState([]);
   const [showLedger, setShowLedger] = useState(false);
 
   useEffect(() => {
+    if (propDomain) {
+      setActiveDomain(propDomain);
+      return;
+    }
     try {
       const keys = ["legal", "coding", "genealogy", "story"];
       let best = null;
@@ -88,9 +92,10 @@ export default function WelcomePanel({ onStart, onResume }) {
       setActiveDomain(null);
       setRecentTopics([]);
     }
-  }, []);
+  }, [propDomain]);
 
   const starters = activeDomain ? (DOMAIN_STARTERS[activeDomain] || GENERIC_STARTERS) : GENERIC_STARTERS;
+  const currentDomainLabel = activeDomain ? activeDomain.charAt(0).toUpperCase() + activeDomain.slice(1) : "Generalist";
 
   return (
     <div className="rei-chat-card">
@@ -150,18 +155,30 @@ export default function WelcomePanel({ onStart, onResume }) {
         {starters.map((s) => {
           const Icon = ICON_MAP[s.icon];
           return (
-            <button
-              key={s.label}
-              type="button"
-              onClick={() => onStart(s.prompt)}
-              className="rei-starter-row"
-            >
-              <div className="rei-starter-row__glyph">{Icon && <Icon size={15} />}</div>
-              <div className="rei-starter-row__body">
-                <div className="rei-starter-row__txt">{s.label}</div>
-                <div className="rei-starter-row__sub">{s.sub}</div>
-              </div>
-            </button>
+            <div key={s.label} className="rei-starter-row-container">
+              <button
+                type="button"
+                onClick={() => onStart && onStart(s.prompt)}
+                className="rei-starter-row"
+                aria-label={`Run ${currentDomainLabel} prompt: ${s.label} — ${s.sub}`}
+              >
+                <div className="rei-starter-row__glyph">{Icon && <Icon size={15} />}</div>
+                <div className="rei-starter-row__body">
+                  <div className="rei-starter-row__txt">{s.label}</div>
+                  <div className="rei-starter-row__sub">{s.sub}</div>
+                </div>
+                <span className="rei-starter-row__hint" aria-hidden="true">↵</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onEdit && onEdit(s.prompt)}
+                className="rei-starter-row__edit-btn"
+                aria-label={`Edit ${currentDomainLabel} prompt: ${s.label}`}
+                title={`Edit prompt: "${s.prompt}"`}
+              >
+                <Pencil size={13} />
+              </button>
+            </div>
           );
         })}
       </div>

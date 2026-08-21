@@ -1,37 +1,115 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { BarChart3, Pin, PinOff, X, ExternalLink } from "lucide-react";
 
 export default function InstrumentRail({
-  sessionTokens,
-  sessionMessages,
-  sessionCost,
-  sessionChunks,
-  savingsVsPremium,
-  escalationCount,
-  modelBreakdown,
-  lifetimeCost,
-  lifetimeSavings,
+  sessionTokens = 0,
+  sessionMessages = 0,
+  sessionCost = 0,
+  sessionChunks = 0,
+  savingsVsPremium = 0,
+  escalationCount = 0,
+  modelBreakdown = {},
+  lifetimeCost = 0,
+  lifetimeSavings = 0,
+  activityCount = 0,
+  telemetryMode = "pinned",
+  isInspectOpen = false,
+  focusedDecision = null,
+  onToggleMode,
+  onCloseInspect,
+  originRef,
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [internalMode, setInternalMode] = useState(telemetryMode);
+
+  useEffect(() => {
+    if (telemetryMode !== undefined) {
+      setInternalMode(telemetryMode);
+    }
+  }, [telemetryMode]);
+
+  const handleToggle = (newMode) => {
+    setInternalMode(newMode);
+    if (onToggleMode) {
+      onToggleMode(newMode);
+    }
+  };
+
+  const isPinned = internalMode === "pinned";
+  const isDrawerModal = isInspectOpen && !isPinned;
+  const isCollapsed = !isPinned && !isDrawerModal;
+
+  const drawerRef = useRef(null);
+  const closeButtonRef = useRef(null);
 
   const totalPremiumCost = sessionCost + savingsVsPremium;
   const savingsPercent = totalPremiumCost > 0
     ? Math.round((savingsVsPremium / totalPremiumCost) * 100)
     : 0;
 
+  // Accessible Escape key dismissal, focus trapping, and focus restoration for modal drawer
+  useEffect(() => {
+    if (!isDrawerModal) return;
+
+    // Focus close button on open
+    setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCloseInspect?.();
+      }
+      if (e.key === "Tab" && drawerRef.current) {
+        const focusable = drawerRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      // Restore focus to originating inspect trigger
+      if (originRef?.current && typeof originRef.current.focus === "function") {
+        originRef.current.focus();
+      }
+    };
+  }, [isDrawerModal, onCloseInspect, originRef]);
+
   if (isCollapsed) {
     return (
-      <aside className="rei-instrument-rail is-collapsed" aria-label="Session instrumentation">
+      <aside className="rei-instrument-rail is-collapsed" aria-label="Session telemetry and inspection">
         <button
-          onClick={() => setIsCollapsed(false)}
+          type="button"
+          onClick={() => handleToggle("pinned")}
           className="rei-instrument-rail__toggle-btn"
           aria-label="Expand sidebar"
           title="Expand sidebar"
         >
           &#8249;
         </button>
-        <div className="rei-instrument-rail__collapsed-hero" title={`Rate Advantage: ${savingsPercent}%`}>
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => handleToggle("pinned")}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleToggle("pinned")}
+          className="rei-instrument-rail__collapsed-hero"
+          title={`Rate Advantage: ${savingsPercent}%`}
+          aria-label={`Activity count: ${activityCount}. Rate advantage: ${savingsPercent}%. Click to expand.`}
+        >
           <div className="rei-instrument-rail__collapsed-hero-value">
-            EFFICIENCY: {totalPremiumCost > 0 ? `${savingsPercent}%` : "\u2014"}
+            {`EFFICIENCY: ${totalPremiumCost > 0 ? `${savingsPercent}%` : "\u2014"}`}
           </div>
         </div>
       </aside>
@@ -39,119 +117,194 @@ export default function InstrumentRail({
   }
 
   return (
-    <aside className="rei-instrument-rail" aria-label="Session instrumentation">
-      <div className="rei-instrument-rail__header">
-        <span className="rei-instrument-rail__title">Live Telemetry</span>
-        <button
-          onClick={() => setIsCollapsed(true)}
-          className="rei-instrument-rail__toggle-btn"
-          aria-label="Collapse sidebar"
-          title="Collapse sidebar"
-        >
-          &#8250;
-        </button>
-      </div>
-
-      <div className="rei-side-card">
-        <div className="rei-side-card__heading">This Session</div>
-        {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
-          <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
-            Routing will select the cheapest capable model for each query.
-            Typical savings vs. calling GPT-4o directly: ~90%+ (ceiling-based).
-            Numbers appear here after your first response.
+    <>
+      {isDrawerModal && (
+        <div
+          className="rei-inspect-backdrop"
+          onClick={onCloseInspect}
+          aria-hidden="true"
+        />
+      )}
+      <aside
+        ref={drawerRef}
+        className={`rei-instrument-rail ${isDrawerModal ? "rei-instrument-rail--drawer" : ""}`}
+        role={isDrawerModal ? "dialog" : "complementary"}
+        aria-modal={isDrawerModal ? "true" : undefined}
+        aria-label="Decision Inspection and Telemetry"
+      >
+        <div className="rei-instrument-rail__header">
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <BarChart3 size={15} style={{ color: "var(--accent-cyan, #38bdf8)" }} />
+            <span className="rei-instrument-rail__title">
+              {focusedDecision ? "Decision Report" : "Live Telemetry"}
+            </span>
           </div>
-        ) : (
-          <>
-            <div className="rei-side-stat">
-              <span className="rei-side-stat__label">Cost</span>
-              <span className={`rei-side-stat__value mono${sessionCost === 0 ? " zero" : ""}`}>
-                {sessionCost === 0 ? "\u2014" : sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
-              </span>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            {/* Pin Toggle for persistent desktop preference */}
+            <button
+              type="button"
+              onClick={() => handleToggle(isPinned ? "collapsed" : "pinned")}
+              className={`rei-instrument-rail__pin-btn ${isPinned ? "is-pinned" : ""}`}
+              aria-label={isPinned ? "Unpin sidebar to collapse" : "Pin sidebar open"}
+              title={isPinned ? "Unpin sidebar" : "Pin sidebar"}
+            >
+              {isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+            </button>
+
+            {/* Close / Collapse button */}
+            <button
+              ref={closeButtonRef}
+              type="button"
+              onClick={isDrawerModal ? onCloseInspect : () => handleToggle("collapsed")}
+              className="rei-instrument-rail__toggle-btn"
+              aria-label="Collapse sidebar"
+              title="Collapse sidebar"
+            >
+              {isDrawerModal ? <X size={15} /> : <>&#8250;</>}
+            </button>
+          </div>
+        </div>
+
+        {/* Focused Decision Inspection View (when opened from message Inspect) */}
+        {focusedDecision ? (
+          <div className="rei-side-card" style={{ borderLeft: "3px solid var(--accent-cyan, #38bdf8)" }}>
+            <div className="rei-side-card__heading" style={{ color: "var(--accent-cyan, #38bdf8)" }}>
+              Inspecting: {focusedDecision.label || focusedDecision.id}
             </div>
             <div className="rei-side-stat">
-              <span className="rei-side-stat__label">Tokens</span>
-              <span className={`rei-side-stat__value mono${sessionTokens === 0 ? " zero" : ""}`}>
-                {sessionTokens === 0 ? "\u2014" : sessionTokens.toLocaleString()}
-              </span>
+              <span className="rei-side-stat__label">Assigned Model</span>
+              <span className="rei-side-stat__value mono">{focusedDecision.model || "auto-routed"}</span>
             </div>
             <div className="rei-side-stat">
-              <span className="rei-side-stat__label">Messages</span>
-              <span className={`rei-side-stat__value mono${sessionMessages === 0 ? " zero" : ""}`}>
-                {sessionMessages === 0 ? "\u2014" : sessionMessages}
+              <span className="rei-side-stat__label">Cost Mode</span>
+              <span className="rei-side-stat__value mono" style={{ fontSize: "11px" }}>
+                {focusedDecision.isObservedCost ? "Observed telemetry" : "Ceiling-based estimate"}
               </span>
             </div>
-            {sessionChunks > sessionMessages && (
+            {focusedDecision.cost != null && (
               <div className="rei-side-stat">
-                <span className="rei-side-stat__label" title="Some responses needed more than one inference chunk to finish (continuation).">
-                  Inference chunks
-                </span>
-                <span className="rei-side-stat__value mono">
-                  {sessionChunks}
+                <span className="rei-side-stat__label">Query Cost</span>
+                <span className="rei-side-stat__value mono verified">
+                  ${typeof focusedDecision.cost === "number" ? focusedDecision.cost.toFixed(5) : focusedDecision.cost}
                 </span>
               </div>
             )}
-            <div className="rei-side-stat">
-              <span className="rei-side-stat__label">Saved vs. premium</span>
-              <span className="rei-side-stat__value verified mono">
-                ${savingsVsPremium.toFixed(4)}
-              </span>
-            </div>
-          </>
-        )}
-      </div>
-
-      <div className="rei-side-card">
-        <div className="rei-side-card__heading">Models</div>
-        {Object.keys(modelBreakdown).length === 0 ? (
-          <div className="rei-side-empty">
-            No model calls yet.<br/>Routing shows up here after your first message.
+            {focusedDecision.hingeScore != null && (
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label">Hinge Score (HS)</span>
+                <span className="rei-side-stat__value mono">{focusedDecision.hingeScore.toFixed(2)}</span>
+              </div>
+            )}
+            {focusedDecision.rationale && (
+              <div style={{ marginTop: "10px", fontSize: "12px", color: "var(--text-secondary, #94a3b8)", lineHeight: "1.45" }}>
+                <strong>Routing Rationale:</strong> {focusedDecision.rationale}
+              </div>
+            )}
           </div>
-        ) : (
-          Object.entries(modelBreakdown).map(([model, tokens]) => (
-            <div key={model} className="rei-side-stat">
-              <span title={model} className="rei-side-stat__label">
-                {model.length > 22 ? model.slice(0, 19) + "..." : model}
-              </span>
-              <span className="rei-side-stat__value mono">
-                {tokens.toLocaleString()} tok
-              </span>
-            </div>
-          ))
-        )}
-      </div>
+        ) : null}
 
-      {lifetimeCost > 0 && (
         <div className="rei-side-card">
-          <div className="rei-side-card__heading">Lifetime</div>
-          <div className="rei-side-stat">
-            <span className="rei-side-stat__label">Total cost</span>
-            <span className="rei-side-stat__value mono">${lifetimeCost.toFixed(4)}</span>
-          </div>
-          <div className="rei-side-stat">
-            <span className="rei-side-stat__label">Total saved</span>
-            <span className="rei-side-stat__value verified mono">${lifetimeSavings.toFixed(2)}</span>
-          </div>
-          {escalationCount > 0 && (
-            <div className="rei-side-stat">
-              <span className="rei-side-stat__label">Escalations</span>
-              <span className="rei-side-stat__value mono">{escalationCount}</span>
+          <div className="rei-side-card__heading">This Session</div>
+          {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
+            <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
+              Routing will select the cheapest capable model for each query.
+              Typical savings vs. calling GPT-4o directly: ~90%+ (ceiling-based).
+              Numbers appear here after your first response.
             </div>
+          ) : (
+            <>
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label">Cost</span>
+                <span className={`rei-side-stat__value mono${sessionCost === 0 ? " zero" : ""}`}>
+                  {sessionCost === 0 ? "\u2014" : sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
+                </span>
+              </div>
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label">Tokens</span>
+                <span className={`rei-side-stat__value mono${sessionTokens === 0 ? " zero" : ""}`}>
+                  {sessionTokens === 0 ? "\u2014" : sessionTokens.toLocaleString()}
+                </span>
+              </div>
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label">Messages</span>
+                <span className={`rei-side-stat__value mono${sessionMessages === 0 ? " zero" : ""}`}>
+                  {sessionMessages === 0 ? "\u2014" : sessionMessages}
+                </span>
+              </div>
+              {sessionChunks > sessionMessages && (
+                <div className="rei-side-stat">
+                  <span className="rei-side-stat__label" title="Some responses needed more than one inference chunk to finish (continuation).">
+                    Inference chunks
+                  </span>
+                  <span className="rei-side-stat__value mono">
+                    {sessionChunks}
+                  </span>
+                </div>
+              )}
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label">Saved vs. premium</span>
+                <span className="rei-side-stat__value verified mono">
+                  ${savingsVsPremium.toFixed(4)}
+                </span>
+              </div>
+            </>
           )}
         </div>
-      )}
 
-      <div className="rei-side-card">
-        <div className="rei-side-card__heading">Build</div>
-        <div className="rei-side-chips">
-          <span className="rei-side-chip">CARDO v3.4</span>
-          <span className="rei-side-chip">v3 Keyword</span>
-          <span className="rei-side-chip">CARDO Guard</span>
+        <div className="rei-side-card">
+          <div className="rei-side-card__heading">Models</div>
+          {Object.keys(modelBreakdown).length === 0 ? (
+            <div className="rei-side-empty">
+              No model calls yet.<br />Routing shows up here after your first message.
+            </div>
+          ) : (
+            Object.entries(modelBreakdown).map(([model, tokens]) => (
+              <div key={model} className="rei-side-stat">
+                <span title={model} className="rei-side-stat__label">
+                  {model.length > 22 ? model.slice(0, 19) + "..." : model}
+                </span>
+                <span className="rei-side-stat__value mono">
+                  {tokens.toLocaleString()} tok
+                </span>
+              </div>
+            ))
+          )}
         </div>
-      </div>
 
-      <a href="/#analytics" className="rei-side-dash-link">
-        Full dashboard <span className="rei-side-dash-link__arrow">&rarr;</span>
-      </a>
-    </aside>
+        {lifetimeCost > 0 && (
+          <div className="rei-side-card">
+            <div className="rei-side-card__heading">Historical Cumulative</div>
+            <div className="rei-side-stat">
+              <span className="rei-side-stat__label">Total cost</span>
+              <span className="rei-side-stat__value mono">${lifetimeCost.toFixed(4)}</span>
+            </div>
+            <div className="rei-side-stat">
+              <span className="rei-side-stat__label">Total saved</span>
+              <span className="rei-side-stat__value verified mono">${lifetimeSavings.toFixed(2)}</span>
+            </div>
+            {escalationCount > 0 && (
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label">Escalations</span>
+                <span className="rei-side-stat__value mono">{escalationCount}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="rei-side-card">
+          <div className="rei-side-card__heading">Protocol Architecture</div>
+          <div className="rei-side-chips">
+            <span className="rei-side-chip">CARDO v3.4</span>
+            <span className="rei-side-chip">Hinge Classifier</span>
+            <span className="rei-side-chip">CARDO Guard</span>
+          </div>
+        </div>
+
+        <a href="/#analytics" className="rei-side-dash-link">
+          Full Analytics Dashboard <ExternalLink size={12} style={{ marginLeft: "4px", display: "inline" }} />
+        </a>
+      </aside>
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Paperclip, X } from "lucide-react";
 import { useRei } from "../ReiContext.js";
 import { readTextFile, MAX_FILE_SIZE, MAX_FILE_COUNT, MAX_COMBINED_SIZE } from "../../../lib/fileExtractor.js";
@@ -7,6 +7,13 @@ export default function ChatInput() {
   const { inputMessage, setInputMessage, selectedDomain, handleSendMessage, inputRef, mobile, generalistPrompts, assistantPromptIndex, setAssistantPromptIndex, attachedFiles, setAttachedFiles } = useRei();
   const fileInputRef = useRef(null);
   const [fileErrors, setFileErrors] = useState([]);
+
+  // Desktop-only autofocus: Never autofocus on mobile to prevent virtual keyboard from occluding the zero-state view
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 768 && inputRef?.current) {
+      inputRef.current.focus();
+    }
+  }, [inputRef]);
 
   return (
     <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: mobile ? "10px 10px 12px" : "12px 16px 16px", background: "var(--surface)", backdropFilter: "blur(12px)", borderTop: "1px solid var(--border)" }}>

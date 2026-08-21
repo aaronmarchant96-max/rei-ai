@@ -410,5 +410,7 @@ export function buildRequestEvidence(input: BuildEvidenceInput): RequestEvidence
       cardoCompliant,
       provenance: input.responseText ? "observed" : "unavailable",
     },
+    routerDecision: decision,
+    estimatedCost: decision.estimatedCost ?? null,
   };
 }

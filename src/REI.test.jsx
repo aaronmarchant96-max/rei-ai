@@ -269,24 +269,28 @@ describe("REI", () => {
     }, { timeout: 3000 });
   });
 
-  it("toggles theme when clicking the theme button", () => {
+  it("toggles theme when clicking the theme button in kebab menu", () => {
     render(<REI />);
 
     const shell = document.querySelector("[data-theme]");
     expect(shell.getAttribute("data-theme")).toBe("dark");
 
-    fireEvent.click(screen.getByTitle("Toggle light / dark theme"));
+    // Open kebab menu and click theme toggle
+    fireEvent.click(screen.getByLabelText(/Workspace utilities and options/i));
+    fireEvent.click(screen.getByText(/Light Mode/i));
 
     expect(shell.getAttribute("data-theme")).toBe("light");
 
-    fireEvent.click(screen.getByTitle("Toggle light / dark theme"));
+    fireEvent.click(screen.getByLabelText(/Workspace utilities and options/i));
+    fireEvent.click(screen.getByText(/Dark Mode/i));
 
     expect(shell.getAttribute("data-theme")).toBe("dark");
   });
 
-  it("opens and closes the philosophy modal", () => {
+  it("opens and closes the philosophy modal via kebab menu", () => {
     render(<REI />);
 
+    fireEvent.click(screen.getByLabelText(/Workspace utilities and options/i));
     fireEvent.click(screen.getByText(/Philosophy/i));
 
     expect(screen.getByText("SYSTEM PHILOSOPHY: R.E.I.")).toBeInTheDocument();
@@ -297,9 +301,10 @@ describe("REI", () => {
     expect(screen.queryByText("SYSTEM PHILOSOPHY: R.E.I.")).not.toBeInTheDocument();
   });
 
-  it("pre-fills legal domain and input when \"Try a Case\" is clicked", async () => {
+  it("pre-fills legal domain and input when \"Try a Case\" is clicked in kebab menu", async () => {
     render(<REI />);
 
+    fireEvent.click(screen.getByLabelText(/Workspace utilities and options/i));
     fireEvent.click(screen.getByText(/Try a Case/i));
 
     await waitFor(() => {
@@ -322,7 +327,8 @@ describe("REI", () => {
       expect(screen.getByText("hello world")).toBeInTheDocument();
     }, { timeout: 3000 });
 
-    fireEvent.click(screen.getByText("Clear Chat"));
+    fireEvent.click(screen.getByLabelText(/Workspace utilities and options/i));
+    fireEvent.click(screen.getByText(/Clear Chat/i));
 
     await waitFor(() => {
       expect(screen.queryByText("hello world")).not.toBeInTheDocument();
@@ -373,5 +379,126 @@ describe("REI", () => {
     global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
     const response = await fetchWithTimeout("/api/cfai", {}, 1000);
     expect(response.ok).toBe(true);
+  });
+});
+
+describe("REI Workspace Transition & Progressive Disclosure", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        headers: { get: () => "application/json" },
+        json: () => Promise.resolve({
+          success: true,
+          reply: "The hinge in this case is the neighbor principle.",
+          model: "llama-3.3-70b-versatile",
+          usage: { prompt_tokens: 100, completion_tokens: 50 },
+          routerDecision: { id: "story-architect", label: "Story Architect", model: "llama-3.3-70b-versatile", estimatedCost: 0.00004 },
+          timestamp: new Date().toISOString(),
+        }),
+      })
+    );
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  test("fresh telemetry preference is collapsed by default", () => {
+    render(<REI />);
+    const collapsedRail = screen.getByLabelText(/Session telemetry and inspection/i);
+    expect(collapsedRail).toHaveClass("is-collapsed");
+    expect(window.localStorage.getItem("rei-telemetry-mode")).toBeNull();
+  });
+
+  test("pinning telemetry persists preference to localStorage", () => {
+    render(<REI />);
+    const expandBtn = screen.getByRole("button", { name: /expand.*sidebar/i });
+    fireEvent.click(expandBtn);
+
+    expect(window.localStorage.getItem("rei-telemetry-mode")).toBe("pinned");
+
+    const pinBtn = screen.getByLabelText(/Unpin sidebar to collapse/i);
+    fireEvent.click(pinBtn);
+
+    expect(window.localStorage.getItem("rei-telemetry-mode")).toBe("collapsed");
+  });
+
+  test("opening Inspect drawer does not mutate persisted pinned mode", async () => {
+    render(<REI />);
+    expect(window.localStorage.getItem("rei-telemetry-mode")).toBeNull();
+
+    // Click Activity / Inspect pill
+    const activityPill = screen.getByRole("button", { name: /Activity: 0 completed records/i });
+    fireEvent.click(activityPill);
+
+    const drawer = screen.getByRole("dialog", { name: /Decision Inspection and Telemetry/i });
+    expect(drawer).toBeInTheDocument();
+
+    // Persisted mode remains unchanged/null
+    expect(window.localStorage.getItem("rei-telemetry-mode")).toBeNull();
+
+    // Escape closes drawer
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("dialog", { name: /Decision Inspection and Telemetry/i })).not.toBeInTheDocument();
+  });
+
+  test("kebab menu supports aria-expanded, Escape dismissal, and outside click", () => {
+    render(<REI />);
+    const kebabBtn = screen.getByLabelText(/Workspace utilities and options/i);
+    expect(kebabBtn).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(kebabBtn);
+    expect(kebabBtn).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("menu", { name: /Workspace options/i })).toBeInTheDocument();
+
+    // Escape dismissal
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(kebabBtn).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("menu", { name: /Workspace options/i })).not.toBeInTheDocument();
+  });
+
+  test("invalid stored domain falls back safely to Generalist", () => {
+    window.localStorage.setItem("rei_selected_domain", "non_existent_domain_xyz");
+    render(<REI />);
+
+    expect(screen.getByText(/Hey! I'm REI — The Generalist/i)).toBeInTheDocument();
+  });
+
+  test("compact decision proof badge renders formatted cost when present and hides cost when absent", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        headers: { get: () => "application/json" },
+        json: () => Promise.resolve({
+          success: true,
+          result: "Here is the neighbor principle.",
+          model: "llama-3.3-70b-versatile",
+          routerDecision: { id: "story-architect", label: "Story Architect", model: "llama-3.3-70b-versatile", estimatedCost: 0.00004 },
+          timestamp: new Date().toISOString(),
+        }),
+      })
+    );
+
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "Tell me a story" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Here is the neighbor principle/i)).toBeInTheDocument();
+    });
+
+    // Verify badge has route label and formatted cost
+    expect(screen.getAllByText("Story Architect").length).toBeGreaterThan(0);
+    expect(screen.getByText("$0.00004")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Inspect decision for Story Architect/i })).toBeInTheDocument();
+
+    // Raw model string should NOT be in the message metadata header
+    const metas = document.querySelectorAll(".rei-chat-meta");
+    const lastMeta = metas[metas.length - 1];
+    expect(lastMeta).not.toHaveTextContent("llama-3.3-70b");
   });
 });

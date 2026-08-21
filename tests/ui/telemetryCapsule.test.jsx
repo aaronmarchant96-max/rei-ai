@@ -1,36 +1,35 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import TelemetryCapsule from "../../src/modules/rei/components/TelemetryCapsule.jsx";
 import TraceStepper from "../../src/modules/rei/components/TraceStepper.jsx";
 import { buildRequestEvidence } from "../../src/lib/evidenceEngine";
 
 describe("TelemetryCapsule.jsx & TraceStepper.jsx (Evidence Invariant Tests)", () => {
-  it("renders observed cost and modeled counterfactual with explicit provenance", () => {
+  it("renders route label, formatted cost, and Inspect button when evidence has cost", () => {
     const evidence = buildRequestEvidence({
-      routerDecision: { model: "llama-3.1-8b-instant", label: "The Engineer" },
+      routerDecision: { model: "llama-3.1-8b-instant", label: "The Engineer", estimatedCost: 0.00007 },
       usage: { prompt_tokens: 1000, completion_tokens: 200, cached_prompt_tokens: 800 },
     });
 
     render(<TelemetryCapsule evidence={evidence} />);
 
-    expect(screen.getByText("llama-3.1-8b-instant")).toBeInTheDocument();
-    expect(screen.getByText("(Observed)")).toBeInTheDocument();
-    expect(screen.getByText("(Modeled)")).toBeInTheDocument();
-    expect(screen.getByText("(Derived)")).toBeInTheDocument();
-    expect(screen.getByText(/80% Cache Hit/i)).toBeInTheDocument();
+    expect(screen.getByText("The Engineer")).toBeInTheDocument();
+    expect(screen.getByText(/\$0\.0000\d+/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Inspect decision for The Engineer/i })).toBeInTheDocument();
   });
 
-  it("never renders missing cost as $0.00 (displays 'Cost unavailable')", () => {
+  it("hides cost segment when cost is unavailable and never renders $0.00", () => {
     const evidence = buildRequestEvidence({
-      routerDecision: { model: "llama-3.3-70b-versatile" },
+      routerDecision: { model: "llama-3.3-70b-versatile", label: "Story Architect" },
       usage: null, // missing token counts
     });
 
     render(<TelemetryCapsule evidence={evidence} />);
 
-    expect(screen.getByText("Cost unavailable")).toBeInTheDocument();
+    expect(screen.getByText("Story Architect")).toBeInTheDocument();
     expect(screen.queryByText("$0.00")).not.toBeInTheDocument();
     expect(screen.queryByText("$0.0000")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Inspect decision for Story Architect/i })).toBeInTheDocument();
   });
 
   it("TraceStepper renders only recorded stages and marks unrecorded rules explicitly", () => {
@@ -50,7 +49,7 @@ describe("TelemetryCapsule.jsx & TraceStepper.jsx (Evidence Invariant Tests)", (
   it("ADVERSARIAL/PATHOLOGICAL SCENARIO: Degrades gracefully with zero manufactured values", () => {
     const pathologicalEvidence = buildRequestEvidence({
       requestId: "pathological-001",
-      routerDecision: { model: "unknown-custom-model" },
+      routerDecision: { model: "unknown-custom-model", label: "Default Fallback" },
       rawTrace: [],
       usage: null,
       responseText: null,
@@ -62,23 +61,15 @@ describe("TelemetryCapsule.jsx & TraceStepper.jsx (Evidence Invariant Tests)", (
 
     render(<TelemetryCapsule evidence={pathologicalEvidence} />);
 
-    // 1. Model is displayed truthfully
-    expect(screen.getByText("unknown-custom-model")).toBeInTheDocument();
+    // 1. Route is displayed truthfully
+    expect(screen.getByText("Default Fallback")).toBeInTheDocument();
 
-    // 2. Cost displays "Cost unavailable" and NEVER $0.00
-    expect(screen.getByText("Cost unavailable")).toBeInTheDocument();
+    // 2. Cost segment is hidden and NEVER renders $0.00
     expect(screen.queryByText("$0.00")).not.toBeInTheDocument();
     expect(screen.queryByText("0.00%")).not.toBeInTheDocument();
 
-    // 3. No bogus Flagship Equivalent or Savings rendered
-    expect(screen.queryByText(/Flagship equiv:/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Saved/i)).not.toBeInTheDocument();
-
-    // 4. No bogus Cache Hit badge rendered
-    expect(screen.queryByText(/Cache Hit/i)).not.toBeInTheDocument();
-
-    // 5. TraceStepper with empty trace displays graceful fallback
-    const { container: stepperContainer } = render(<TraceStepper routeTrace={[]} />);
+    // 3. TraceStepper with empty trace displays graceful fallback
+    render(<TraceStepper routeTrace={[]} />);
     expect(screen.getByText("No runtime trace recorded for this request.")).toBeInTheDocument();
   });
 });

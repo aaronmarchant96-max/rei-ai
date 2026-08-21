@@ -32,8 +32,6 @@ import ReiContext from "./modules/rei/ReiContext.js";
 
 const DOMAIN_PROFILES = getDomainProfiles();
 
-// Stable per-request correlation key. crypto.randomUUID when available; a
-// timestamp+random fallback for non-secure contexts.
 function generateRequestId() {
   try {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -43,9 +41,6 @@ function generateRequestId() {
   return `req-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-// Forgiving-but-bounded self-improvement intent gate (cheap string match, not a
-// classifier). Only queries matching these trigger injecting the live self-audit
-// block. Keep short — the block is a targeted signal, not a universal footer.
 const SELF_IMPROVE_HINTS = [
   "improve",
   "get better",
@@ -81,54 +76,6 @@ export function getAssistantWelcomeCopy() {
   ].join(" ");
 }
 
-function buildAssistantStyleReply(userText) {
-  const clean = userText.trim().replace(/\s+/g, " ");
-  if (isSimpleGreeting(clean)) {
-    return [
-      "Hey.",
-      "Say what you want to sort out, and I’ll help pull it apart cleanly."
-    ].join(" ");
-  }
-
-  return [
-    "Hinge:",
-    "the turning point that changes the answer.",
-    "",
-    "Facts:",
-    "what is known and why it matters.",
-    "",
-    "Assumptions:",
-    "what is still inferred or uncertain.",
-    "",
-    "Evaluation:",
-    "how strong the case is and where the real risk sits.",
-    "",
-    "What would change my mind:",
-    "the evidence that would flip the conclusion.",
-    "",
-    "Move:",
-    "the smallest useful next step."
-  ].join("\n");
-}
-
-const API_TIMEOUT_MS = 120000; // generous: LLM completions can legitimately take 60-120s
-
-export async function fetchWithTimeout(url, options = {}, timeoutMs = API_TIMEOUT_MS) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
-    return response;
-  } catch (error) {
-    if (error.name === "AbortError") {
-      throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)}s. The backend may be cold-starting or overloaded — try again.`);
-    }
-    throw error;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 export function buildDomainSystemMessage(domainId, currentDomain) {
   const domainLabel = currentDomain?.label || "REI.ai";
   const domainDescription = currentDomain?.description || "reasoning assistant";
@@ -148,18 +95,35 @@ function readStoredMessages(selectedDomain) {
   return readChatHistoryHCM(selectedDomain, welcomeText);
 }
 
+const API_TIMEOUT_MS = 120000;
+
+export async function fetchWithTimeout(url, options = {}, timeoutMs = API_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    return response;
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)}s. The backend may be cold-starting or overloaded — try again.`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export default function REI({ initialPrompt } = {}) {
-  // Mobile detection
   const mobile = useMobile();
   const keyboardVisible = useKeyboardVisible();
   const inputRef = useRef(null);
   const retryPayloadRef = useRef(null);
+  const inspectTriggerRef = useRef(null);
 
-  // Scroll input into view when keyboard opens
   useEffect(() => {
     if (keyboardVisible && inputRef.current) {
       setTimeout(() => {
-        inputRef.current.scrollIntoView({
+        inputRef.current?.scrollIntoView({
           behavior: "smooth",
           block: "end"
         });
@@ -167,7 +131,6 @@ export default function REI({ initialPrompt } = {}) {
     }
   }, [keyboardVisible]);
 
-  // Copy text to clipboard function — returns true on success, false on failure
   const copyText = async (text) => {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -211,7 +174,6 @@ export default function REI({ initialPrompt } = {}) {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Failed to export decision document:", err);
-      // Fallback: open a print-ready window when the download path fails
       try {
         if (typeof window !== "undefined" && window.open) {
           const printWindow = window.open("", "_blank", "width=800,height=900");
@@ -234,17 +196,8 @@ export default function REI({ initialPrompt } = {}) {
   };
 
   function mapTierToPathway(tier) {
-    // All tiers map to "cheap" — the cheapRouteConfidence (1−hs) drives
-    // the escalation decision. Deterministic/premium pathways short-circuit
-    // to escalation=false, so we never use those here.
     return "cheap";
   }
-
-  // Add fade-in animation style
-  const fadeInStyle = {
-    animation: "fadeIn 0.3s ease-in-out forwards",
-    opacity: 0
-  };
 
   const [themeMode, setThemeMode] = useState(() => {
     try {
@@ -260,19 +213,93 @@ export default function REI({ initialPrompt } = {}) {
     } catch (e) {}
   }, [themeMode]);
 
-  const [selectedDomain, setSelectedDomain] = useState("assistant");
+  // Selected domain with fallback to assistant for invalid values
+  const [selectedDomain, setSelectedDomain] = useState(() => {
+    try {
+      const saved = localStorage.getItem("rei_selected_domain");
+      if (saved && DOMAIN_PROFILES.some((d) => d.id === saved)) {
+        return saved;
+      }
+    } catch (e) {}
+    return "assistant";
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("rei_selected_domain", selectedDomain);
+    } catch (e) {}
+  }, [selectedDomain]);
+
+  // Decomposed Telemetry State Machine (Persisted mode vs Transient inspect)
+  const [telemetryMode, setTelemetryMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem("rei-telemetry-mode");
+      return saved === "pinned" ? "pinned" : "collapsed";
+    } catch (e) {
+      return "collapsed";
+    }
+  });
+
+  const handleToggleTelemetryMode = (mode) => {
+    setTelemetryMode(mode);
+    try {
+      localStorage.setItem("rei-telemetry-mode", mode);
+    } catch (e) {}
+  };
+
+  const [isInspectOpen, setIsInspectOpen] = useState(false);
+  const [focusedDecision, setFocusedDecision] = useState(null);
+
+  const handleInspectDecision = (evidence, originEvent) => {
+    if (originEvent && originEvent.currentTarget) {
+      inspectTriggerRef.current = originEvent.currentTarget;
+    }
+    const decision = evidence?.routerDecision || {};
+    const cost = evidence?.economics?.observedCostUsd != null
+      ? evidence.economics.observedCostUsd
+      : (decision?.estimatedCost != null && decision.estimatedCost > 0 ? decision.estimatedCost : null);
+    setFocusedDecision({
+      ...decision,
+      cost,
+      isObservedCost: evidence?.economics?.observedProvenance === "observed",
+    });
+    setIsInspectOpen(true);
+  };
+
+  // Accessible Kebab Menu State
+  const [isKebabOpen, setIsKebabOpen] = useState(false);
+  const kebabBtnRef = useRef(null);
+  const kebabMenuRef = useRef(null);
+
+  useEffect(() => {
+    if (!isKebabOpen) return;
+    const handleKebabKeyDown = (e) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setIsKebabOpen(false);
+        if (kebabBtnRef.current) kebabBtnRef.current.focus();
+      }
+    };
+    const handleOutsideClick = (e) => {
+      if (
+        kebabMenuRef.current && !kebabMenuRef.current.contains(e.target) &&
+        kebabBtnRef.current && !kebabBtnRef.current.contains(e.target)
+      ) {
+        setIsKebabOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKebabKeyDown);
+    window.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      window.removeEventListener("keydown", handleKebabKeyDown);
+      window.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isKebabOpen]);
+
   const [rawRecordText, setRawRecordText] = useState("");
   const [showIngest, setShowIngest] = useState(false);
   const [recordSourceType, setRecordSourceType] = useState("other");
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
-
-  // Clear legacy chat history key on first load (pre‑v2 storage)
-  useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("rei_chat_history_v2")) {
-      console.info("Removing legacy chat history key 'rei_chat_history_v2' to reset chat");
-      localStorage.removeItem("rei_chat_history_v2");
-    }
-  }, []);
 
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState(() => {
@@ -298,15 +325,18 @@ export default function REI({ initialPrompt } = {}) {
 
   const currentDomain = DOMAIN_PROFILES.find((d) => d.id === selectedDomain) || DOMAIN_PROFILES[0];
 
-
   const sessionRecap = useMemo(() => {
     if (messages.length < 3) return null;
     const decisions = messages.filter(m => m?.sender === "rei" && (m?.rawJson?.routerDecision?.hingeScore || 0) > 0.3).length;
     return decisions > 0 ? { decisions } : null;
   }, [messages]);
+
+  const activityCount = useMemo(() => {
+    return messages.filter(m => m?.sender === "rei" && (m?.evidence || m?.rawJson?.routerDecision)).length;
+  }, [messages]);
+
   const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, sessionChunks, escalationCount, trackMessage, lifetimeCost, lifetimeSavings, resetSession } = useSessionTracker();
 
-  // Pre-fill input when navigated from landing page with a prompt
   useEffect(() => {
     if (initialPrompt) {
       setInputMessage(initialPrompt);
@@ -314,7 +344,6 @@ export default function REI({ initialPrompt } = {}) {
     }
   }, [initialPrompt]);
 
-  // Clear chat and initialize domain-specific context when domain changes
   useEffect(() => {
     const domainSpecificMessage = {
       sender: "rei",
@@ -327,18 +356,15 @@ export default function REI({ initialPrompt } = {}) {
       saveChatHistoryHCM(selectedDomain, [domainSpecificMessage]);
     }
 
-    // Prevent a pasted record from leaking into a different domain
     setRawRecordText("");
     setShowIngest(false);
     setRecordSourceType("other");
   }, [selectedDomain]);
 
-  // Auto scroll to bottom of chat only when messages length changes
   useEffect(() => {
     chatEndRef.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [messages.length]);
 
-  // Sync to local storage (domain-specific)
   useEffect(() => {
     if (typeof window !== "undefined") {
       saveChatHistoryHCM(selectedDomain, messages);
@@ -358,136 +384,54 @@ export default function REI({ initialPrompt } = {}) {
     }
   };
 
-  async function processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userText, requestId, inputScan) {
-    const contentType = response.headers.get("content-type") || "";
-
-    if (!response.ok) {
-      let errorDetail = "";
-      try {
-        const text = await response.text();
-        errorDetail = text.startsWith("<")
-          ? "HTTP " + response.status + " — server error page (" + text.slice(0, 150).trim().replace(/\n/g, " ") + "...)"
-          : text.slice(0, 300);
-      } catch (_) {
-        errorDetail = "HTTP " + response.status;
-      }
-      throw new Error("Backend request failed: " + errorDetail);
-    }
-
-    let data;
-    try {
-      data = await response.json();
-    } catch (jsonError) {
-      throw new Error("Backend returned non-JSON response (content-type: " + (contentType || "unknown") + ")");
-    }
+  const processApiResponse = async (response, routerDecision, ingestedRecord, recordSourceType, promptText, requestId, inputScan) => {
+    const data = await response.json();
 
     if (!data.success) {
-      throw new Error(data.error || "Server returned failure response status");
+      throw new Error(data.error || "The AI routing gateway returned an error. Please try again.");
     }
 
-    const parsedSections = parseAssistantStyleReply(data.result);
-    const isStructured = Object.keys(parsedSections).some((k) => k !== "intro" && parsedSections[k].trim());
-    const pendingDecision = {
-      id: `${Date.now()}-${selectedDomain.slice(0, 8)}-${Math.random().toString(36).slice(2, 6)}`,
-      requestId,
-      sections: parsedSections,
-      routerDecision: {
-        label: routerDecision?.label,
-        model: data.model || routerDecision?.model,
-        matchedTerms: routerDecision?.matchedTerms,
-        hingeScore: routerDecision?.hingeScore,
-      },
-      domainLabel: currentDomain?.label || "REI.ai",
-      inputPreview: (userText || "").slice(0, 200),
-      createdAt: new Date().toISOString(),
-      actualTokens: null,
-      actualCost: null,
-    };
+    const aiText = data.result || data.reply || "";
+    let usage = data.usage;
+    const modelUsed = data.model || routerDecision?.model || "unknown";
+    const routeId = routerDecision?.id || "generalist";
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: "rei",
-        text: data.result,
-        timestamp: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
-        rawJson: {
-          engine: "REI-Hinge-Core v0.3",
-          domain: selectedDomain,
-          command: "score",
-          model: data.model || "Local cfai CLI Executable",
-          timestamp: data.timestamp || new Date().toISOString(),
-          hadIngestedRecord: Boolean(ingestedRecord),
-          recordSourceType: ingestedRecord ? recordSourceType : null,
-          routerDecision: { ...(data.routerDecision || routerDecision), model: data.model || routerDecision?.model },
-          usage: data.usage || null,
-          rawTrace: data.rawTrace || null,
-          redTeamResult: inputScan || null,
-          truncated: data.truncated || false,
-        }
-      }
-    ]);
-
-    const usage = data.usage;
-    const actualTokens = usage
-      ? (usage.total_tokens || (usage.prompt_tokens || 0) + (usage.completion_tokens || 0))
-      : (routerDecision?.maxTokens || 0);
-
-    const modelName = data.model || routerDecision?.model || "deepseek-v4-flash";
-    const rates = getModelCosts(modelName);
-    const PREMIUM_RATES = { input: 0.0025, output: 0.0100 };
-
-    const isGroqFreeTier = deriveProvider(modelName) === "groq";
-
-    const actualCost = usage
-      ? isGroqFreeTier ? 0 : computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, rates.input, rates.output)
+    const costs = getModelCosts(modelUsed);
+    const actualCost = usage && typeof usage.prompt_tokens === "number" && typeof usage.completion_tokens === "number"
+      ? computeActualCost(usage.prompt_tokens, usage.completion_tokens, costs.input, costs.output)
       : (routerDecision?.estimatedCost || 0);
 
-    const actualPremium = usage
-      ? computeActualCost(usage.prompt_tokens || 0, usage.completion_tokens || 0, PREMIUM_RATES.input, PREMIUM_RATES.output)
-      : (routerDecision?.premiumCost || 0);
+    const isGreeting = routeId === "simple-greeting";
 
-    trackMessage(
-      actualTokens,
-      modelName,
-      actualCost,
-      actualPremium,
-      modelName === "gpt-4o",
-      data.continuation?.chunks || 1
-    );
-
-    try {
+    if (!isGreeting) {
       logDecision({
-        ...pendingDecision,
-        actualTokens,
-        actualCost,
+        domain: selectedDomain,
+        routeId: routeId,
+        model: modelUsed,
+        hingeScore: routerDecision?.hingeScore || 0,
+        estimatedCost: actualCost,
+        tokenCount: (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0),
+        rationale: routerDecision?.rationale || "Auto-routed by CARDO",
       });
-    } catch (e) {
-      console.warn("Failed to log decision:", e);
+      trackMessage({
+        cost: actualCost,
+        tokens: (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0),
+        model: modelUsed,
+        chunks: data.chunks || 1,
+        escalation: routerDecision?.escalation || false,
+      });
     }
 
-    // Patch the pre-API routing log entry with post-API actuals
-    // (provider, rescue flag, truncation) for the evidence dashboard.
-    try {
-      updateLatestLogEntry({
-        provider: deriveProvider(modelName),
-        rescue: String(modelName || "").includes("(fallback)"),
-        truncated: Boolean(data.truncated),
-        continuations: data.continuation?.attempted ? (data.continuation.chunks - 1) : 0,
-        totalChunks: data.continuation?.chunks || 1,
-        finalTruncated: data.continuation?.finalTruncated ?? Boolean(data.truncated),
-        structured: isStructured,
-        actualCost,
-        actualTokens,
-      }, requestId);
-    } catch (e) {
-      console.warn("Failed to patch routing log:", e);
-    }
+    updateLatestLogEntry({
+      actualTokens: (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0),
+      actualCost: actualCost,
+      status: "success",
+      resolvedModel: modelUsed,
+      chunks: data.chunks || 1,
+    });
 
-    // Deterministic evaluation of the live request: response-side safety scan
-    // plus routing-policy adherence. Stored separately from the routing event
-    // so the log keeps "what happened" distinct from "what we judged about it".
     try {
-      const responseText = data?.result || "";
+      const responseText = aiText;
       const responseScan = responseText ? scanRedTeamInput(responseText) : null;
       const wasAdversarialRoute = routerDecision?.id === "adversarial-validation";
       const routeExpected = Boolean(inputScan?.escalateToD2);
@@ -496,7 +440,7 @@ export default function REI({ initialPrompt } = {}) {
         requestId,
         domain: selectedDomain,
         routeId: routerDecision?.id,
-        model: modelName,
+        model: modelUsed,
         evaluator: "deterministic",
         evaluatorVersion: "red-team-v1",
         evaluation: {
@@ -510,78 +454,72 @@ export default function REI({ initialPrompt } = {}) {
           evaluatedAt: new Date().toISOString(),
         },
       });
-
-      // Fire-and-forget: persist the deterministic evaluation result to the
-      // server-side evaluation plane for longitudinal queries. The localStorage
-      // evalLog remains the safety-net — if this POST fails, nothing is lost.
-      fetch("/api/eval/result", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          requestId,
-          tenantId: "pilot",
-          domain: selectedDomain,
-          routeId: routerDecision?.id,
-          model: modelName,
-          evaluator: "deterministic",
-          evaluatorVersion: "red-team-v1",
-          evaluation: {
-            qualityScore: inputScan?.score ?? null,
-            safetyVerdict: responseScan?.verdict,
-            routeExpected,
-            routeCorrect,
-            notes: responseScan?.findings?.length
-              ? responseScan.findings.map((f) => `${f.severity}: ${f.finding} (${f.category})`)
-              : [],
-            evaluatedAt: new Date().toISOString(),
-          },
-        }),
-      }).catch(function () {
-        // Silently degrade — the localStorage evalLog is the safety net.
-      });
     } catch (e) {
-      console.warn("Failed to write eval log:", e);
+      console.warn("Failed to log evaluation:", e);
     }
-  }
 
-  async function handleSendMessage(e) {
-    e?.preventDefault?.();
-    if (!inputMessage.trim()) return;
+    const finalRouterDecision = {
+      ...(data.routerDecision || routerDecision),
+      model: modelUsed,
+      estimatedCost: data.routerDecision?.estimatedCost != null ? data.routerDecision.estimatedCost : routerDecision?.estimatedCost,
+    };
 
+    const aiMsg = {
+      sender: "rei",
+      text: aiText,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      domainLabel: currentDomain.label,
+      rawJson: {
+        routerDecision: finalRouterDecision,
+        usage,
+        requestId,
+        model: modelUsed,
+        timestamp: new Date().toISOString(),
+        redTeamResult: data.redTeamResult || null,
+        research: data.research || null,
+        rawTrace: data.rawTrace || null,
+      },
+    };
+
+    setMessages((prev) => [...prev, aiMsg]);
+  };
+
+  const handleSendMessage = async (customPrompt) => {
+    const promptText = typeof customPrompt === "string" ? customPrompt : inputMessage;
+    if (!promptText.trim() && attachedFiles.length === 0) return;
+
+    setBackendError(null);
     const requestId = generateRequestId();
-
     const ingestedRecord = rawRecordText.trim();
 
-    // Pre-send guard — fail fast, locally, instead of round-tripping to the backend only to get rejected there.
     if (ingestedRecord.length > MAX_RECORD_CHARS) {
       setMessages((prev) => [
         ...prev,
         {
           sender: "rei",
-          text: `That pasted record is ${ingestedRecord.length.toLocaleString()} characters — over the ${MAX_RECORD_CHARS.toLocaleString()} limit. Trim it to the relevant section (e.g. just the entry for the person in question) and try again.`,
+          text: `That pasted record is ${ingestedRecord.length.toLocaleString()} characters — over the ${MAX_RECORD_CHARS.toLocaleString()} limit. Trim it to the relevant section and try again.`,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           isSystemNotice: true,
         },
       ]);
-      return; // don't clear the textarea — let them edit and resend
+      return;
     }
 
     const userMsg = {
       sender: "user",
-      text: inputMessage,
+      text: promptText,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       attachedRecord: ingestedRecord
         ? { charCount: ingestedRecord.length, sourceType: recordSourceType }
         : null,
     };
 
-    // Optimistically render user message and clear input field for instant responsiveness
     setMessages((prev) => [...prev, userMsg]);
     setInputMessage("");
+    const currentFiles = [...attachedFiles];
     setAttachedFiles([]);
     setIsTyping(true);
 
-    // Capture and clear ingest state up front, so it can't accidentally attach to a later, unrelated message.
     setRawRecordText("");
     setShowIngest(false);
     setRecordSourceType("other");
@@ -590,8 +528,6 @@ export default function REI({ initialPrompt } = {}) {
 
     try {
       let systemContext = getDomainPrompt(selectedDomain);
-
-      // Format previous chat history to send to backend (last 10 messages, filtering out system init messages)
       const historyPayload = messages
         .filter(msg => !msg.text.startsWith("System initialized. Welcome to REI.ai"))
         .slice(-10)
@@ -600,15 +536,12 @@ export default function REI({ initialPrompt } = {}) {
           content: msg.text
         }));
 
-      const sourceLabel = SOURCE_TYPES.find((s) => s.id === recordSourceType)?.label || "Other / unspecified";
-
       const recordBlock = ingestedRecord
-        ? `\n\nIngested Source Record (pasted by user, source: ${sourceLabel} — treat as raw, unverified material to evaluate and tier, not as established fact):\n\"\"\"\n${ingestedRecord}\n\"\"\"\n`
+        ? `\n\nIngested Record (${recordSourceType}):\n${ingestedRecord}`
         : "";
 
-      const currentFiles = attachedFiles.length ? attachedFiles : [];
       const fileBlock = currentFiles.length
-        ? `\n\nAttached Files (uploaded by user — plain-text only, no images or binary; treat each file's content as user-provided context, not as established fact):\n${currentFiles.map((f) => `--- ${f.name} ---\n${f.content}`).join("\n\n")}\n`
+        ? `\n\nAttached Files:\n${currentFiles.map((f) => `--- ${f.name} ---\n${f.content}`).join("\n\n")}\n`
         : "";
 
       const routerStart = performance.now();
@@ -620,8 +553,6 @@ export default function REI({ initialPrompt } = {}) {
       });
       const routingMs = Math.round((performance.now() - routerStart) * 100) / 100;
 
-      // Deterministic input-side security signal (D1 scan). Policy-derived
-      // expectation for route-correctness, not ground truth.
       const inputScan = scanRedTeamInput(userMsg.text);
 
       const escalation = shouldEscalateToRemote({
@@ -653,16 +584,11 @@ export default function REI({ initialPrompt } = {}) {
         inputRedTeamEscalate: inputScan?.escalateToD2 ?? false,
       });
 
-
-      // Call route handler API with domain-specific context
       const isGreeting = routerDecision.id === "simple-greeting";
       const systemPrompt = isGreeting
         ? `You are REI — the "${currentDomain.label}" persona (${currentDomain.subtitle}). Reply to this greeting in one short, friendly sentence in-character.`
         : systemContext;
-      // Inject the live claims-gate self-audit block ONLY for self-improvement
-      // intent in the generalist channel, so the engine reasons over its own
-      // gate output instead of generic ML advice. Self-informed, not
-      // self-modifying — output is still just a proposal for human review.
+
       const isSelfImprovementIntent =
         !isGreeting &&
         selectedDomain === "assistant" &&
@@ -672,10 +598,6 @@ export default function REI({ initialPrompt } = {}) {
         ? `\n\n${buildSelfAuditContext()}`
         : "";
 
-      // Inject the deployed source index when the user asks to analyze specific
-      // code or when self-improvement intent is detected — same static
-      // sourceIndex.json for both paths.  Dynamic import (code-split, only
-      // loaded when triggered).
       const FILE_ANALYSIS_VERBS = [
         "analyze", "review", "check", "inspect", "examine",
         "look at", "audit", "read", "show me",
@@ -700,37 +622,54 @@ export default function REI({ initialPrompt } = {}) {
       const inputPayload = isGreeting
         ? userMsg.text
         : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`;
-      retryPayloadRef.current = { inputPayload, systemPrompt, historyPayload, routerDecision, ingestedRecord, recordSourceType, userText: userMsg.text, inputScan };
+
+      retryPayloadRef.current = {
+        inputPayload,
+        prompt: userMsg.text,
+        systemPrompt,
+        history: historyPayload,
+        files: currentFiles,
+        routerDecision,
+        ingestedRecord,
+        recordSourceType,
+        userMsg,
+        requestId,
+        inputScan,
+      };
 
       const response = await fetchWithTimeout("/api/cfai", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           command: "score",
           input: inputPayload,
-          systemPrompt: systemPrompt,
+          prompt: userMsg.text,
+          systemPrompt: systemPrompt + fileBlock,
           history: historyPayload,
           routerDecision,
           requestId,
-        })
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`The gateway returned HTTP ${response.status}. Please retry.`);
+      }
 
       await processApiResponse(response, routerDecision, ingestedRecord, recordSourceType, userMsg.text, requestId, inputScan);
     } catch (error) {
       console.error("REI.ai API error:", error);
-      setBackendError({ routerDecision: routerDecision || null, errorMessage: error.message });
+      setBackendError({ routerDecision: routerDecision || null, errorMessage: error.message, userText: userMsg.text });
     } finally {
       setIsTyping(false);
     }
-  }
+  };
 
   const handleRetry = async () => {
     const p = retryPayloadRef.current;
     if (!p) return;
     setBackendError(null);
     setIsTyping(true);
+
     try {
       const response = await fetchWithTimeout("/api/cfai", {
         method: "POST",
@@ -738,16 +677,22 @@ export default function REI({ initialPrompt } = {}) {
         body: JSON.stringify({
           command: "score",
           input: p.inputPayload,
+          prompt: p.prompt,
           systemPrompt: p.systemPrompt,
-          history: p.historyPayload,
+          history: p.history,
           routerDecision: p.routerDecision,
+          requestId: p.requestId,
         }),
       });
-      await processApiResponse(response, p.routerDecision, p.ingestedRecord, p.recordSourceType, p.userText, generateRequestId(), p.inputScan);
-      retryPayloadRef.current = null;
+
+      if (!response.ok) {
+        throw new Error(`The gateway returned HTTP ${response.status}. Please retry.`);
+      }
+
+      await processApiResponse(response, p.routerDecision, p.ingestedRecord, p.recordSourceType, p.userMsg.text, p.requestId, p.inputScan);
     } catch (error) {
       console.error("REI.ai retry error:", error);
-      setBackendError({ routerDecision: p.routerDecision, errorMessage: error.message });
+      setBackendError({ routerDecision: p.routerDecision, errorMessage: error.message, userText: p.userMsg.text });
     } finally {
       setIsTyping(false);
     }
@@ -769,11 +714,14 @@ export default function REI({ initialPrompt } = {}) {
           overflow: "hidden"
         }}
       >
-        {/* Sticky Header with safe area top */}
+        {/* Top Header with 5 Primary Domain Chips & Secondary Kebab Menu */}
         <header className="safe-top rei-header">
-          {!mobile && <span className="rei-header__version" title="CARDO REI protocol version">CARDO v3.4</span>}
-          {/* Domain selection tab strip */}
-          <div className="rei-domain-tabs">
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+            {!mobile && <span className="rei-header__version" title="CARDO REI protocol version">CARDO v3.4</span>}
+          </div>
+
+          {/* Primary Domain Tab Strip */}
+          <nav className="rei-domain-tabs" aria-label="Cognitive domain archetypes">
             {DOMAIN_PROFILES.map((dom) => (
               <button
                 key={dom.id}
@@ -781,58 +729,99 @@ export default function REI({ initialPrompt } = {}) {
                 onClick={() => setSelectedDomain(dom.id)}
                 className={`rei-domain-tab ${selectedDomain === dom.id ? "is-active" : ""}`}
                 title={getDomain(dom.id)?.subtitle || dom.label}
+                aria-current={selectedDomain === dom.id ? "page" : undefined}
               >
                 <span className="rei-domain-tab__label">{dom.label}</span>
               </button>
             ))}
-          </div>
-          {mobile && (
+          </nav>
+
+          {/* Right Controls: Compact Activity Pill & Accessible Kebab Menu */}
+          <div className="rei-header__actions" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <button
               type="button"
-              onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
-              className="rei-action-btn rei-header__mobile-theme"
-              title="Toggle light / dark theme"
-              aria-label="Toggle light or dark theme"
+              onClick={(e) => {
+                inspectTriggerRef.current = e.currentTarget;
+                setFocusedDecision(null);
+                setIsInspectOpen(true);
+              }}
+              className="rei-activity-pill"
+              aria-label={`Activity: ${activityCount} completed records. Click to inspect telemetry.`}
+              title="View session telemetry and decision reports"
             >
-              {themeMode === "light" ? "🌙" : "☀️"}
+              <span className="rei-activity-pill__dot">⚡</span>
+              <span>Activity ({activityCount})</span>
             </button>
-          )}
-          {!mobile && (
-            <div className="rei-header__actions">
+
+            <div style={{ position: "relative" }}>
               <button
+                ref={kebabBtnRef}
                 type="button"
-                onClick={() => setThemeMode((m) => (m === "light" ? "dark" : "light"))}
-                className="rei-action-btn"
-                title="Toggle light / dark theme"
+                onClick={() => setIsKebabOpen(!isKebabOpen)}
+                className="rei-action-btn rei-action-btn--kebab"
+                aria-label="Workspace utilities and options"
+                aria-haspopup="true"
+                aria-expanded={isKebabOpen}
               >
-                {themeMode === "light" ? "🌙 Dark" : "☀️ Light"}
+                •••
               </button>
-              <button
-                type="button"
-                onClick={handleClearHistory}
-                className="rei-action-btn rei-action-btn--danger"
-              >
-                Clear Chat
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsPhilosophyOpen(true)}
-                className="rei-action-btn"
-              >
-                Philosophy
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedDomain("legal");
-                  setInputMessage("What is the hinge in Donoghue v Stevenson?");
-                }}
-                className="rei-action-btn rei-action-btn--accent"
-              >
-                Try a Case
-              </button>
+
+              {isKebabOpen && (
+                <div
+                  ref={kebabMenuRef}
+                  className="rei-kebab-popover"
+                  role="menu"
+                  aria-label="Workspace options"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setThemeMode((m) => (m === "light" ? "dark" : "light"));
+                      setIsKebabOpen(false);
+                    }}
+                    className="rei-kebab-item"
+                  >
+                    {themeMode === "light" ? "🌙 Dark Mode" : "☀️ Light Mode"}
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      handleClearHistory();
+                      setIsKebabOpen(false);
+                    }}
+                    className="rei-kebab-item rei-kebab-item--danger"
+                  >
+                    🗑️ Clear Chat
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setIsPhilosophyOpen(true);
+                      setIsKebabOpen(false);
+                    }}
+                    className="rei-kebab-item"
+                  >
+                    📖 Philosophy
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setSelectedDomain("legal");
+                      setInputMessage("What is the hinge in Donoghue v Stevenson?");
+                      setIsKebabOpen(false);
+                    }}
+                    className="rei-kebab-item"
+                  >
+                    ⚖️ Try a Case
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </header>
 
         {/* Unified workspace area: conversation + attached composer on left, instrument rail on right */}
@@ -859,13 +848,14 @@ export default function REI({ initialPrompt } = {}) {
 
               {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
                 <WelcomePanel
-                  onResume={(domainId) => {
-                    setSelectedDomain(domainId);
-                  }}
-                  onStart={(prompt) => {
+                  activeDomain={selectedDomain}
+                  onResume={(domainId) => setSelectedDomain(domainId)}
+                  onStart={(prompt) => handleSendMessage(prompt)}
+                  onEdit={(prompt) => {
                     setInputMessage(prompt);
-                    handleSendMessage({ preventDefault: () => {} });
-                  }} />
+                    if (inputRef.current) inputRef.current.focus();
+                  }}
+                />
               )}
 
               {showRecap && sessionRecap && (
@@ -882,6 +872,7 @@ export default function REI({ initialPrompt } = {}) {
                   }}>×</button>
                 </div>
               )}
+
               <ChatHistory
                 messages={messages}
                 selectedDomain={selectedDomain}
@@ -890,6 +881,7 @@ export default function REI({ initialPrompt } = {}) {
                 mobile={mobile}
                 onCopy={copyText}
                 onExport={handleExport}
+                onInspect={handleInspectDecision}
                 domainLabel={currentDomain?.label || "REI.ai"}
               />
 
@@ -898,7 +890,11 @@ export default function REI({ initialPrompt } = {}) {
                   routerDecision={backendError.routerDecision}
                   errorMessage={backendError.errorMessage}
                   onRetry={handleRetry}
-                  onDismiss={() => setBackendError(null)}
+                  onDismiss={() => {
+                    if (backendError.userText) setInputMessage(backendError.userText);
+                    setBackendError(null);
+                    if (inputRef.current) inputRef.current.focus();
+                  }}
                 />
               )}
             </main>
@@ -906,19 +902,24 @@ export default function REI({ initialPrompt } = {}) {
             <ChatInput />
           </div>
 
-          {!mobile && (
-            <InstrumentRail
-              sessionTokens={sessionTokens}
-              sessionMessages={sessionMessages}
-              sessionCost={sessionCost}
-              sessionChunks={sessionChunks}
-              savingsVsPremium={savingsVsPremium}
-              escalationCount={escalationCount}
-              modelBreakdown={modelBreakdown}
-              lifetimeCost={lifetimeCost}
-              lifetimeSavings={lifetimeSavings}
-            />
-          )}
+          <InstrumentRail
+            sessionTokens={sessionTokens}
+            sessionMessages={sessionMessages}
+            sessionCost={sessionCost}
+            sessionChunks={sessionChunks}
+            savingsVsPremium={savingsVsPremium}
+            escalationCount={escalationCount}
+            modelBreakdown={modelBreakdown}
+            lifetimeCost={lifetimeCost}
+            lifetimeSavings={lifetimeSavings}
+            activityCount={activityCount}
+            telemetryMode={telemetryMode}
+            isInspectOpen={isInspectOpen}
+            focusedDecision={focusedDecision}
+            onToggleMode={handleToggleTelemetryMode}
+            onCloseInspect={() => setIsInspectOpen(false)}
+            originRef={inspectTriggerRef}
+          />
         </div>
       
         <PhilosophyModal isOpen={isPhilosophyOpen} onClose={() => setIsPhilosophyOpen(false)} />

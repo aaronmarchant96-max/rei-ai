@@ -1671,3 +1671,233 @@
   .rei-starter-row:hover,
   .rei-touch-button--send:active { transform: none !important; }
 }
+
+/* ── Sibling Starter Cards ── */
+.rei-starter-row-container {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+}
+
+.rei-starter-row-container .rei-starter-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface-card, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  color: var(--text-primary, #f1f5f9);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.rei-starter-row-container .rei-starter-row:hover,
+.rei-starter-row-container .rei-starter-row:focus-visible {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.06));
+  border-color: var(--amber-border, rgba(240, 201, 101, 0.3));
+}
+
+.rei-starter-row__hint {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--amber-text, #f0c965);
+  opacity: 0.6;
+}
+
+.rei-starter-row-container:hover .rei-starter-row__hint {
+  opacity: 1;
+}
+
+.rei-starter-row__edit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  background: var(--surface-card, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rei-starter-row__edit-btn:hover,
+.rei-starter-row__edit-btn:focus-visible {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+  color: var(--text-primary, #f1f5f9);
+  border-color: var(--border, #475569);
+}
+
+/* ── Compact Decision Proof Badge ── */
+.rei-decision-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0;
+  padding: 3px 10px;
+  background: rgba(240, 201, 101, 0.04);
+  border: 1px solid rgba(240, 201, 101, 0.16);
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: var(--text-secondary, #cbd5e1);
+  width: fit-content;
+}
+
+.rei-decision-badge__route {
+  font-weight: 600;
+  color: var(--amber-text, #f0c965);
+}
+
+.rei-decision-badge__dot {
+  color: var(--text-muted, #64748b);
+}
+
+.rei-decision-badge__cost {
+  color: var(--text-emerald, #34d399);
+  font-size: 11px;
+}
+
+.rei-decision-badge__inspect-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent-cyan, #38bdf8);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.rei-decision-badge__inspect-btn:hover,
+.rei-decision-badge__inspect-btn:focus-visible {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* ── Activity Pill in Header ── */
+.rei-activity-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: var(--accent-cyan, #38bdf8);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rei-activity-pill:hover,
+.rei-activity-pill:focus-visible {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--accent-cyan, #38bdf8);
+}
+
+.rei-activity-pill__dot {
+  font-size: 12px;
+}
+
+/* ── Accessible Kebab Popover ── */
+.rei-action-btn--kebab {
+  padding: 4px 10px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.rei-kebab-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--surface, #0f172a);
+  border: 1px solid var(--border, #334155);
+  border-radius: 8px;
+  padding: 6px;
+  min-width: 160px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rei-kebab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--text-primary, #f1f5f9);
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+}
+
+.rei-kebab-item:hover,
+.rei-kebab-item:focus-visible {
+  background: var(--surface-hover, rgba(255, 255, 255, 0.08));
+}
+
+.rei-kebab-item--danger {
+  color: #f87171;
+}
+
+.rei-kebab-item--danger:hover,
+.rei-kebab-item--danger:focus-visible {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* ── Inspect Drawer Overlay (Modal) ── */
+.rei-inspect-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+}
+
+.rei-instrument-rail--drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  max-width: 90vw;
+  background: var(--surface, #0b0f17);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  overflow-y: auto;
+  border-left: 1px solid var(--border, #334155);
+}
+
+.rei-instrument-rail__pin-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rei-instrument-rail__pin-btn:hover {
+  color: var(--text-primary, #f8fafc);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.rei-instrument-rail__pin-btn.is-pinned {
+  color: var(--accent-cyan, #38bdf8);
+}

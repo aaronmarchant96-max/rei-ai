@@ -4,7 +4,7 @@ import { buildRequestEvidence } from "../../../lib/evidenceEngine";
 import TelemetryCapsule from "./TelemetryCapsule.jsx";
 import CardoComparisonToggle from "./CardoComparisonToggle.jsx";
 
-export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport, domainLabel = "REI.ai" }) {
+export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport, onInspect, domainLabel = "REI.ai" }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (text) => {
@@ -69,7 +69,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
       )}
 
       {msg.sender === "rei" && !isSystemNotice && evidence && (
-        <TelemetryCapsule evidence={evidence} />
+        <TelemetryCapsule evidence={evidence} onInspect={onInspect} />
       )}
 
       <div
