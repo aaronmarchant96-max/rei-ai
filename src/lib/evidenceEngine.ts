@@ -184,6 +184,30 @@ const GPT4O_RATES = {
   outputPer1k: 0.0100,
 };
 
+export function isValidObservedTelemetry(params?: {
+  inputTokens?: any;
+  outputTokens?: any;
+  cost?: any;
+  model?: any;
+}): boolean {
+  if (!params) return false;
+  const { inputTokens, outputTokens, cost, model } = params;
+  return (
+    Number.isFinite(inputTokens) &&
+    Number(inputTokens) >= 0 &&
+    Number.isFinite(outputTokens) &&
+    Number(outputTokens) >= 0 &&
+    Number.isFinite(cost) &&
+    Number(cost) >= 0 &&
+    typeof model === "string" &&
+    model.trim().length > 0 &&
+    model !== "undefined" &&
+    model !== "unknown" &&
+    model !== "unknown-model" &&
+    model !== "[object Object]"
+  );
+}
+
 /**
  * Normalizes recorded execution telemetry into a canonical RequestEvidence object.
  */
@@ -191,7 +215,9 @@ export function buildRequestEvidence(input: BuildEvidenceInput): RequestEvidence
   const requestId = input.requestId || `req-${Date.now()}`;
   const timestamp = input.timestamp || new Date().toISOString();
   const decision = input.routerDecision || {};
-  const model = decision.model || "unknown-model";
+  const rawModel = decision.model || "unknown-model";
+  const hasCleanModel = typeof rawModel === "string" && rawModel.trim().length > 0 && rawModel !== "undefined" && rawModel !== "unknown" && rawModel !== "unknown-model";
+  const model = hasCleanModel ? rawModel : "unknown-model";
   const route = decision.label || decision.domain || "default";
 
   // 1. Normalize Route Trace (Preserves only recorded stages; never manufactures)
@@ -222,10 +248,16 @@ export function buildRequestEvidence(input: BuildEvidenceInput): RequestEvidence
   }
 
   // 2. Normalize Tokens & Caching Telemetry
-  const promptTokens = input.usage?.prompt_tokens ?? null;
-  const completionTokens = input.usage?.completion_tokens ?? null;
-  const cachedTokens = input.usage?.cached_prompt_tokens ?? null;
-  const hasTokenData = promptTokens != null && completionTokens != null;
+  const promptTokens = (input.usage && Number.isFinite(Number(input.usage.prompt_tokens)) && Number(input.usage.prompt_tokens) >= 0)
+    ? Number(input.usage.prompt_tokens)
+    : null;
+  const completionTokens = (input.usage && Number.isFinite(Number(input.usage.completion_tokens)) && Number(input.usage.completion_tokens) >= 0)
+    ? Number(input.usage.completion_tokens)
+    : null;
+  const cachedTokens = (input.usage && Number.isFinite(Number(input.usage.cached_prompt_tokens)) && Number(input.usage.cached_prompt_tokens) >= 0)
+    ? Number(input.usage.cached_prompt_tokens)
+    : null;
+  const hasTokenData = promptTokens != null && completionTokens != null && hasCleanModel;
 
   let cacheHit = false;
   let cacheHitRatePct: number | null = null;
@@ -245,16 +277,17 @@ export function buildRequestEvidence(input: BuildEvidenceInput): RequestEvidence
 
   if (hasTokenData && promptTokens != null && completionTokens != null) {
     const costs = getModelCosts(model);
-    observedCostUsd = Number(computeActualCost(promptTokens, completionTokens, costs.input, costs.output).toFixed(6));
+    const calculatedCost = computeActualCost(promptTokens, completionTokens, costs.input, costs.output);
+    if (Number.isFinite(calculatedCost) && calculatedCost >= 0) {
+      observedCostUsd = Number(calculatedCost.toFixed(6));
 
-    // Modeled GPT-4o benchmark counterfactual
-    counterfactualCostUsd = Number(
-      computeActualCost(promptTokens, completionTokens, GPT4O_RATES.inputPer1k, GPT4O_RATES.outputPer1k).toFixed(6)
-    );
-
-    if (counterfactualCostUsd > 0 && observedCostUsd != null) {
-      savingsAmountUsd = Number((counterfactualCostUsd - observedCostUsd).toFixed(6));
-      savingsPercentage = Number((((counterfactualCostUsd - observedCostUsd) / counterfactualCostUsd) * 100).toFixed(1));
+      // Modeled GPT-4o benchmark counterfactual
+      const calculatedCounterfactual = computeActualCost(promptTokens, completionTokens, GPT4O_RATES.inputPer1k, GPT4O_RATES.outputPer1k);
+      if (Number.isFinite(calculatedCounterfactual) && calculatedCounterfactual > 0) {
+        counterfactualCostUsd = Number(calculatedCounterfactual.toFixed(6));
+        savingsAmountUsd = Number((counterfactualCostUsd - observedCostUsd).toFixed(6));
+        savingsPercentage = Number((((counterfactualCostUsd - observedCostUsd) / counterfactualCostUsd) * 100).toFixed(1));
+      }
     }
   }
 

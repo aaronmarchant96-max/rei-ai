@@ -167,52 +167,71 @@ export default function InstrumentRail({
         </div>
 
         {/* Focused Decision Inspection View (when opened from message Inspect) */}
-        {focusedDecision ? (
-          <div className="rei-side-card" style={{ borderLeft: "3px solid var(--accent-cyan, #38bdf8)" }}>
-            <div className="rei-side-card__heading" style={{ color: "var(--accent-cyan, #38bdf8)" }}>
-              Inspecting: {focusedDecision.label || focusedDecision.id}
-            </div>
-            <div className="rei-side-stat">
-              <span className="rei-side-stat__label">Assigned Model</span>
-              <span className="rei-side-stat__value mono">{focusedDecision.model || "auto-routed"}</span>
-            </div>
-            <div className="rei-side-stat">
-              <span className="rei-side-stat__label">Cost Mode</span>
-              <span className="rei-side-stat__value mono" style={{ fontSize: "11px" }}>
-                {focusedDecision.isObservedCost ? "Observed telemetry" : "Ceiling-based estimate"}
-              </span>
-            </div>
-            {focusedDecision.cost != null && (
+        {focusedDecision ? (() => {
+          const rawModel = focusedDecision.model;
+          const hasValidModel = typeof rawModel === "string" && rawModel.trim().length > 0 && rawModel !== "undefined" && rawModel !== "unknown" && rawModel !== "unknown-model" && rawModel !== "[object Object]";
+          const displayModel = hasValidModel ? rawModel : "Model unavailable";
+
+          const isObserved = Boolean(focusedDecision.isObservedCost) && Number.isFinite(focusedDecision.cost) && focusedDecision.cost >= 0 && hasValidModel;
+          const hasEstimate = Number.isFinite(focusedDecision.estimatedCost) && focusedDecision.estimatedCost > 0;
+
+          const costMode = isObserved
+            ? "Observed telemetry"
+            : hasEstimate
+              ? "Ceiling-based estimate"
+              : "Unavailable";
+
+          const queryCostDisplay = isObserved
+            ? `$${focusedDecision.cost.toFixed(5)}`
+            : hasEstimate
+              ? `~$${focusedDecision.estimatedCost.toFixed(5)}`
+              : "Cost unavailable · Provider usage telemetry missing";
+
+          return (
+            <div className="rei-side-card" style={{ borderLeft: "3px solid var(--accent-cyan, #38bdf8)" }}>
+              <div className="rei-side-card__heading" style={{ color: "var(--accent-cyan, #38bdf8)" }}>
+                Inspecting: {focusedDecision.label || focusedDecision.id || "Decision"}
+              </div>
               <div className="rei-side-stat">
-                <span className="rei-side-stat__label">Query Cost</span>
-                <span className="rei-side-stat__value mono verified">
-                  ${typeof focusedDecision.cost === "number" ? focusedDecision.cost.toFixed(5) : focusedDecision.cost}
+                <span className="rei-side-stat__label">Assigned Model</span>
+                <span className="rei-side-stat__value mono">{displayModel}</span>
+              </div>
+              <div className="rei-side-stat">
+                <span className="rei-side-stat__label">Cost Mode</span>
+                <span className="rei-side-stat__value mono" style={{ fontSize: "11px" }}>
+                  {costMode}
                 </span>
               </div>
-            )}
-            {focusedDecision.hingeScore != null && (
               <div className="rei-side-stat">
-                <span className="rei-side-stat__label">Hinge Score (HS)</span>
-                <span className="rei-side-stat__value mono">{focusedDecision.hingeScore.toFixed(2)}</span>
+                <span className="rei-side-stat__label">Query Cost</span>
+                <span className={`rei-side-stat__value mono${isObserved ? " verified" : ""}`}>
+                  {queryCostDisplay}
+                </span>
               </div>
-            )}
-            {focusedDecision.rationale && (
-              <div style={{ marginTop: "10px", fontSize: "12px", color: "var(--text-secondary, #94a3b8)", lineHeight: "1.45" }}>
-                <strong>Routing Rationale:</strong> {focusedDecision.rationale}
-              </div>
-            )}
-            {focusedDecision.blueprint && (
-              <div style={{ marginTop: "12px", padding: "10px", background: "rgba(0,0,0,0.3)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <div style={{ color: "var(--accent-cyan, #38bdf8)", fontSize: "11px", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px" }}>
-                  📐 Planning & Scaffolding Blueprint
+              {Number.isFinite(focusedDecision.hingeScore) && (
+                <div className="rei-side-stat">
+                  <span className="rei-side-stat__label">Hinge Score (HS)</span>
+                  <span className="rei-side-stat__value mono">{focusedDecision.hingeScore.toFixed(2)}</span>
                 </div>
-                <div style={{ fontSize: "12px", color: "var(--text, #e2e8f0)", whiteSpace: "pre-wrap", lineHeight: "1.45" }}>
-                  {focusedDecision.blueprint}
+              )}
+              {focusedDecision.rationale && (
+                <div style={{ marginTop: "10px", fontSize: "12px", color: "var(--text-secondary, #94a3b8)", lineHeight: "1.45" }}>
+                  <strong>Routing Rationale:</strong> {focusedDecision.rationale}
                 </div>
-              </div>
-            )}
-          </div>
-        ) : null}
+              )}
+              {focusedDecision.blueprint && (
+                <div style={{ marginTop: "12px", padding: "10px", background: "rgba(0,0,0,0.3)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  <div style={{ color: "var(--accent-cyan, #38bdf8)", fontSize: "11px", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px" }}>
+                    📐 Planning & Scaffolding Blueprint
+                  </div>
+                  <div style={{ fontSize: "12px", color: "var(--text, #e2e8f0)", whiteSpace: "pre-wrap", lineHeight: "1.45" }}>
+                    {focusedDecision.blueprint}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })() : null}
 
         <div className="rei-side-card">
           <div className="rei-side-card__heading">This Session</div>
@@ -227,19 +246,27 @@ export default function InstrumentRail({
               <div className="rei-side-stat">
                 <span className="rei-side-stat__label">Cost</span>
                 <span className={`rei-side-stat__value mono${sessionCost === 0 ? " zero" : ""}`}>
-                  {sessionCost === 0 ? "\u2014" : sessionCost < 0.0001 ? "< $0.0001" : `$${sessionCost.toFixed(4)}`}
+                  {!Number.isFinite(sessionCost) || sessionCost < 0
+                    ? "Cost unavailable · Provider usage telemetry missing"
+                    : sessionCost === 0
+                      ? "\u2014"
+                      : sessionCost < 0.0001
+                        ? "< $0.0001"
+                        : `$${sessionCost.toFixed(4)}`}
                 </span>
               </div>
               <div className="rei-side-stat">
                 <span className="rei-side-stat__label">Tokens</span>
                 <span className={`rei-side-stat__value mono${sessionTokens === 0 ? " zero" : ""}`}>
-                  {sessionTokens === 0 ? "\u2014" : sessionTokens.toLocaleString()}
+                  {!Number.isFinite(sessionTokens) || sessionTokens <= 0
+                    ? "\u2014"
+                    : sessionTokens.toLocaleString()}
                 </span>
               </div>
               <div className="rei-side-stat">
                 <span className="rei-side-stat__label">Messages</span>
                 <span className={`rei-side-stat__value mono${sessionMessages === 0 ? " zero" : ""}`}>
-                  {sessionMessages === 0 ? "\u2014" : sessionMessages}
+                  {Number.isFinite(sessionMessages) && sessionMessages > 0 ? sessionMessages : "\u2014"}
                 </span>
               </div>
               {sessionChunks > sessionMessages && (
@@ -248,14 +275,16 @@ export default function InstrumentRail({
                     Inference chunks
                   </span>
                   <span className="rei-side-stat__value mono">
-                    {sessionChunks}
+                    {Number.isFinite(sessionChunks) ? sessionChunks : "\u2014"}
                   </span>
                 </div>
               )}
               <div className="rei-side-stat">
                 <span className="rei-side-stat__label">Saved vs. premium</span>
                 <span className="rei-side-stat__value verified mono">
-                  ${savingsVsPremium.toFixed(4)}
+                  {Number.isFinite(savingsVsPremium) && savingsVsPremium > 0 && Number.isFinite(sessionCost) && sessionCost >= 0
+                    ? `$${savingsVsPremium.toFixed(4)}`
+                    : "\u2014"}
                 </span>
               </div>
             </>
@@ -264,22 +293,40 @@ export default function InstrumentRail({
 
         <div className="rei-side-card">
           <div className="rei-side-card__heading">Models</div>
-          {Object.keys(modelBreakdown).length === 0 ? (
-            <div className="rei-side-empty">
-              No model calls yet.<br />Routing shows up here after your first message.
-            </div>
-          ) : (
-            Object.entries(modelBreakdown).map(([model, tokens]) => (
-              <div key={model} className="rei-side-stat">
-                <span title={model} className="rei-side-stat__label">
-                  {model.length > 22 ? model.slice(0, 19) + "..." : model}
-                </span>
-                <span className="rei-side-stat__value mono">
-                  {tokens.toLocaleString()} tok
-                </span>
-              </div>
-            ))
-          )}
+          {(() => {
+            const validModels = Object.entries(modelBreakdown).filter(([model, tokens]) =>
+              typeof model === "string" &&
+              model.trim().length > 0 &&
+              model !== "undefined" &&
+              model !== "unknown" &&
+              model !== "unknown-model" &&
+              model !== "[object Object]" &&
+              Number.isFinite(Number(tokens)) &&
+              Number(tokens) > 0
+            );
+
+            if (validModels.length === 0) {
+              return (
+                <div className="rei-side-empty">
+                  No model calls yet.<br />Routing shows up here after your first message.
+                </div>
+              );
+            }
+
+            return validModels.map(([model, tokens]) => {
+              const numericTokens = Number(tokens);
+              return (
+                <div key={model} className="rei-side-stat">
+                  <span title={model} className="rei-side-stat__label">
+                    {model.length > 22 ? model.slice(0, 19) + "..." : model}
+                  </span>
+                  <span className="rei-side-stat__value mono">
+                    {numericTokens.toLocaleString()} tok
+                  </span>
+                </div>
+              );
+            });
+          })()}
         </div>
 
         {lifetimeCost > 0 && (

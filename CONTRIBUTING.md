@@ -9,7 +9,7 @@
 
 ## Making changes
 
-- Keep tests passing — 88 suites, 1027 tests as the safety net
+- Keep tests passing — 89 suites, 1035 tests as the safety net
 - Write tests for new behavior before or alongside the implementation
 - Follow the [Architecture Decision Record](docs/DECISIONS.md) format for significant design choices
 - Keep commit messages descriptive — what changed and why

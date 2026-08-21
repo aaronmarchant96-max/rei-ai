@@ -117,7 +117,7 @@ Direct, reproducible machine telemetry captured from live production endpoints (
 
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
-| 1027 tests / 88 suites | `npm test -- --runInBand` | ✅ (current run; canonical count is generated in `src/data/claims.json`) |
+| 1035 tests / 89 suites | `npm test -- --runInBand` | ✅ (current run; canonical count is generated in `src/data/claims.json`) |
 | Build succeeds | `npm run build` | ✅ (2,301 modules transformed) |
 | Lint 0 errors / 236 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
 | Live API HTTP 200 | `curl https://prompthound-labs.vercel.app/api/cfai` | ✅ (2026-08-17 verified) |
