@@ -202,8 +202,9 @@ export default function ToolsLanding({ onOpenTool }) {
           <HingeMark size={32} animated={false} color="#E2A33D" />
         </motion.div>
         
-        <div className="relative font-mono text-xs font-bold tracking-widest uppercase text-[var(--amber)] mb-4 z-10">
-          REI.ai by PromptHound Labs
+        <div className="relative font-mono text-xs font-semibold tracking-wide text-gray-300 mb-4 z-10 bg-[#18181b]/90 border border-border/80 px-4 py-2 rounded-full inline-flex items-center gap-2 max-w-2xl text-center shadow-lg">
+          <span className="w-2 h-2 rounded-full bg-[var(--amber)] shrink-0 animate-pulse" />
+          <span>Built by <strong className="text-white font-bold">Aaron Marchant</strong> — AI systems engineer specializing in deterministic routing, evaluation systems, and auditable LLM infrastructure.</span>
         </div>
         
         <h1 
@@ -270,25 +271,36 @@ export default function ToolsLanding({ onOpenTool }) {
           Your provider bills you for tokens. It does not tell you whether a smaller model could have handled the job. REI isn't replacing provider billing — it fixes the decision that happens before the bill.
         </p>
 
-        <button
-          onClick={() => onOpenTool({ tool: "rei" })}
-          className="relative z-10 group flex items-center gap-2 bg-[var(--amber)] text-[#1A1300] px-6 sm:px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300 text-xs sm:text-sm"
-        >
-          Launch REI.ai — Route a real request & see what you would have paid <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
-        </button>
+        {/* Dual Primary Action Paths: Try REI.ai vs View Engineering Case Study */}
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-xl mx-auto mb-4 w-full">
+          <button
+            onClick={() => onOpenTool({ tool: "rei" })}
+            className="group flex items-center justify-center gap-2 bg-[var(--amber)] text-[#1A1300] px-6 sm:px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300 text-xs sm:text-sm w-full sm:w-auto"
+          >
+            Try REI.ai <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
+          </button>
 
-        <div className="relative z-10 flex items-center justify-center gap-3 mt-4">
-          <span className="font-mono text-[11px] uppercase tracking-widest text-[#565B72]">or</span>
+          <a
+            href={`${REPO_URL}/blob/main/docs/CASE_STUDY.md`}
+            target="_blank"
+            rel="noreferrer"
+            className="group inline-flex items-center justify-center gap-2 bg-[#18181b]/90 hover:bg-[#27272a] border border-border/80 text-white px-6 sm:px-8 py-4 rounded-full font-heading font-semibold uppercase tracking-wider hover:border-gray-500 transition-all duration-300 text-xs sm:text-sm w-full sm:w-auto"
+          >
+            View engineering case study <ArrowRight className="w-4 h-4 text-gray-400 group-hover:translate-x-[3px] group-hover:text-white transition-all duration-300" />
+          </a>
+        </div>
+
+        <div className="relative z-10 flex items-center justify-center gap-3 mt-2">
           <button
             onClick={() => onOpenTool({ tool: "analytics" })}
-            className="group inline-flex items-center gap-2 text-sm text-hinge-bright hover:text-[var(--amber)] transition-colors font-mono tracking-wide"
+            className="group inline-flex items-center gap-1.5 text-xs text-hinge-bright hover:text-[var(--amber)] transition-colors font-mono tracking-wide"
           >
             View measured savings analytics
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-[3px] transition-transform duration-300" />
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-[2px] transition-transform duration-300" />
           </button>
         </div>
 
-        <p className="relative z-10 text-[#565B72] text-xs mt-5 px-1">
+        <p className="relative z-10 text-[#565B72] text-xs mt-4 px-1">
           1. Pick a domain → 2. Ask your question → 3. See the reasoning, not just the answer.
         </p>
       </motion.header>
@@ -299,9 +311,9 @@ export default function ToolsLanding({ onOpenTool }) {
         className="relative z-10 w-full px-4 sm:px-6 md:px-0 mx-auto max-w-5xl py-14 md:py-24"
       >
         <div className="text-center mb-12 md:mb-16">
-          <div className="font-mono text-[11px] md:text-xs font-bold tracking-widest uppercase text-hinge-bright mb-3 md:mb-4 px-2">Formal Methodology for Trustworthy AI Development</div>
+          <div className="font-mono text-[11px] md:text-xs font-bold tracking-widest uppercase text-hinge-bright mb-3 md:mb-4 px-2">Formal Architecture & Systems Engineering</div>
           <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-2">
-            Not a product. A verified <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">methodology</span>.
+            Built on a verified <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">engineering methodology</span>.
           </h2>
           <p className="text-[#EDEFF5] text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-light px-3">
             That 90%+ spend reduction isn't a marketing claim — it's the measured output of the CARDO REI cognitive architecture. CARDO finds the hinge, the single factor that changes the answer. Every decision is tested, every claim is measured, every system is traced.

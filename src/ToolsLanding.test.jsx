@@ -3,11 +3,12 @@ import ToolsLanding from "./ToolsLanding.jsx";
 import claimsData from "./data/claims.json";
 
 describe("ToolsLanding", () => {
-  it("renders hero with REI.ai name and launch button", () => {
+  it("renders hero with Aaron Marchant attribution and Try REI.ai button", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText(/REI\.ai by PromptHound Labs/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /launch rei\.ai/i })).toBeInTheDocument();
+    expect(screen.getByText(/Aaron Marchant/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /try rei\.ai/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /view engineering case study/i })).toBeInTheDocument();
   });
 
   it("renders stats badges with accuracy and test count", () => {
@@ -31,7 +32,7 @@ describe("ToolsLanding", () => {
   it("renders the methodology flow (find the hinge → test/measure/trace → gate → iterate)", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByRole("heading", { name: /not a product\..*methodology/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /built on a verified.*engineering methodology/i })).toBeInTheDocument();
     expect(screen.getByText(/find the hinge/i)).toBeInTheDocument();
     expect(screen.getByText(/verified evidence/i)).toBeInTheDocument();
     expect(screen.getByText(/human \/ claims gate/i)).toBeInTheDocument();
@@ -57,15 +58,15 @@ describe("ToolsLanding", () => {
     expect(screen.getByText(/storm replay/i)).toBeInTheDocument();
   });
 
-  it("navigates to REI from hero button", () => {
+  it("navigates to REI from hero Try REI.ai button", () => {
     const onOpenTool = jest.fn();
     render(<ToolsLanding onOpenTool={onOpenTool} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /launch rei\.ai/i }));
+    fireEvent.click(screen.getByRole("button", { name: /try rei\.ai/i }));
     expect(onOpenTool).toHaveBeenCalledWith({ tool: "rei" });
   });
 
-  it("surfaces a prominent analytics CTA next to the launch button", () => {
+  it("surfaces a prominent analytics CTA next to the action buttons", () => {
     const onOpenTool = jest.fn();
     render(<ToolsLanding onOpenTool={onOpenTool} />);
 
@@ -78,8 +79,8 @@ describe("ToolsLanding", () => {
   it("renders footer", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText(/github/i)).toBeInTheDocument();
-    expect(screen.getByText(/rei\.ai by prompthound/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/github/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/by prompthound/i)).toBeInTheDocument();
   });
 
   it("opens a tool from the full card surface", () => {
