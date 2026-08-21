@@ -27,7 +27,7 @@ archived_at: null
 
 **The Underlying Methodology:** Powered by **CARDO REI**, a formal cognitive architecture that enforces pre-flight quality gates, isolates the decisive "Hinge" of every prompt, separates verified facts from assumptions, and returns auditable execution receipts.
 
-Backed by **1057 automated tests across 85 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
+Backed by **1009 automated tests across 84 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -50,7 +50,7 @@ Backed by **1057 automated tests across 85 test suites** (100% green CI), REI.ai
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 1057 automated tests across 85 test suites to catch routing, security, and cost-contract regressions.
+- **Empirical Rigor:** Backed by 1009 automated tests across 84 test suites to catch routing, security, and cost-contract regressions.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -189,7 +189,7 @@ export OPENAI_API_KEY="local-dev-key"
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **1057 passing tests across 85 suites** |
+| Automated Tests | **1009 passing tests across 84 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Intel Celeron J4105, 8GB RAM |
 | Monthly Operating Budget | $25/month |
@@ -216,7 +216,7 @@ npm run dev:full
 # Or run the headless cognitive proxy gateway alone
 npm run server
 
-# Run full test suite (85 test suites, 1057 tests)
+# Run full test suite (84 test suites, 1009 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

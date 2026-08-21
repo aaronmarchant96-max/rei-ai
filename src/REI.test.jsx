@@ -501,4 +501,18 @@ describe("REI Workspace Transition & Progressive Disclosure", () => {
     const lastMeta = metas[metas.length - 1];
     expect(lastMeta).not.toHaveTextContent("llama-3.3-70b");
   });
+
+  test("starter cards render sibling Run and Edit buttons with unique accessible names", () => {
+    render(<REI />);
+    const runButtons = screen.getAllByRole("button", { name: /^Run /i });
+    const editButtons = screen.getAllByRole("button", { name: /^Edit /i });
+
+    expect(runButtons.length).toBe(4);
+    expect(editButtons.length).toBe(4);
+
+    // Edit button populates composer without dispatching
+    fireEvent.click(editButtons[0]);
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    expect(input.value.length).toBeGreaterThan(0);
+  });
 });
