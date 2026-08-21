@@ -15,7 +15,7 @@ export default {
     id: "coding-hinge",
     jobType: "coding-hinge",
     label: "Coding Hinge",
-    model: "llama-3.3-70b-versatile",
+    model: "gemini-3.6-flash",
     maxTokens: 600,
     costPer1k: 1.0,
     qualityGate: "Phase 0 + HARD STOP",

@@ -15,7 +15,7 @@ export default {
     id: "story-architect",
     jobType: "story-architect",
     label: "Story Architect",
-    model: "llama-3.3-70b-versatile",
+    model: "deepseek-chat",
     maxTokens: 4096,
     costPer1k: 1.0,
     qualityGate: "Character hinge + timeline",

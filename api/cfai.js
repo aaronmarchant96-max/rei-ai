@@ -405,7 +405,7 @@ async function callDeepSeek(messages, maxTokens, modelOverride, temperature = 0.
   const controller = new AbortController();
   const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
   try {
-    const requestedModel = modelOverride || "deepseek-v4-flash";
+    const requestedModel = modelOverride || "deepseek-chat";
     const payload = {
       model: requestedModel,
       messages: messages,
@@ -1107,13 +1107,13 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   const isGreeting = routerDecision?.id === "simple-greeting";
   const maxTokens = Math.max(routerDecision?.maxTokens || 4096, isGreeting ? 200 : 50);
   const toolsToPass = isGreeting ? null : AVAILABLE_TOOLS;
-  const primaryModel = routerDecision?.model || "deepseek-v4-flash";
+  const primaryModel = routerDecision?.model || "deepseek-chat";
   const primaryBackend = getBackendForModel(primaryModel);
   const temperature = routerDecision?.temperature ?? 0.7;
   // Only pass the routed model to Groq when Groq IS the primary backend —
   // as a fallback it must use the default model (a non-Groq routed model
-  // like deepseek-v4-flash would be rejected by Groq's API).
-  const deepseekModel = primaryBackend === "deepseek" ? primaryModel : "deepseek-v4-flash";
+  // like deepseek-chat would be rejected by Groq's API).
+  const deepseekModel = primaryBackend === "deepseek" ? primaryModel : "deepseek-chat";
   const groqModel = primaryBackend === "groq" ? primaryModel : null;
   const geminiModel = primaryBackend === "gemini" ? primaryModel : null;
 
