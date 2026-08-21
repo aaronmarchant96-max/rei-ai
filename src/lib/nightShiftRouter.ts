@@ -231,7 +231,7 @@ function buildDecision(id: string, overrides: Record<string, any> = {}, hingeDat
     id: baseEntry.id || id,
     jobType: baseEntry.jobType || id,
     label: baseEntry.label || id,
-    model: baseEntry.model || "deepseek-v4-flash",
+    model: baseEntry.model || "deepseek-chat",
     maxTokens: baseEntry.maxTokens || 400,
     costPer1k: baseEntry.costPer1k ?? 1.0,
     qualityGate: baseEntry.qualityGate || "Default reasoning gate",
