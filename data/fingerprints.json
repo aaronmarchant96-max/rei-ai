@@ -31,7 +31,7 @@
     "id": "structured-reasoning",
     "jobType": "structured-reasoning",
     "label": "Structured Reasoning",
-    "model": "llama-3.3-70b-versatile",
+    "model": "deepseek-chat",
     "maxTokens": 1500,
     "qualityGate": "Hinge + Facts + Move",
     "enforce": null,
@@ -67,8 +67,8 @@
     ],
     "temperature": 0.6,
     "fallbackPriority": "adversarial-validation",
-    "costPer1kInput": 0.00059,
-    "costPer1kOutput": 0.00079
+    "costPer1kInput": 0.00014,
+    "costPer1kOutput": 0.00028
   },
   {
     "id": "coding-hinge",
@@ -126,7 +126,7 @@
     "id": "genealogy-deep-dive",
     "jobType": "genealogy-deep-dive",
     "label": "Genealogy Deep Dive",
-    "model": "llama-3.3-70b-versatile",
+    "model": "deepseek-chat",
     "maxTokens": 4000,
     "qualityGate": "Evidence tiers + citations",
     "enforce": "EVIDENCE_TIERS",
@@ -157,14 +157,14 @@
     ],
     "temperature": 0.2,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0.00059,
-    "costPer1kOutput": 0.00079
+    "costPer1kInput": 0.00014,
+    "costPer1kOutput": 0.00028
   },
   {
     "id": "story-architect",
     "jobType": "story-architect",
     "label": "Story Architect",
-    "model": "llama-3.3-70b-versatile",
+    "model": "deepseek-chat",
     "maxTokens": 4096,
     "costPer1k": 1,
     "qualityGate": "Character hinge + timeline",
@@ -186,14 +186,14 @@
     ],
     "temperature": 0.7,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0.00059,
-    "costPer1kOutput": 0.00079
+    "costPer1kInput": 0.00014,
+    "costPer1kOutput": 0.00028
   },
   {
     "id": "adversarial-validation",
     "jobType": "adversarial-validation",
     "label": "Adversarial Validation",
-    "model": "llama-3.3-70b-versatile",
+    "model": "deepseek-chat",
     "maxTokens": 3000,
     "qualityGate": "Red-team validation",
     "enforce": "RED_TEAM",
@@ -212,18 +212,18 @@
     ],
     "temperature": 0.1,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0.00059,
-    "costPer1kOutput": 0.00079
+    "costPer1kInput": 0.00014,
+    "costPer1kOutput": 0.00028
   },
   {
     "id": "legal-hinge",
     "jobType": "legal-hinge",
     "label": "Legal Hinge",
-    "model": "llama-3.3-70b-versatile",
+    "model": "deepseek-chat",
     "maxTokens": 3000,
     "qualityGate": "Verified-index check + hinge-before-holding",
     "enforce": null,
-    "description": "Case analysis grounded in the verified precedent index \u2014 flags anything outside it as unverified.",
+    "description": "Case analysis grounded in the verified precedent index — flags anything outside it as unverified.",
     "matchTerms": [
       "precedent",
       "holding",
@@ -249,7 +249,7 @@
     ],
     "temperature": 0.2,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0.00059,
-    "costPer1kOutput": 0.00079
+    "costPer1kInput": 0.00014,
+    "costPer1kOutput": 0.00028
   }
 ]

@@ -532,8 +532,8 @@ export function buildRouterDecision({
 
   if (highStructureSignals.length > 0 || complexityTier === "high" || (hingeResult && hingeResult.hs >= 0.50)) {
     const decision = buildDecision("structured-reasoning", {
-      rationale: "High-complexity or high-hinge reasoning request detected in Generalist; route through Gemini.",
-      model: "gemini-2.5-flash",
+      rationale: "High-complexity or high-hinge reasoning request detected in Generalist; route through DeepSeek.",
+      model: "deepseek-chat",
       qualityGate: "Hinge + Facts + Move + challenge test",
       maxTokens: 1500,
       temperature: 0.2,

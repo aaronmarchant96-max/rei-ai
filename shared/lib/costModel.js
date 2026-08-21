@@ -21,6 +21,7 @@
 // ceiling so budget enforcement never under-estimates.
 
 const RATES = {
+  "deepseek-chat": { ceiling: 0.00042, hit: 0.0000028, miss: 0.00014 },
   "deepseek-v4-flash": { ceiling: 0.00042, hit: 0.0000028, miss: 0.00014 },
   "gpt-4o": { ceiling: 0.0125 },
   // Unknown/models absent from the table: the conservative premium ceiling, so

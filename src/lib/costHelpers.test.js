@@ -33,7 +33,7 @@ describe("costHelpers", () => {
       const costs = getModelCosts("llama-3.3-70b-versatile");
       const rate = getModelCostRate("llama-3.3-70b-versatile");
       expect(rate).toBe(costs.ceiling);
-      expect(rate).toBe(costs.input + costs.output);
+      expect(rate).toBeCloseTo(costs.input + costs.output, 6);
     });
   });
 

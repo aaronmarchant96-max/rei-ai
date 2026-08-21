@@ -24,7 +24,7 @@ MODEL_COSTS.mock = { input: 0, output: 0, ceiling: 0 };
 MODEL_COSTS["rate-limited"] = { input: 0, output: 0, ceiling: 0 };
 Object.assign(MODEL_COSTS, modelRates as unknown as Record<string, { input: number; output: number; ceiling: number }>);
 
-export const DEFAULT_COST_MODEL = "llama-3.3-70b-versatile";
+export const DEFAULT_COST_MODEL = "deepseek-chat";
 
 export function getModelCosts(model: string): ModelCost {
   const clean = String(model || "").replace(" (fallback)", "");
