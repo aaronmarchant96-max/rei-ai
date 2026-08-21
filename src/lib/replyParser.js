@@ -61,3 +61,54 @@ export function parseAssistantStyleReply(text) {
 
   return sections;
 }
+
+/**
+ * Separates internal planning, blueprint, and CARDO scaffolding from the visible assistant deliverable.
+ * Places scaffolding into metadata for the Inspect drawer while ensuring the conversation
+ * displays ONLY the clean requested deliverable.
+ */
+export function extractDeliverableAndScaffolding(text) {
+  if (text == null || typeof text !== "string") {
+    return { deliverable: "", scaffolding: null };
+  }
+
+  let raw = text;
+  const scaffoldingParts = [];
+
+  // 1. Extract and strip <think>...</think> tags
+  raw = raw.replace(/<think>([\s\S]*?)<\/think>/gi, (_, content) => {
+    const trimmed = content.trim();
+    if (trimmed) scaffoldingParts.push(trimmed);
+    return "";
+  }).replace(/<think>[\s\S]*$/gi, "");
+
+  // 2. Extract and strip <details>...</details> blocks
+  raw = raw.replace(/<details\b[^>]*>([\s\S]*?)<\/details>/gi, (_, content) => {
+    const cleanContent = content.replace(/<summary\b[^>]*>[\s\S]*?<\/summary>/gi, "").trim();
+    if (cleanContent) scaffoldingParts.push(cleanContent);
+    return "";
+  });
+
+  // 3. Extract and strip any standalone <summary>...</summary> or unclosed <details>
+  raw = raw.replace(/<summary\b[^>]*>[\s\S]*?<\/summary>/gi, "");
+  raw = raw.replace(/<\/?details\b[^>]*>/gi, "");
+  raw = raw.replace(/<\/?summary\b[^>]*>/gi, "");
+
+  // 4. Extract and strip internal Phase 0 / Structural Blueprint / CARDO Hinge blocks if raw
+  const scaffoldingBlockRegex = /^(?:\s*|\n*)(?:\*\*Phase 0[\s\S]*?(?:\*\*CARDO Hinge Analysis\*\*|\*\*Structural Blueprint\*\*|Structural Blueprint)[\s\S]*?)(?=\n---|\n\n[A-Z#]|$)/i;
+  raw = raw.replace(scaffoldingBlockRegex, (match) => {
+    const trimmed = match.trim();
+    if (trimmed) scaffoldingParts.push(trimmed);
+    return "";
+  });
+
+  // 5. Strip any leading markdown horizontal rules (--- or ***) and leading whitespace
+  raw = raw.replace(/^(?:\s*[-*_]{3,}\s*)+/g, "").trim();
+
+  const scaffolding = scaffoldingParts.join("\n\n").trim() || null;
+
+  return {
+    deliverable: raw,
+    scaffolding,
+  };
+}

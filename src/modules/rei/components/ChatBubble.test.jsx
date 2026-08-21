@@ -39,7 +39,7 @@ describe("ChatBubble", () => {
   it("renders router badge for assistant messages", () => {
     render(<ChatBubble msg={baseMsg} selectedDomain="assistant" mobile={false} onCopy={jest.fn()} />);
     expect(screen.getAllByText("Structured Reasoning").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("llama-3.3-70b-versatile").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Inspect ›")).toBeInTheDocument();
   });
 
   it("does not render CARDO cards for non-assistant domains", () => {
@@ -80,5 +80,25 @@ describe("ChatBubble", () => {
         Hinge: "The core pivot point.",
       }),
     }));
+  });
+
+  it("regression: strips literal <details>, <summary>, and internal CARDO planning labels from rendered assistant text", () => {
+    const rawStoryMsg = {
+      ...baseMsg,
+      text: "<details><summary>Narrative Blueprint (Click to expand)</summary> **Phase 0 – Questioning Stance** - **Genre & Tone:** Historical thriller. **CARDO Hinge Analysis** The hinge is the secret orders. **Structural Blueprint** 1. Inciting Slip-through </details> --- The night fell like a shroud over Berlin's broken spine. Snow drummed a thin, relentless rhythm.",
+    };
+
+    render(<ChatBubble msg={rawStoryMsg} selectedDomain="story" mobile={false} onCopy={jest.fn()} />);
+
+    // Assert that NO literal HTML tags or planning headers appear in rendered text
+    expect(screen.queryByText(/<details/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/<summary/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Narrative Blueprint/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Phase 0/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/CARDO Hinge Analysis/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Structural Blueprint/i)).not.toBeInTheDocument();
+
+    // Assert that the clean story prose IS rendered directly
+    expect(screen.getByText(/The night fell like a shroud over Berlin's broken spine/i)).toBeInTheDocument();
   });
 });

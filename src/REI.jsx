@@ -16,7 +16,7 @@ import { logEval } from "./lib/evalLog";
 import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
-import { parseAssistantStyleReply } from "./lib/replyParser.js";
+import { parseAssistantStyleReply, extractDeliverableAndScaffolding } from "./lib/replyParser.js";
 import { isSimpleGreeting } from "./lib/routingConstants.js";
 import { getDomainProfiles, getDomainPrompt, getDomain } from "./domains/_index.js";
 import IngestPanel from "./modules/rei/components/IngestPanel.jsx";
@@ -391,7 +391,8 @@ export default function REI({ initialPrompt } = {}) {
       throw new Error(data.error || "The AI routing gateway returned an error. Please try again.");
     }
 
-    const aiText = data.result || data.reply || "";
+    const rawAiText = data.result || data.reply || "";
+    const { deliverable: aiText, scaffolding: extractedBlueprint } = extractDeliverableAndScaffolding(rawAiText);
     let usage = data.usage;
     const modelUsed = data.model || routerDecision?.model || "unknown";
     const routeId = routerDecision?.id || "generalist";
@@ -462,6 +463,7 @@ export default function REI({ initialPrompt } = {}) {
       ...(data.routerDecision || routerDecision),
       model: modelUsed,
       estimatedCost: data.routerDecision?.estimatedCost != null ? data.routerDecision.estimatedCost : routerDecision?.estimatedCost,
+      blueprint: extractedBlueprint || data.routerDecision?.blueprint || routerDecision?.blueprint || null,
     };
 
     const aiMsg = {
@@ -475,6 +477,7 @@ export default function REI({ initialPrompt } = {}) {
         requestId,
         model: modelUsed,
         timestamp: new Date().toISOString(),
+        blueprint: extractedBlueprint,
         redTeamResult: data.redTeamResult || null,
         research: data.research || null,
         rawTrace: data.rawTrace || null,

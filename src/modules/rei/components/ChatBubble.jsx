@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { parseAssistantStyleReply } from "../../../lib/replyParser.js";
+import { parseAssistantStyleReply, extractDeliverableAndScaffolding } from "../../../lib/replyParser.js";
 import { buildRequestEvidence } from "../../../lib/evidenceEngine";
 import TelemetryCapsule from "./TelemetryCapsule.jsx";
 import CardoComparisonToggle from "./CardoComparisonToggle.jsx";
@@ -56,6 +56,8 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
     createdAt: msg.rawJson?.timestamp || new Date().toISOString(),
   };
 
+  const { deliverable: cleanDeliverableText } = extractDeliverableAndScaffolding(msg.text);
+
   return (
     <div
       className={`rei-chat-message ${msg.sender === "user" ? "rei-chat-message--user" : "rei-chat-message--rei"}`}
@@ -79,7 +81,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
         {isAssistantStructuredReply ? (
           (() => {
             if (!isStructured) {
-              return <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>;
+              return <div style={{ fontSize: "15px", lineHeight: "1.6", whiteSpace: "pre-wrap" }}>{cleanDeliverableText}</div>;
             }
 
             return (
@@ -169,39 +171,14 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
           })()
         ) : (
           <div>
-            <div style={{ fontSize: "15px", lineHeight: "1.6" }}>{msg.text}</div>
+            <div style={{ fontSize: "15px", lineHeight: "1.6", whiteSpace: "pre-wrap" }}>{cleanDeliverableText}</div>
           </div>
-        )}
-
-        {/* Collapsible Telemetry Dropdown */}
-        {msg.rawJson && !isSystemNotice && (
-          <details style={{ marginTop: "14px", borderTop: "1px solid rgba(255, 255, 255, 0.08)", paddingTop: "8px" }}>
-            <summary style={{ fontSize: "11.5px", color: "var(--text-muted)", cursor: "pointer", fontWeight: 600, userSelect: "none" }}>
-              🔍 View Night Shift Routing Telemetry ({msg.rawJson.routerDecision?.model || "auto"})
-            </summary>
-            <div className="rei-router-panel__grid" style={{ marginTop: "8px" }}>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Route:</span> {msg.rawJson.routerDecision?.label || "n/a"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Model:</span> {msg.rawJson.routerDecision?.model || msg.rawJson.model || "n/a"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Hinge score:</span> {msg.rawJson.routerDecision?.hingeScore?.toFixed(2) || "n/a"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Matched terms:</span> {msg.rawJson.routerDecision?.matchedTerms?.join(", ") || "none"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Max tokens:</span> {msg.rawJson.routerDecision?.maxTokens || "n/a"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Quality gate:</span> {msg.rawJson.routerDecision?.qualityGate || "n/a"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Escalation:</span> {msg.rawJson.routerDecision?.escalation?.escalate ? "⚠️ Recommended — " + msg.rawJson.routerDecision.escalation.reason : "Not recommended • routing cost within threshold"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Enforcement:</span> {msg.rawJson.routerDecision?.enforce || "none"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Rationale:</span> {msg.rawJson.routerDecision?.rationale || "n/a"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Est. cost:</span> ${msg.rawJson.routerDecision?.estimatedCost?.toFixed(4) || "—"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Premium cost:</span> ${msg.rawJson.routerDecision?.premiumCost?.toFixed(4) || "—"}</div>
-              <div className="rei-router-panel__item"><span className="rei-router-panel__label">Savings:</span> {msg.rawJson.routerDecision?.premiumCost > 0
-                ? `${Math.round((1 - (msg.rawJson.routerDecision.estimatedCost || 0) / msg.rawJson.routerDecision.premiumCost) * 100)}%`
-                : "—"}</div>
-            </div>
-          </details>
         )}
 
         {/* Bubble Bottom Actions */}
         <div style={{ position: "absolute", bottom: "10px", right: "12px", display: "flex", gap: "6px" }}>
           <button
-            onClick={() => handleCopy(msg.text)}
+            onClick={() => handleCopy(cleanDeliverableText)}
             className="rei-copy-btn touch-target"
             aria-label="Copy message"
             onMouseOver={(e) => e.currentTarget.style.opacity = 1}

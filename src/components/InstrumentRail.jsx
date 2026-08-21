@@ -201,6 +201,16 @@ export default function InstrumentRail({
                 <strong>Routing Rationale:</strong> {focusedDecision.rationale}
               </div>
             )}
+            {focusedDecision.blueprint && (
+              <div style={{ marginTop: "12px", padding: "10px", background: "rgba(0,0,0,0.3)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                <div style={{ color: "var(--accent-cyan, #38bdf8)", fontSize: "11px", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px" }}>
+                  📐 Planning & Scaffolding Blueprint
+                </div>
+                <div style={{ fontSize: "12px", color: "var(--text, #e2e8f0)", whiteSpace: "pre-wrap", lineHeight: "1.45" }}>
+                  {focusedDecision.blueprint}
+                </div>
+              </div>
+            )}
           </div>
         ) : null}
 
