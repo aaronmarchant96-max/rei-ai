@@ -39,15 +39,15 @@ REI.ai introduces a **zero-inference pre-spend router** (<10ms resolution) backe
 
 ## 2. Company & Founder Profile
 
-### 2.1 Sole Founder & Engineering Philosophy
+### 2.1 Solo Founder & Zero-Headcount Operating Model
 - **Founder**: Aaron Marchant — AI Systems Engineer & Software Architect.
-- **Operating Model**: Hyper-lean, bootstrapped engineering using the **C-Activity Bootstrap Loop** (using AI tools to build AI systems).
+- **Headcount Strategy**: **100% Solo Founder (Zero Hiring)**. No hiring or team expansion planned. All platform engineering, routing maintenance, pilot reconciliation, and onboarding are fully automated via AI pair-engineering and serverless edge functions.
 - **Track Record**: Processed **1.848 Billion development & evaluation tokens** through the OpenCode/DeepSeek workflow for **$23.52 total API spend** (97.35% input-cache hit rate across 1,000+ deployments).
 - **Test Infrastructure**: Built and maintains a 100% green test suite comprising **1,099 automated tests across 97 test files**.
 
-### 2.2 Infrastructure Efficiency
+### 2.2 Infrastructure & Capital Efficiency
 - **Operating Overhead**: ~$60/month total infrastructure budget.
-- **Gross Margins**: **~90%+** under Bring Your Own Key (BYOK) architecture (zero inference balance-sheet liability).
+- **Gross Margins**: **~90%+** under Bring Your Own Key (BYOK) architecture (zero inference balance-sheet liability, zero payroll overhead).
 
 ---
 
