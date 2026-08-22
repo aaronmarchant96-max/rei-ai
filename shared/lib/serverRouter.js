@@ -13,7 +13,7 @@ const fingerprints = JSON.parse(fs.readFileSync(fingerprintsPath, "utf8"));
 
 const DOMAIN_MAP = {
   genealogy: "genealogy-deep-dive",
-  coding: "coding-deep-dive",
+  coding: "coding-hinge",
   story: "creative-story",
   creative: "creative-story",
   legal: "case-hinge-legal",
@@ -138,10 +138,29 @@ export function computeServerCost(modelName = "deepseek-chat", inputTokens = 0, 
 }
 
 export function normalizeFinishReason(rawReason) {
+  if (rawReason === "unknown") return "unknown";
   if (!rawReason) return "stop";
   const r = String(rawReason).toLowerCase().trim();
+  if (r === "stop" || r === "end_turn" || r === "stop_sequence") return "stop";
   if (r === "length" || r === "max_tokens" || r === "max_tokens_exceeded") return "length";
   if (r === "content_filter" || r === "safety") return "content_filter";
   if (r === "cancelled" || r === "abort") return "cancelled";
   return "stop";
+}
+
+export function evaluateDeliveryIntegrity({ rawContent = "", finishReason = null, transportCompleted = true }) {
+  const normalizedFinish = normalizeFinishReason(finishReason);
+  const failureReasons = [];
+
+  if (!transportCompleted) failureReasons.push("transport_incomplete");
+  if (normalizedFinish !== "stop") failureReasons.push(`invalid_termination:${normalizedFinish}`);
+  if (!rawContent || rawContent.trim().length === 0) failureReasons.push("empty_content");
+
+  const deliveryGatePassed = failureReasons.length === 0;
+
+  return {
+    deliveryGatePassed,
+    finishStatus: deliveryGatePassed ? "complete" : (normalizedFinish === "stop" ? "incomplete" : normalizedFinish),
+    failureReasons
+  };
 }

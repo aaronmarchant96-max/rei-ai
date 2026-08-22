@@ -1088,7 +1088,7 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
 
 // ── Main API router: primary backend + fallback chain ──
 
-async function callModelAPI(prompt, systemPrompt, history, routerDecision, messagesOverride) {
+async function callModelAPI(prompt, systemPrompt, history, routerDecision, messagesOverride, modelOverride) {
   var messages;
   if (messagesOverride && Array.isArray(messagesOverride) && messagesOverride.length > 0) {
     messages = messagesOverride;
@@ -1113,24 +1113,23 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
     ];
   }
 
+  const targetModel = modelOverride || routerDecision?.model || "deepseek-chat";
   const isGreeting = routerDecision?.id === "simple-greeting";
   const maxTokens = Math.max(routerDecision?.maxTokens || 4096, isGreeting ? 200 : 50);
   const toolsToPass = isGreeting ? null : AVAILABLE_TOOLS;
-  const primaryModel = routerDecision?.model || "deepseek-chat";
+  const primaryModel = targetModel;
   const primaryBackend = getBackendForModel(primaryModel);
   const temperature = routerDecision?.temperature ?? 0.7;
-  // Only pass the routed model to Groq when Groq IS the primary backend —
-  // as a fallback it must use the default model (a non-Groq routed model
-  // like deepseek-chat would be rejected by Groq's API).
+  
   const deepseekModel = primaryBackend === "deepseek" ? primaryModel : "deepseek-chat";
-  const groqModel = primaryBackend === "groq" ? primaryModel : null;
-  const geminiModel = primaryBackend === "gemini" ? primaryModel : null;
+  const groqModel = primaryBackend === "groq" ? primaryModel : "llama-3.3-70b-versatile";
+  const geminiModel = primaryBackend === "gemini" ? primaryModel : "gemini-1.5-flash";
 
   // Map of available backends (each accepts an optional message override so
   // the continuation & tool loops can re-call the SAME backend with appended turns)
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs, passTools, modelOverride) { return callDeepSeek(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : deepseekModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
-  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools, modelOverride) { return callGroq(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs, passTools, mOverride) { return callDeepSeek(msgs || messages, maxTokens, mOverride !== undefined ? mOverride : deepseekModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools, mOverride) { return callGroq(msgs || messages, maxTokens, mOverride !== undefined ? mOverride : groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs, passTools) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs, passTools) { return callGLM(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs, passTools) { return callOpenAI(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
@@ -1199,12 +1198,19 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
   if (primaryBackend && backends[primaryBackend]) {
     var cooldownUntil = providerCooldown.get(primaryBackend);
     if (cooldownUntil && Date.now() < cooldownUntil) {
-      console.warn("Skipping primary backend " + primaryBackend + " — in cooldown (" + Math.ceil((cooldownUntil - Date.now()) / 1000) + "s remaining)");
+      console.warn("Skipping direct model backend " + primaryBackend + " — in cooldown");
     } else {
       var result = await backends[primaryBackend]();
       if (result) {
         providerCooldown.delete(primaryBackend);
-        return await finalizeResult(result, backends[primaryBackend], messages, model, null, backends);
+        return {
+          content: result.content,
+          model: model,
+          usage: result.usage,
+          truncated: result.truncated || false,
+          finishReason: result.finishReason || "stop",
+          rateLimited: false,
+        };
       }
     }
   }
@@ -1229,14 +1235,14 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
   }
 
   return {
-    content: "[REI.AI NOTICE] All reasoning backends are unavailable. Please wait a moment and try again.",
-    model: "none",
+    content: "[REI.AI NOTICE] Model execution failed for " + model + ".",
+    model: model,
     rateLimited: true,
-    retryAfter: "~30s",
   };
 }
 
 export async function handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision, messagesOverride) {
+  let modelOverride = null;
   if (command && typeof command === "object" && !Array.isArray(command)) {
     const opts = command;
     input = opts.prompt || opts.input || "";
@@ -1244,6 +1250,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
     history = opts.history || [];
     routerDecision = opts.routerDecision || opts.router || null;
     messagesOverride = opts.messagesOverride || opts.messages || null;
+    modelOverride = opts.modelOverride || opts.model || null;
     command = opts.command || "chat";
     args = opts.args || [];
   } else {
@@ -1258,7 +1265,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
   if (!localCliExists) {
     try {
       const payload = input || (args.length > 0 ? args.join(" ") : "help");
-      const response = await callModelAPI(payload, systemPrompt, history, routerDecision, messagesOverride);
+      const response = await callModelAPI(payload, systemPrompt, history, routerDecision, messagesOverride, modelOverride);
       return {
         success: true,
         result: response.content,

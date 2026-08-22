@@ -21,14 +21,14 @@ export default async function handler(req, res) {
 
     return res.status(isReady ? 200 : 503).json({
       status: isReady ? "ready" : "degraded",
-      version: "40a244c",
+      version: process.env.VERCEL_GIT_COMMIT_SHA || "production",
       gateway: "chat-completions",
       timestamp: new Date().toISOString()
     });
   } catch (err) {
     return res.status(503).json({
       status: "degraded",
-      version: "40a244c",
+      version: process.env.VERCEL_GIT_COMMIT_SHA || "production",
       gateway: "chat-completions",
       timestamp: new Date().toISOString()
     });

@@ -4,7 +4,7 @@
 
 import "dotenv/config";
 import { handleCfaiRequest } from "../../cfai.js";
-import { buildServerRouterDecision, computeServerCost, normalizeFinishReason } from "../../../shared/lib/serverRouter.js";
+import { buildServerRouterDecision, computeServerCost, normalizeFinishReason, evaluateDeliveryIntegrity } from "../../../shared/lib/serverRouter.js";
 import { parseApiKeyHeader, resolveTenantContext } from "../../../shared/lib/authTenantEngine.js";
 
 const ERROR_CODES = {
@@ -150,15 +150,23 @@ export default async function handler(req, res) {
     if (!cfaiRes || cfaiRes.rateLimited || cfaiRes.success === false || replyText.includes("All reasoning backends are unavailable") || (cfaiRes.reply === undefined && cfaiRes.content === undefined && cfaiRes.result === undefined)) {
       return errorReply(res, 503, ERROR_CODES.CF_MODEL_UNAVAILABLE, "All upstream model backends unavailable");
     }
-    const rawFinishReason = cfaiRes.finishReason || (cfaiRes.isTruncated ? "length" : "stop");
+
+    const executedModel = cfaiRes.model || selectedModel;
+    const isTruncated = Boolean(cfaiRes.truncated || cfaiRes.isTruncated);
+    const rawFinishReason = cfaiRes.finishReason || (isTruncated ? "length" : null);
+    const deliveryGate = evaluateDeliveryIntegrity({
+      rawContent: replyText,
+      finishReason: rawFinishReason,
+      transportCompleted: true
+    });
     const normalizedFinish = normalizeFinishReason(rawFinishReason);
-    const isComplete = normalizedFinish === "stop";
+    const isComplete = deliveryGate.deliveryGatePassed && !isTruncated;
 
     const usage = normalizeUsage(cfaiRes.usage, userPrompt, replyText);
-    const costs = computeServerCost(selectedModel, usage.prompt_tokens, usage.completion_tokens);
+    const costs = computeServerCost(executedModel, usage.prompt_tokens, usage.completion_tokens);
 
     if (typeof res.setHeader === "function") {
-      res.setHeader("X-REI-Pathway", selectedModel);
+      res.setHeader("X-REI-Pathway", executedModel);
       res.setHeader("X-REI-Savings", String(costs.modeledDifferenceUsd));
     }
 
@@ -175,7 +183,7 @@ export default async function handler(req, res) {
       eligible_savings_usd: isComplete ? costs.modeledDifferenceUsd : 0,
       savings_policy_version: "delivery-gated-v1",
       savings_eligibility: isComplete ? "eligible" : "excluded",
-      finish_status: isComplete ? "complete" : normalizedFinish,
+      finish_status: isComplete ? "complete" : deliveryGate.finishStatus,
       single_flight_coalesced: Boolean(cfaiRes.singleFlightCoalesced),
       execution_role: cfaiRes.executionRole || "leader"
     };

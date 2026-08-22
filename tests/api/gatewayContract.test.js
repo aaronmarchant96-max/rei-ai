@@ -191,4 +191,33 @@ describe("REI.ai Gateway Contract — Single-Instance Coalescing & Health", () =
     expect(res.body.status).toBe("ready");
     expect(res.body.gateway).toBe("chat-completions");
   });
+
+  it("10. Direct modelOverride executes requested model and records receipt model accuracy", async () => {
+    const req = createMockReq({
+      body: {
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: "Write a short test function" }]
+      }
+    });
+    const res = createMockRes();
+
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.model).toBe("llama-3.3-70b-versatile");
+    expect(res.body.receipt).toBeDefined();
+    expect(res.body.receipt.savings_policy_version).toBe("delivery-gated-v1");
+  });
+
+  it("11. Incomplete or length finish_reason yields $0 eligible savings and excluded status", async () => {
+    const { evaluateDeliveryIntegrity } = await import("../../shared/lib/serverRouter.js");
+    const gateResult = evaluateDeliveryIntegrity({
+      rawContent: "Partial content without terminal stop",
+      finishReason: "length",
+      transportCompleted: true
+    });
+
+    expect(gateResult.deliveryGatePassed).toBe(false);
+    expect(gateResult.finishStatus).toBe("length");
+  });
 });

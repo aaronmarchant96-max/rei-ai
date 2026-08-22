@@ -94,3 +94,42 @@ describe("requireApiKey", function () {
     expect(res._status).toBeNull();
   });
 });
+
+import { resolveTenantContext } from "../../shared/lib/authTenantEngine.js";
+
+describe("resolveTenantContext P0 auth security gate", function () {
+  var prevKeys;
+
+  beforeEach(function () {
+    prevKeys = process.env.REI_API_KEYS;
+  });
+
+  afterEach(function () {
+    if (prevKeys !== undefined) process.env.REI_API_KEYS = prevKeys;
+    else delete process.env.REI_API_KEYS;
+  });
+
+  it("strictly rejects unconfigured rei_key_* credentials when REI_API_KEYS is set", function () {
+    process.env.REI_API_KEYS = "valid_key_123:tenant_a";
+    const ctx = resolveTenantContext("rei_key_unconfigured_hacker");
+    expect(ctx.isAllowed).toBe(false);
+    expect(ctx.status).toBe(401);
+  });
+
+  it("allows configured keys when REI_API_KEYS is set", function () {
+    process.env.REI_API_KEYS = "valid_key_123:tenant_a";
+    const ctx = resolveTenantContext("valid_key_123");
+    expect(ctx.isAllowed).toBe(true);
+    expect(ctx.tenantId).toBe("tenant_a");
+  });
+
+  it("allows fallback key in unconfigured non-production environment", function () {
+    delete process.env.REI_API_KEYS;
+    delete process.env.REI_API_KEY;
+    const prevEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
+    const ctx = resolveTenantContext("rei_key_dev_probe");
+    expect(ctx.isAllowed).toBe(true);
+    process.env.NODE_ENV = prevEnv;
+  });
+});
