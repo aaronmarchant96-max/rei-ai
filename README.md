@@ -33,7 +33,7 @@ archived_at: null
 
 **The Underlying Methodology:** Powered by **CARDO REI**, a formal cognitive architecture that enforces pre-flight quality gates, isolates the decisive "Hinge" of every prompt, separates verified facts from assumptions, and returns auditable execution receipts.
 
-Backed by **1105 automated tests across 97 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
+Backed by **1112 automated tests across 98 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -197,7 +197,7 @@ export OPENAI_API_KEY="local-dev-key"
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **1105 passing tests across 97 suites** |
+| Automated Tests | **1112 passing tests across 98 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) *(orig. Celeron J4105)* |
 | Monthly Operating Budget | ~$60/month *(expanded evaluation & tool testing volume)* |

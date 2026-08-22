@@ -1,6 +1,15 @@
 {
-  "generatedAt": "2026-08-22T08:01:40.439Z",
+  "generatedAt": "2026-08-22T22:25:51.437Z",
   "entries": [
+    {
+      "hash": "d2cef8f",
+      "date": "2026-08-22",
+      "subject": "fix(gateway): preserve execution evidence integrity [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(gateway): preserve execution evidence integrity"
+    },
     {
       "hash": "f617b19",
       "date": "2026-08-20",
@@ -1527,16 +1536,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 169,
-    "totalTags": 172,
+    "totalEntries": 170,
+    "totalTags": 173,
     "byTag": {
-      "test": 57,
+      "test": 58,
       "manual": 101,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 169
+      "2026-08": 170
     }
   }
 }
