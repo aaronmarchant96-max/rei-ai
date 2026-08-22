@@ -47,10 +47,12 @@ Backed by **1069 automated tests across 94 test suites** (100% green CI), REI.ai
 - **Evidence & Provenance Architecture:** Emits canonical `RequestEvidence` objects downstream of execution with explicit epistemic tiers (`observed`, `derived`, `modeled`, `replayed`, `unavailable`). Missing telemetry renders "Evidence unavailable" — zero substitution of `$0.00`.
 - **Prompt-Freeze & Deterministic Caching Protocol:** Sustains an **88.0% reconstructed effective prompt cache ratio** (136.2M cached / 154.7M input tokens across $N=1,500$ reconstructed model turns) by freezing prefix order and generating SHA-256 deterministic cache keys. [See caching protocol](docs/CACHING_RULES.md).
 - **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
+- **Instance-Local Single-Flight & Provider Concurrency Pools:** Coalesces in-flight identical non-streaming requests (`stream: false`) per tenant using SHA-256 canonical hashing while managing bounded concurrency pools for Gemini and Groq (`maxConcurrent: 4`, `maxQueueDepth: 20`).
+- **Delivery Integrity Gate (`delivery-gated-v1`):** Validates transport completion, finish reason normalization (`stop`), raw vs. display parse parity, code fence balance, and explicit artifact contracts. Incomplete or truncated responses are marked `savingsEligibility: "excluded"` and contribute `$0.00` to eligible savings.
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 1069 automated tests across 94 test suites to catch routing, security, and cost-contract regressions.
+- **Empirical Rigor & Fast Local Loop:** Backed by 1069 automated tests across 94 test suites with an 11.4-second fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -216,7 +218,10 @@ npm run dev:full
 # Or run the headless cognitive proxy gateway alone
 npm run server
 
-# Run full test suite (94 test suites, 1069 tests)
+# Run fast test loop (~11.4s on 12-thread machine via 50% maxWorkers)
+npm run test:fast
+
+# Run serial test suite (94 test suites, 1069 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

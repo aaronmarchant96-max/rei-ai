@@ -118,7 +118,10 @@ Direct, reproducible machine telemetry captured from live production endpoints (
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
 | 1069 tests / 94 suites | `npm test -- --runInBand` | ✅ (current run; canonical count is generated in `src/data/claims.json`) |
-| Build succeeds | `npm run build` | ✅ (2,301 modules transformed) |
+| Fast Jest worker test loop (11.38s warm median) | `npm run test:fast` | ✅ 11.38s warm median (range: 11.28–11.42s) via `maxWorkers=50%` across 94 suites and 1069 tests |
+| Gateway Concurrency & Single-Flight (9 tests) | `npm test -- --runInBand src/lib/gatewayConcurrency.test.js` | ✅ Tenant-scoped single-flight coalescing, leader/follower cost accounting, Gemini & Groq pools |
+| Delivery Integrity Gate (9 tests) | `npm test -- --runInBand src/lib/deliveryIntegrityGate.test.ts` | ✅ Transport, finish_reason normalization, raw/display parse parity, delivery-gated-v1 economic policy |
+| Build succeeds | `npm run build` | ✅ (2,295 modules transformed) |
 | Lint 0 errors / 236 warnings | `npm run lint` | ✅ (warnings: intentional no-console + legacy no-unused-vars) |
 | Live API HTTP 200 | `curl https://prompthound-labs.vercel.app/api/cfai` | ✅ (2026-08-17 verified) |
 | 200-entry decision store ring buffer | `npm test -- --runInBand src/lib/decisionStore.test.ts` | ✅ 8 tests |
