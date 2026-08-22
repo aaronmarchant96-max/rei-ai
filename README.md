@@ -19,6 +19,12 @@ archived_at: null
 > Originally built on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now running on a Lenovo ThinkPad T14 Gen 2a (AMD Ryzen 5 PRO 5650U, 16GB RAM) with a ~$60/month operating budget:
 > **1.848B development & evaluation tokens processed through the OpenCode/DeepSeek build workflow for $23.52, with 97.35% measured input-cache hits across 1,000+ deployments.**
 
+> [!TIP]
+> ### 🪝 The Bootstrap Loop
+> **Are you going to try using it?**
+> 
+> Because the live gateway is online. When you throw a prompt at `/api/v1/chat/completions`, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. **That's the whole point.**
+
 ---
 
 ## 🎯 What is REI.ai?

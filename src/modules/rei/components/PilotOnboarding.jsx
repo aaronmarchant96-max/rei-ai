@@ -115,7 +115,24 @@ console.log("Receipt:", response.receipt);`;
         </div>
       </div>
 
-      {/* Base URL & Key Config */}
+      {/* ── Founder's Invitation: The Bootstrap Loop 🪝 ── */}
+      <div style={{ background: "linear-gradient(135deg, rgba(240, 201, 101, 0.12) 0%, rgba(15, 23, 42, 0.95) 100%)", border: "1px solid rgba(240, 201, 101, 0.4)", borderRadius: "12px", padding: "20px 24px", marginBottom: "28px", display: "flex", gap: "16px", alignItems: "flex-start" }}>
+        <div style={{ fontSize: "24px", background: "rgba(240, 201, 101, 0.15)", border: "1px solid rgba(240, 201, 101, 0.3)", borderRadius: "10px", width: "42px", height: "42px", display: "flex", alignItems: "center", justifyCenter: "center", flexShrink: 0 }}>
+          🪝
+        </div>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--amber, #f0c965)" }}>The Bootstrap Loop</span>
+            <span style={{ fontSize: "10px", fontWeight: 700, background: "rgba(240, 201, 101, 0.2)", color: "var(--amber, #f0c965)", padding: "2px 8px", borderRadius: "10px" }}>C-Activity Flywheel</span>
+          </div>
+          <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 6px 0", color: "#f8fafc" }}>
+            Are you going to try using it?
+          </h3>
+          <p style={{ fontSize: "13px", color: "var(--text-muted, #cbd5e1)", lineHeight: "1.6", margin: 0 }}>
+            Because the demo is live. And when you throw a prompt at the gateway, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. <b>That’s the whole point.</b>
+          </p>
+        </div>
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "32px" }}>
         <div style={{ background: "var(--surface-lift, #0f172a)", border: "1px solid var(--border, #334155)", borderRadius: "12px", padding: "20px" }}>
           <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 800, color: "var(--amber, #f0c965)", marginBottom: "8px" }}>

@@ -300,7 +300,49 @@ export default function ToolsLanding({ onOpenTool }) {
           </button>
         </div>
 
-        <p className="relative z-10 text-[#565B72] text-xs mt-4 px-1">
+        {/* ── Founder's Invitation: The Bootstrap Loop 🪝 ── */}
+        <motion.div 
+          initial="hidden" animate="visible" variants={fadeIn}
+          className="relative z-10 w-full max-w-3xl mx-auto mt-10 bg-gradient-to-r from-[#181510] via-[#241d12] to-[#181510] border border-[var(--amber)]/40 rounded-2xl p-5 md:p-6 text-left shadow-[0_0_25px_rgba(226,163,61,0.15)] overflow-hidden"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-xl bg-[var(--amber)]/10 border border-[var(--amber)]/30 flex items-center justify-center shrink-0 text-xl shadow-inner">
+              🪝
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--amber)]">The Bootstrap Loop</span>
+                <span className="bg-[var(--amber)]/20 text-[var(--amber)] font-mono text-[9px] px-2 py-0.5 rounded-full font-bold uppercase border border-[var(--amber)]/30">C-Activity Flywheel</span>
+              </div>
+              <h3 className="text-white font-medium text-base sm:text-lg mb-2">
+                Are you going to try using it?
+              </h3>
+              <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-4 font-light">
+                Because the demo is live. And when you throw a prompt at the gateway, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. <strong className="text-white font-medium">That’s the whole point.</strong>
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => onOpenTool({ tool: "pilot" })}
+                  className="inline-flex items-center gap-2 bg-[var(--amber)] text-black px-4 py-2 rounded-lg font-mono text-xs font-bold uppercase hover:bg-[var(--amber-hover)] transition-all shadow-md"
+                >
+                  <span>🚀 Join the Loop (`/pilot`)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <a
+                  href={REPO_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-white font-mono transition-colors border border-gray-800 hover:border-gray-600 px-3.5 py-2 rounded-lg"
+                >
+                  <span>Star on GitHub</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <p className="relative z-10 text-[#565B72] text-xs mt-6 px-1">
           1. Pick a domain → 2. Ask your question → 3. See the reasoning, not just the answer.
         </p>
       </motion.header>
