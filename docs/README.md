@@ -23,6 +23,7 @@ If you are evaluating this repository for the first time, follow this reading pa
 | Document | What it covers | Status |
 | :--- | :--- | :--- |
 | [**CARDO REI Methodology**](CARDO_REI.md) | **One-sheet.** Formal method spec: find the hinge → test/measure/trace → verified evidence → human gate → iterate | Canonical |
+| [**Business Plan & Commercial Strategy**](BUSINESS_PLAN.md) | **Authoritative.** 4-phase commercial roadmap, ICP, unit economics, BYOK model, financial projections | Canonical |
 | [**Portfolio Overview**](PORTFOLIO_OVERVIEW.md) | **Authoritative.** 3-pillar engineering portfolio index (REI.ai, Arena Harness, Family Archive) | Canonical |
 | [**Defense-in-Depth Control Matrix**](DEFENSE_IN_DEPTH_CONTROL_MATRIX.md) | **Authoritative.** 8-stage control pipeline mapping human, multi-model, and machine verification to neutralize LLM cognitive failure modes | Canonical |
 | [**Information-Theoretic Architecture**](INFORMATION_THEORETIC_ARCHITECTURE.md) | **Authoritative.** Formal spec: CARDO REI 8-phase loop, complexity index, CARDO GUARD equation, claim stratification, testable hypotheses | Canonical |
