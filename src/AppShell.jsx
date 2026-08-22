@@ -164,8 +164,10 @@ export default function AppShell() {
                       : "PromptHound Labs | The Furnace";
   }, [tool]);
 
+  const isChatWorkspace = tool === "rei" || tool === "cfai";
+
   return (
-    <div className={`app-shell ${tool !== "tools" ? "is-workspace" : ""}`}>
+    <div className={`app-shell ${isChatWorkspace ? "is-workspace" : ""}`}>
       <header className="sticky top-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-border px-6 py-4 flex items-center justify-between">
         <a href="/" className="flex items-center gap-3 cursor-pointer rei-brand" onClick={(e) => {
           if (window.location.pathname === "/" && !window.location.hash) {
@@ -198,7 +200,7 @@ export default function AppShell() {
         )}
       </header>
 
-      <main className={`shell-main ${tool !== "tools" ? "shell-main--workspace" : ""}`}>
+      <main className={`shell-main ${isChatWorkspace ? "shell-main--workspace" : ""}`}>
         <Suspense fallback={<LoadingShell />}>
           {tool === "tools" ? (
             <ErrorBoundary toolName="Tools">
