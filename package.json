@@ -19,7 +19,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:visual": "node scripts/verify-workspace-layout.mjs",
-    "prebuild": "node scripts/validate-eval-integrity.mjs --check && node scripts/validate-app-shell.mjs && node scripts/validate-docs.mjs && node scripts/validate-model-rates.mjs --check && node scripts/index-source.mjs",
+    "prebuild": "node scripts/extract-error-gaps.mjs --check && node scripts/validate-eval-integrity.mjs --check && node scripts/validate-app-shell.mjs && node scripts/validate-docs.mjs && node scripts/validate-model-rates.mjs --check && node scripts/index-source.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "server": "node server.js",

@@ -53,21 +53,22 @@ function extractEntries() {
     if (!block.includes("[caught:")) continue;
 
     const [hash, date, subject, body] = block.trim().split("\x00");
+    const fullText = ((subject || "") + "\n" + (body || "")).trim();
 
-    const tagMatches = [...body.matchAll(/\[caught:\s*([^\]]+)\]/gi)];
+    const tagMatches = [...fullText.matchAll(/\[caught:\s*([^\]]+)\]/gi)];
     const tags = tagMatches
       .map(m => m[1].trim().toLowerCase())
       .filter(t => VALID_TAGS.has(t));
 
     if (tags.length === 0) continue;
 
-    const contextLine = body
+    const contextLine = fullText
       .split("\n")
       .find(line => line.includes("[caught:"))
       ?.replace(/\[caught:[^\]]*\]/gi, "")
       .replace(/^[\s,;\-:—]+|[\s,;\-:—]+$/g, "")
       .replace(/^["']+|["']+$/g, "")
-      .trim() || "";
+      .trim() || subject || "";
 
     entries.push({
       hash: hash?.slice(0, 7) || "",

@@ -12,6 +12,18 @@ This file defines the two-agent model (AGY = analysis/plan, EXEC = execution) pl
 
 ---
 
+> [!IMPORTANT]
+> ### 🚨 Mandatory Agent Context & Instruction Stack
+> Every AI agent, Codex assistant, and CLI session operating on this repository MUST read and adhere to the following instruction stack before executing plan steps or code modifications:
+> 1. [`AGENTS.md`](AGENTS.md) — Multi-Agent Workflow Spec, Triage Gates & Worktree Safety
+> 2. [`TOKEN_SAVERS.md`](TOKEN_SAVERS.md) — Token Efficiency Tactics & Anti-Fabrication Rules
+> 3. [`WORKFLOW_QUICKREF.md`](WORKFLOW_QUICKREF.md) — 3-Layer Execution Contract
+> 4. [`docs/SESSION_HANDOFF.md`](docs/SESSION_HANDOFF.md) — Active Session Context & Pinned Commit
+> 5. [`docs/REI_CODE_PATTERNS.md`](docs/REI_CODE_PATTERNS.md) — Authoritative Code Patterns
+> 6. [`opencode.json`](opencode.json) — Instruction Stack Registration Vector
+
+---
+
 ## Task Triage Gate (runs before every task)
 
 Before AGY is invoked, classify the task:
@@ -311,4 +323,4 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 
 ---
 
-*Last reviewed: 2026-08-22 (added gateway contract battery tests, serverRouter boundary, unified auth engine, delivery-gated economics, and canonical business plan). Stale after: 2026-08-23. Verify rules before executing.*
+*Last reviewed: 2026-08-22 (repaired extract-error-gaps to scan commit subjects + bodies [169 entries], added --check to prebuild, refreshed review timestamp, and added mandatory Codex/agent instruction stack directive). Stale after: 2026-08-23. Verify rules before executing.*

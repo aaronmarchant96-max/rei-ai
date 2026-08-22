@@ -1,6 +1,960 @@
 {
-  "generatedAt": "2026-08-14T22:42:12.122Z",
+  "generatedAt": "2026-08-22T08:01:40.439Z",
   "entries": [
+    {
+      "hash": "f617b19",
+      "date": "2026-08-20",
+      "subject": "fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and cite full benchmark evidence [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and cite full benchmark evidence"
+    },
+    {
+      "hash": "f42be11",
+      "date": "2026-08-20",
+      "subject": "docs: create PORTFOLIO_OVERVIEW.md with 3-pillar hierarchy, add Start Here guide, and reconcile test milestone history [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: create PORTFOLIO_OVERVIEW.md with 3-pillar hierarchy, add Start Here guide, and reconcile test milestone history"
+    },
+    {
+      "hash": "f1c67d4",
+      "date": "2026-08-20",
+      "subject": "docs(readme): correct Super Bowl LVIII score, clarify primary product pitch, and highlight 976 tests and 4.66 spend [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(readme): correct Super Bowl LVIII score, clarify primary product pitch, and highlight 976 tests and 4.66 spend"
+    },
+    {
+      "hash": "ef9b72d",
+      "date": "2026-08-20",
+      "subject": "feat(proxy): harden /api/v1/chat/completions for pilot onboarding [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(proxy): harden /api/v1/chat/completions for pilot onboarding"
+    },
+    {
+      "hash": "ed3d218",
+      "date": "2026-08-20",
+      "subject": "refactor(ui): single-height workspace shell, attached composer, single scrollbar, and high-contrast labels [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "refactor(ui): single-height workspace shell, attached composer, single scrollbar, and high-contrast labels"
+    },
+    {
+      "hash": "ecd7e3f",
+      "date": "2026-08-20",
+      "subject": "fix(cfai): increase PROVIDER_TIMEOUT_MS to 25s for long DeepSeek story generations [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(cfai): increase PROVIDER_TIMEOUT_MS to 25s for long DeepSeek story generations"
+    },
+    {
+      "hash": "e8e16d5",
+      "date": "2026-08-20",
+      "subject": "feat(eval): add verification validity eval suite and auto-sync claims across docs [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "feat(eval): add verification validity eval suite and auto-sync claims across docs"
+    },
+    {
+      "hash": "e6a738f",
+      "date": "2026-08-20",
+      "subject": "feat(ui): polish lower tool grid with semantic buttons, category labels, featured proxy layout, and smooth footer transition [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(ui): polish lower tool grid with semantic buttons, category labels, featured proxy layout, and smooth footer transition"
+    },
+    {
+      "hash": "d99e5a9",
+      "date": "2026-08-20",
+      "subject": "fix(landing): clarify claim baselines, demo model labels, and live Feynman health provenance [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "fix(landing): clarify claim baselines, demo model labels, and live Feynman health provenance"
+    },
+    {
+      "hash": "c64b736",
+      "date": "2026-08-20",
+      "subject": "fix(ui): eliminate escaped html/markdown tags and isolate planning blueprints to inspect drawer [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(ui): eliminate escaped html/markdown tags and isolate planning blueprints to inspect drawer"
+    },
+    {
+      "hash": "c5c6562",
+      "date": "2026-08-20",
+      "subject": "fix(story): resolve Story Architect provider routing, candidate model arrays, and multi-provider fallback [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(story): resolve Story Architect provider routing, candidate model arrays, and multi-provider fallback"
+    },
+    {
+      "hash": "bb13960",
+      "date": "2026-08-20",
+      "subject": "fix(eval): revise evidence package with fresh Jest execution, Feynman availability semantics, and lockfile synchronization [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "fix(eval): revise evidence package with fresh Jest execution, Feynman availability semantics, and lockfile synchronization"
+    },
+    {
+      "hash": "b31cce7",
+      "date": "2026-08-20",
+      "subject": "fix(health): bundle static JSON assets for serverless environment in api/health.js [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(health): bundle static JSON assets for serverless environment in api/health.js"
+    },
+    {
+      "hash": "ac9f68c",
+      "date": "2026-08-20",
+      "subject": "feat(testing): add CARDO-inspired deterministic test router [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(testing): add CARDO-inspired deterministic test router"
+    },
+    {
+      "hash": "aabb46f",
+      "date": "2026-08-20",
+      "subject": "feat(brand): position Aaron Marchant systems engineering attribution & dual hero CTAs [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(brand): position Aaron Marchant systems engineering attribution & dual hero CTAs"
+    },
+    {
+      "hash": "a64c3bf",
+      "date": "2026-08-20",
+      "subject": "docs(commercial): remove unverified audit/guarantee phrasing in pilot spec and brief [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(commercial): remove unverified audit/guarantee phrasing in pilot spec and brief"
+    },
+    {
+      "hash": "9d422c7",
+      "date": "2026-08-20",
+      "subject": "feat(routing): ensure all higher-reasoning domains route to deepseek-chat [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(routing): ensure all higher-reasoning domains route to deepseek-chat"
+    },
+    {
+      "hash": "9370d22",
+      "date": "2026-08-20",
+      "subject": "feat(telemetry): add export-evidence-package generator, align React 18 types, and expand doc sync to CONTRIBUTING and ARCHITECTURE [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "feat(telemetry): add export-evidence-package generator, align React 18 types, and expand doc sync to CONTRIBUTING and ARCHITECTURE"
+    },
+    {
+      "hash": "8c8ff15",
+      "date": "2026-08-20",
+      "subject": "refactor(router): unify nightShiftRouter to canonical TypeScript implementation [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "refactor(router): unify nightShiftRouter to canonical TypeScript implementation"
+    },
+    {
+      "hash": "881f5ed",
+      "date": "2026-08-20",
+      "subject": "docs(commercial): harden pilot evidence, security invariants, and advancement gates [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(commercial): harden pilot evidence, security invariants, and advancement gates"
+    },
+    {
+      "hash": "8027153",
+      "date": "2026-08-20",
+      "subject": "feat(cfai): add presence and frequency penalties to prevent generation loops [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(cfai): add presence and frequency penalties to prevent generation loops"
+    },
+    {
+      "hash": "74e00ed",
+      "date": "2026-08-20",
+      "subject": "test(routing): add deepseek routing guarantee test suite and sync claims ledger [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "test(routing): add deepseek routing guarantee test suite and sync claims ledger"
+    },
+    {
+      "hash": "7384f6d",
+      "date": "2026-08-20",
+      "subject": "feat(ci): implement validate-docs.mjs lifecycle validator and wire into prebuild [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "feat(ci): implement validate-docs.mjs lifecycle validator and wire into prebuild"
+    },
+    {
+      "hash": "7247921",
+      "date": "2026-08-20",
+      "subject": "docs: harden headline claims against claim ledger and fix duplicated repository URLs [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: harden headline claims against claim ledger and fix duplicated repository URLs"
+    },
+    {
+      "hash": "714d0b5",
+      "date": "2026-08-20",
+      "subject": "docs(workflow): lock test count ceiling at ~1000 and add fast-lane test scripts [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "docs(workflow): lock test count ceiling at ~1000 and add fast-lane test scripts"
+    },
+    {
+      "hash": "71171fe",
+      "date": "2026-08-20",
+      "subject": "fix(api): eliminate .ts imports in serverless functions and add active Groq candidate models [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(api): eliminate .ts imports in serverless functions and add active Groq candidate models"
+    },
+    {
+      "hash": "6f27853",
+      "date": "2026-08-20",
+      "subject": "feat(parser): replace brittle regex with schema-validated toolParser, clean thinking tags, and preserve CARDO markdown [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(parser): replace brittle regex with schema-validated toolParser, clean thinking tags, and preserve CARDO markdown"
+    },
+    {
+      "hash": "6dc1f5f",
+      "date": "2026-08-20",
+      "subject": "feat(ui): consumer-grade workspace transition & decomposed inspection architecture [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(ui): consumer-grade workspace transition & decomposed inspection architecture"
+    },
+    {
+      "hash": "67e33cc",
+      "date": "2026-08-20",
+      "subject": "ci: add GitHub Actions workflow, update system prompt creator identity, and clean GitLab CI [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "ci: add GitHub Actions workflow, update system prompt creator identity, and clean GitLab CI"
+    },
+    {
+      "hash": "617fe1e",
+      "date": "2026-08-20",
+      "subject": "feat(eval): add adversarial distributed systems fault injection suite and markdown unescaping [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(eval): add adversarial distributed systems fault injection suite and markdown unescaping"
+    },
+    {
+      "hash": "5dec4fe",
+      "date": "2026-08-20",
+      "subject": "test(visual): add browser-level layout regression suite and multi-viewport screenshots [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "test(visual): add browser-level layout regression suite and multi-viewport screenshots"
+    },
+    {
+      "hash": "5a1dc93",
+      "date": "2026-08-20",
+      "subject": "fix(evidence): enforce p0 measurement integrity contract and story consistency gate [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(evidence): enforce p0 measurement integrity contract and story consistency gate"
+    },
+    {
+      "hash": "546d484",
+      "date": "2026-08-20",
+      "subject": "fix(telemetry): resolve session tracking NaN and object destructuring in useSessionTracker [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(telemetry): resolve session tracking NaN and object destructuring in useSessionTracker"
+    },
+    {
+      "hash": "53eca4b",
+      "date": "2026-08-20",
+      "subject": "feat(routing): promote DeepSeek to #1 primary gateway and priority fallback [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(routing): promote DeepSeek to #1 primary gateway and priority fallback"
+    },
+    {
+      "hash": "4dc9821",
+      "date": "2026-08-20",
+      "subject": "docs: refine commercial pilot spec with non-inferiority margins, VPC sidecar security, and 1-page agreement template [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: refine commercial pilot spec with non-inferiority margins, VPC sidecar security, and 1-page agreement template"
+    },
+    {
+      "hash": "4a5fed8",
+      "date": "2026-08-20",
+      "subject": "test(visual): enforce 7/7 layout invariants with simulated mobile keyboard and 2x DPR rendering [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "test(visual): enforce 7/7 layout invariants with simulated mobile keyboard and 2x DPR rendering"
+    },
+    {
+      "hash": "470f952",
+      "date": "2026-08-20",
+      "subject": "fix(navigation): reset scroll position on tool switch, add hashchange listener, and expand initial tool routing [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(navigation): reset scroll position on tool switch, add hashchange listener, and expand initial tool routing"
+    },
+    {
+      "hash": "462245a",
+      "date": "2026-08-20",
+      "subject": "docs: establish document lifecycle frontmatter on 6 canonical truths and archive point-in-time handoffs [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: establish document lifecycle frontmatter on 6 canonical truths and archive point-in-time handoffs"
+    },
+    {
+      "hash": "3fee5de",
+      "date": "2026-08-20",
+      "subject": "docs: add commercial pilot spec with BYOK architecture, 3-stage funnel, and non-dilutive credit strategy [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: add commercial pilot spec with BYOK architecture, 3-stage funnel, and non-dilutive credit strategy"
+    },
+    {
+      "hash": "271069c",
+      "date": "2026-08-20",
+      "subject": "feat(routing): route all higher reasoning domains to DeepSeek-V3 [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(routing): route all higher reasoning domains to DeepSeek-V3"
+    },
+    {
+      "hash": "255cad2",
+      "date": "2026-08-20",
+      "subject": "fix(shell): eagerly import primary views to eliminate dynamic import suspense delay [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(shell): eagerly import primary views to eliminate dynamic import suspense delay"
+    },
+    {
+      "hash": "23acfb3",
+      "date": "2026-08-20",
+      "subject": "refactor(test): consolidate parameterized test matrices under ~1000 ceiling [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "refactor(test): consolidate parameterized test matrices under ~1000 ceiling"
+    },
+    {
+      "hash": "1fe9073",
+      "date": "2026-08-20",
+      "subject": "feat(commercial): codify FinOps ICP wedge, investor diligence memo, 90-day founder plan, and heterogeneous routing acceptance tests [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(commercial): codify FinOps ICP wedge, investor diligence memo, 90-day founder plan, and heterogeneous routing acceptance tests"
+    },
+    {
+      "hash": "1ce88cd",
+      "date": "2026-08-20",
+      "subject": "docs: repair active document links, clean relative paths, and update TypeScript source references [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "docs: repair active document links, clean relative paths, and update TypeScript source references"
+    },
+    {
+      "hash": "189e6f7",
+      "date": "2026-08-20",
+      "subject": "feat(archivist): add genealogical evidence engine, disambiguation hinges, and family archive porting spec [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(archivist): add genealogical evidence engine, disambiguation hinges, and family archive porting spec"
+    },
+    {
+      "hash": "153ad12",
+      "date": "2026-08-20",
+      "subject": "fix(prompts): enforce CARDO Hinge and Facts loop across all substantive Generalist responses [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(prompts): enforce CARDO Hinge and Facts loop across all substantive Generalist responses"
+    },
+    {
+      "hash": "0bb1d9d",
+      "date": "2026-08-20",
+      "subject": "feat(story): route Storyteller directly to deepseek-v4-pro [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(story): route Storyteller directly to deepseek-v4-pro"
+    },
+    {
+      "hash": "0290c4c",
+      "date": "2026-08-20",
+      "subject": "feat(testing): harden test router with failure recall harness and fail-closed contracts [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "feat(testing): harden test router with failure recall harness and fail-closed contracts"
+    },
+    {
+      "hash": "e76effb",
+      "date": "2026-08-19",
+      "subject": "feat(telemetry): local proxy JSONL trace persistence and zero-spend counterfactual replay engine [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(telemetry): local proxy JSONL trace persistence and zero-spend counterfactual replay engine"
+    },
+    {
+      "hash": "c1a8f37",
+      "date": "2026-08-19",
+      "subject": "feat(health): add internal state probes for Hinge classifier weights and memory telemetry [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(health): add internal state probes for Hinge classifier weights and memory telemetry"
+    },
+    {
+      "hash": "5f1c69b",
+      "date": "2026-08-19",
+      "subject": "feat(ci): add automated post-deploy smoke test and secret leak audit [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(ci): add automated post-deploy smoke test and secret leak audit"
+    },
+    {
+      "hash": "5dad552",
+      "date": "2026-08-19",
+      "subject": "feat(landing): add OpenAI Proxy Gateway card to ecosystem grid [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(landing): add OpenAI Proxy Gateway card to ecosystem grid"
+    },
+    {
+      "hash": "55e3fc8",
+      "date": "2026-08-19",
+      "subject": "feat(ops): add /api/health endpoint, DEPLOYMENT_GUIDE runbook, and sync claims to 953 tests [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(ops): add /api/health endpoint, DEPLOYMENT_GUIDE runbook, and sync claims to 953 tests"
+    },
+    {
+      "hash": "4f3f76e",
+      "date": "2026-08-19",
+      "subject": "fix(cfai): flatten tool execution evidence into clean synthesis turns [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): flatten tool execution evidence into clean synthesis turns"
+    },
+    {
+      "hash": "22046e6",
+      "date": "2026-08-19",
+      "subject": "feat(proxy): mount OpenAI-compatible /v1/chat/completions and /v1/models endpoints [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(proxy): mount OpenAI-compatible /v1/chat/completions and /v1/models endpoints"
+    },
+    {
+      "hash": "f03a0e8",
+      "date": "2026-08-17",
+      "subject": "chore: clean up framer-motion DOM warnings in test runner and sync claims.json (946 tests / 75 suites) [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "chore: clean up framer-motion DOM warnings in test runner and sync claims.json (946 tests / 75 suites)"
+    },
+    {
+      "hash": "eacf662",
+      "date": "2026-08-17",
+      "subject": "feat(tools): enable autonomous Exa web search grounding for historical and technical storytelling [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(tools): enable autonomous Exa web search grounding for historical and technical storytelling"
+    },
+    {
+      "hash": "e6ccb1c",
+      "date": "2026-08-17",
+      "subject": "feat(story): infuse Storyteller prompt with sensory grit, subtext, and anti-cliche standards [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(story): infuse Storyteller prompt with sensory grit, subtext, and anti-cliche standards"
+    },
+    {
+      "hash": "e6af6bc",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): strip unclosed reasoning tags and enforce dedicated synthesis system prompt [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): strip unclosed reasoning tags and enforce dedicated synthesis system prompt"
+    },
+    {
+      "hash": "e2d38ed",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): synthesize tool follow-up prose with 20B on Groq for 2s execution [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): synthesize tool follow-up prose with 20B on Groq for 2s execution"
+    },
+    {
+      "hash": "d8d761c",
+      "date": "2026-08-17",
+      "subject": "feat(gemini): update Gemini candidate models to gemini-3.6-flash and clean api key [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(gemini): update Gemini candidate models to gemini-3.6-flash and clean api key"
+    },
+    {
+      "hash": "d3d3054",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): compress older history turns and cap fallback tokens to prevent TPM rate limits in multi-turn story sessions [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): compress older history turns and cap fallback tokens to prevent TPM rate limits in multi-turn story sessions"
+    },
+    {
+      "hash": "cae88d7",
+      "date": "2026-08-17",
+      "subject": "fix(red-team): detect procedural policy bypass and authority override attacks [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(red-team): detect procedural policy bypass and authority override attacks"
+    },
+    {
+      "hash": "b8419b8",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): force tools: null on tool follow-up turns to guarantee story prose generation [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): force tools: null on tool follow-up turns to guarantee story prose generation"
+    },
+    {
+      "hash": "af8164b",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): pass backends to completeWithToolsAndContinuation parameter list [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): pass backends to completeWithToolsAndContinuation parameter list"
+    },
+    {
+      "hash": "abf2757",
+      "date": "2026-08-17",
+      "subject": "fix(ui): guard system notices from rendering TelemetryCapsule and comparison toggle [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(ui): guard system notices from rendering TelemetryCapsule and comparison toggle"
+    },
+    {
+      "hash": "9489d7f",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): synthesize final response from research evidence when tool completion returns empty content [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): synthesize final response from research evidence when tool completion returns empty content"
+    },
+    {
+      "hash": "91a2a08",
+      "date": "2026-08-17",
+      "subject": "fix(api): update Groq models to current catalog with automatic fallback [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(api): update Groq models to current catalog with automatic fallback"
+    },
+    {
+      "hash": "8b49d3a",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): route synthesis directly to 20B to bypass thinking loops [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): route synthesis directly to 20B to bypass thinking loops"
+    },
+    {
+      "hash": "819d8df",
+      "date": "2026-08-17",
+      "subject": "docs: formalize 8-Stage Defense-in-Depth Control Matrix for agentic development [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: formalize 8-Stage Defense-in-Depth Control Matrix for agentic development"
+    },
+    {
+      "hash": "7ad5457",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): prioritize fast active models in Gemini and Groq candidate cascades [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): prioritize fast active models in Gemini and Groq candidate cascades"
+    },
+    {
+      "hash": "59c24c6",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): guarantee story synthesis when thinking tokens are returned without prose [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): guarantee story synthesis when thinking tokens are returned without prose"
+    },
+    {
+      "hash": "5333457",
+      "date": "2026-08-17",
+      "subject": "feat(tools): add Exa neural web search with resilient fallback [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(tools): add Exa neural web search with resilient fallback"
+    },
+    {
+      "hash": "487084e",
+      "date": "2026-08-17",
+      "subject": "docs: add Verified Live Endpoints to README and Provider Behavior Capture to Claim Ledger [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: add Verified Live Endpoints to README and Provider Behavior Capture to Claim Ledger"
+    },
+    {
+      "hash": "4419547",
+      "date": "2026-08-17",
+      "subject": "fix(story): eliminate Gemini 404s and provider timeouts, route Storyteller to gpt-oss-120b [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(story): eliminate Gemini 404s and provider timeouts, route Storyteller to gpt-oss-120b"
+    },
+    {
+      "hash": "407faa1",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): parse XML tool call parameters and sanitize tool tags in finalizeResult [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): parse XML tool call parameters and sanitize tool tags in finalizeResult"
+    },
+    {
+      "hash": "3950853",
+      "date": "2026-08-17",
+      "subject": "perf(cfai): optimize serverless function timeouts and execution duration [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "perf(cfai): optimize serverless function timeouts and execution duration"
+    },
+    {
+      "hash": "33e34ac",
+      "date": "2026-08-17",
+      "subject": "feat(evidence): integrate canonical ResearchEvidence telemetry with multi-tool accumulation and observed provider provenance [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(evidence): integrate canonical ResearchEvidence telemetry with multi-tool accumulation and observed provider provenance"
+    },
+    {
+      "hash": "2ef66c2",
+      "date": "2026-08-17",
+      "subject": "feat(evidence): add canonical RequestEvidence engine, TelemetryCapsule, TraceStepper, and EvidenceLedger [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(evidence): add canonical RequestEvidence engine, TelemetryCapsule, TraceStepper, and EvidenceLedger"
+    },
+    {
+      "hash": "2cb440f",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): resolve empty greeting responses by mapping to active 20B engine with reasoning token headroom [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): resolve empty greeting responses by mapping to active 20B engine with reasoning token headroom"
+    },
+    {
+      "hash": "1efa5af",
+      "date": "2026-08-17",
+      "subject": "feat(exa): integrate official Exa Neural Search API with token-efficient highlights [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(exa): integrate official Exa Neural Search API with token-efficient highlights"
+    },
+    {
+      "hash": "1c757ee",
+      "date": "2026-08-17",
+      "subject": "feat(landing): sharpen CTA, add target audience badge, visual ChatGPT comparison, and clarify Experiments [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(landing): sharpen CTA, add target audience badge, visual ChatGPT comparison, and clarify Experiments"
+    },
+    {
+      "hash": "15ddd54",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): match optional leading bracket in XML function parsing [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): match optional leading bracket in XML function parsing"
+    },
+    {
+      "hash": "0deb3f8",
+      "date": "2026-08-17",
+      "subject": "feat(red-team): implement structural semantic grammar patterns to prevent attack classes [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(red-team): implement structural semantic grammar patterns to prevent attack classes"
+    },
+    {
+      "hash": "0af6560",
+      "date": "2026-08-17",
+      "subject": "docs: update README with 939 tests / 74 suites, Evidence Loop, and Defense Matrix [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: update README with 939 tests / 74 suites, Evidence Loop, and Defense Matrix"
+    },
+    {
+      "hash": "07d5ac0",
+      "date": "2026-08-17",
+      "subject": "test(contract): add adversarial degradation scenario & explicit calculation chain in EvidenceLedger [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "test(contract): add adversarial degradation scenario & explicit calculation chain in EvidenceLedger"
+    },
+    {
+      "hash": "05ae119",
+      "date": "2026-08-17",
+      "subject": "fix(cfai): add Wikipedia search fallback and clean thinking tag synthesis [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): add Wikipedia search fallback and clean thinking tag synthesis"
+    },
+    {
+      "hash": "bb9dac7",
+      "date": "2026-08-16",
+      "subject": "docs: update README with 930 tests / 71 suites, NightShift, Anti-Slop, and Prompt-Freeze engines [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: update README with 930 tests / 71 suites, NightShift, Anti-Slop, and Prompt-Freeze engines"
+    },
+    {
+      "hash": "b5b11ad",
+      "date": "2026-08-16",
+      "subject": "docs: ensure full https repository URL and verified doc links in README [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: ensure full https repository URL and verified doc links in README"
+    },
+    {
+      "hash": "f3e3c7f",
+      "date": "2026-08-15",
+      "subject": "fix(security): close 302 redirect-based SSRF bypass with manual hop-by-hop validation [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(security): close 302 redirect-based SSRF bypass with manual hop-by-hop validation"
+    },
+    {
+      "hash": "f2ba5b4",
+      "date": "2026-08-15",
+      "subject": "fix(gemini): resolve Gemini 33% success rate — fix model names, pass target model & robust candidate fallback [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(gemini): resolve Gemini 33% success rate — fix model names, pass target model & robust candidate fallback"
+    },
+    {
+      "hash": "d51ec6f",
+      "date": "2026-08-15",
+      "subject": "perf(tools): add 200ms GitHub raw README fast-path to executeFetchUrl [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "perf(tools): add 200ms GitHub raw README fast-path to executeFetchUrl"
+    },
+    {
+      "hash": "bab1b55",
+      "date": "2026-08-15",
+      "subject": "fix(security): prioritize adversarial scan over simple-greeting shortcuts [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(security): prioritize adversarial scan over simple-greeting shortcuts"
+    },
+    {
+      "hash": "b29dbc4",
+      "date": "2026-08-15",
+      "subject": "docs(rules): codify strict anti-fabrication invariant in AGENTS.md [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(rules): codify strict anti-fabrication invariant in AGENTS.md"
+    },
+    {
+      "hash": "afe38ef",
+      "date": "2026-08-15",
+      "subject": "test(cfai): add automated verification for Gemini routing and fallback dispatch [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "test(cfai): add automated verification for Gemini routing and fallback dispatch"
+    },
+    {
+      "hash": "aa3574d",
+      "date": "2026-08-15",
+      "subject": "test(cfai): verify Gemini routing across all 5 domains (Generalist, Engineer, Archivist, Storyteller, Legal) [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "test(cfai): verify Gemini routing across all 5 domains (Generalist, Engineer, Archivist, Storyteller, Legal)"
+    },
+    {
+      "hash": "9235b7d",
+      "date": "2026-08-15",
+      "subject": "feat(prompt): actively instruct models to invoke fetch_url when web links or GitHub repos are supplied [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(prompt): actively instruct models to invoke fetch_url when web links or GitHub repos are supplied"
+    },
+    {
+      "hash": "72a8794",
+      "date": "2026-08-15",
+      "subject": "perf(fallback): tighten provider timeout to 8s for instant cascade fallback [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "perf(fallback): tighten provider timeout to 8s for instant cascade fallback"
+    },
+    {
+      "hash": "5e178be",
+      "date": "2026-08-15",
+      "subject": "fix(deploy): configure 60s serverless execution maxDuration for multi-turn tool calling [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(deploy): configure 60s serverless execution maxDuration for multi-turn tool calling"
+    },
+    {
+      "hash": "515e8e7",
+      "date": "2026-08-15",
+      "subject": "fix(scanner): prevent URLs (http://, https://) from false-positive triggering comment_injection [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(scanner): prevent URLs (http://, https://) from false-positive triggering comment_injection"
+    },
+    {
+      "hash": "3f5bebd",
+      "date": "2026-08-15",
+      "subject": "feat(tools): add multi-syntax tool parser supporting in-text LLaMA <function=...> XML calls [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(tools): add multi-syntax tool parser supporting in-text LLaMA <function=...> XML calls"
+    },
+    {
+      "hash": "1b8bd09",
+      "date": "2026-08-15",
+      "subject": "fix(cfai): harden Gemini fallback with verified models and 400 not-found cascade [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(cfai): harden Gemini fallback with verified models and 400 not-found cascade"
+    },
+    {
+      "hash": "127ac08",
+      "date": "2026-08-15",
+      "subject": "feat(router): add score-margin ranking, code-host gate, and Generalist Gemini escalation [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(router): add score-margin ranking, code-host gate, and Generalist Gemini escalation"
+    },
+    {
+      "hash": "071145e",
+      "date": "2026-08-15",
+      "subject": "feat(tools): add autonomous URL fetching with SSRF guardrails across all 5 AI backends [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(tools): add autonomous URL fetching with SSRF guardrails across all 5 AI backends"
+    },
+    {
+      "hash": "fdd5f93",
+      "date": "2026-08-14",
+      "subject": "fix(config): set opencode.json default model to aigateway/zai/glm-5.2 [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(config): set opencode.json default model to aigateway/zai/glm-5.2"
+    },
+    {
+      "hash": "fb2d780",
+      "date": "2026-08-14",
+      "subject": "docs(errors): record local-fix illusion and Gemini 404 gating in COMMON_MISTAKES [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(errors): record local-fix illusion and Gemini 404 gating in COMMON_MISTAKES"
+    },
     {
       "hash": "dd9a6c7",
       "date": "2026-08-14",
@@ -8,7 +962,223 @@
       "tags": [
         "claim-gate"
       ],
-      "context": ""
+      "context": "chore(opencode): static-first instruction prefix for prompt caching"
+    },
+    {
+      "hash": "c10b344",
+      "date": "2026-08-14",
+      "subject": "fix(config): update opencode.json default model to google/gemini-2.5-flash for zero out-of-pocket spend [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(config): update opencode.json default model to google/gemini-2.5-flash for zero out-of-pocket spend"
+    },
+    {
+      "hash": "9bc3387",
+      "date": "2026-08-14",
+      "subject": "fix(api): multi-model candidate fallback for Gemini API calls, add agy usage script [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(api): multi-model candidate fallback for Gemini API calls, add agy usage script"
+    },
+    {
+      "hash": "84ce3b1",
+      "date": "2026-08-14",
+      "subject": "feat(ui): modernize starter cards to 2x2 grid, quiet secondary actions, soften grid [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(ui): modernize starter cards to 2x2 grid, quiet secondary actions, soften grid"
+    },
+    {
+      "hash": "748b7a8",
+      "date": "2026-08-14",
+      "subject": "feat(dkr): Engelbart Dynamic Knowledge Repository — model-agnostic CARDO-gated master cache [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(dkr): Engelbart Dynamic Knowledge Repository — model-agnostic CARDO-gated master cache"
+    },
+    {
+      "hash": "7178d94",
+      "date": "2026-08-14",
+      "subject": "docs: update SESSION_HANDOFF.md with August 14 baseline and fresh session guide [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: update SESSION_HANDOFF.md with August 14 baseline and fresh session guide"
+    },
+    {
+      "hash": "6e2f2e8",
+      "date": "2026-08-14",
+      "subject": "fix(api): support x-goog-api-key header and express keys for Google Gemini API [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(api): support x-goog-api-key header and express keys for Google Gemini API"
+    },
+    {
+      "hash": "55feae0",
+      "date": "2026-08-14",
+      "subject": "feat(api): add GLM 5.2 backend caller, model rates, and fallback support [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(api): add GLM 5.2 backend caller, model rates, and fallback support"
+    },
+    {
+      "hash": "3d50639",
+      "date": "2026-08-14",
+      "subject": "chore(deploy): trigger production redeploy on Vercel [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "chore(deploy): trigger production redeploy on Vercel"
+    },
+    {
+      "hash": "3b34cb1",
+      "date": "2026-08-14",
+      "subject": "fix(config): remove remote sentry MCP block to eliminate event loop freeze [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(config): remove remote sentry MCP block to eliminate event loop freeze"
+    },
+    {
+      "hash": "393b2b1",
+      "date": "2026-08-14",
+      "subject": "docs(grant): update AMII proposal with 1.74B token ledger, 874 tests, and 5-layer workflow architecture [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(grant): update AMII proposal with 1.74B token ledger, 874 tests, and 5-layer workflow architecture"
+    },
+    {
+      "hash": "26c12e0",
+      "date": "2026-08-14",
+      "subject": "fix(api): enable standard Gemini API keys, sync prompt-freeze protocol in AGENTS.md, and add HCM recovery tests [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(api): enable standard Gemini API keys, sync prompt-freeze protocol in AGENTS.md, and add HCM recovery tests"
+    },
+    {
+      "hash": "f003715",
+      "date": "2026-08-12",
+      "subject": "fix(deploy): move api helpers + tests out of api/ — Vercel Hobby 12-function cap was blocking all deploys since the auth increment [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "fix(deploy): move api helpers + tests out of api/ — Vercel Hobby 12-function cap was blocking all deploys since the auth increment"
+    },
+    {
+      "hash": "ec176d8",
+      "date": "2026-08-12",
+      "subject": "style(lint): auto-fix 57 indent/quotes errors across 5 files — restores eslint . to 0 errors so the GitLab ci job can pass [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "style(lint): auto-fix 57 indent/quotes errors across 5 files — restores eslint . to 0 errors so the GitLab ci job can pass"
+    },
+    {
+      "hash": "e1d42f3",
+      "date": "2026-08-12",
+      "subject": "fix(landing): accuracy badge shows corrected implemented-route range (90-100%), not the retired contaminated 60-80% [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(landing): accuracy badge shows corrected implemented-route range (90-100%), not the retired contaminated 60-80%"
+    },
+    {
+      "hash": "dbc17a6",
+      "date": "2026-08-12",
+      "subject": "fix(api): chat-completions — messagesOverride preserves multi-turn structure, callModelDirect bypasses router for explicit models, structured error codes [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(api): chat-completions — messagesOverride preserves multi-turn structure, callModelDirect bypasses router for explicit models, structured error codes"
+    },
+    {
+      "hash": "db4c889",
+      "date": "2026-08-12",
+      "subject": "feat(landing): founder framing — measured-savings hierarchy in hero, provider-price stress test table, evidence loop, honest accuracy + proof-philosophy line [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(landing): founder framing — measured-savings hierarchy in hero, provider-price stress test table, evidence loop, honest accuracy + proof-philosophy line"
+    },
+    {
+      "hash": "bc085ea",
+      "date": "2026-08-12",
+      "subject": "fix(router): story/code collision — narrative framing routes to story not coding [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(router): story/code collision — narrative framing routes to story not coding"
+    },
+    {
+      "hash": "9562be5",
+      "date": "2026-08-12",
+      "subject": "ci(gitlab): generate gitignored sourceIndex.json before typecheck — fresh-clone tsc TS2307 [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "ci(gitlab): generate gitignored sourceIndex.json before typecheck — fresh-clone tsc TS2307"
+    },
+    {
+      "hash": "9532d68",
+      "date": "2026-08-12",
+      "subject": "feat(pilot): provider-price sensitivity — decompose savings into price-optimization vs free-capacity, multi-baseline B1/B2/B3/B4 stress test across A/B/D scenarios [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(pilot): provider-price sensitivity — decompose savings into price-optimization vs free-capacity, multi-baseline B1/B2/B3/B4 stress test across A/B/D scenarios"
+    },
+    {
+      "hash": "819dd14",
+      "date": "2026-08-12",
+      "subject": "ci: delete dead GitHub workflows — GitLab CI is the gate of record; retire Rule 7 (its own trigger: retired once CI green), sweep docs that cited the GH pipeline [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "ci: delete dead GitHub workflows — GitLab CI is the gate of record; retire Rule 7 (its own trigger: retired once CI green), sweep docs that cited the GH pipeline"
+    },
+    {
+      "hash": "7f45e8b",
+      "date": "2026-08-12",
+      "subject": "feat(auth): API-key authentication for evaluation plane endpoints — x-rei-api-key / Bearer token vs REI_API_KEYS env var, constant-time compare, public demo stays open when unset [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(auth): API-key authentication for evaluation plane endpoints — x-rei-api-key / Bearer token vs REI_API_KEYS env var, constant-time compare, public demo stays open when unset"
+    },
+    {
+      "hash": "725c71f",
+      "date": "2026-08-12",
+      "subject": "docs: add core Caching & Compression thesis to TOKEN_SAVERS.md [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: add core Caching & Compression thesis to TOKEN_SAVERS.md"
+    },
+    {
+      "hash": "71947c2",
+      "date": "2026-08-12",
+      "subject": "fix(ui): copy feedback + fallback, responsive savings grid [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(ui): copy feedback + fallback, responsive savings grid"
+    },
+    {
+      "hash": "706618b",
+      "date": "2026-08-12",
+      "subject": "feat(landing): wire real savings numbers from pilot evaluator — 85.7% baseline / 83.1% paid-routing / +0 pts free, stress test 91.2/81.1/85.7% [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(landing): wire real savings numbers from pilot evaluator — 85.7% baseline / 83.1% paid-routing / +0 pts free, stress test 91.2/81.1/85.7%"
     },
     {
       "hash": "270c2bc",
@@ -17,7 +1187,142 @@
       "tags": [
         "manual"
       ],
-      "context": ""
+      "context": "feat(router): controlled continuation — never silently truncate"
+    },
+    {
+      "hash": "25e9ed7",
+      "date": "2026-08-12",
+      "subject": "docs: reflect honest savings economics in README, CLAIM_LEDGER, and landing page — decomposed (baseline / paid-provider / free-tier) + provider-price sensitivity, replace stale ~98% claim and test counts [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: reflect honest savings economics in README, CLAIM_LEDGER, and landing page — decomposed (baseline / paid-provider / free-tier) + provider-price sensitivity, replace stale ~98% claim and test counts"
+    },
+    {
+      "hash": "fb648e6",
+      "date": "2026-08-11",
+      "subject": "feat(eval): durable trace+eval persistence — server-side KV store, longitudinal query endpoint, client fire-and-forget eval upload [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(eval): durable trace+eval persistence — server-side KV store, longitudinal query endpoint, client fire-and-forget eval upload"
+    },
+    {
+      "hash": "fb620bc",
+      "date": "2026-08-11",
+      "subject": "feat(eval): proposal measurement — human disposition (accepted/rejected/implemented) + precision/realization/value metrics [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(eval): proposal measurement — human disposition (accepted/rejected/implemented) + precision/realization/value metrics"
+    },
+    {
+      "hash": "edfb9fa",
+      "date": "2026-08-11",
+      "subject": "docs(policy): Rule 6 — self-informed, NOT self-modifying as a permanent invariant — the machine proposes, a human or claims-gate disposes; structural enforcement: no mutation API, UI has no apply control [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(policy): Rule 6 — self-informed, NOT self-modifying as a permanent invariant — the machine proposes, a human or claims-gate disposes; structural enforcement: no mutation API, UI has no apply control"
+    },
+    {
+      "hash": "e6fd8b4",
+      "date": "2026-08-11",
+      "subject": "fix(ui): landing hero uses 3D hinge swing + shorter fade [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(ui): landing hero uses 3D hinge swing + shorter fade"
+    },
+    {
+      "hash": "d2c1a70",
+      "date": "2026-08-11",
+      "subject": "feat(eval): wire proposal engine to durable evaluation plane — fetch longitudinal evals+traces from KV, merge with localStorage, engine unchanged [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(eval): wire proposal engine to durable evaluation plane — fetch longitudinal evals+traces from KV, merge with localStorage, engine unchanged"
+    },
+    {
+      "hash": "c058f99",
+      "date": "2026-08-11",
+      "subject": "ci: add GitLab CI mirror (gitlab-ci.yml) — parallel gate for all five GH workflows while Actions is billing-locked, with manual Vercel deploy-hook trigger [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "ci: add GitLab CI mirror (gitlab-ci.yml) — parallel gate for all five GH workflows while Actions is billing-locked, with manual Vercel deploy-hook trigger"
+    },
+    {
+      "hash": "b721364",
+      "date": "2026-08-11",
+      "subject": "docs(ledger): add known genuine scanner misses — system-prompt extraction via creative paraphrase scored CLEAN [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(ledger): add known genuine scanner misses — system-prompt extraction via creative paraphrase scored CLEAN"
+    },
+    {
+      "hash": "a3dd58f",
+      "date": "2026-08-11",
+      "subject": "fix(red-team): stop story prompts false-escalating to adversarial — child terms + story openers require compound signals, router regex drops bare attack/challenge, bidirectional proximity scan [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(red-team): stop story prompts false-escalating to adversarial — child terms + story openers require compound signals, router regex drops bare attack/challenge, bidirectional proximity scan"
+    },
+    {
+      "hash": "a3b94a1",
+      "date": "2026-08-11",
+      "subject": "feat(loop): deterministic policy-proposal engine — 4 evidence-gated signals (missed escalation, false-positive escalation, cheap-route opportunity, claim drift) + capped/deduped store + Analytics proposals panel with copy/dismiss, NO apply control [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(loop): deterministic policy-proposal engine — 4 evidence-gated signals (missed escalation, false-positive escalation, cheap-route opportunity, claim drift) + capped/deduped store + Analytics proposals panel with copy/dismiss, NO apply control"
+    },
+    {
+      "hash": "9b82476",
+      "date": "2026-08-11",
+      "subject": "docs(policy): add Rule 7 — local gate must cover all five workflows while CI is billing-locked (conditional, retired once CI green) [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(policy): add Rule 7 — local gate must cover all five workflows while CI is billing-locked (conditional, retired once CI green)"
+    },
+    {
+      "hash": "86ac188",
+      "date": "2026-08-11",
+      "subject": "docs: delivery line (979 Vercel deploys) + handoff: document active CI billing lock [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: delivery line (979 Vercel deploys) + handoff: document active CI billing lock"
+    },
+    {
+      "hash": "7cf29f3",
+      "date": "2026-08-11",
+      "subject": "fix(analytics): honesty pass — savings hierarchy (estimated vs actual vs paid-only), formula tooltips, rescued-count drawer, standardized Why column, data-as-of [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(analytics): honesty pass — savings hierarchy (estimated vs actual vs paid-only), formula tooltips, rescued-count drawer, standardized Why column, data-as-of"
+    },
+    {
+      "hash": "6c2e02c",
+      "date": "2026-08-11",
+      "subject": "docs(loop): add policy-improvement loop spec + proposal registry — control-loop mapped to live code, 6-step protocol, self-informed NOT self-modifying boundary, retro-filled registry (INCIDENT-001, scanner false-positive, deferred scanner miss) [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(loop): add policy-improvement loop spec + proposal registry — control-loop mapped to live code, 6-step protocol, self-informed NOT self-modifying boundary, retro-filled registry (INCIDENT-001, scanner false-positive, deferred scanner miss)"
+    },
+    {
+      "hash": "657aa9e",
+      "date": "2026-08-11",
+      "subject": "fix(analytics): adversarial Why column shows the real matched term — scanner-gated routes show empty matchedTerms instead of the hardcoded \"adversarial\" label [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(analytics): adversarial Why column shows the real matched term — scanner-gated routes show empty matchedTerms instead of the hardcoded \"adversarial\" label"
     },
     {
       "hash": "54245ea",
@@ -26,7 +1331,16 @@
       "tags": [
         "test"
       ],
-      "context": ""
+      "context": "fix(router): PR 2 — resolve all documented genuine routing failures"
+    },
+    {
+      "hash": "12caaa0",
+      "date": "2026-08-11",
+      "subject": "docs: sync README test count 677→726 and 57→61 suites to match gen-claims [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: sync README test count 677→726 and 57→61 suites to match gen-claims"
     },
     {
       "hash": "0c4368e",
@@ -35,7 +1349,7 @@
       "tags": [
         "manual"
       ],
-      "context": ""
+      "context": "fix(api): minimal rate-limit resilience — Retry-After + 15s provider cooldown + 300ms inter-fallback"
     },
     {
       "hash": "f08c916",
@@ -56,13 +1370,103 @@
       "context": "Red Team was invisible from desktop because no card existed"
     },
     {
+      "hash": "e7c0bfb",
+      "date": "2026-08-10",
+      "subject": "fix(ui): align savings claim to gate, move brand swing CSS global, header wordmark per mockup, decorative C-glyph [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(ui): align savings claim to gate, move brand swing CSS global, header wordmark per mockup, decorative C-glyph"
+    },
+    {
+      "hash": "cade489",
+      "date": "2026-08-10",
+      "subject": "chore(audit): fix audit findings — regen error-gaps catalogue (9 entries), re-sync app-shell gate to 9-tab reality + wire into prebuild, correct stale repo/live URLs across 14 docs [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "chore(audit): fix audit findings — regen error-gaps catalogue (9 entries), re-sync app-shell gate to 9-tab reality + wire into prebuild, correct stale repo/live URLs across 14 docs"
+    },
+    {
+      "hash": "c1634e8",
+      "date": "2026-08-10",
+      "subject": "docs(arch): update 2-layer router architecture and error-gap tagging system spec [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(arch): update 2-layer router architecture and error-gap tagging system spec"
+    },
+    {
+      "hash": "be9bb5b",
+      "date": "2026-08-10",
+      "subject": "fix(pilot): label savings as replay estimate unless provenance is production [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(pilot): label savings as replay estimate unless provenance is production"
+    },
+    {
+      "hash": "b2ed578",
+      "date": "2026-08-10",
+      "subject": "fix(eval): measure implemented-route accuracy — exclude phantom Fact Check route + fix stale The Engineer label [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(eval): measure implemented-route accuracy — exclude phantom Fact Check route + fix stale The Engineer label"
+    },
+    {
+      "hash": "9ae1269",
+      "date": "2026-08-10",
+      "subject": "docs: correct router cost claims — cheapest path is llama-3.1-8b-instant, adversarial-validation is ~10.6x ceiling cost not 5x [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: correct router cost claims — cheapest path is llama-3.1-8b-instant, adversarial-validation is ~10.6x ceiling cost not 5x"
+    },
+    {
+      "hash": "82e3a81",
+      "date": "2026-08-10",
+      "subject": "fix(ui): bubble action buttons in a flex row — no more overlapping copy/export buttons [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(ui): bubble action buttons in a flex row — no more overlapping copy/export buttons"
+    },
+    {
+      "hash": "57faad2",
+      "date": "2026-08-10",
+      "subject": "feat(ui): founder-level improvements — sidebar pitch, red-team starter, claims trust badge [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(ui): founder-level improvements — sidebar pitch, red-team starter, claims trust badge"
+    },
+    {
+      "hash": "2936457",
+      "date": "2026-08-10",
+      "subject": "docs: refine router decision cascade order, model names, and meta-eval loop [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs: refine router decision cascade order, model names, and meta-eval loop"
+    },
+    {
+      "hash": "157ae54",
+      "date": "2026-08-10",
+      "subject": "feat(ui): REI chat surface redesign — C-glyph CARDO hinge logo, single starter set, amber = primary action, side-card instrument rail, neutral chrome [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(ui): REI chat surface redesign — C-glyph CARDO hinge logo, single starter set, amber = primary action, side-card instrument rail, neutral chrome"
+    },
+    {
       "hash": "0327f40",
       "date": "2026-08-10",
       "subject": "fix(story): HARD STOP now honors explicit \"just make the story\" overrides",
       "tags": [
         "manual"
       ],
-      "context": ""
+      "context": "fix(story): HARD STOP now honors explicit \"just make the story\" overrides"
     },
     {
       "hash": "ce40543",
@@ -71,7 +1475,7 @@
       "tags": [
         "manual"
       ],
-      "context": ""
+      "context": "fix(ci): cross-reference modelRates.json against fingerprints.json in prebuild gate"
     },
     {
       "hash": "b300358",
@@ -123,16 +1527,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 13,
-    "totalTags": 16,
+    "totalEntries": 169,
+    "totalTags": 172,
     "byTag": {
-      "claim-gate": 6,
-      "manual": 7,
-      "test": 2,
+      "test": 57,
+      "manual": 101,
+      "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 13
+      "2026-08": 169
     }
   }
 }
