@@ -132,4 +132,15 @@ describe("resolveTenantContext P0 auth security gate", function () {
     expect(ctx.isAllowed).toBe(true);
     process.env.NODE_ENV = prevEnv;
   });
+
+  it("strictly rejects unconfigured rei_key_pilot in production mode when REI_API_KEYS is absent", function () {
+    delete process.env.REI_API_KEYS;
+    delete process.env.REI_API_KEY;
+    const prevEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    const ctx = resolveTenantContext("rei_key_pilot");
+    expect(ctx.isAllowed).toBe(false);
+    expect(ctx.status).toBe(401);
+    process.env.NODE_ENV = prevEnv;
+  });
 });

@@ -138,14 +138,13 @@ export function computeServerCost(modelName = "deepseek-chat", inputTokens = 0, 
 }
 
 export function normalizeFinishReason(rawReason) {
-  if (rawReason === "unknown") return "unknown";
-  if (!rawReason) return "stop";
+  if (!rawReason) return "unknown";
   const r = String(rawReason).toLowerCase().trim();
   if (r === "stop" || r === "end_turn" || r === "stop_sequence") return "stop";
   if (r === "length" || r === "max_tokens" || r === "max_tokens_exceeded") return "length";
   if (r === "content_filter" || r === "safety") return "content_filter";
   if (r === "cancelled" || r === "abort") return "cancelled";
-  return "stop";
+  return "unknown";
 }
 
 export function evaluateDeliveryIntegrity({ rawContent = "", finishReason = null, transportCompleted = true }) {

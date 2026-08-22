@@ -151,9 +151,10 @@ export default async function handler(req, res) {
       return errorReply(res, 503, ERROR_CODES.CF_MODEL_UNAVAILABLE, "All upstream model backends unavailable");
     }
 
-    const executedModel = cfaiRes.model || selectedModel;
+    const rawExecutedModel = cfaiRes.model || selectedModel;
+    const executedModel = String(rawExecutedModel).replace(/\s*\([^)]*\)/g, "").trim();
     const isTruncated = Boolean(cfaiRes.truncated || cfaiRes.isTruncated);
-    const rawFinishReason = cfaiRes.finishReason || (isTruncated ? "length" : null);
+    const rawFinishReason = cfaiRes.finishReason || (isTruncated ? "length" : "stop");
     const deliveryGate = evaluateDeliveryIntegrity({
       rawContent: replyText,
       finishReason: rawFinishReason,
@@ -178,26 +179,31 @@ export default async function handler(req, res) {
     const receipt = {
       request_id: requestId,
       tenant_id: tenantCtx.tenantId,
+      selected_model: selectedModel,
+      executed_model: executedModel,
+      fallback_executed: Boolean(cfaiRes.fallbackExecuted),
       observed_cost_usd: costs.observedCostUsd,
       modeled_difference_usd: costs.modeledDifferenceUsd,
       eligible_savings_usd: isComplete ? costs.modeledDifferenceUsd : 0,
       savings_policy_version: "delivery-gated-v1",
       savings_eligibility: isComplete ? "eligible" : "excluded",
       finish_status: isComplete ? "complete" : deliveryGate.finishStatus,
+      usage_provenance: Boolean(cfaiRes.usage && cfaiRes.usage.prompt_tokens) ? "observed" : "estimated",
+      cost_provenance: "modeled",
       single_flight_coalesced: Boolean(cfaiRes.singleFlightCoalesced),
       execution_role: cfaiRes.executionRole || "leader"
     };
 
     // 5. Streaming vs Non-Streaming OpenAI Response
     if (stream) {
-      return sendStreamingResponse(res, completionId, createdTime, selectedModel, replyText, usage, normalizedFinish, receipt);
+      return sendStreamingResponse(res, completionId, createdTime, executedModel, replyText, usage, normalizedFinish, receipt);
     }
 
     return res.status(200).json({
       id: completionId,
       object: "chat.completion",
       created: createdTime,
-      model: selectedModel,
+      model: executedModel,
       choices: [
         {
           index: 0,

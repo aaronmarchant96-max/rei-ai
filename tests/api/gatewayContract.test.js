@@ -192,7 +192,7 @@ describe("REI.ai Gateway Contract — Single-Instance Coalescing & Health", () =
     expect(res.body.gateway).toBe("chat-completions");
   });
 
-  it("10. Direct modelOverride executes requested model and records receipt model accuracy", async () => {
+  it("10. Direct modelOverride executes requested model and records receipt model accuracy and provenance", async () => {
     const req = createMockReq({
       body: {
         model: "llama-3.3-70b-versatile",
@@ -206,18 +206,24 @@ describe("REI.ai Gateway Contract — Single-Instance Coalescing & Health", () =
     expect(res.statusCode).toBe(200);
     expect(res.body.model).toBe("llama-3.3-70b-versatile");
     expect(res.body.receipt).toBeDefined();
-    expect(res.body.receipt.savings_policy_version).toBe("delivery-gated-v1");
+    expect(res.body.receipt.selected_model).toBe("llama-3.3-70b-versatile");
+    expect(res.body.receipt.executed_model).toBe("llama-3.3-70b-versatile");
+    expect(res.body.receipt.usage_provenance).toBeDefined();
+    expect(res.body.receipt.cost_provenance).toBe("modeled");
   });
 
-  it("11. Incomplete or length finish_reason yields $0 eligible savings and excluded status", async () => {
-    const { evaluateDeliveryIntegrity } = await import("../../shared/lib/serverRouter.js");
+  it("11. Missing finish_reason yields unknown status, delivery gate failure, and $0 eligible savings", async () => {
+    const { evaluateDeliveryIntegrity, normalizeFinishReason } = await import("../../shared/lib/serverRouter.js");
+    
+    expect(normalizeFinishReason(null)).toBe("unknown");
+
     const gateResult = evaluateDeliveryIntegrity({
       rawContent: "Partial content without terminal stop",
-      finishReason: "length",
+      finishReason: null,
       transportCompleted: true
     });
 
     expect(gateResult.deliveryGatePassed).toBe(false);
-    expect(gateResult.finishStatus).toBe("length");
+    expect(gateResult.finishStatus).toBe("unknown");
   });
 });

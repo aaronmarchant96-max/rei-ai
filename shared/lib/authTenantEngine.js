@@ -23,13 +23,19 @@ export function resolveTenantContext(apiKey) {
     return { isAllowed: false, status: 401, code: "CF_AUTH_REQUIRED", message: "Authentication required. Provide a valid Bearer key (e.g. Bearer rei_key_...)." };
   }
 
+  const isProduction = process.env.NODE_ENV === "production";
   const envKeys = process.env.REI_API_KEYS;
   const singleKey = process.env.REI_API_KEY;
 
   let keyEntries = [];
   if (envKeys) {
     keyEntries = envKeys.split(",").map((s) => s.trim()).filter(Boolean);
+  } else if (isProduction) {
+    if (singleKey) {
+      keyEntries = [`${singleKey}:pilot:100:60`];
+    }
   } else {
+    // Non-production (development / test) default keys
     keyEntries = [
       "rei_key_pilot:pilot:100:60",
       "rei_key_quota_test:quota_test:10:60",
