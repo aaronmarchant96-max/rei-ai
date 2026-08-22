@@ -138,6 +138,9 @@ export interface RequestEvidence {
     cardoCompliant: boolean;
     provenance: "observed" | "unavailable";
   };
+
+  routerDecision?: any;
+  estimatedCost?: number | null;
 }
 
 export interface BuildEvidenceInput {

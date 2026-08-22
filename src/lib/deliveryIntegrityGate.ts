@@ -18,8 +18,8 @@ export interface DeliveryGateInput {
   prompt?: string;
   rawContent?: string;
   displayContent?: string;
-  finishReason?: string;
-  providerFinishReason?: string;
+  finishReason?: string | null;
+  providerFinishReason?: string | null;
   transportCompleted?: boolean;
   requiredArtifacts?: ArtifactRequirements | null;
 }
