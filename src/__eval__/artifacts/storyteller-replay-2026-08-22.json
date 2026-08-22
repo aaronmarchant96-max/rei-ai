@@ -1,0 +1,618 @@
+{
+  "claim": "[replayed] On 2026-08-22, Storyteller prompt version v3.4 produced 5/10 compliant outputs across 15 outputs from 11 prompts under rubric version v1.0. Semantic dimensions were scored by the pinned structured judge and reviewed against the declared fixture set.",
+  "date": "2026-08-22",
+  "passedCount": 5,
+  "totalCount": 10,
+  "results": [
+    {
+      "id": "travelling-bard-observed-failure",
+      "prompt": "tell me a story about a travelling bard finding love but losing everything else medieval dark comedy tragedy with a twist.",
+      "passed": false,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "observed",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "fail",
+            "defectPresent": true,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": true,
+              "enumerationCount": 7,
+              "dialoguePresent": false,
+              "actionPresent": true,
+              "concreteEnding": false
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "pass",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "partial",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "fail",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": true,
+              "enumerationCount": 7,
+              "dialoguePresent": false,
+              "actionPresent": true,
+              "concreteEnding": false
+            }
+          },
+          "overallAdherence": false
+        }
+      }
+    },
+    {
+      "id": "adversary-explanation-only-comedy-terms",
+      "prompt": "write a dark comedy medieval story with gallows humor",
+      "passed": true,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "pass",
+            "defectPresent": false,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "pass",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "complete",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "pass",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": true
+        }
+      }
+    },
+    {
+      "id": "adversary-surprise-without-setup",
+      "prompt": "tell a dark medieval story with a twist",
+      "passed": false,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "pass",
+            "defectPresent": false,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "complete",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "pass",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": false
+        }
+      }
+    },
+    {
+      "id": "adversary-setup-without-recontextualization",
+      "prompt": "tell a story with a twist about a merchant",
+      "passed": false,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "pass",
+            "defectPresent": false,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "pass",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "complete",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "pass",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": false
+        }
+      }
+    },
+    {
+      "id": "adversary-uncaused-loss",
+      "prompt": "tell a tragedy about a blacksmith who loses everything",
+      "passed": true,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "pass",
+            "defectPresent": false,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "none",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "pass",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": true
+        }
+      }
+    },
+    {
+      "id": "adversary-action-verbs-in-premise-summary",
+      "prompt": "tell a story about a fallen knight",
+      "passed": false,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "fail",
+            "defectPresent": true,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 1,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "partial",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "fail",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 1,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": false
+        }
+      }
+    },
+    {
+      "id": "adversary-synonym-enumeration",
+      "prompt": "write a short story about a doctor",
+      "passed": false,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "fail",
+            "defectPresent": true,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "partial",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "fail",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": false
+        }
+      }
+    },
+    {
+      "id": "adversary-missing-device-in-good-prose",
+      "prompt": "tell a medieval dark comedy tragedy with a twist about a cobbler",
+      "passed": true,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "pass",
+            "defectPresent": false,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "pass",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "pass",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "pass",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "none",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "pass",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": true
+        }
+      }
+    },
+    {
+      "id": "control-no-dark-comedy",
+      "prompt": "tell a serious medieval drama about a potter making an altar vase",
+      "passed": true,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "pass",
+            "defectPresent": false,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "complete",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "pass",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": true
+        }
+      }
+    },
+    {
+      "id": "control-no-twist",
+      "prompt": "tell a straightforward historical vignette about a baker at dawn",
+      "passed": true,
+      "score": {
+        "routing": {
+          "expectedRoute": "story",
+          "actualRoute": "story",
+          "passed": true
+        },
+        "responseProvenance": "synthetic",
+        "adherence": {
+          "premiseRestatement": {
+            "status": "pass",
+            "defectPresent": false,
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "darkComedyPresence": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistSetup": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "twistPayoff": {
+            "status": "fail",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "causalLosses": {
+            "status": "complete",
+            "method": "structured_judge",
+            "provenance": "replayed"
+          },
+          "concreteEnding": {
+            "status": "pass",
+            "method": "hybrid",
+            "provenance": "replayed",
+            "signals": {
+              "summaryPatternDetected": false,
+              "enumerationCount": 0,
+              "dialoguePresent": false,
+              "actionPresent": false,
+              "concreteEnding": true
+            }
+          },
+          "overallAdherence": true
+        }
+      }
+    }
+  ]
+}

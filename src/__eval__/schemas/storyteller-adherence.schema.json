@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StorytellerAdherenceFixture",
+  "type": "object",
+  "required": [
+    "id",
+    "prompt",
+    "response",
+    "expectedRoute",
+    "responseProvenance",
+    "requirements",
+    "expectedAdherence"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "prompt": { "type": "string" },
+    "response": { "type": "string" },
+    "expectedRoute": { "type": "string", "enum": ["story"] },
+    "responseProvenance": { "type": "string", "enum": ["observed", "replayed", "synthetic"] },
+    "requirements": {
+      "type": "object",
+      "required": ["darkComedy", "twist", "dramatizedLoss", "concreteEnding"],
+      "properties": {
+        "darkComedy": { "type": "boolean" },
+        "twist": { "type": "boolean" },
+        "dramatizedLoss": { "type": "boolean" },
+        "concreteEnding": { "type": "boolean" }
+      }
+    },
+    "expectedAdherence": {
+      "type": "object",
+      "required": ["premiseRestatement", "darkComedyPresence", "twistSetup", "twistPayoff", "causalLosses", "concreteEnding"],
+      "properties": {
+        "premiseRestatement": { "type": "boolean" },
+        "darkComedyPresence": { "type": "boolean" },
+        "twistSetup": { "type": "boolean" },
+        "twistPayoff": { "type": "boolean" },
+        "causalLosses": { "type": "string", "enum": ["complete", "partial", "none"] },
+        "concreteEnding": { "type": "boolean" }
+      }
+    }
+  },
+  "additionalProperties": true
+}

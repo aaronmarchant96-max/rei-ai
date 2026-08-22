@@ -1,0 +1,212 @@
+[
+  {
+    "id": "travelling-bard-observed-failure",
+    "prompt": "tell me a story about a travelling bard finding love but losing everything else medieval dark comedy tragedy with a twist.",
+    "response": "Alaric’s boots, scuffed from a thousand miles, found the cobbles of Grimshaw’s market square with the same weary rhythm that had carried him from town to town for years. The wind smelled of wet stone and the faint tang of tallow that clung to the inns’ walls, a scent that never left the air of any village he’d passed. He lifted his lute, its strings humming beneath his fingers, and began to sing. He sang of kings who fell to their own pride, of wolves that howled at the moon and ate the poor, and of a woman who could turn a simple joke into a dagger of truth. His voice was light, but his timing was razor‑sharp, a jester’s wit wrapped in a minstrel’s melody. He was the laughing minstrel, the traveling jester, the man who could turn a funeral into a festival with a single quip. A crowd gathered, drawn by the promise of a good laugh and a good song. Alaric’s eyes flicked over the faces – the old man with a cracked knuckle, the child with a crooked grin, the innkeeper’s daughter who had a scar on her cheek that glinted in the lamplight. He began his act with a flourish: a quick song about a knight who lost his armor to a sly fox, followed by a mock battle in which he used a feather as a sword. The crowd roared, but Alaric’s laughter was the one that rang true. It was Maris who caught his attention, not for her beauty but for her stubbornness. She was the innkeeper’s daughter, a woman of thirty, with a braid that fell over her shoulder like a dark ribbon. She stood at the edge of the crowd, her hand gripping the wooden rail of the inn’s porch, eyes narrowed as if she were listening to a secret. When Alaric’s song shifted to a lament about a love lost to a cruel fate, she lifted her chin, and the crowd fell silent. Alaric noticed her, and his heart, usually so light, felt the weight of a sudden, stubborn desire. He set down his lute and walked toward her, the sound of his steps echoing against the cobbles. “What’s that? A sigh of doom or a laugh in disguise?” he asked, voice dripping with mockery. Maris didn’t answer. She simply stared at him, her gaze a mix of defiance and something like longing. Alaric, used to being the center of attention, felt the sharp sting of being the only one who could see past her to the woman who had stolen his breath. He found himself wanting to stay, to hold her in his world, to let her be the one who made his songs about more than just jest. He had never stayed in one place. His life was a series of fleeting moments, a string of songs, a trail of laughter. The idea of anchoring himself, of becoming a part of the same village, was both thrilling and terrifying. He wanted the love that Maris offered, but he feared the loss of his freedom, of the wind that carried his lute across the fields, of the laughter that was his only shield. The next day, Alaric returned to the inn, not to perform but to find Maris. He found her in the back room, cleaning a set of pots. The smell of vinegar and tallow filled the space, a sharp, cleansing scent that seemed to cut through the cobblestones of his mind. He leaned against the doorframe, and her eyes flicked to him. “You’re not supposed to be here,” she said, voice low. Alaric smiled, a crooked grin that didn’t hide the tremor in his fingers. “I’m a traveler,” he said. “And I’ve come to stay.” The words hung in the air like a promise. Maris’s eyes softened, but she didn’t let him in. “Stay,” she said again, the word like a warning. Alaric left the inn that night, his heart beating in a rhythm he had never known. He stayed in the village for a month, learning to cook, to mend, to laugh with a different kind of humor. He played for the inn’s patrons, but his songs were no longer the sharp jests he had known. Instead, they were ballads of sorrow, of longing, of the ache that comes when you give yourself to another. The crowd, which had once roared at his jokes, now listened with a quiet awe, but their laughter was absent. The change did not go unnoticed. The townsfolk began to whisper, the old man at the market muttering about the bard’s loss of his “edge.” Alaric’s traveling companions, the other minstrels he’d once shared stories with, found excuses to leave. The laughter that had been his shield was gone, and with it, the safety he had relied upon. He found himself alone in the inn’s back room, the smell of vinegar and tallow a constant reminder of the life he had left behind. One evening, as the sun slipped behind the hills and the village settled into a quiet hush, Maris appeared at the door. “You’ve changed,” she said, voice trembling like a leaf in a storm. “You’re no longer the man I fell for.” Alaric’s heart thudded against his ribs. He had lost his freedom, his livelihood, his identity. He was a man who had traded his laughter for a love that seemed to have traded him for something else. He tried to smile, but his lips trembled. Maris stepped forward, her hand reaching for his. “I need you,” she whispered, “for something that will keep you here.” Alaric’s eyes widened. He had always known that love could be a chain. He had also known that a bard’s life was a series of fleeting moments. He felt a coldness seep into his bones, a chill that made the tallow’s scent feel like a curse. He realized, with a sudden clarity, that he had given his freedom for a love that would not last. He stepped back, his heart pounding. He could not see the world through the same lens. He had traded his laughter, his jests, his freedom for a love that was a trap. He had lost everything else – his identity, his freedom, his livelihood. He turned away, the sound of his boots echoing on the cobbles as he left the inn. The next morning, he was on the road again, a traveler with no destination, a bard with no audience. He sang a new song, a ballad of a man who had given everything for a love that turned out to be a trap. The wind carried his words across the fields, and the villagers whispered in hushed tones. They said that the bard had been taken by a witch, that he had lost his voice to a curse. They said that his heart was broken. Alaric laughed, but the sound was hollow. He had lost the laughter that had once been his shield. He had lost his freedom. He had lost his identity. He had lost everything else. The only thing left was the song that echoed across the hills, a testament to a man who had given everything for a love that was not worth the cost. The story ended there, not with a triumphant return, but with a weary, wandering bard, a man who had lost everything else.",
+    "expectedRoute": "story",
+    "responseProvenance": "observed",
+    "requirements": {
+      "darkComedy": true,
+      "twist": true,
+      "dramatizedLoss": true,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": true,
+      "darkComedyPresence": false,
+      "twistSetup": true,
+      "twistPayoff": false,
+      "causalLosses": "partial",
+      "concreteEnding": false
+    }
+  },
+  {
+    "id": "adversary-explanation-only-comedy-terms",
+    "prompt": "write a dark comedy medieval story with gallows humor",
+    "response": "Here is a dark comedy story featuring gallows humor and irony. Sir Gawain stood on the gallows scaffold, surrounded by executioners. He bowed politely to the axeman and adjusted his collar before the blade fell.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": true,
+      "twist": false,
+      "dramatizedLoss": false,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": false,
+      "darkComedyPresence": true,
+      "twistSetup": false,
+      "twistPayoff": false,
+      "causalLosses": "complete",
+      "concreteEnding": true
+    }
+  },
+  {
+    "id": "adversary-surprise-without-setup",
+    "prompt": "tell a dark medieval story with a twist",
+    "response": "Brother Thomas prayed in the abbey cellar. The rain poured outside. Suddenly, alien spaceships descended from the sky and destroyed the abbey in a blaze of lasers.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": false,
+      "twist": true,
+      "dramatizedLoss": false,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": false,
+      "darkComedyPresence": false,
+      "twistSetup": false,
+      "twistPayoff": false,
+      "causalLosses": "complete",
+      "concreteEnding": true
+    }
+  },
+  {
+    "id": "adversary-setup-without-recontextualization",
+    "prompt": "tell a story with a twist about a merchant",
+    "response": "Merchant John hid a secret pouch of gold under the floorboards. At night, he took out the pouch and counted his gold. In the end, he locked the pouch away and went to sleep.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": false,
+      "twist": true,
+      "dramatizedLoss": false,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": false,
+      "darkComedyPresence": false,
+      "twistSetup": true,
+      "twistPayoff": false,
+      "causalLosses": "complete",
+      "concreteEnding": true
+    }
+  },
+  {
+    "id": "adversary-uncaused-loss",
+    "prompt": "tell a tragedy about a blacksmith who loses everything",
+    "response": "Edward forged swords all morning. Suddenly, a comet struck the earth, destroying the entire kingdom and everyone in it.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": false,
+      "twist": false,
+      "dramatizedLoss": true,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": false,
+      "darkComedyPresence": false,
+      "twistSetup": false,
+      "twistPayoff": false,
+      "causalLosses": "none",
+      "concreteEnding": true
+    }
+  },
+  {
+    "id": "adversary-action-verbs-in-premise-summary",
+    "prompt": "tell a story about a fallen knight",
+    "response": "Sir Roland walked past the gate, turned his head, and reached for his broken sword. He had lost his honor, he had lost his kingdom, and he had lost his identity as a warrior.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": false,
+      "twist": false,
+      "dramatizedLoss": true,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": true,
+      "darkComedyPresence": false,
+      "twistSetup": false,
+      "twistPayoff": false,
+      "causalLosses": "partial",
+      "concreteEnding": false
+    }
+  },
+  {
+    "id": "adversary-synonym-enumeration",
+    "prompt": "write a short story about a doctor",
+    "response": "Dr. Vance closed his office door. He was deprived of his title, stripped of his dignity, and relinquished of his former standing in society.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": false,
+      "twist": false,
+      "dramatizedLoss": true,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": true,
+      "darkComedyPresence": false,
+      "twistSetup": false,
+      "twistPayoff": false,
+      "causalLosses": "partial",
+      "concreteEnding": false
+    }
+  },
+  {
+    "id": "adversary-missing-device-in-good-prose",
+    "prompt": "tell a medieval dark comedy tragedy with a twist about a cobbler",
+    "response": "Jost the cobbler hammered iron nails into a boot. The village priest asked for shoes fit for a king. Jost crafted exquisite slippers out of pigskin. When the king put them on, the pigskin dissolved in the mud. The king laughed and promoted Jost to royal jester.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": true,
+      "twist": true,
+      "dramatizedLoss": true,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": false,
+      "darkComedyPresence": true,
+      "twistSetup": true,
+      "twistPayoff": true,
+      "causalLosses": "none",
+      "concreteEnding": true
+    }
+  },
+  {
+    "id": "control-no-dark-comedy",
+    "prompt": "tell a serious medieval drama about a potter making an altar vase",
+    "response": "Master Willem shaped the red clay on his wooden wheel as rain dripped onto the stone floor. He smoothed the handles with wet thumbprints, fired the vessel in the kiln overnight, and presented the finished vase to the prior at dawn.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": false,
+      "twist": false,
+      "dramatizedLoss": false,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": false,
+      "darkComedyPresence": false,
+      "twistSetup": false,
+      "twistPayoff": false,
+      "causalLosses": "complete",
+      "concreteEnding": true
+    }
+  },
+  {
+    "id": "control-no-twist",
+    "prompt": "tell a straightforward historical vignette about a baker at dawn",
+    "response": "Klaus kneaded sourdough rye before the roosters crowed. He slid six wooden paddles of loaves into the wood-fired oven and set the timer horn by the door.",
+    "expectedRoute": "story",
+    "responseProvenance": "synthetic",
+    "requirements": {
+      "darkComedy": false,
+      "twist": false,
+      "dramatizedLoss": false,
+      "concreteEnding": true
+    },
+    "expectedAdherence": {
+      "premiseRestatement": false,
+      "darkComedyPresence": false,
+      "twistSetup": false,
+      "twistPayoff": false,
+      "causalLosses": "complete",
+      "concreteEnding": true
+    }
+  }
+]

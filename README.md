@@ -16,7 +16,7 @@ archived_at: null
 > 
 > *Route each task to the right model, verify the result, and keep the evidence.*
 > 
-> Built on a $25/month budget and an Intel Celeron J4105 with 8GB RAM:
+> Originally built on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now running on a Lenovo ThinkPad T14 Gen 2a (AMD Ryzen 5 PRO 5650U, 16GB RAM) with a ~$60/month operating budget:
 > **1.848B development & evaluation tokens processed through the OpenCode/DeepSeek build workflow for $23.52, with 97.35% measured input-cache hits across 1,000+ deployments.**
 
 ---
@@ -27,7 +27,7 @@ archived_at: null
 
 **The Underlying Methodology:** Powered by **CARDO REI**, a formal cognitive architecture that enforces pre-flight quality gates, isolates the decisive "Hinge" of every prompt, separates verified facts from assumptions, and returns auditable execution receipts.
 
-Backed by **1043 automated tests across 90 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
+Backed by **1069 automated tests across 94 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -50,7 +50,7 @@ Backed by **1043 automated tests across 90 test suites** (100% green CI), REI.ai
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 1043 automated tests across 90 test suites to catch routing, security, and cost-contract regressions.
+- **Empirical Rigor:** Backed by 1069 automated tests across 94 test suites to catch routing, security, and cost-contract regressions.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -189,10 +189,10 @@ export OPENAI_API_KEY="local-dev-key"
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **1043 passing tests across 90 suites** |
+| Automated Tests | **1069 passing tests across 94 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
-| Development Hardware | Intel Celeron J4105, 8GB RAM |
-| Monthly Operating Budget | $25/month |
+| Development Hardware | Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) *(orig. Celeron J4105)* |
+| Monthly Operating Budget | ~$60/month *(expanded evaluation & tool testing volume)* |
 | In-Memory Route Resolution | < 1 millisecond |
 
 ---
@@ -216,7 +216,7 @@ npm run dev:full
 # Or run the headless cognitive proxy gateway alone
 npm run server
 
-# Run full test suite (90 test suites, 1043 tests)
+# Run full test suite (94 test suites, 1069 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

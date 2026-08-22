@@ -81,3 +81,33 @@ export function getCostBadgeLabel(model: string, tokens: number, usage?: CostBad
   const ceiling = computeCeilingCost(tokens, model);
   return `⚡ ${tokens} tok · est ${formatCostDisplay(ceiling)}`;
 }
+
+export interface EconomicPolicyRecord {
+  observedCostUsd: number;
+  modeledPremiumCostUsd: number;
+  modeledDifferenceUsd: number;
+  savingsPolicyVersion: "delivery-gated-v1";
+  savingsEligibility: "eligible" | "excluded";
+  eligibleSavingsUsd: number;
+  exclusionReason?: string | null;
+}
+
+export function evaluateSavingsEligibility(
+  observedCostUsd: number,
+  modeledPremiumCostUsd: number,
+  deliveryGatePassed: boolean,
+  exclusionReason?: string | null
+): EconomicPolicyRecord {
+  const modeledDifferenceUsd = Math.max(0, modeledPremiumCostUsd - observedCostUsd);
+  const eligible = deliveryGatePassed;
+
+  return {
+    observedCostUsd,
+    modeledPremiumCostUsd,
+    modeledDifferenceUsd,
+    savingsPolicyVersion: "delivery-gated-v1",
+    savingsEligibility: eligible ? "eligible" : "excluded",
+    eligibleSavingsUsd: eligible ? modeledDifferenceUsd : 0,
+    exclusionReason: eligible ? null : (exclusionReason || "response_delivery_gate_failed")
+  };
+}

@@ -16,7 +16,7 @@ export default {
     jobType: "coding-hinge",
     label: "Coding Hinge",
     model: "gemini-3.6-flash",
-    maxTokens: 600,
+    maxTokens: 4000,
     costPer1k: 1.0,
     qualityGate: "Phase 0 + HARD STOP",
     enforce: "HARD_STOP",

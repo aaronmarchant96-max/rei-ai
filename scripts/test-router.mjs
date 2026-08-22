@@ -55,9 +55,11 @@ export const TIERS = {
       "src/lib/detectAISlop.test.js",
       "src/lib/sourceContext.test.ts",
       "src/lib/selfAuditContext.test.ts",
+      "src/lib/deliveryIntegrityGate.test.ts",
+      "src/lib/gatewayConcurrency.test.js",
     ],
     fileMatches: [
-      /^src\/lib\/(?:nightShiftRouter|hingeClassifier|costHelpers|deRoboticize|detectAISlop|persistentContextEngine|fileExtractor|sourceContext|selfAuditContext)\.[a-z0-9]+$/i,
+      /^src\/lib\/(?:nightShiftRouter|hingeClassifier|costHelpers|deRoboticize|detectAISlop|persistentContextEngine|fileExtractor|sourceContext|selfAuditContext|deliveryIntegrityGate|concurrencyPool|singleFlight|batchRunner|gatewayConcurrency)\.[a-z0-9]+$/i,
       /^src\/domains\//i,
       /^data\/(?:fingerprints|modelRates)\.json$/i,
       /^src\/data\//i,

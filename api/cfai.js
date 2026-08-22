@@ -4,6 +4,8 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import fs from "fs";
 import { parseToolCalls, extractThinkingAndContent, isPrivateHostname } from "../shared/lib/toolParser.js";
+import { BoundedConcurrencyPool } from "../src/lib/concurrencyPool.mjs";
+import { SingleFlightGroup, computeSingleFlightKey } from "../src/lib/singleFlight.mjs";
 
 export const maxDuration = 60;
 
@@ -12,6 +14,10 @@ const CFAI_PATH = process.env.CFAI_PATH;
 
 const MAX_INPUT_CHARS = 14000;
 const PROVIDER_TIMEOUT_MS = 25000;
+
+export const geminiPool = new BoundedConcurrencyPool({ name: "gemini", maxConcurrent: 4, maxQueueDepth: 20, acquireDeadlineMs: 10000 });
+export const groqPool = new BoundedConcurrencyPool({ name: "groq", maxConcurrent: 4, maxQueueDepth: 20, acquireDeadlineMs: 10000 });
+export const singleFlightGroup = new SingleFlightGroup();
 
 var providerCooldown = new Map();
 var THROTTLE_COOLDOWN_MS = 15000;
@@ -452,8 +458,9 @@ async function callDeepSeek(messages, maxTokens, modelOverride, temperature = 0.
 }
 
 async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7, tools = null) {
-  const rawKey = process.env.GEMINI_API_KEY;
-  if (!rawKey || rawKey.includes("your_gemini_api_key_here")) return null;
+  return geminiPool.run(async function () {
+    const rawKey = process.env.GEMINI_API_KEY;
+    if (!rawKey || rawKey.includes("your_gemini_api_key_here")) return null;
   const key = rawKey.replace(/^"|"$/g, "").trim();
 
   const candidateModels = [
@@ -534,73 +541,75 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
     }
   }
   return null;
+});
 }
 
 async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, tools = null) {
-  const rawKey = process.env.GROQ_API_KEY;
-  if (!rawKey || rawKey.includes("your_groq_api_key_here")) return null;
-  const key = rawKey.replace(/^"|"$/g, "");
+  return groqPool.run(async function () {
+    const rawKey = process.env.GROQ_API_KEY;
+    if (!rawKey || rawKey.includes("your_groq_api_key_here")) return null;
+    const key = rawKey.replace(/^"|"$/g, "");
 
-  const candidateModels = [
-    modelOverride,
-    "openai/gpt-oss-120b",
-    "openai/gpt-oss-20b",
-    "qwen/qwen3.6-27b",
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant",
-  ].filter(Boolean);
+    const candidateModels = [
+      modelOverride,
+      "openai/gpt-oss-120b",
+      "openai/gpt-oss-20b",
+      "qwen/qwen3.6-27b",
+      "llama-3.3-70b-versatile",
+      "llama-3.1-8b-instant",
+    ].filter(Boolean);
 
-  const uniqueCandidates = Array.from(new Set(candidateModels));
+    const uniqueCandidates = Array.from(new Set(candidateModels));
 
-  for (let m = 0; m < uniqueCandidates.length; m++) {
-    const model = uniqueCandidates[m];
-    const controller = new AbortController();
-    const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
-    try {
-      const hasToolsOrFollowUp = Array.isArray(messages) && messages.some(m => m.role === "tool" || m.tool_calls);
-      const effectiveMaxTokens = hasToolsOrFollowUp ? Math.min(maxTokens, 2048) : maxTokens;
-      const payload = { model: model, messages: messages, temperature: temperature, max_tokens: effectiveMaxTokens };
-      if (tools && tools.length > 0) payload.tools = tools;
-      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        signal: controller.signal,
-        headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        if (res.status === 429) {
-          await recordThrottle("groq", res);
-          return null;
-        }
-        if (res.status === 404 || res.status === 413) {
-          // Model deprecated on Groq or payload too large — try next candidate model
+    for (let m = 0; m < uniqueCandidates.length; m++) {
+      const model = uniqueCandidates[m];
+      const controller = new AbortController();
+      const timer = setTimeout(function () { controller.abort(); }, PROVIDER_TIMEOUT_MS);
+      try {
+        const hasToolsOrFollowUp = Array.isArray(messages) && messages.some(m => m.role === "tool" || m.tool_calls);
+        const effectiveMaxTokens = hasToolsOrFollowUp ? Math.min(maxTokens, 2048) : maxTokens;
+        const payload = { model: model, messages: messages, temperature: temperature, max_tokens: effectiveMaxTokens };
+        if (tools && tools.length > 0) payload.tools = tools;
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          signal: controller.signal,
+          headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          if (res.status === 429) {
+            await recordThrottle("groq", res);
+            return null;
+          }
+          if (res.status === 404 || res.status === 413) {
+            // Model deprecated on Groq or payload too large — try next candidate model
+            continue;
+          }
+          console.warn("Groq status " + res.status);
           continue;
         }
-        console.warn("Groq status " + res.status);
-        continue;
+        const data = await res.json();
+        var finishReason = data.choices?.[0]?.finish_reason || null;
+        return {
+          content: data.choices?.[0]?.message?.content || "",
+          model: model,
+          usage: data.usage || null,
+          truncated: finishReason === "length",
+          finishReason: finishReason,
+          tool_calls: data.choices?.[0]?.message?.tool_calls || null
+        };
+      } catch (err) {
+        if (err && err.name === "AbortError") {
+          console.warn("Groq timed out after " + PROVIDER_TIMEOUT_MS + "ms");
+        } else {
+          console.warn("Groq request error: " + (err && err.message ? err.message : err));
+        }
+      } finally {
+        clearTimeout(timer);
       }
-      const data = await res.json();
-      var finishReason = data.choices?.[0]?.finish_reason || null;
-      return {
-        content: data.choices?.[0]?.message?.content || "",
-        model: model,
-        usage: data.usage || null,
-        truncated: finishReason === "length",
-        finishReason: finishReason,
-        tool_calls: data.choices?.[0]?.message?.tool_calls || null
-      };
-    } catch (err) {
-      if (err && err.name === "AbortError") {
-        console.warn("Groq timed out after " + PROVIDER_TIMEOUT_MS + "ms");
-      } else {
-        console.warn("Groq request error: " + (err && err.message ? err.message : err));
-      }
-      return null;
-    } finally {
-      clearTimeout(timer);
     }
-  }
-  return null;
+    return null;
+  });
 }
 
 async function callOpenAI(messages, maxTokens, temperature = 0.7, tools = null) {

@@ -11,9 +11,10 @@
     "app:validate": "node scripts/validate-app-shell.mjs",
     "docs:validate": "node scripts/validate-docs.mjs",
     "test": "jest --runInBand",
+    "test:serial": "jest --runInBand",
     "test:route": "node scripts/test-router.mjs",
     "test:route:eval": "node scripts/eval-test-router-recall.mjs",
-    "test:fast": "jest --onlyChanged",
+    "test:fast": "jest --maxWorkers=50%",
     "test:changed": "jest -o",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -33,7 +34,8 @@
     "usage:agy": "python3 scripts/agy-usage.py",
     "claims:gen": "node scripts/gen-claims.mjs",
     "claims:check": "node scripts/gen-claims.mjs --check",
-    "evidence:pack": "tsx scripts/export-evidence-package.mjs"
+    "evidence:pack": "tsx scripts/export-evidence-package.mjs",
+    "eval:storyteller:replay": "node scripts/run-storyteller-adherence-replay.mjs"
   },
   "dependencies": {
     "@azure/functions": "^4.7.0",

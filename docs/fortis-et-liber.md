@@ -60,7 +60,7 @@ Repository: https://github.com/aaronmarchant96-max/rei-ai
 | **aaronmarchant96-max** | 11 | Personal profile and configuration | Active |
 | **local-video-motion-zone-detector** | 3 | Motion detection prototype | Active |
 
-**All repositories built on commodity hardware (Intel Celeron J4105, 8GB RAM) with a $25/month budget.**
+**Repositories originally built on commodity hardware (Intel Celeron J4105, 8GB RAM, $25/mo budget); now running on a Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) with a ~$60/month operating budget.**
 
 **Cross-repo patterns:**
 - Consistent documentation discipline (Fortis et Liber methodology)
