@@ -1901,3 +1901,94 @@
 .rei-instrument-rail__pin-btn.is-pinned {
   color: var(--accent-cyan, #38bdf8);
 }
+
+/* ── High-End Chat Micro-Animations ── */
+@keyframes chatMessageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hingeAuraPulse {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(240, 201, 101, 0.08);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(240, 201, 101, 0.22);
+  }
+}
+
+@keyframes badgeShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.rei-chat-message {
+  animation: chatMessageEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.rei-chat-bubble {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.rei-chat-bubble:hover {
+  transform: translateY(-1px);
+}
+
+.rei-chat-bubble--rei {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.rei-chat-bubble--rei:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 0 15px rgba(226, 163, 61, 0.08);
+}
+
+.rei-decision-badge {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+.rei-decision-badge:hover {
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: 0 0 16px rgba(226, 163, 61, 0.28) !important;
+  border-color: var(--amber) !important;
+}
+
+.rei-decision-badge__inspect-btn {
+  transition: transform 0.2s ease, color 0.2s ease !important;
+}
+
+.rei-decision-badge__inspect-btn:hover {
+  transform: translateX(2px);
+  color: var(--amber-hover, #efae4c) !important;
+}
+
+.rei-input-shell {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.rei-input-form:focus-within {
+  box-shadow: 0 0 0 1.5px var(--amber), 0 0 24px rgba(226, 163, 61, 0.16) !important;
+  border-color: var(--amber) !important;
+}
+
+.rei-cardo-hinge-box {
+  animation: hingeAuraPulse 3s ease-in-out infinite;
+  transition: border-color 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease !important;
+}
+
+.rei-cardo-hinge-box:hover {
+  border-left-color: var(--amber-hover, #efae4c) !important;
+  transform: translateX(3px);
+  box-shadow: 0 6px 24px rgba(240, 201, 101, 0.28) !important;
+}
+

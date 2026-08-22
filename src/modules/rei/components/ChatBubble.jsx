@@ -91,12 +91,12 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
                 {/* 📌 1. THE HINGE FOCUS CONTAINER */}
                 {hasHinge && (
                   <div
+                    className="rei-cardo-hinge-box"
                     style={{
                       borderLeft: "4px solid var(--amber-border)",
                       marginBottom: "12px",
                       borderRadius: "0 10px 10px 0",
                       padding: "12px 16px",
-                      boxShadow: "0 4px 14px rgba(240, 201, 101, 0.08)",
                     }}
                   >
                     <div style={{ color: "var(--amber-text)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 800, marginBottom: "4px" }}>
