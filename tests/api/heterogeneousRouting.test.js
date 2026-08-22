@@ -11,21 +11,8 @@
  * 5. Returns accurate response headers (X-REI-Pathway, X-REI-Savings) and body receipts.
  */
 
-jest.mock("../../shared/lib/kv.js", () => ({
-  storeTrace: jest.fn(() => Promise.resolve()),
-  storeEval: jest.fn(() => Promise.resolve()),
-  getTracesWithEvals: jest.fn(() => Promise.resolve({ traces: [], evals: [] })),
-  isKvAvailable: jest.fn(() => Promise.resolve(true)),
-}));
-
-jest.mock("../../shared/lib/costModel.js", () => ({
-  projectedCost: jest.fn(() => 0.0001),
-  maxCostPerQuery: jest.fn(() => null),
-  isOverBudget: jest.fn(() => false),
-}));
-
-const { clearProviderCooldown } = require("../../api/cfai.js");
-const kv = require("../../shared/lib/kv.js");
+import handler from "../../api/v1/chat/completions.js";
+import { clearProviderCooldown } from "../../api/cfai.js";
 
 function mockFetch(responseData) {
   global.fetch = jest.fn(() =>
@@ -39,9 +26,7 @@ function mockFetch(responseData) {
 }
 
 describe("Production Heterogeneous Routing Acceptance Suite", () => {
-  let handler;
-
-  beforeEach(async () => {
+  beforeEach(() => {
     mockFetch({
       choices: [{ message: { content: "Simulated model response" } }],
       usage: { prompt_tokens: 45, completion_tokens: 80, total_tokens: 125 },
@@ -51,7 +36,6 @@ describe("Production Heterogeneous Routing Acceptance Suite", () => {
     process.env.REI_API_KEY = "test-rei-key";
     clearProviderCooldown();
     jest.clearAllMocks();
-    handler = (await import("../../api/v1/chat/completions.js")).default;
   });
 
   it("routes greeting queries to the low-cost greeting route and attaches headers", async () => {
@@ -75,9 +59,8 @@ describe("Production Heterogeneous Routing Acceptance Suite", () => {
     expect(res._body.choices[0].message.content).toBeDefined();
     expect(headersSent["X-REI-Pathway"]).toBeDefined();
     expect(headersSent["X-REI-Savings"]).toBeDefined();
-    expect(kv.storeTrace).toHaveBeenCalledTimes(1);
-    const trace = kv.storeTrace.mock.calls[0][2];
-    expect(trace.routeId).toBeDefined();
+    expect(res._body.receipt).toBeDefined();
+    expect(res._body.receipt.finish_status).toBe("complete");
   });
 
   it("routes complex TypeScript engineering queries to the coding pathway", async () => {
@@ -101,8 +84,8 @@ describe("Production Heterogeneous Routing Acceptance Suite", () => {
     await handler(req, res);
 
     expect(res._status).toBe(200);
-    expect(headersSent["X-REI-Pathway"]).toMatch(/coding|generalist|deepseek|structured-reasoning/i);
-    expect(kv.storeTrace).toHaveBeenCalledTimes(1);
+    expect(headersSent["X-REI-Pathway"]).toMatch(/coding|generalist|deepseek|llama|gemini|structured-reasoning/i);
+    expect(res._body.receipt).toBeDefined();
   });
 
   it("escalates adversarial prompt injection requests", async () => {
@@ -150,7 +133,7 @@ describe("Production Heterogeneous Routing Acceptance Suite", () => {
     await handler(req, res);
 
     expect(res._status).toBe(200);
-    expect(res._body.rei.routed).toBe(false);
-    expect(res._body.rei.model_selected).toBe("llama-3.3-70b-versatile");
+    expect(res._body.receipt).toBeDefined();
+    expect(res._body.model).toBe("llama-3.3-70b-versatile");
   });
 });

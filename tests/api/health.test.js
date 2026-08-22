@@ -1,10 +1,10 @@
 import healthHandler from "../../api/health.js";
 
 describe("Health check endpoint", () => {
-  it("returns 200 with internal state probes for classifier and centroids", async () => {
+  it("returns 200 with minimal ready probe and incurs $0 inference cost", async () => {
     let statusCode = null;
     let jsonBody = null;
-    const req = {};
+    const req = { method: "GET" };
     const res = {
       status(code) {
         statusCode = code;
@@ -20,13 +20,26 @@ describe("Health check endpoint", () => {
     await healthHandler(req, res);
     expect(statusCode).toBe(200);
     expect(jsonBody).toBeDefined();
-    expect(jsonBody.status).toBe("healthy");
-    expect(jsonBody.service).toBe("rei-ai");
-    expect(jsonBody.subsystems.hingeClassifier.status).toBe("operational");
-    expect(jsonBody.subsystems.hingeClassifier.parametersLoaded).toBeGreaterThan(0);
-    expect(jsonBody.subsystems.semanticCentroids.status).toBe("operational");
-    expect(jsonBody.subsystems.semanticCentroids.vectorDim).toBe(384);
-    expect(jsonBody.subsystems.openaiProxy.status).toBe("operational");
-    expect(jsonBody.system.heapUsedMb).toBeGreaterThan(0);
+    expect(jsonBody.status).toBe("ready");
+    expect(jsonBody.gateway).toBe("chat-completions");
+    expect(jsonBody.timestamp).toBeDefined();
+  });
+
+  it("returns 405 for non-GET methods", async () => {
+    let statusCode = null;
+    const req = { method: "POST" };
+    const res = {
+      status(code) {
+        statusCode = code;
+        return this;
+      },
+      json() {
+        return this;
+      },
+      setHeader() {}
+    };
+
+    await healthHandler(req, res);
+    expect(statusCode).toBe(405);
   });
 });

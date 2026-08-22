@@ -13,6 +13,7 @@ const CardoGuard = lazy(() => import("./CardoGuard.jsx"));
 const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
 const Analytics = lazy(() => import("./Analytics.jsx"));
 const RedTeam = lazy(() => import("./RedTeam.jsx"));
+const PilotOnboarding = lazy(() => import("./modules/rei/components/PilotOnboarding.jsx"));
 
 function LoadingShell() {
   return (
@@ -189,6 +190,7 @@ export default function AppShell() {
                 if (el) el.scrollIntoView({ behavior: "smooth" });
               }, 100);
             }} className="rei-header-nav__link">Experiments</button>
+            <button onClick={() => setTool("pilot")} className="rei-header-nav__link">Developers</button>
             <div className="w-px h-4 bg-gray-700 mx-1"></div>
             <a href="https://x.com/PromptHound96" target="_blank" rel="noreferrer" className="rei-header-nav__link">X (Twitter)</a>
             <a href="https://github.com/aaronmarchant96-max/rei-ai" target="_blank" rel="noreferrer" className="rei-header-nav__link">GitHub</a>
@@ -205,6 +207,8 @@ export default function AppShell() {
                 setTool(t);
               }} />
             </ErrorBoundary>
+          ) : tool === "pilot" ? (
+            <ErrorBoundary toolName="Developers"><PilotOnboarding /></ErrorBoundary>
           ) : tool === "story-forge" ? (
             <ErrorBoundary toolName="Story Forge"><CreativeEngine /></ErrorBoundary>
           ) : tool === "storm-replay" ? (

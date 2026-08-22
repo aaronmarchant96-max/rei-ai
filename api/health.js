@@ -1,9 +1,8 @@
-// REI.ai System Health & Subsystem State Verification Endpoint
-// Route: /api/health & /health
+// REI.ai System Health Endpoint
+// Route: /api/health
+// Public Minimal Health Probe — performs zero inference and incurs $0 cost.
 
-import ecsWeights from "../data/ml/ecs_weights.json" with { type: "json" };
-import centroids from "../data/ml/domain_centroids.json" with { type: "json" };
-import rates from "../src/data/modelRates.json" with { type: "json" };
+import { buildServerRouterDecision } from "../shared/lib/serverRouter.js";
 
 export default async function handler(req, res) {
   if (res.setHeader) {
@@ -11,62 +10,27 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "no-store, max-age=0");
   }
 
-  const startTime = Date.now();
+  try {
+    // 1. Test gateway boundary instantiation without performing inference
+    const routerProbe = buildServerRouterDecision({ input: "health check" });
+    const isReady = Boolean(routerProbe && routerProbe.model);
 
-  // 1. Verify Hinge Classifier Weights
-  const hingeOperational = !!(ecsWeights && ecsWeights.weights && typeof ecsWeights.weights.w0 === "number");
-
-  // 2. Verify Semantic Domain Centroids
-  const centroidsOperational = !!(centroids && centroids.vectorDim === 384 && centroids.domains);
-  const domainList = centroids?.domains ? Object.keys(centroids.domains) : [];
-
-  // 3. Verify Pricing Catalog
-  const ratesOperational = !!(rates && typeof rates === "object");
-
-  // 4. Memory Telemetry
-  const memoryUsage = process.memoryUsage ? process.memoryUsage() : null;
-
-  const isHealthy = hingeOperational && centroidsOperational && ratesOperational;
-
-  const healthData = {
-    status: isHealthy ? "healthy" : "degraded",
-    service: "rei-ai",
-    version: "1.0.0",
-    timestamp: new Date().toISOString(),
-    uptimeSeconds: Math.floor(process.uptime ? process.uptime() : 0),
-    latencyMs: Date.now() - startTime,
-    subsystems: {
-      hingeClassifier: {
-        status: hingeOperational ? "operational" : "unavailable",
-        version: ecsWeights?.version || "unknown",
-        parametersLoaded: ecsWeights?.weights ? Object.keys(ecsWeights.weights).length : 0,
-        isolationVerified: ecsWeights?.metrics?.isolationVerified === true,
-      },
-      semanticCentroids: {
-        status: centroidsOperational ? "operational" : "unavailable",
-        vectorDim: centroids?.vectorDim || 0,
-        clustersPerDomain: centroids?.k || 0,
-        domains: domainList,
-      },
-      pricingCatalog: {
-        status: ratesOperational ? "operational" : "unavailable",
-        premiumBaseline: rates?._premium || "gpt-4o",
-      },
-      openaiProxy: {
-        status: "operational",
-        primaryGateway: "deepseek",
-        deepseekConfigured: !!(process.env.DEEPSEEK_API_KEY || process.env.deepseek),
-        supportedModels: 8,
-        routeEndpoint: "/v1/chat/completions",
-      }
-    },
-    system: {
-      nodeVersion: process.version,
-      heapUsedMb: memoryUsage ? +(memoryUsage.heapUsed / (1024 * 1024)).toFixed(2) : null,
-      heapTotalMb: memoryUsage ? +(memoryUsage.heapTotal / (1024 * 1024)).toFixed(2) : null,
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      return res.status(405).json({ error: "Method Not Allowed" });
     }
-  };
 
-  const statusCode = isHealthy ? 200 : 503;
-  return res.status(statusCode).json(healthData);
+    return res.status(isReady ? 200 : 503).json({
+      status: isReady ? "ready" : "degraded",
+      version: "40a244c",
+      gateway: "chat-completions",
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    return res.status(503).json({
+      status: "degraded",
+      version: "40a244c",
+      gateway: "chat-completions",
+      timestamp: new Date().toISOString()
+    });
+  }
 }

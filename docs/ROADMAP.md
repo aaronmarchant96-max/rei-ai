@@ -66,4 +66,4 @@ REI.ai solves this with a **zero-inference deterministic routing engine** and **
 
 - **Cost Reduction Baseline**: **-85.7%** (replayed demo) / **~92%** (ceiling-based modeled) vs. always-premium gpt-4o baseline.
 - **Holdout Accuracy**: **72.8%** deterministic accuracy across 136 unique pooled calibration samples.
-- **Empirical Rigor**: Backed by **1096 automated tests across 96 test suites**. Canonical verification is tracked in [`src/data/claims.json`](../src/data/claims.json).
+- **Empirical Rigor**: Backed by **1099 automated tests across 97 test suites**. Canonical verification is tracked in [`src/data/claims.json`](../src/data/claims.json).

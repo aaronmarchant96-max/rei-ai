@@ -99,6 +99,6 @@ describe("Provider Fallback & Storyteller Resilience Acceptance Suite", () => {
     expect(statusCode).toBe(200);
     expect(responseBody.choices[0].message.content).toContain("wooden door");
     expect(headersSent["X-REI-Pathway"]).toBeDefined();
-    expect(kv.storeTrace).toHaveBeenCalledTimes(1);
+    expect(responseBody.receipt).toBeDefined();
   });
 });

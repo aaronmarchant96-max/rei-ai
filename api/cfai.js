@@ -1237,10 +1237,21 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
 }
 
 export async function handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision, messagesOverride) {
-  args = args || [];
-  input = input || "";
-  systemPrompt = systemPrompt || "";
-  history = history || [];
+  if (command && typeof command === "object" && !Array.isArray(command)) {
+    const opts = command;
+    input = opts.prompt || opts.input || "";
+    systemPrompt = opts.systemPrompt || "";
+    history = opts.history || [];
+    routerDecision = opts.routerDecision || opts.router || null;
+    messagesOverride = opts.messagesOverride || opts.messages || null;
+    command = opts.command || "chat";
+    args = opts.args || [];
+  } else {
+    args = args || [];
+    input = input || "";
+    systemPrompt = systemPrompt || "";
+    history = history || [];
+  }
 
   const localCliExists = CFAI_PATH && fs.existsSync(CFAI_PATH);
 

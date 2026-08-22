@@ -1,0 +1,147 @@
+/**
+ * @file shared/lib/serverRouter.js
+ * @description Server-safe plain JavaScript gateway boundary.
+ * Free of TypeScript, JSX, or browser module dependencies.
+ * Consumed by Vercel serverless functions (/api/v1/chat/completions.js, /api/cfai.js, /api/health.js).
+ */
+
+import fs from "fs";
+import path from "path";
+
+const fingerprintsPath = path.resolve(process.cwd(), "data/fingerprints.json");
+const fingerprints = JSON.parse(fs.readFileSync(fingerprintsPath, "utf8"));
+
+const DOMAIN_MAP = {
+  genealogy: "genealogy-deep-dive",
+  coding: "coding-deep-dive",
+  story: "creative-story",
+  creative: "creative-story",
+  legal: "case-hinge-legal",
+  assistant: "structured-reasoning"
+};
+
+const DEFAULT_MODEL_RATES = {
+  "deepseek-chat": { input: 0.00014, output: 0.00028, premiumBasis: 0.005 },
+  "deepseek-v4-flash": { input: 0.00014, output: 0.00028, premiumBasis: 0.005 },
+  "llama-3.1-8b-instant": { input: 0.00005, output: 0.00008, premiumBasis: 0.003 },
+  "llama-3.3-70b-versatile": { input: 0.00059, output: 0.00079, premiumBasis: 0.005 },
+  "zai/glm-5.2": { input: 0.001, output: 0.0048, premiumBasis: 0.015 }
+};
+
+export function buildServerRouterDecision({ input = "", domain = null, model = null }) {
+  const promptText = (input || "").toLowerCase().trim();
+
+  // 1. Direct Model Override
+  if (model && model !== "rei-auto") {
+    const matchedFp = fingerprints.find((f) => f.model === model || f.id === model);
+    return {
+      id: matchedFp?.id || "custom-model",
+      label: matchedFp?.label || model,
+      model: model,
+      jobType: matchedFp?.jobType || "custom",
+      estimatedCost: matchedFp ? (matchedFp.costPer1kInput * 0.5 + matchedFp.costPer1kOutput * 0.5) : 0.0002,
+      maxTokens: matchedFp?.maxTokens || 2048,
+      temperature: matchedFp?.temperature || 0.7,
+      selectionReason: "Direct model override"
+    };
+  }
+
+  // 2. Domain Match Override
+  if (domain && DOMAIN_MAP[domain]) {
+    const targetId = DOMAIN_MAP[domain];
+    const fp = fingerprints.find((f) => f.id === targetId);
+    if (fp) {
+      return {
+        id: fp.id,
+        label: fp.label,
+        model: fp.model,
+        jobType: fp.jobType,
+        estimatedCost: fp.costPer1kInput * 0.5 + fp.costPer1kOutput * 0.5,
+        maxTokens: fp.maxTokens,
+        temperature: fp.temperature,
+        selectionReason: `Explicit domain mapping: ${domain}`
+      };
+    }
+  }
+
+  // 3. Simple Greeting Check
+  const greetingFp = fingerprints.find((f) => f.id === "simple-greeting");
+  if (greetingFp && greetingFp.matchTerms.some((term) => promptText === term || promptText.startsWith(term + " "))) {
+    return {
+      id: greetingFp.id,
+      label: greetingFp.label,
+      model: greetingFp.model,
+      jobType: greetingFp.jobType,
+      estimatedCost: greetingFp.costPer1kInput * 0.05 + greetingFp.costPer1kOutput * 0.05,
+      maxTokens: greetingFp.maxTokens,
+      temperature: greetingFp.temperature,
+      selectionReason: "Matched simple greeting pattern"
+    };
+  }
+
+  // 4. Term-Matching Ranking across Catalog
+  let bestMatch = null;
+  let maxScore = 0;
+
+  for (const fp of fingerprints) {
+    if (!fp.matchTerms) continue;
+    let score = 0;
+    for (const term of fp.matchTerms) {
+      if (promptText.includes(term.toLowerCase())) {
+        score += term.length > 4 ? 2 : 1;
+      }
+    }
+    if (score > maxScore) {
+      maxScore = score;
+      bestMatch = fp;
+    }
+  }
+
+  if (bestMatch && maxScore > 0) {
+    return {
+      id: bestMatch.id,
+      label: bestMatch.label,
+      model: bestMatch.model,
+      jobType: bestMatch.jobType,
+      estimatedCost: bestMatch.costPer1kInput * 0.5 + bestMatch.costPer1kOutput * 0.5,
+      maxTokens: bestMatch.maxTokens,
+      temperature: bestMatch.temperature,
+      selectionReason: `Matched terms (score: ${maxScore})`
+    };
+  }
+
+  // 5. Default Structured Reasoning Fallback
+  const defaultFp = fingerprints.find((f) => f.id === "structured-reasoning") || fingerprints[0];
+  return {
+    id: defaultFp.id,
+    label: defaultFp.label,
+    model: defaultFp.model,
+    jobType: defaultFp.jobType,
+    estimatedCost: defaultFp.costPer1kInput * 0.5 + defaultFp.costPer1kOutput * 0.5,
+    maxTokens: defaultFp.maxTokens,
+    temperature: defaultFp.temperature,
+    selectionReason: "Default fallback to structured reasoning"
+  };
+}
+
+export function computeServerCost(modelName = "deepseek-chat", inputTokens = 0, outputTokens = 0) {
+  const rates = DEFAULT_MODEL_RATES[modelName] || DEFAULT_MODEL_RATES["deepseek-chat"];
+  const observedCostUsd = ((inputTokens / 1000) * rates.input) + ((outputTokens / 1000) * rates.output);
+  const counterfactualCostUsd = ((inputTokens / 1000) * rates.premiumBasis) + ((outputTokens / 1000) * rates.premiumBasis);
+  const modeledDifferenceUsd = Math.max(0, counterfactualCostUsd - observedCostUsd);
+
+  return {
+    observedCostUsd: Number(observedCostUsd.toFixed(6)),
+    counterfactualCostUsd: Number(counterfactualCostUsd.toFixed(6)),
+    modeledDifferenceUsd: Number(modeledDifferenceUsd.toFixed(6))
+  };
+}
+
+export function normalizeFinishReason(rawReason) {
+  if (!rawReason) return "stop";
+  const r = String(rawReason).toLowerCase().trim();
+  if (r === "length" || r === "max_tokens" || r === "max_tokens_exceeded") return "length";
+  if (r === "content_filter" || r === "safety") return "content_filter";
+  if (r === "cancelled" || r === "abort") return "cancelled";
+  return "stop";
+}
