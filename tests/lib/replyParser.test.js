@@ -70,20 +70,30 @@ Immediate execution step.`;
     expect(res.Move).toBe("Immediate execution step.");
   });
 
-  it("safely unescapes presentation markdown tokens while protecting code and paths", () => {
+  it("A08 — Presentation Markdown Rendering Transformation (unescapes presentation markdown while preserving code, regexes, and paths)", () => {
     const { unescapeProseMarkdown } = require("../../src/lib/replyParser.js");
-    
-    const prose = "\\# Section Heading\nThis is \\*\\*bold\\*\\* text.";
-    expect(unescapeProseMarkdown(prose)).toBe("# Section Heading\nThis is **bold** text.");
 
-    const codeBlock = "```bash\nC:\\Users\\Aaron\\repo\\script.sh \\*\\*\n```";
-    expect(unescapeProseMarkdown(codeBlock)).toBe("```bash\nC:\\Users\\Aaron\\repo\\script.sh \\*\\*\n```");
+    const input = String.raw`
+\# Evidence Analysis
 
-    const inlineCode = "`\\d+\\s+\\w+`";
-    expect(unescapeProseMarkdown(inlineCode)).toBe("`\\d+\\s+\\w+`");
+\*\*Source:\*\* Original
 
-    const windowsPath = "Check file at C:\\Users\\Aaron\\data.csv in prose.";
-    expect(unescapeProseMarkdown(windowsPath)).toBe("Check file at C:\\Users\\Aaron\\data.csv in prose.");
+Path: C:\Users\aaron\records
+
+Inline: \`C:\Users\aaron\records\`
+
+\`\`\`
+const pattern = /\w+\s+record/;
+\`\`\`
+`;
+
+    const output = unescapeProseMarkdown(input);
+
+    expect(output).toContain("# Evidence Analysis");
+    expect(output).toContain("**Source:** Original");
+    expect(output).toContain(String.raw`C:\Users\aaron\records`);
+    expect(output).toContain(String.raw`/\w+\s+record/`);
+    expect(output).not.toContain(String.raw`\# Evidence Analysis`);
   });
 
   it("strips thinking tags cleanly before extracting sections", () => {

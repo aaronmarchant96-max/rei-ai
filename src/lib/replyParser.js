@@ -139,8 +139,8 @@ export function unescapeProseMarkdown(text) {
         // Unescape bold/italic formatting: \*\*bold\*\* -> **bold**
         .replace(/\\(\*\*|__)/g, "$1")
         // Unescape list items or escaped bold/italics: \* item or \*text\* -> * item / *text*
-        // ONLY if not preceded by a drive letter (A-Z:\) or word char with backslash (Windows path C:\Users)
-        .replace(/(?<![A-Za-z]:)(?<!\\[A-Za-z0-9_]+)\\(\*|_|\[|\])/g, "$1");
+        // ONLY if not part of a Windows drive path (e.g. C:\Users) or regex backslash word char (\w, \s, \d)
+        .replace(/(?<![A-Za-z]:\\)(?<!\\[A-Za-z0-9_]+)\\(\*|_|\[|\])/g, "$1");
     })
     .join("");
 }
