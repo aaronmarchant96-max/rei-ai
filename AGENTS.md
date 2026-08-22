@@ -1,6 +1,6 @@
 ---
 verified: true
-last_reviewed: 2026-08-14
+last_reviewed: 2026-08-22
 stale_after_hours: 24
 ---
 
@@ -311,4 +311,4 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 
 ---
 
-*Last reviewed: 2026-08-14 (added prompt-freeze caching protocol, recovery tests, and updated review timestamps). Stale after: 2026-08-15. Verify rules before executing.*
+*Last reviewed: 2026-08-22 (added gateway contract battery tests, serverRouter boundary, unified auth engine, delivery-gated economics, and canonical business plan). Stale after: 2026-08-23. Verify rules before executing.*
