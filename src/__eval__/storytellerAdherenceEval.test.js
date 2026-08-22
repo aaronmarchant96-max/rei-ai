@@ -18,7 +18,7 @@ export function evaluateConclusionStructure(prose) {
   const conclusionText = prose.slice(conclusionWindowStart);
 
   // Detect summary/enumeration patterns e.g. "he lost his X, he lost his Y" or "deprived of X, stripped of Y"
-  const enumerationRegex = /(?:he|she|they|had)\s+(?:lost|deprived|stripped|relinquished|given up)\s+[^.!\n]+(?:\s+and\s+|\s*,\s*)+(?:his|her|their|lost|deprived|stripped)/i;
+  const enumerationRegex = /(?:he|she|they|had)\s+(?:lost|deprived|stripped|relinquished|given up)\s+[^.!\n]+(?:\s+and\s+|\s*,\s*)(?:his|her|their|lost|deprived|stripped)/i;
   const repetitiveLossRegex = /(?:lost|deprived|stripped)\s+[^.!\n]+(?:lost|deprived|stripped)/i;
 
   const summaryPatternDetected = enumerationRegex.test(conclusionText) || repetitiveLossRegex.test(conclusionText);

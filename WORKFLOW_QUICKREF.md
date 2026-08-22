@@ -1,4 +1,4 @@
-# Workflow Quick-ref (verified 2026-08-14)
+# Workflow Quick-ref (verified 2026-08-22)
 
 One-page operational memory. Rationale lives in `AGENTS.md` / `docs/WORKFLOW_DETAILED.md` / `TOKEN_SAVERS.md`.
 
