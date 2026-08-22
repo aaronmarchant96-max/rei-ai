@@ -70,6 +70,22 @@ Immediate execution step.`;
     expect(res.Move).toBe("Immediate execution step.");
   });
 
+  it("safely unescapes presentation markdown tokens while protecting code and paths", () => {
+    const { unescapeProseMarkdown } = require("../../src/lib/replyParser.js");
+    
+    const prose = "\\# Section Heading\nThis is \\*\\*bold\\*\\* text.";
+    expect(unescapeProseMarkdown(prose)).toBe("# Section Heading\nThis is **bold** text.");
+
+    const codeBlock = "```bash\nC:\\Users\\Aaron\\repo\\script.sh \\*\\*\n```";
+    expect(unescapeProseMarkdown(codeBlock)).toBe("```bash\nC:\\Users\\Aaron\\repo\\script.sh \\*\\*\n```");
+
+    const inlineCode = "`\\d+\\s+\\w+`";
+    expect(unescapeProseMarkdown(inlineCode)).toBe("`\\d+\\s+\\w+`");
+
+    const windowsPath = "Check file at C:\\Users\\Aaron\\data.csv in prose.";
+    expect(unescapeProseMarkdown(windowsPath)).toBe("Check file at C:\\Users\\Aaron\\data.csv in prose.");
+  });
+
   it("strips thinking tags cleanly before extracting sections", () => {
     const text = `<think>
 Internal deliberations on whether this is a database bottleneck...

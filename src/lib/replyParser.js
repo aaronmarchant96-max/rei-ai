@@ -105,10 +105,9 @@ export function extractDeliverableAndScaffolding(text) {
   // 5. Strip any leading markdown horizontal rules (--- or ***) and leading whitespace
   raw = raw.replace(/^(?:\s*[-*_]{3,}\s*)+/g, "").trim();
 
-  // 6. Unescape accidental backslash-escaped markdown tokens (\###, \*\*, \`, \_)
-  raw = raw
-    .replace(/\\(#{1,6}\s)/g, "$1")
-    .replace(/\\(\*\*|__|\*|_|`{1,3}|\[|\])/g, "$1");
+  // 6. Safely unescape accidental presentation backslash escapes on prose nodes only.
+  // Code fences, inline code, URLs, Windows paths (e.g. C:\Users), and regexes remain 100% intact.
+  raw = unescapeProseMarkdown(raw);
 
   const scaffolding = scaffoldingParts.join("\n\n").trim() || null;
 
@@ -116,4 +115,32 @@ export function extractDeliverableAndScaffolding(text) {
     deliverable: raw,
     scaffolding,
   };
+}
+
+export function unescapeProseMarkdown(text) {
+  if (!text || typeof text !== "string") return "";
+
+  // 1. Unescape accidental backslash-escaped backticks (\``` or \`) in prose before code block extraction
+  let processed = text.replace(/\\(`{1,3})/g, "$1");
+
+  // 2. Split text by valid fenced code blocks (```...```) and inline code (`...`)
+  const codeBlockRegex = /(```[\s\S]*?```|`[^`\n]+`)/g;
+  const parts = processed.split(codeBlockRegex);
+
+  return parts
+    .map((part, index) => {
+      // Odd indices are valid code blocks or inline code — preserve completely
+      if (index % 2 === 1) return part;
+
+      // Even indices are prose nodes — unescape presentation tokens while preserving Windows paths & regexes
+      return part
+        // Unescape headings: \# Heading -> # Heading
+        .replace(/\\(#{1,6}\s)/g, "$1")
+        // Unescape bold/italic formatting: \*\*bold\*\* -> **bold**
+        .replace(/\\(\*\*|__)/g, "$1")
+        // Unescape list items or escaped bold/italics: \* item or \*text\* -> * item / *text*
+        // ONLY if not preceded by a drive letter (A-Z:\) or word char with backslash (Windows path C:\Users)
+        .replace(/(?<![A-Za-z]:)(?<!\\[A-Za-z0-9_]+)\\(\*|_|\[|\])/g, "$1");
+    })
+    .join("");
 }

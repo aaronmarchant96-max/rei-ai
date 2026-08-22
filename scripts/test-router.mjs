@@ -57,6 +57,7 @@ export const TIERS = {
       "src/lib/selfAuditContext.test.ts",
       "src/lib/deliveryIntegrityGate.test.ts",
       "src/lib/gatewayConcurrency.test.js",
+      "src/__eval__/archivistAdherenceEval.test.js",
     ],
     fileMatches: [
       /^src\/lib\/(?:nightShiftRouter|hingeClassifier|costHelpers|deRoboticize|detectAISlop|persistentContextEngine|fileExtractor|sourceContext|selfAuditContext|deliveryIntegrityGate|concurrencyPool|singleFlight|batchRunner|gatewayConcurrency)\.[a-z0-9]+$/i,
