@@ -1,67 +1,63 @@
 ---
-status: historical
-authority_scope: none
+status: active
+authority_scope: session-handoff-and-active-state
 owner: Aaron Marchant
-last_verified: null
-verified_against_commit: null
+last_verified: 2026-08-22
+verified_against_commit: 7c844e2
 claims_source: docs/CLAIM_LEDGER.md
 supersedes: []
-superseded_by: docs/PORTFOLIO_OVERVIEW.md
-archived_at: 2026-08-20
+superseded_by: null
+archived_at: null
 ---
 
-> ⚠️ **HISTORICAL DOCUMENT — POINT-IN-TIME SESSION SNAPSHOT (August 14, 2026)**  
-> *This document preserves intermediate session state (684 tests). For current canonical architecture, testing strategy, and verified metrics, see [`docs/PORTFOLIO_OVERVIEW.md`](PORTFOLIO_OVERVIEW.md) and [`src/data/claims.json`](../src/data/claims.json).*
+# Active Session Handoff — August 22, 2026
 
-# Archived Session Handoff — 2026-08-14
-
-- **Branch:** `main` at `725c71f`
+- **Branch:** `main` at `7c844e2`
 - **Repo (GitHub):** https://github.com/aaronmarchant96-max/rei-ai
-- **Repo (GitLab Mirror):** https://gitlab.com/prompthound-labs-group/rei-ai
-- **Directory:** `/home/potatoking/rei-ai`
 - **Production URL:** `https://prompthound-labs.vercel.app`
+- **Legacy URL Alias:** `https://debate-furnace.vercel.app`
 
-## Verification & Claim Baseline
+---
 
-- **Tests:** 684 unit tests / 58 suites passing 100% green (`npm test`)
-- **Claims Verification:** `node scripts/gen-claims.mjs --check` (Synced & passing)
-- **Cache Hit Rate:** 97.35% measured (Jul 16–Aug 14) / 97.67% (Jul 12–Aug 10)
-- **Total Build Cost:** ~$22–$23 across 684 tests & 22k lines of code
-- **Build:** `npm run build` passing cleanly
-- **TypeScript:** `npx tsc --noEmit` clean
+## 🟢 Verification & Claim Baseline
 
-## Recent Milestone Achievements
+- **Tests:** 1,099 unit & integration tests / 97 suites passing 100% green (`npm test`)
+- **Claims Synchronization:** `node scripts/gen-claims.mjs --check` (94 markdown files 100% clean)
+- **Prebuild Integrity:** `node scripts/extract-error-gaps.mjs --check` (169 tagged commits / 172 tags)
+- **TypeScript:** `npx tsc --noEmit` 0 errors clean
+- **Production Build:** `npm run build` passing cleanly (Vite 5.4)
 
-1. **Phase 1 Pilot Evaluator Engine (`pilotEval.ts`, `run-pilot.mjs`):**
-   - Replays customer transaction logs against REI router.
-   - Outputs honest cost/quality report (+92.9% cheap route savings, 83.1% pooled savings, -19% quality-preservation escalation).
-2. **Red Team Security UI & Corpus (`f08c916`):**
-   - In-browser D1 security firewall with Base64 auto-decode and educational-framing mitigation.
-   - 10-case regression suite (17 tests).
-3. **Measurement Contamination Resolution (Incident #001):**
-   - Fixed phantom Fact Check route & stale label maps (`evalLabelMap.js`, `validate-eval-integrity.mjs`).
-   - Accuracy verified at 90-96% with auditable denominator.
-4. **Token Economics & Caching Thesis (`TOKEN_SAVERS.md`):**
-   - "The model is cheap; context is what you pay for."
-   - 4-habit model: Freeze prefix, compress history, grep symbol lines, machine verification ($0 tests).
+---
 
-## Key System Architecture
+## 🎯 Recent Major Milestones
+
+1. **Gateway Repair & Unified Auth (`shared/lib/serverRouter.js`, `shared/lib/authTenantEngine.js`)**:
+   - Plain-JS serverless gateway boundary eliminating ESM/Babel compilation crashes on Vercel.
+   - Unified auth parsing `REI_API_KEYS`, enforcing 100 req/min tenant quota with structured 429 JSON errors before provider calls.
+2. **Delivery-Gated Economics (`delivery-gated-v1`)**:
+   - Response receipts (`receipt` object) with `savings_policy_version: "delivery-gated-v1"`.
+   - Truncated/incomplete turns (`finish_status !== "complete"`) yield `$0.00` eligible savings (`savings_eligibility: "excluded"`).
+3. **Offline Gateway Contract Battery & Live Canary**:
+   - [`tests/api/gatewayContract.test.js`](../tests/api/gatewayContract.test.js): Deterministic 8-invariant test battery.
+   - [`scripts/verify-deployed-gateway.mjs`](../scripts/verify-deployed-gateway.mjs): Live deployment canary script.
+4. **Developer Pilot Onboarding & 14-Day Audit Engine**:
+   - Screen live at `/pilot` with cURL, Python, Node SDK snippets, health check, test trigger, and receipt inspector.
+   - Automated reconciliation generator [`scripts/generate-pilot-report.mjs`](../scripts/generate-pilot-report.mjs).
+5. **Canonical Business Plan & GTM Roadmap (`docs/BUSINESS_PLAN.md`)**:
+   - 4-Phase Commercial Roadmap, ICP definition, BYOK unit economics, and 100% Solo Founder (zero hiring) operating model.
+
+---
+
+## 🔒 Multi-Agent Co-Pilot Operating Rules
 
 ```text
-Incoming Prompt ──> [ Layer 1: Hinge Classifier ] ──> [ Layer 2: Decision Cascade ] ──> Target Route
-                        ├── ECS (Text Complexity)          ├── 1. empty / greeting
-                        ├── DAS (Shannon Entropy)          ├── 2. meta-query
-                        └── APS (Adversarial Scanner)      ├── 3. self-evaluation / adversarial
-                                                           └── 4. domain match / fallback
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                 CO-PILOT RECONCILIATION & SAFETY GATE                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. Check local HEAD vs origin/main before starting any task                 │
+│ 2. Verify git status --short and branch recent commits                     │
+│ 3. Never overwrite, reset, or stash in-flight uncommitted work              │
+│ 4. If HEAD advances during work ──► STOP & revalidate against live state   │
+│ 5. Execute prebuild checks & claims:gen before final commit                 │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
-
-* **Fast Path Model:** `deepseek-v4-flash`
-* **Reasoning Model:** `openrouter/deepseek/deepseek-r1` / `deepseek/deepseek-r1`
-
----
-
-## Instructions for Fresh Session Resume
-
-1. **Start fresh sessions frequently** — long conversations (3,000+ messages) cause browser DOM and Bun event loop freeze (`MaxListenersExceededWarning`).
-2. **The instruction prefix is frozen:** OpenCode automatically loads `AGENTS.md`, `TOKEN_SAVERS.md`, and `SESSION_HANDOFF.md`, so 97%+ of input tokens hit DeepSeek's prompt cache instantly.
-3. **Verify state locally:** Run `npm test` and `node scripts/gen-claims.mjs --check`.

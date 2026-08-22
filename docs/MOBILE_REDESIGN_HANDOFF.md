@@ -1,3 +1,18 @@
+---
+status: historical
+authority_scope: none
+owner: Aaron Marchant
+last_verified: null
+verified_against_commit: null
+claims_source: docs/CLAIM_LEDGER.md
+supersedes: []
+superseded_by: docs/PORTFOLIO_OVERVIEW.md
+archived_at: 2026-06-29
+---
+
+> ⚠️ **HISTORICAL DOCUMENT — POINT-IN-TIME DEVELOPMENT SNAPSHOT (June 29, 2026)**  
+> *This handoff document reflects point-in-time mobile redesign state. For current canonical architecture, testing strategy, and verified metrics, see [`docs/PORTFOLIO_OVERVIEW.md`](PORTFOLIO_OVERVIEW.md) and [`src/data/claims.json`](../src/data/claims.json).*
+
 # 📱 Mobile-First Redesign Handoff
 **Project:** debate-furnace / REI.ai  
 **Date:** June 29, 2026  
