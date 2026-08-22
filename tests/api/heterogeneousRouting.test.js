@@ -28,7 +28,7 @@ function mockFetch(responseData) {
 describe("Production Heterogeneous Routing Acceptance Suite", () => {
   beforeEach(() => {
     mockFetch({
-      choices: [{ message: { content: "Simulated model response" } }],
+      choices: [{ message: { content: "Simulated model response" }, finish_reason: "stop" }],
       usage: { prompt_tokens: 45, completion_tokens: 80, total_tokens: 125 },
     });
     process.env.GROQ_API_KEY = "test-groq-key";

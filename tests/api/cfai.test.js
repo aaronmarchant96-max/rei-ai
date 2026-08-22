@@ -225,7 +225,8 @@ describe("handler", function () {
 
     expect(res._status).toBe(200);
     expect(res._body.result).toContain("gemini fallback ok");
-    expect(res._body.model).toContain("fallback");
+    expect(res._body.model).not.toContain("fallback");
+    expect(res._body.fallbackExecuted).toBe(true);
 
     var cooldown = mod.getProviderCooldown();
     var cooled = cooldown.filter(function (c) { return c.provider === "deepseek" || c.provider === "groq"; });
@@ -361,7 +362,8 @@ describe("provider timeout (AbortError) falls back instead of hard-failing", fun
     var result = await handleCfaiRequest("score", [], "tell me a story", "You are REI.", [], { id: "story-architect", model: "gemini-2.5-flash", maxTokens: 2048 });
     expect(result.success).toBe(true);
     expect(result.result).toBe("Fell back to Groq.");
-    expect(result.model).toContain("fallback");
+    expect(result.model).not.toContain("fallback");
+    expect(result.fallbackExecuted).toBe(true);
     expect(global.fetch).toHaveBeenCalledTimes(2);
   });
 

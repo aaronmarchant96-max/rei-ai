@@ -125,12 +125,28 @@ export function buildServerRouterDecision({ input = "", domain = null, model = n
 }
 
 export function computeServerCost(modelName = "deepseek-chat", inputTokens = 0, outputTokens = 0) {
-  const rates = DEFAULT_MODEL_RATES[modelName] || DEFAULT_MODEL_RATES["deepseek-chat"];
+  const canonicalModel = String(modelName || "")
+    .replace(/\s*\(fallback\)\s*$/i, "")
+    .trim();
+  const rates = DEFAULT_MODEL_RATES[canonicalModel];
+
+  if (!rates) {
+    return {
+      canonicalModel,
+      modelRated: false,
+      observedCostUsd: null,
+      counterfactualCostUsd: null,
+      modeledDifferenceUsd: null
+    };
+  }
+
   const observedCostUsd = ((inputTokens / 1000) * rates.input) + ((outputTokens / 1000) * rates.output);
   const counterfactualCostUsd = ((inputTokens / 1000) * rates.premiumBasis) + ((outputTokens / 1000) * rates.premiumBasis);
   const modeledDifferenceUsd = Math.max(0, counterfactualCostUsd - observedCostUsd);
 
   return {
+    canonicalModel,
+    modelRated: true,
     observedCostUsd: Number(observedCostUsd.toFixed(6)),
     counterfactualCostUsd: Number(counterfactualCostUsd.toFixed(6)),
     modeledDifferenceUsd: Number(modeledDifferenceUsd.toFixed(6))

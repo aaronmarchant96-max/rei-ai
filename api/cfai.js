@@ -1162,7 +1162,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        const finalRes = await finalizeResult(result, backends[backend], messages, (result.model || "deepseek-chat") + " (fallback)", routerDecision, backends);
+        const finalRes = await finalizeResult(result, backends[backend], messages, result.model || "deepseek-chat", routerDecision, backends);
         finalRes.fallbackExecuted = true;
         return finalRes;
       }
@@ -1210,8 +1210,9 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
           model: model,
           usage: result.usage,
           truncated: result.truncated || false,
-          finishReason: result.finishReason || "stop",
+          finishReason: result.finishReason || null,
           rateLimited: false,
+          fallbackExecuted: false,
         };
       }
     }
@@ -1230,7 +1231,9 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", null, backends);
+        const finalRes = await finalizeResult(result, backends[backend], messages, result.model || model, null, backends);
+        finalRes.fallbackExecuted = true;
+        return finalRes;
       }
       await sleep(INTER_FALLBACK_MS);
     }
@@ -1276,7 +1279,8 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
         usage: response.usage || null,
         research: response.research || null,
         truncated: response.truncated || false,
-        finishReason: response.finishReason || (response.truncated ? "length" : "stop"),
+        finishReason: response.finishReason || (response.truncated ? "length" : null),
+        fallbackExecuted: Boolean(response.fallbackExecuted),
         continuation: response.continuation || { attempted: false, chunks: 1, truncatedChunks: 0, finalTruncated: false },
         timestamp: new Date().toISOString(),
       };

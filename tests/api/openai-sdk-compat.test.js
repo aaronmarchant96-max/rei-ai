@@ -70,7 +70,7 @@ beforeEach(() => {
 });
 
 describe("OpenAI SDK Compatibility Matrix & Contract Verification", () => {
-  it("Contract 1 [cURL]: Basic non-streaming request returns valid OpenAI chat.completion", async () => {
+  it("Contract 1 [cURL]: Missing provider finish metadata remains unknown", async () => {
     const handler = (await import("../../api/v1/chat/completions.js")).default;
     const req = {
       method: "POST",
@@ -90,12 +90,15 @@ describe("OpenAI SDK Compatibility Matrix & Contract Verification", () => {
         {
           index: 0,
           message: { role: "assistant", content: "Verified OpenAI SDK compatible output." },
-          finish_reason: "stop",
+          finish_reason: "unknown",
         },
       ],
     });
     expect(typeof res._body.id).toBe("string");
     expect(typeof res._body.created).toBe("number");
+    expect(res._body.receipt.finish_status).toBe("unknown");
+    expect(res._body.receipt.eligible_savings_usd).toBe(0);
+    expect(res._body.receipt.savings_eligibility).toBe("excluded");
   });
 
   it("Contract 2 [Python/Node SDK]: Drop-in base URL replacement works with default parameters", async () => {
@@ -152,7 +155,7 @@ describe("OpenAI SDK Compatibility Matrix & Contract Verification", () => {
 
     // Terminal chunk and [DONE]
     const penultimate = JSON.parse(res._writes[res._writes.length - 2].replace(/^data: /, "").trim());
-    expect(penultimate.choices[0].finish_reason).toBe("stop");
+    expect(penultimate.choices[0].finish_reason).toBe("unknown");
     expect(res._writes[res._writes.length - 1]).toBe("data: [DONE]\n\n");
   });
 

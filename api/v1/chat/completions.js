@@ -36,20 +36,31 @@ function errorReply(res, status, code, message, param = null) {
 }
 
 function normalizeUsage(rawUsage, userPrompt, contentText) {
-  const promptTok = typeof rawUsage?.prompt_tokens === "number" && rawUsage.prompt_tokens > 0
+  const isValidTokenCount = (value) => Number.isFinite(value) && value >= 0;
+  const hasPrompt = isValidTokenCount(rawUsage?.prompt_tokens);
+  const hasCompletion = isValidTokenCount(rawUsage?.completion_tokens);
+  const hasTotal = isValidTokenCount(rawUsage?.total_tokens);
+  const allObserved = hasPrompt && hasCompletion && hasTotal
+    && rawUsage.total_tokens === rawUsage.prompt_tokens + rawUsage.completion_tokens;
+  const noneObserved = !hasPrompt && !hasCompletion && !hasTotal;
+
+  const promptTok = hasPrompt
     ? rawUsage.prompt_tokens
     : Math.max(1, Math.ceil((userPrompt || "").length / 4));
-  const compTok = typeof rawUsage?.completion_tokens === "number" && rawUsage.completion_tokens > 0
+  const compTok = hasCompletion
     ? rawUsage.completion_tokens
     : Math.max(1, Math.ceil((contentText || "").length / 4));
-  const totalTok = typeof rawUsage?.total_tokens === "number" && rawUsage.total_tokens > 0
+  const totalTok = allObserved
     ? rawUsage.total_tokens
     : promptTok + compTok;
 
   return {
-    prompt_tokens: promptTok,
-    completion_tokens: compTok,
-    total_tokens: totalTok,
+    usage: {
+      prompt_tokens: promptTok,
+      completion_tokens: compTok,
+      total_tokens: totalTok,
+    },
+    provenance: allObserved ? "observed" : (noneObserved ? "estimated" : "mixed"),
   };
 }
 
@@ -154,7 +165,7 @@ export default async function handler(req, res) {
     const rawExecutedModel = cfaiRes.model || selectedModel;
     const executedModel = String(rawExecutedModel).replace(/\s*\([^)]*\)/g, "").trim();
     const isTruncated = Boolean(cfaiRes.truncated || cfaiRes.isTruncated);
-    const rawFinishReason = cfaiRes.finishReason || (isTruncated ? "length" : "stop");
+    const rawFinishReason = isTruncated ? "length" : (cfaiRes.finishReason ?? null);
     const deliveryGate = evaluateDeliveryIntegrity({
       rawContent: replyText,
       finishReason: rawFinishReason,
@@ -163,12 +174,15 @@ export default async function handler(req, res) {
     const normalizedFinish = normalizeFinishReason(rawFinishReason);
     const isComplete = deliveryGate.deliveryGatePassed && !isTruncated;
 
-    const usage = normalizeUsage(cfaiRes.usage, userPrompt, replyText);
+    const normalizedUsage = normalizeUsage(cfaiRes.usage, userPrompt, replyText);
+    const usage = normalizedUsage.usage;
+    const usageProvenance = normalizedUsage.provenance;
     const costs = computeServerCost(executedModel, usage.prompt_tokens, usage.completion_tokens);
+    const savingsEligible = isComplete && usageProvenance === "observed" && costs.modelRated;
 
     if (typeof res.setHeader === "function") {
       res.setHeader("X-REI-Pathway", executedModel);
-      res.setHeader("X-REI-Savings", String(costs.modeledDifferenceUsd));
+      res.setHeader("X-REI-Savings", String(savingsEligible ? costs.modeledDifferenceUsd : 0));
     }
 
     const requestId = cfaiRes.requestId || `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -182,14 +196,15 @@ export default async function handler(req, res) {
       selected_model: selectedModel,
       executed_model: executedModel,
       fallback_executed: Boolean(cfaiRes.fallbackExecuted),
-      observed_cost_usd: costs.observedCostUsd,
+      observed_cost_usd: usageProvenance === "observed" && costs.modelRated ? costs.observedCostUsd : null,
+      modeled_cost_usd: costs.modelRated ? costs.observedCostUsd : null,
       modeled_difference_usd: costs.modeledDifferenceUsd,
-      eligible_savings_usd: isComplete ? costs.modeledDifferenceUsd : 0,
+      eligible_savings_usd: savingsEligible ? costs.modeledDifferenceUsd : 0,
       savings_policy_version: "delivery-gated-v1",
-      savings_eligibility: isComplete ? "eligible" : "excluded",
+      savings_eligibility: savingsEligible ? "eligible" : "excluded",
       finish_status: isComplete ? "complete" : deliveryGate.finishStatus,
-      usage_provenance: Boolean(cfaiRes.usage && cfaiRes.usage.prompt_tokens) ? "observed" : "estimated",
-      cost_provenance: "modeled",
+      usage_provenance: usageProvenance,
+      cost_provenance: costs.modelRated ? "modeled" : "unavailable",
       single_flight_coalesced: Boolean(cfaiRes.singleFlightCoalesced),
       execution_role: cfaiRes.executionRole || "leader"
     };

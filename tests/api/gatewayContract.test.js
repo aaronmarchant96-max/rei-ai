@@ -7,7 +7,7 @@
 import handler from "../../api/v1/chat/completions.js";
 import healthHandler from "../../api/health.js";
 import { resolveTenantContext, parseApiKeyHeader } from "../../shared/lib/authTenantEngine.js";
-import { normalizeFinishReason } from "../../shared/lib/serverRouter.js";
+import { computeServerCost } from "../../shared/lib/serverRouter.js";
 import { clearProviderCooldown } from "../../api/cfai.js";
 
 function mockFetch(responseData) {
@@ -70,11 +70,18 @@ function createMockRes() {
 
 beforeEach(() => {
   mockFetch({
-    choices: [{ message: { content: "Verified gateway response." } }],
+    choices: [{ message: { content: "Verified gateway response." }, finish_reason: "stop" }],
     usage: { prompt_tokens: 15, completion_tokens: 25, total_tokens: 40 },
   });
   process.env.GROQ_API_KEY = "test-groq-key";
   process.env.REI_API_KEY = "test-rei-key";
+  delete process.env.DEEPSEEK_API_KEY;
+  delete process.env.deepseek;
+  delete process.env.GEMINI_API_KEY;
+  delete process.env.GLM_API_KEY;
+  delete process.env.AI_GATEWAY_TOKEN;
+  delete process.env.VERCEL_OIDC_TOKEN;
+  delete process.env.OPENAI_API_KEY;
   clearProviderCooldown();
 });
 
@@ -136,21 +143,39 @@ describe("REI.ai Gateway Contract — Response Invariants & Integrity Economics"
     expect(res.body.choices[0].message.role).toBe("assistant");
     expect(res.body.receipt).toBeDefined();
     expect(res.body.receipt.savings_policy_version).toBe("delivery-gated-v1");
+    expect(res.body.receipt.usage_provenance).toBe("observed");
+    expect(res.body.receipt.observed_cost_usd).toEqual(expect.any(Number));
+    expect(res.body.receipt.savings_eligibility).toBe("eligible");
   });
 
-  it("6. Truncated/Incomplete response contributes $0 eligible savings", async () => {
-    const finishReason = normalizeFinishReason("length");
-    expect(finishReason).toBe("length");
+  it("6. Missing provider finish and usage metadata fail closed through the handler", async () => {
+    mockFetch({
+      choices: [{ message: { content: "Fallback response without terminal metadata." } }],
+    });
+    const req = createMockReq({
+      body: {
+        model: "deepseek-chat",
+        messages: [{ role: "user", content: "Exercise the fallback path" }],
+      },
+    });
+    const res = createMockRes();
 
-    // Delivery-gated-v1 rule check:
-    const isComplete = finishReason === "stop";
-    const modeledDifferenceUsd = 0.045;
-    const eligibleSavingsUsd = isComplete ? modeledDifferenceUsd : 0;
-    const eligibility = isComplete ? "eligible" : "excluded";
+    await handler(req, res);
 
-    expect(isComplete).toBe(false);
-    expect(eligibleSavingsUsd).toBe(0);
-    expect(eligibility).toBe("excluded");
+    expect(res.statusCode).toBe(200);
+    expect(res.body.model).toBe("llama-3.3-70b-versatile");
+    expect(res.body.choices[0].finish_reason).toBe("unknown");
+    expect(res.body.receipt).toMatchObject({
+      selected_model: "deepseek-chat",
+      executed_model: "llama-3.3-70b-versatile",
+      fallback_executed: true,
+      finish_status: "unknown",
+      usage_provenance: "estimated",
+      observed_cost_usd: null,
+      eligible_savings_usd: 0,
+      savings_eligibility: "excluded",
+    });
+    expect(res.body.receipt.modeled_cost_usd).toEqual(expect.any(Number));
   });
 
   it("7. Streaming produces valid SSE chunks with terminal receipt", async () => {
@@ -208,22 +233,39 @@ describe("REI.ai Gateway Contract — Single-Instance Coalescing & Health", () =
     expect(res.body.receipt).toBeDefined();
     expect(res.body.receipt.selected_model).toBe("llama-3.3-70b-versatile");
     expect(res.body.receipt.executed_model).toBe("llama-3.3-70b-versatile");
-    expect(res.body.receipt.usage_provenance).toBeDefined();
+    expect(res.body.receipt.fallback_executed).toBe(false);
+    expect(res.body.receipt.usage_provenance).toBe("observed");
     expect(res.body.receipt.cost_provenance).toBe("modeled");
   });
 
-  it("11. Missing finish_reason yields unknown status, delivery gate failure, and $0 eligible savings", async () => {
-    const { evaluateDeliveryIntegrity, normalizeFinishReason } = await import("../../shared/lib/serverRouter.js");
-    
-    expect(normalizeFinishReason(null)).toBe("unknown");
-
-    const gateResult = evaluateDeliveryIntegrity({
-      rawContent: "Partial content without terminal stop",
-      finishReason: null,
-      transportCompleted: true
+  it("11. Mixed usage and unknown model rates never populate observed cost or eligible savings", async () => {
+    mockFetch({
+      choices: [{ message: { content: "Response with partial usage." }, finish_reason: "stop" }],
+      usage: { prompt_tokens: 15 },
     });
+    const req = createMockReq({
+      body: {
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: "Exercise partial usage" }],
+      },
+    });
+    const res = createMockRes();
 
-    expect(gateResult.deliveryGatePassed).toBe(false);
-    expect(gateResult.finishStatus).toBe("unknown");
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.receipt).toMatchObject({
+      usage_provenance: "mixed",
+      observed_cost_usd: null,
+      eligible_savings_usd: 0,
+      savings_eligibility: "excluded",
+    });
+    expect(res.body.receipt.modeled_cost_usd).toEqual(expect.any(Number));
+
+    expect(computeServerCost("unknown-provider-model", 10, 10)).toMatchObject({
+      modelRated: false,
+      observedCostUsd: null,
+      modeledDifferenceUsd: null,
+    });
   });
 });
