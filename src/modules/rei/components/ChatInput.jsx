@@ -121,7 +121,9 @@ export default function ChatInput() {
                 }
               }}
               placeholder={
-                selectedDomain === "coding"
+                mobile
+                  ? "Ask REI.ai…"
+                  : selectedDomain === "coding"
                   ? "Describe the feature or bug — REI will find the architectural hinge and write verification-first code."
                   : selectedDomain === "red-team"
                     ? "Type your adversarial prompt or vulnerability scenario..."
