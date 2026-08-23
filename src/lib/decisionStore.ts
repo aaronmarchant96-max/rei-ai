@@ -1,8 +1,11 @@
+import type { StrategicSituation } from "./strategic/strategicTypes";
+
 const STORAGE_KEY = "rei_decision_store";
 const MAX_ENTRIES = 200;
 const SECTION_KEYS = ["Hinge", "Facts", "Assumptions", "Evaluation", "ChangeMind", "Move", "intro"] as const;
 
 export interface DecisionEntry {
+  schemaVersion?: 1;
   id: string;
   /** Stable correlation key shared with the routing-log entry for the same request. */
   requestId?: string;
@@ -27,6 +30,7 @@ export interface DecisionEntry {
   actualTokens?: number;
   actualCost?: number;
   durationMs?: number;
+  strategicSituation?: StrategicSituation;
 }
 
 function isDecisionEntry(value: unknown): value is DecisionEntry {
@@ -60,7 +64,7 @@ export function logDecision(entry: DecisionEntry): void {
   }
   try {
     const store = getDecisions();
-    store.unshift(entry);
+    store.unshift({ schemaVersion: 1, ...entry });
     if (store.length > MAX_ENTRIES) {
       store.length = MAX_ENTRIES;
     }

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { BarChart3, Pin, PinOff, X, ExternalLink } from "lucide-react";
+import ActivityTimeline from "./ActivityTimeline.jsx";
 
 export default function InstrumentRail({
   sessionTokens = 0,
@@ -12,6 +13,7 @@ export default function InstrumentRail({
   lifetimeCost = 0,
   lifetimeSavings = 0,
   activityCount = 0,
+  activityProjections = [],
   telemetryMode = "pinned",
   isInspectOpen = false,
   focusedDecision = null,
@@ -233,8 +235,13 @@ export default function InstrumentRail({
           );
         })() : null}
 
-        <div className="rei-side-card rei-side-card--session">
-          <div className="rei-side-card__heading">This conversation</div>
+        <div className="rei-side-card">
+          <div className="rei-side-card__heading">Activity</div>
+          <ActivityTimeline projections={activityProjections} />
+        </div>
+
+        <div className="rei-side-card">
+          <div className="rei-side-card__heading">This Session</div>
           {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
             <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
               REI chooses a model that fits each job. After the first answer, this panel shows which model answered, why it was chosen, and what it cost.

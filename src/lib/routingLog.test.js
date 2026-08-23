@@ -27,6 +27,8 @@ describe("routingLog", () => {
 
     const logs = getLogs();
     expect(logs).toHaveLength(2);
+    expect(logs[0].id).toMatch(/^routing:/);
+    expect(logs[1].id).toMatch(/^routing:/);
     expect(logs[0].domain).toBe("story"); // newest first
     expect(logs[1].domain).toBe("coding");
     expect(logs[0].timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
@@ -48,11 +50,8 @@ describe("routingLog", () => {
 
     clearLogs();
     expect(getLogs()).toHaveLength(0);
-    expect(localStorage.getItem("rei_routing_log")).toBeNull();
-  });
-
-  it("getLogs returns empty array when no data", () => {
     expect(getLogs()).toEqual([]);
+    expect(localStorage.getItem("rei_routing_log")).toBeNull();
   });
 
   it("preserves extra fields on entries", () => {
@@ -119,7 +118,8 @@ describe("routingLog", () => {
   });
 
   it("updateLatestLogEntry preserves requestId through write/read", () => {
-    logRoutingDecision({ ...makeEntry("coding"), requestId: "req-123" });
+    logRoutingDecision({ ...makeEntry("coding"), id: "routing:provided", requestId: "req-123" });
+    expect(getLogs()[0].id).toBe("routing:provided");
     expect(getLogs()[0].requestId).toBe("req-123");
   });
 
@@ -155,12 +155,8 @@ describe("routingLog", () => {
     expect(doc.entries[0].rationale).toBeUndefined();
     expect(doc.entries[0].domain).toBe("coding");
     expect(doc.entries[0].estimatedCost).toBe(0.0005);
-  });
-
-  it("exportLogsJSON retains prompt fields on explicit redact:false", () => {
-    logRoutingDecision(makeEntry("story"));
-    const doc = JSON.parse(exportLogsJSON(getLogs(), { redact: false }));
-    expect(doc.entries[0].inputPreview).toBe("Test input story");
-    expect(doc.entries[0].rationale).toBe("Test rationale for story");
+    const unredacted = JSON.parse(exportLogsJSON(getLogs(), { redact: false }));
+    expect(unredacted.entries[0].inputPreview).toBe("Test input coding");
+    expect(unredacted.entries[0].rationale).toBe("Test rationale for coding");
   });
 });

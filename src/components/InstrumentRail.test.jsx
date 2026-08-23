@@ -71,8 +71,8 @@ describe("InstrumentRail", () => {
     expect(screen.queryByText("Escalations")).not.toBeInTheDocument();
   });
 
-  it("shows inference chunks when chunks exceed messages (continuation happened)", () => {
-    render(
+  it("shows inference chunks only when chunks exceed messages", () => {
+    const { rerender } = render(
       <InstrumentRail
         {...defaultProps}
         sessionMessages={3}
@@ -82,11 +82,7 @@ describe("InstrumentRail", () => {
 
     expect(screen.getByText("Inference chunks")).toBeInTheDocument();
     expect(screen.getByText("7")).toBeInTheDocument();
-  });
-
-  it("hides inference chunks when chunks equal messages (no continuation)", () => {
-    render(<InstrumentRail {...defaultProps} />);
-
+    rerender(<InstrumentRail {...defaultProps} />);
     expect(screen.queryByText("Inference chunks")).not.toBeInTheDocument();
   });
 });

@@ -119,8 +119,8 @@
     ],
     "temperature": 0.3,
     "fallbackPriority": "structured-reasoning",
-    "costPer1kInput": 0.0001,
-    "costPer1kOutput": 0.0004
+    "costPer1kInput": 0.00075,
+    "costPer1kOutput": 0.00375
   },
   {
     "id": "genealogy-deep-dive",

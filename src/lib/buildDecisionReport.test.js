@@ -51,26 +51,33 @@ describe("buildDecisionReport", () => {
     expect(report.markdown).toContain("**Generated:** August 4, 2026");
   });
 
-  it("returns a stable filename with a .md extension", () => {
-    const report = buildDecisionReport({ sections });
-    expect(report.filename).toMatch(/^cardo-decision-\d+\.md$/);
-  });
-
   it("returns printable html with sections and meta", () => {
+    const strategicSituation = {
+      detected: true,
+      players: [{ name: "Finance <script>", role: "budget owner", power: "high" }],
+      incentives: [], alternatives: [], falsificationConditions: ["Finance rejects verified savings"],
+      convergenceZone: { identified: false },
+    };
     const report = buildDecisionReport({
       sections,
       routerDecision: { label: "Structured Reasoning", model: "llama-3.3-70b" },
       domainLabel: "Legal",
+      strategicSituation,
     });
     expect(report.html).toContain("<!doctype html>");
     expect(report.html).toContain("CARDO Decision Report");
     expect(report.html).toContain(">Hinge</h2>");
     expect(report.html).toContain("Structured Reasoning (llama-3.3-70b)");
     expect(report.html).toContain("Legal");
+    expect(report.markdown).toContain("## Strategic Situation");
+    expect(report.markdown).toContain("## Candidate Convergence\nNo feasible convergence identified");
+    expect(report.html).toContain("Finance &lt;script&gt;");
+    expect(report.html).not.toContain("Finance <script>");
   });
 
   it("defaults domain label to REI.ai", () => {
     const report = buildDecisionReport({ sections });
     expect(report.markdown).toContain("**Domain:** REI.ai");
+    expect(report.filename).toMatch(/^cardo-decision-\d+\.md$/);
   });
 });

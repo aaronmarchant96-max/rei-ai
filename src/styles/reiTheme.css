@@ -3164,4 +3164,64 @@
     animation: none !important;
     transition-duration: 0.01ms !important;
   }
+.rei-activity-group {
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  padding: 8px 0;
+}
+
+.rei-activity-group summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  text-transform: capitalize;
+}
+
+.rei-activity-status {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 9px;
+  padding: 1px 6px;
+}
+
+.rei-activity-status.is-complete { color: var(--success, #22c55e); }
+.rei-activity-status.is-partial,
+.rei-activity-status.is-legacy { color: var(--amber, #f0c965); }
+.rei-activity-status.is-orphaned { color: var(--danger, #ef4444); }
+
+.rei-activity-sources {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 9px;
+  line-height: 1.4;
+  margin: 6px 0;
+  text-transform: capitalize;
+}
+
+.rei-activity-group ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rei-activity-group li {
+  align-items: center;
+  display: grid;
+  font-size: 11px;
+  gap: 6px;
+  grid-template-columns: 6px 1fr auto;
+  padding: 4px 0;
+}
+
+.rei-activity-group li small {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.rei-activity-event-dot {
+  background: var(--accent-cyan, #38bdf8);
+  border-radius: 50%;
+  height: 5px;
+  width: 5px;
 }

@@ -24,6 +24,7 @@ describe("evalLog", () => {
 
     const evals = getEvals();
     expect(evals).toHaveLength(1);
+    expect(evals[0].id).toMatch(/^eval:/);
     expect(evals[0].requestId).toBe("req-1");
     expect(evals[0].evaluator).toBe("deterministic");
     expect(evals[0].evaluation.routeCorrect).toBe(true);

@@ -183,6 +183,7 @@ describe("REI", () => {
       const cfaiCall = calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
       const body = JSON.parse(cfaiCall[1].body);
       expect(body.input).not.toContain("## Self-Audit");
+      expect(body.systemPrompt).not.toContain("Optional Strategic Metadata Contract");
     }, { timeout: 3000 });
   });
 
@@ -244,9 +245,26 @@ describe("REI", () => {
     await waitFor(() => {
       const logs = JSON.parse(window.localStorage.getItem("rei_routing_log") || "[]");
       expect(logs).toHaveLength(1);
+      expect(logs[0].id).toMatch(/^routing:/);
       expect(logs[0].requestId).toBeTruthy();
       expect(logs[0].inputRedTeamScore).toBeGreaterThan(0);
       expect(logs[0].inputRedTeamEscalate).toBe(true);
+    }, { timeout: 3000 });
+
+    await waitFor(() => {
+      const logs = JSON.parse(window.localStorage.getItem("rei_routing_log") || "[]");
+      const decisions = JSON.parse(window.localStorage.getItem("rei_decision_store") || "[]");
+      expect(logs[0].status).toBe("success");
+      expect(decisions).toHaveLength(1);
+      expect(decisions[0]).toMatchObject({
+        schemaVersion: 1,
+        id: `decision:${logs[0].requestId}`,
+        requestId: logs[0].requestId,
+        domainLabel: "The Generalist",
+      });
+      expect(decisions[0].sections.Hinge).toBe("The core pivot point.");
+      expect(decisions[0].sections.Facts).toBe("What is known.");
+      expect(decisions[0].sections.Move).toBe("Next step.");
     }, { timeout: 3000 });
   });
 
@@ -428,12 +446,44 @@ describe("REI", () => {
     jest.advanceTimersByTime(1001);
     await assertion;
     jest.useRealTimers();
-  });
-
-  it("resolves with the response when fetch completes in time", async () => {
     global.fetch = jest.fn(() => Promise.resolve({ ok: true }));
     const response = await fetchWithTimeout("/api/cfai", {}, 1000);
     expect(response.ok).toBe(true);
+  });
+
+  it("adds strategic instructions after routing and persists only a validated trailing envelope", async () => {
+    const strategicSituation = {
+      schemaVersion: 1, detected: true,
+      evidence: [],
+      players: [
+        { id: "finance", name: "Finance", role: "budget owner", power: "high", vetoCapability: false, exitCapability: false, objectives: [] },
+        { id: "developers", name: "Developers", role: "users", power: "medium", vetoCapability: false, exitCapability: true, objectives: [] },
+      ],
+      rules: [], objectives: [], incentives: [], constraints: [], strategies: [], conflicts: [], alternatives: [],
+      alignment: "unknown", falsificationConditions: [],
+    };
+    global.fetch = jest.fn(() => Promise.resolve({
+      ok: true,
+      headers: { get: () => "application/json" },
+      json: () => Promise.resolve({
+        success: true,
+        result: `Finance and developers need a shared operating rule.\n<rei-strategic-envelope>\n${JSON.stringify(strategicSituation)}\n</rei-strategic-envelope>`,
+        model: "llama-3.1-8b-instant",
+        timestamp: "2026-08-23T12:00:00.000Z",
+      }),
+    }));
+    render(<REI />);
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "Finance wants lower cost, but developers require override control. What will each group do?" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => expect(screen.getByText(/shared operating rule/i)).toBeInTheDocument());
+    const body = JSON.parse(global.fetch.mock.calls.find((call) => String(call[0]).includes("/api/cfai"))[1].body);
+    expect(body.systemPrompt).toContain("Optional Strategic Metadata Contract");
+    expect(body.routerDecision).toBeDefined();
+    expect(screen.queryByText(/rei-strategic-envelope/i)).not.toBeInTheDocument();
+    const decisions = JSON.parse(window.localStorage.getItem("rei_decision_store") || "[]");
+    expect(decisions[0].strategicSituation).toEqual(strategicSituation);
   });
 });
 
