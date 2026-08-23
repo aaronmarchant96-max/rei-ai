@@ -22,29 +22,14 @@ export const singleFlightGroup = new SingleFlightGroup();
 var providerCooldown = new Map();
 var THROTTLE_COOLDOWN_MS = 15000;
 var INTER_FALLBACK_MS = 300;
-var DEFAULT_RETRY_AFTER_MS = 1500;
 
 function sleep(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
 
-function parseRetryAfter(res) {
-  try {
-    var header = res.headers.get("Retry-After");
-    if (!header) return DEFAULT_RETRY_AFTER_MS;
-    var seconds = Number(header);
-    if (!isNaN(seconds) && seconds > 0) return seconds * 1000;
-    var date = Date.parse(header);
-    if (!isNaN(date)) return Math.max(0, date - Date.now());
-  } catch (_) { /* fall through */ }
-  return DEFAULT_RETRY_AFTER_MS;
-}
-
-function recordThrottle(provider, res) {
-  var retryAfter = parseRetryAfter(res);
+function recordThrottle(provider) {
   providerCooldown.set(provider, Date.now() + THROTTLE_COOLDOWN_MS);
   console.warn(provider + " rate-limited — cooling down for " + (THROTTLE_COOLDOWN_MS / 1000) + "s");
-  return sleep(retryAfter);
 }
 
 export function getProviderCooldown() {
@@ -428,7 +413,7 @@ async function callDeepSeek(messages, maxTokens, modelOverride, temperature = 0.
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("deepseek", res); }
+      if (res.status === 429) { recordThrottle("deepseek"); }
       else {
         var errText = await res.text().catch(function () { return "(unreadable)"; });
         console.warn("DeepSeek status " + res.status + ": " + errText.slice(0, 300));
@@ -493,7 +478,7 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
       });
       if (!res.ok) {
         if (res.status === 429) {
-          await recordThrottle("gemini", res);
+          recordThrottle("gemini");
           return null;
         }
 
@@ -578,7 +563,7 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
         });
         if (!res.ok) {
           if (res.status === 429) {
-            await recordThrottle("groq", res);
+            recordThrottle("groq");
             return null;
           }
           if (res.status === 404 || res.status === 413) {
@@ -627,7 +612,7 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7, tools = null) 
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("openai", res); }
+      if (res.status === 429) { recordThrottle("openai"); }
       return null;
     }
     const data = await res.json();
@@ -668,7 +653,7 @@ async function callGLM(messages, maxTokens, temperature = 0.7, tools = null) {
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("glm", res); }
+      if (res.status === 429) { recordThrottle("glm"); }
       else {
         const errText = await res.text().catch(function () { return ""; });
         console.warn("GLM status " + res.status + ": " + errText.slice(0, 200));

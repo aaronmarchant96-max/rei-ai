@@ -171,9 +171,10 @@ describe("handler", function () {
   });
 
   it("records provider cooldown on 429 and falls back to next provider", async function () {
+    var timeoutSpy = jest.spyOn(global, "setTimeout");
     global.fetch = jest.fn()
       .mockImplementationOnce(function () {
-        return Promise.resolve(fetchOnceResponse({ error: "rate limited" }, 429, false, { "Retry-After": "3" }));
+        return Promise.resolve(fetchOnceResponse({ error: "rate limited" }, 429, false, { "Retry-After": "0.05" }));
       })
       .mockImplementationOnce(function () {
         return Promise.resolve(fetchOnceResponse(
@@ -197,6 +198,8 @@ describe("handler", function () {
     var dsCooldown = cooldown.filter(function (c) { return c.provider === "deepseek"; });
     expect(dsCooldown.length).toBe(1);
     expect(dsCooldown[0].remaining).toBeGreaterThan(0);
+    expect(timeoutSpy.mock.calls.some(function (call) { return call[1] === 50; })).toBe(false);
+    timeoutSpy.mockRestore();
   });
 
   it("skips in-cooldown provider and continues fallback to remaining backend", async function () {
