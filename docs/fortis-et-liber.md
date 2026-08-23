@@ -102,6 +102,11 @@ Use Jest as the main evidence gate.
 
 ### Recent Fixes and Updates
 
+> **Historical chronology:** test counts in the dated entries below describe the
+> suite at the time of each change. They are not the current repository
+> baseline. For the current measured count, use `src/data/claims.json` and
+> `npm run claims:check`.
+
 **Evidence audit — claims aligned to measured reality (2026-08-05):**
 - **Retired the "92%" and "~90%" accuracy claims**: no benchmark produced them. Verified via `npm test -- --runInBand --testPathPatterns=routingEval`: deterministic router accuracy is **60–80%** (basic 60%, blind 67%, ML 66.7%, V3 80%, semantic-blind 73%).
 - **Semantic eval is NOT valid in CI**: `routingEvalBlindV2` requires ONNX + model download; without it, it measures hash-noise (12%) and the test itself prints "⛔ THIS RESULT DOES NOT VALIDATE SEMANTIC ACCURACY." Real semantic accuracy requires an environment with `@xenova/transformers` + HuggingFace access.
@@ -201,9 +206,9 @@ Use Jest as the main evidence gate.
 - **Verification**: `npm test -- --runInBand src/lib/cardoGuard.test.js src/CardoGuard.test.jsx` (17/17 tests now passing)
 - **Impact**: CARDO GUARD confidence labeling is now consistent across low confidence scenarios
 
-### Current Test Status
+### Historical Test Status — 2026-08-05
 
-- **Total tests**: 508 passing across 38 suites (was 78; +430 from session 2026-08-04/05 fixes and coverage)
+- **Point-in-time total**: 508 passing across 38 suites on 2026-08-05 (was 78; +430 from that session's fixes and coverage). This is historical, not the current baseline.
 - **Key test files**:
   - `src/lib/persistentContextEngine.test.js` - Hierarchical memory compression and recovery checks
   - `src/lib/cardoGuard.test.js` - Core decision logic tests (pump + SaaS scenarios)

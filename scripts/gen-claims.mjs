@@ -97,7 +97,7 @@ const DOC_TARGETS = [
         replacement: () => `Backed by **${testCount} automated tests across ${suiteCount} test suites**`
       },
       {
-        pattern: /- \*\*Empirical Rigor:\*\* Backed by \d+ automated tests across \d+ test suites/g,
+        pattern: /- \*\*Empirical Rigor(?: & Fast Local Loop)?:\*\* Backed by [\d,]+ automated tests across \d+ test suites/g,
         replacement: () => `- **Empirical Rigor:** Backed by ${testCount} automated tests across ${suiteCount} test suites`
       },
       {
@@ -107,6 +107,10 @@ const DOC_TARGETS = [
       {
         pattern: /# Run full test suite \(\d+ test suites, \d+ tests\)/g,
         replacement: () => `# Run full test suite (${suiteCount} test suites, ${testCount} tests)`
+      },
+      {
+        pattern: /# Run serial test suite \(\d+ test suites, \d+ tests\)/g,
+        replacement: () => `# Run serial test suite (${suiteCount} test suites, ${testCount} tests)`
       }
     ]
   },
@@ -169,6 +173,71 @@ const DOC_TARGETS = [
       {
         pattern: /Backed by \*\*\d+ automated tests across \d+ test suites\*\*/g,
         replacement: () => `Backed by **${testCount} automated tests across ${suiteCount} test suites**`
+      },
+      {
+        pattern: /\*\*[\d,]+ tests across \d+ test suites\*\*/g,
+        replacement: () => `**${testCount.toLocaleString("en-US")} tests across ${suiteCount} test suites**`
+      }
+    ]
+  },
+  {
+    relPath: "TOKEN_SAVERS.md",
+    transforms: [
+      {
+        pattern: /Current: \d+ tests \/ \d+ suites/g,
+        replacement: () => `Current: ${testCount} tests / ${suiteCount} suites`
+      }
+    ]
+  },
+  {
+    relPath: "docs/SESSION_HANDOFF.md",
+    transforms: [
+      {
+        pattern: /- \*\*Tests:\*\* [\d,]+ unit & integration tests \/ \d+ suites passing 100% green \(`npm test`\)/g,
+        replacement: () => `- **Tests:** ${testCount.toLocaleString("en-US")} unit & integration tests / ${suiteCount} suites passing 100% green (\`npm test\`)`
+      }
+    ]
+  },
+  {
+    relPath: "docs/PORTFOLIO_OVERVIEW.md",
+    transforms: [
+      {
+        pattern: /\*\*\d+ automated tests across \d+ suites\*\*/g,
+        replacement: () => `**${testCount} automated tests across ${suiteCount} suites**`
+      },
+      {
+        pattern: /\b\d+ Tests\b/g,
+        replacement: () => `${testCount} Tests`
+      },
+      {
+        pattern: /\*\*\d+ passing automated tests\*\* across \d+ test suites/g,
+        replacement: () => `**${testCount} passing automated tests** across ${suiteCount} test suites`
+      },
+      {
+        pattern: /\| \*\*Automated Passing Tests\*\* \| \*\*\d+ tests\*\* \(\d+ suites\) \|/g,
+        replacement: () => `| **Automated Passing Tests** | **${testCount} tests** (${suiteCount} suites) |`
+      }
+    ]
+  },
+  {
+    relPath: "docs/BUSINESS_PLAN.md",
+    transforms: [
+      {
+        pattern: /\*\*[\d,]+ automated tests across \d+ test (?:files|suites)\*\*/g,
+        replacement: () => `**${testCount.toLocaleString("en-US")} automated tests across ${suiteCount} test suites**`
+      }
+    ]
+  },
+  {
+    relPath: "docs/GITHUB_PROFILE_README.md",
+    transforms: [
+      {
+        pattern: /\*\*[\d,]+ automated tests across \d+ test suites\*\*/g,
+        replacement: () => `**${testCount.toLocaleString("en-US")} automated tests across ${suiteCount} test suites**`
+      },
+      {
+        pattern: /Automated Tests\s+──►\s+[\d,]+ tests across \d+ suites/g,
+        replacement: () => `Automated Tests  ──► ${testCount.toLocaleString("en-US")} tests across ${suiteCount} suites`
       }
     ]
   }
