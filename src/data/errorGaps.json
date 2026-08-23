@@ -1,6 +1,15 @@
 {
-  "generatedAt": "2026-08-23T06:33:13.276Z",
+  "generatedAt": "2026-08-23T06:47:02.313Z",
   "entries": [
+    {
+      "hash": "d7843c1",
+      "date": "2026-08-23",
+      "subject": "fix(story): enforce coherent genre-complete delivery [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(story): enforce coherent genre-complete delivery"
+    },
     {
       "hash": "16da615",
       "date": "2026-08-23",
@@ -1554,16 +1563,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 172,
-    "totalTags": 175,
+    "totalEntries": 173,
+    "totalTags": 176,
     "byTag": {
-      "manual": 102,
+      "manual": 103,
       "test": 59,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 172
+      "2026-08": 173
     }
   }
 }
