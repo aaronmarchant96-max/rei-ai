@@ -1080,7 +1080,7 @@ const STORY_DELIVERY_CONTRACT = `
   1. Write a one-sentence premise built around a specific contradiction rather than a stock genre setup.
   2. Identify the protagonist's concrete want, private fear, decisive hinge, and the causal chain that makes the ending possible.
   3. Build a causal tonal braid: requested tones must affect the same events and consequences, not appear as disconnected passages.
-  4. Choose one planted detail and its eventual payoff. The payoff must alter meaning, action, or consequence rather than merely echo the detail.
+  4. Plant one apparently minor but memorable detail early. By the ending, make it materially affect the outcome and acquire a different meaning. Match the transformation to the requested genre and tone; comic-to-tragic is one possible form, never a universal template.
   5. Draft the story, then revise it as a senior editor. Remove generic rescue beats, convenient strangers, inherited mentor slogans, redundant atmospheric description, and any paragraph that does not change the situation.
   6. Limit the prose to a small set of memorable images. Prefer precise recurring objects with changing meaning over a stream of interchangeable similes.
   7. Check the state ledger, causal continuity, genre fulfillment, and ending. Return only the revised story—never the brief, blueprint, checklist, or editorial notes.
