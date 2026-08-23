@@ -1091,6 +1091,14 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
 const STORY_DELIVERY_CONTRACT = `
 
 [STORY DELIVERY CONTRACT]
+- [SENIOR EDITOR PASS — perform silently before answering]
+  1. Write a one-sentence premise built around a specific contradiction rather than a stock genre setup.
+  2. Identify the protagonist's concrete want, private fear, decisive hinge, and the causal chain that makes the ending possible.
+  3. Build a causal tonal braid: requested tones must affect the same events and consequences, not appear as disconnected passages.
+  4. Choose one planted detail and its eventual payoff. The payoff must alter meaning, action, or consequence rather than merely echo the detail.
+  5. Draft the story, then revise it as a senior editor. Remove generic rescue beats, convenient strangers, inherited mentor slogans, redundant atmospheric description, and any paragraph that does not change the situation.
+  6. Limit the prose to a small set of memorable images. Prefer precise recurring objects with changing meaning over a stream of interchangeable similes.
+  7. Check the state ledger, causal continuity, genre fulfillment, and ending. Return only the revised story—never the brief, blueprint, checklist, or editorial notes.
 - Treat every explicitly requested genre and tone as a binding acceptance criterion. When comedy and tragedy are both requested, include at least two distinct comic beats arising from character or circumstance and one irreversible tragic consequence caused by an event in the story.
 - Maintain a silent state ledger for every named character, object, injury, location, and resolved event. A character who dies or becomes incapacitated must not speak, laugh, move, or attack later unless the story explicitly establishes why.
 - Do not repeat an action beat, sentence frame, sensory image, or dramatic exchange merely to extend the response. Every paragraph must change the situation.

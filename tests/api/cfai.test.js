@@ -524,6 +524,20 @@ describe("Storyteller delivery contract", function () {
     expect(system).toContain("End once, after the decisive consequence");
   });
 
+  it("runs the universal senior-editor sequence inside every story request", async function () {
+    var body = await runStory("Write a quiet family drama about an inherited workshop");
+    var system = body.messages.find(function (m) { return m.role === "system"; }).content;
+
+    expect(system).toContain("SENIOR EDITOR PASS");
+    expect(system).toContain("one-sentence premise");
+    expect(system).toContain("causal tonal braid");
+    expect(system).toContain("planted detail and its eventual payoff");
+    expect(system).toContain("Remove generic rescue beats");
+    expect(system).toContain("Limit the prose to a small set of memorable images");
+    expect(system).toContain("Return only the revised story");
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("does not expose research tools for a wholly invented fantasy prompt", async function () {
     var body = await runStory("Tell me a fantasy ranger story with comedy and tragedy");
     expect(body.tools).toBeUndefined();
@@ -533,5 +547,23 @@ describe("Storyteller delivery contract", function () {
     var body = await runStory("Write historical fiction set during the real Battle of Berlin in 1945");
     expect(body.tools).toBeDefined();
     expect(body.tools.length).toBeGreaterThan(0);
+  });
+
+  it("does not impose the Storyteller editorial protocol on non-story routes", async function () {
+    process.env.GROQ_API_KEY = "test-key";
+    var { handleCfaiRequest, clearProviderCooldown } = await import("../../api/cfai.js");
+    clearProviderCooldown();
+    mockFetchQueue([{ data: providerResponse("A structured answer.", "stop") }]);
+    await handleCfaiRequest("score", [], "Help me compare two options", "You are The Generalist.", [], {
+      id: "structured-reasoning",
+      domain: "assistant",
+      model: "llama-3.3-70b-versatile",
+      maxTokens: 2048,
+    });
+
+    var body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    var system = body.messages.find(function (m) { return m.role === "system"; }).content;
+    expect(system).not.toContain("STORY DELIVERY CONTRACT");
+    expect(system).not.toContain("SENIOR EDITOR PASS");
   });
 });
