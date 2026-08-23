@@ -639,7 +639,7 @@ export default function REI({ initialPrompt } = {}) {
 
       const inputPayload = isGreeting
         ? userMsg.text
-        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`;
+        : `${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`.trim();
       const effectiveSystemPrompt = systemPrompt + fileBlock + (strategicDetection.detected ? STRATEGIC_OUTPUT_DIRECTIVE : "");
 
       retryPayloadRef.current = {

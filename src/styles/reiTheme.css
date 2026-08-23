@@ -3164,6 +3164,7 @@
     animation: none !important;
     transition-duration: 0.01ms !important;
   }
+}
 .rei-activity-group {
   border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
   padding: 8px 0;
