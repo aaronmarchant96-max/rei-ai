@@ -850,7 +850,7 @@ export default function REI({ initialPrompt } = {}) {
                 />
               )}
 
-              {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
+              {messages.length <= 1 && !isTyping && (
                 <WelcomePanel
                   activeDomain={selectedDomain}
                   onResume={(domainId) => setSelectedDomain(domainId)}

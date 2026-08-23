@@ -51,6 +51,39 @@ const GENERIC_STARTERS = [
   { label: "Scan for prompt injections", sub: "Detect injection attacks before they reach a model", prompt: "Take me to the red team scanner — I want to test a prompt for adversarial patterns.", icon: "🛡️" },
 ];
 
+const DOMAIN_WELCOME = {
+  assistant: {
+    title: "Cognitive Engine",
+    eyebrow: "Evidence-aware reasoning workspace",
+    description: "Turn an uncertain question into a clear hinge, an evidence map, and a next move you can defend.",
+    signal: "Deterministic routing",
+  },
+  coding: {
+    title: "The Engineer",
+    eyebrow: "Architecture · verification · delivery",
+    description: "Move from a fuzzy requirement or failing build to the architectural hinge, a tested change, and a clean handoff.",
+    signal: "Verification-first code",
+  },
+  genealogy: {
+    title: "The Archivist",
+    eyebrow: "Sources · identity · provenance",
+    description: "Separate records from inference, resolve conflicting identities, and build a family-history conclusion that shows its work.",
+    signal: "Evidence tiering",
+  },
+  story: {
+    title: "The Storyteller",
+    eyebrow: "Character · tension · consequence",
+    description: "Find the emotional hinge, pressure-test the arc, and shape a story where every major turn earns its place.",
+    signal: "Narrative coherence",
+  },
+  legal: {
+    title: "The Precedent Engine",
+    eyebrow: "Authority · facts · decisive rule",
+    description: "Trace the controlling authority, isolate the fact that changes the rule, and make the legal reasoning auditable.",
+    signal: "Precedent mapping",
+  },
+};
+
 export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: propDomain }) {
   const [activeDomain, setActiveDomain] = useState(propDomain || null);
   const [recentTopics, setRecentTopics] = useState([]);
@@ -96,6 +129,7 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
 
   const starters = activeDomain ? (DOMAIN_STARTERS[activeDomain] || GENERIC_STARTERS) : GENERIC_STARTERS;
   const currentDomainLabel = activeDomain ? activeDomain.charAt(0).toUpperCase() + activeDomain.slice(1) : "Generalist";
+  const welcome = DOMAIN_WELCOME[activeDomain] || DOMAIN_WELCOME.assistant;
 
   return (
     <div className="rei-chat-card">
@@ -104,13 +138,13 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
           <div className="rei-chat-intro__copy">
             <div className="rei-chat-intro__eyebrow">
               <span className="rei-chat-intro__signal" aria-hidden="true" />
-              Evidence-aware reasoning workspace
+              {welcome.eyebrow}
             </div>
             <h1 className="rei-chat-intro__headline">
-              REI<span className="rei-chat-intro__suffix">.ai</span> Cognitive Engine
+              REI<span className="rei-chat-intro__suffix">.ai</span> {welcome.title}
             </h1>
             <p className="rei-chat-intro__text">
-              Turn an uncertain question into a clear hinge, an evidence map, and a next move you can defend.
+              {welcome.description}
             </p>
           </div>
           <button
@@ -124,7 +158,7 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
         </div>
         <div className="rei-chat-intro__trust" aria-label="Workspace capabilities">
           <span>CARDO v3.4</span>
-          <span>Deterministic routing</span>
+          <span>{welcome.signal}</span>
           <span>Verifiable receipts</span>
         </div>
       </div>
@@ -147,7 +181,7 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
         </div>
       )}
 
-      <div className="rei-starters">
+      <div className={`rei-starters ${starters.length === 3 ? "is-three" : ""}`}>
         <div className="rei-starters__label">Pick a starting point</div>
         {starters.map((s) => {
           const Icon = ICON_MAP[s.icon];

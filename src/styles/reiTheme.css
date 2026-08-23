@@ -2308,6 +2308,10 @@
   padding: 24px clamp(24px, 4vw, 52px) clamp(28px, 4vw, 44px);
 }
 
+.rei-starters.is-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .rei-starters__label {
   margin-bottom: 4px;
   color: #777d77;
@@ -2924,6 +2928,10 @@
 }
 
 @media (max-width: 900px) {
+  .rei-starters.is-three {
+    grid-template-columns: 1fr;
+  }
+
   .rei-header {
     min-height: 60px;
     padding-inline: 14px;
