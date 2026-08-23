@@ -17,6 +17,10 @@ import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
 import { parseAssistantStyleReply, extractDeliverableAndScaffolding } from "./lib/replyParser.js";
+import { detectStrategicSituation } from "./lib/strategic/detectStrategicSituation";
+import { extractStrategicEnvelope } from "./lib/strategic/strategicEnvelope";
+import { STRATEGIC_OUTPUT_DIRECTIVE } from "./lib/strategic/strategicPrompt.js";
+import { projectStoredSessionActivity } from "./lib/activityLedger";
 import { isSimpleGreeting } from "./lib/routingConstants.js";
 import { getDomainProfiles, getDomainPrompt, getDomain } from "./domains/_index.js";
 import IngestPanel from "./modules/rei/components/IngestPanel.jsx";
@@ -162,6 +166,7 @@ export default function REI({ initialPrompt } = {}) {
         domainLabel: exportData.domainLabel || currentDomain?.label || "REI.ai",
         sourceText: exportData.sourceText || "",
         createdAt: exportData.createdAt || exportData.timestamp || new Date(),
+        strategicSituation: exportData.strategicSituation,
       });
       const blob = new Blob([report.markdown], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -183,6 +188,7 @@ export default function REI({ initialPrompt } = {}) {
               routerDecision: exportData.routerDecision,
               domainLabel: exportData.domainLabel || getDomain(selectedDomain)?.label || "REI.ai",
               createdAt: exportData.createdAt || exportData.timestamp || new Date(),
+              strategicSituation: exportData.strategicSituation,
             }).html);
             printWindow.document.close();
             printWindow.focus();
@@ -331,9 +337,10 @@ export default function REI({ initialPrompt } = {}) {
     return decisions > 0 ? { decisions } : null;
   }, [messages]);
 
-  const activityCount = useMemo(() => {
-    return messages.filter(m => m?.sender === "rei" && (m?.evidence || m?.rawJson?.routerDecision)).length;
+  const activityProjections = useMemo(() => {
+    return projectStoredSessionActivity();
   }, [messages]);
+  const activityCount = useMemo(() => activityProjections.reduce((count, projection) => count + projection.events.length, 0), [activityProjections]);
 
   const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, sessionChunks, escalationCount, trackMessage, lifetimeCost, lifetimeSavings, resetSession } = useSessionTracker();
 
@@ -392,7 +399,8 @@ export default function REI({ initialPrompt } = {}) {
     }
 
     const rawAiText = data.result || data.reply || "";
-    const { deliverable: aiText, scaffolding: extractedBlueprint } = extractDeliverableAndScaffolding(rawAiText);
+    const strategicEnvelope = extractStrategicEnvelope(rawAiText);
+    const { deliverable: aiText, scaffolding: extractedBlueprint } = extractDeliverableAndScaffolding(strategicEnvelope.visibleText);
     let usage = data.usage;
     const modelUsed = data.model || routerDecision?.model || "unknown";
     const routeId = routerDecision?.id || "generalist";
@@ -403,16 +411,32 @@ export default function REI({ initialPrompt } = {}) {
       : (routerDecision?.estimatedCost || 0);
 
     const isGreeting = routeId === "simple-greeting";
+    const finalRouterDecision = {
+      ...(data.routerDecision || routerDecision),
+      model: modelUsed,
+      estimatedCost: data.routerDecision?.estimatedCost != null ? data.routerDecision.estimatedCost : routerDecision?.estimatedCost,
+      blueprint: extractedBlueprint || data.routerDecision?.blueprint || routerDecision?.blueprint || null,
+    };
 
     if (!isGreeting) {
+      const sections = parseAssistantStyleReply(aiText);
       logDecision({
-        domain: selectedDomain,
-        routeId: routeId,
-        model: modelUsed,
-        hingeScore: routerDecision?.hingeScore || 0,
-        estimatedCost: actualCost,
-        tokenCount: (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0),
-        rationale: routerDecision?.rationale || "Auto-routed by CARDO",
+        schemaVersion: 1,
+        id: `decision:${requestId}`,
+        requestId,
+        sections,
+        routerDecision: {
+          label: finalRouterDecision?.label || finalRouterDecision?.id,
+          model: modelUsed,
+          matchedTerms: finalRouterDecision?.routingSignals?.matchedTerms || finalRouterDecision?.matchedTerms || [],
+          hingeScore: finalRouterDecision?.hingeScore || 0,
+        },
+        domainLabel: currentDomain.label,
+        inputPreview: promptText.slice(0, 80),
+        createdAt: data.timestamp || new Date().toISOString(),
+        actualTokens: (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0),
+        actualCost,
+        strategicSituation: strategicEnvelope.strategicSituation || undefined,
       });
       trackMessage({
         cost: actualCost,
@@ -430,7 +454,7 @@ export default function REI({ initialPrompt } = {}) {
       status: "success",
       resolvedModel: modelUsed,
       chunks: data.chunks || 1,
-    });
+    }, requestId);
 
     try {
       const responseText = aiText;
@@ -460,13 +484,6 @@ export default function REI({ initialPrompt } = {}) {
       console.warn("Failed to log evaluation:", e);
     }
 
-    const finalRouterDecision = {
-      ...(data.routerDecision || routerDecision),
-      model: modelUsed,
-      estimatedCost: data.routerDecision?.estimatedCost != null ? data.routerDecision.estimatedCost : routerDecision?.estimatedCost,
-      blueprint: extractedBlueprint || data.routerDecision?.blueprint || routerDecision?.blueprint || null,
-    };
-
     const aiMsg = {
       sender: "rei",
       text: aiText,
@@ -482,6 +499,8 @@ export default function REI({ initialPrompt } = {}) {
         redTeamResult: data.redTeamResult || null,
         research: data.research || null,
         rawTrace: data.rawTrace || null,
+        strategicMetadataStatus: strategicEnvelope.status,
+        strategicSituation: strategicEnvelope.strategicSituation,
       },
     };
 
@@ -558,6 +577,7 @@ export default function REI({ initialPrompt } = {}) {
       const routingMs = Math.round((performance.now() - routerStart) * 100) / 100;
 
       const inputScan = scanRedTeamInput(userMsg.text);
+      const strategicDetection = detectStrategicSituation(userMsg.text);
 
       const escalation = shouldEscalateToRemote({
         confidence: 1 - (routerDecision.hingeScore || 0),
@@ -626,11 +646,12 @@ export default function REI({ initialPrompt } = {}) {
       const inputPayload = isGreeting
         ? userMsg.text
         : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`;
+      const effectiveSystemPrompt = systemPrompt + fileBlock + (strategicDetection.detected ? STRATEGIC_OUTPUT_DIRECTIVE : "");
 
       retryPayloadRef.current = {
         inputPayload,
         prompt: userMsg.text,
-        systemPrompt,
+        systemPrompt: effectiveSystemPrompt,
         history: historyPayload,
         files: currentFiles,
         routerDecision,
@@ -648,7 +669,7 @@ export default function REI({ initialPrompt } = {}) {
           command: "score",
           input: inputPayload,
           prompt: userMsg.text,
-          systemPrompt: systemPrompt + fileBlock,
+          systemPrompt: effectiveSystemPrompt,
           history: historyPayload,
           routerDecision,
           requestId,
@@ -917,6 +938,7 @@ export default function REI({ initialPrompt } = {}) {
             lifetimeCost={lifetimeCost}
             lifetimeSavings={lifetimeSavings}
             activityCount={activityCount}
+            activityProjections={activityProjections}
             telemetryMode={telemetryMode}
             isInspectOpen={isInspectOpen}
             focusedDecision={focusedDecision}

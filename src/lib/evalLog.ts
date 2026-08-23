@@ -26,6 +26,8 @@ export interface Evaluation {
 }
 
 export interface EvalEntry {
+  /** Durable source-record identity. Optional only for legacy callers/records. */
+  id?: string;
   /** REQUIRED — correlation key joining routing decision, usage/outcome,
    *  and this evaluation for one request. */
   requestId: string;
@@ -38,11 +40,17 @@ export interface EvalEntry {
   evaluation: Evaluation;
 }
 
+function createEvalEntryId(entry: EvalEntry): string {
+  const version = entry.evaluatorVersion || "unknown-version";
+  const evaluatedAt = entry.evaluation?.evaluatedAt || "unknown-time";
+  return `eval:${entry.requestId}:${entry.evaluator}:${version}:${evaluatedAt}`;
+}
+
 export function logEval(entry: EvalEntry): void {
   if (typeof window === "undefined") return;
   try {
     const store = getEvals();
-    store.unshift(entry);
+    store.unshift({ ...entry, id: entry.id || createEvalEntryId(entry) });
     if (store.length > MAX_ENTRIES) {
       store.length = MAX_ENTRIES;
     }

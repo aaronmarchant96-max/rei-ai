@@ -2,6 +2,8 @@ const STORAGE_KEY = "rei_routing_log";
 const MAX_ENTRIES = 500;
 
 export interface RoutingLogEntry {
+  /** Durable source-record identity. Optional only for legacy stored entries. */
+  id?: string;
   /** Stable correlation key joining the pre-API routing decision, post-API
    * usage/outcome patch, and any downstream evaluation events for one request. */
   requestId?: string;
@@ -28,6 +30,22 @@ export interface RoutingLogEntry {
   escalation?: { escalate: boolean; reason: string };
   structured?: boolean;
   timestamp?: string;
+  actualTokens?: number;
+  actualCost?: number;
+  status?: "success" | "error" | "pending";
+  resolvedModel?: string;
+  chunks?: number;
+  inputRedTeamScore?: number | null;
+  inputRedTeamVerdict?: string | null;
+  inputRedTeamEscalate?: boolean;
+}
+
+function createRoutingEntryId(entry: RoutingLogEntry): string {
+  if (entry.requestId) return `routing:${entry.requestId}`;
+  if (typeof globalThis.crypto?.randomUUID === "function") {
+    return `routing:${globalThis.crypto.randomUUID()}`;
+  }
+  return `routing:${Date.now()}:${Math.random().toString(36).slice(2, 10)}`;
 }
 
 export function logRoutingDecision(entry: RoutingLogEntry): void {
@@ -37,6 +55,7 @@ export function logRoutingDecision(entry: RoutingLogEntry): void {
     logs.unshift({
       timestamp: new Date().toISOString(),
       ...entry,
+      id: entry.id || createRoutingEntryId(entry),
     });
     if (logs.length > MAX_ENTRIES) {
       logs.length = MAX_ENTRIES;

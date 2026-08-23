@@ -54,6 +54,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
     domainLabel,
     sourceText: msg.text,
     createdAt: msg.rawJson?.timestamp || new Date().toISOString(),
+    strategicSituation: msg.rawJson?.strategicSituation,
   };
 
   const { deliverable: cleanDeliverableText } = extractDeliverableAndScaffolding(msg.text);

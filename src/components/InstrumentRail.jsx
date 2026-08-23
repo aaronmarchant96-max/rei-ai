@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { BarChart3, Pin, PinOff, X, ExternalLink } from "lucide-react";
+import ActivityTimeline from "./ActivityTimeline.jsx";
 
 export default function InstrumentRail({
   sessionTokens = 0,
@@ -12,6 +13,7 @@ export default function InstrumentRail({
   lifetimeCost = 0,
   lifetimeSavings = 0,
   activityCount = 0,
+  activityProjections = [],
   telemetryMode = "pinned",
   isInspectOpen = false,
   focusedDecision = null,
@@ -232,6 +234,11 @@ export default function InstrumentRail({
             </div>
           );
         })() : null}
+
+        <div className="rei-side-card">
+          <div className="rei-side-card__heading">Activity</div>
+          <ActivityTimeline projections={activityProjections} />
+        </div>
 
         <div className="rei-side-card">
           <div className="rei-side-card__heading">This Session</div>

@@ -40,6 +40,7 @@ describe("decisionStore", () => {
 
     const store = getDecisions();
     expect(store).toHaveLength(2);
+    expect(store[0].schemaVersion).toBe(1);
     expect(store[0].id).toBe("id-b");
     expect(store[1].id).toBe("id-a");
   });
@@ -92,10 +93,6 @@ describe("decisionStore", () => {
     const coding = getDecisions({ domain: "coding" });
     expect(coding).toHaveLength(1);
     expect(coding[0].id).toBe("code-1");
-  });
-
-  it("returns empty array for unknown domain filter", () => {
-    logDecision({ ...baseEntry(), id: "a" });
     expect(getDecisions({ domain: "nonexistent" })).toHaveLength(0);
   });
 

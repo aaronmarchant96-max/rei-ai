@@ -2,6 +2,34 @@ function normalizeSection(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  })[character]);
+}
+
+function formatClaim(claim) {
+  if (!claim?.statement) return "";
+  return `[${String(claim.epistemicStatus || "unknown").toUpperCase()} · ${String(claim.confidence || "unknown").toUpperCase()}] ${claim.statement}`;
+}
+
+function buildStrategicSections(strategicSituation) {
+  if (!strategicSituation?.detected) return [];
+  const players = (strategicSituation.players || []).map((player) => `- ${player.name} — ${player.role} (${player.power} power)`).join("\n");
+  const incentives = (strategicSituation.incentives || []).map((item) => `- ${item.actorId}: ${formatClaim(item.claim)}`).join("\n");
+  const alternatives = (strategicSituation.alternatives || []).map((claim) => `- ${formatClaim(claim)}`).join("\n");
+  const falsification = (strategicSituation.falsificationConditions || []).map((condition) => `- ${condition}`).join("\n");
+  return [
+    ["Strategic Situation", players],
+    ["Declared Objective vs Incentive Model", incentives],
+    ["Strategic Hinge", formatClaim(strategicSituation.strategicHinge)],
+    ["Candidate Convergence", strategicSituation.convergenceZone?.identified ? formatClaim(strategicSituation.convergenceZone.description) : "No feasible convergence identified from the available evidence."],
+    ["Recommended Intervention", formatClaim(strategicSituation.intervention?.description)],
+    ["Alternative Explanations", alternatives],
+    ["What Would Falsify This", falsification],
+  ].filter(([, value]) => Boolean(value));
+}
+
 function formatDate(date) {
   return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -10,7 +38,7 @@ function formatDate(date) {
   });
 }
 
-function buildPrintableHtml(sections, routerDecision, domainLabel, date) {
+function buildPrintableHtml(sections, routerDecision, domainLabel, date, strategicSituation) {
   const title = "CARDO Decision Report";
   const sectionBlocks = [
     ["Hinge", sections?.Hinge],
@@ -19,18 +47,18 @@ function buildPrintableHtml(sections, routerDecision, domainLabel, date) {
     ["Evaluation", sections?.Evaluation],
     ["What Would Change This", sections?.ChangeMind],
     ["Recommended Move", sections?.Move],
-  ]
+  ].concat(buildStrategicSections(strategicSituation))
     .filter(([, text]) => Boolean(text && text.trim()))
     .map(([label, text]) => `
       <section style="margin-bottom: 24px;">
-        <h2 style="margin: 0 0 8px; font-size: 18px;">${label}</h2>
-        <div style="white-space: pre-wrap; line-height: 1.5;">${text}</div>
+        <h2 style="margin: 0 0 8px; font-size: 18px;">${escapeHtml(label)}</h2>
+        <div style="white-space: pre-wrap; line-height: 1.5;">${escapeHtml(text)}</div>
       </section>
     `)
     .join("");
 
   const routerLine = routerDecision
-    ? `<p><strong>Router:</strong> ${routerDecision.label} (${routerDecision.model})</p>`
+    ? `<p><strong>Router:</strong> ${escapeHtml(routerDecision.label)} (${escapeHtml(routerDecision.model)})</p>`
     : "";
 
   return `<!doctype html>
@@ -48,8 +76,8 @@ function buildPrintableHtml(sections, routerDecision, domainLabel, date) {
   <body>
     <h1>${title}</h1>
     <div class="meta">
-      <p><strong>Generated:</strong> ${date}</p>
-      <p><strong>Domain:</strong> ${domainLabel}</p>
+      <p><strong>Generated:</strong> ${escapeHtml(date)}</p>
+      <p><strong>Domain:</strong> ${escapeHtml(domainLabel)}</p>
       ${routerLine}
     </div>
     ${sectionBlocks}
@@ -59,7 +87,7 @@ function buildPrintableHtml(sections, routerDecision, domainLabel, date) {
 </html>`;
 }
 
-export function buildDecisionReport({ sections = {}, routerDecision, domainLabel = "REI.ai", sourceText = "", createdAt = new Date() }) {
+export function buildDecisionReport({ sections = {}, routerDecision, domainLabel = "REI.ai", sourceText = "", createdAt = new Date(), strategicSituation }) {
   const normalizedSections = {
     Hinge: normalizeSection(sections?.Hinge),
     Facts: normalizeSection(sections?.Facts),
@@ -87,6 +115,7 @@ export function buildDecisionReport({ sections = {}, routerDecision, domainLabel
     normalizedSections.Evaluation ? `## Evaluation\n${normalizedSections.Evaluation}\n` : "",
     normalizedSections.ChangeMind ? `## What Would Change This\n${normalizedSections.ChangeMind}\n` : "",
     normalizedSections.Move ? `## Recommended Move\n${normalizedSections.Move}\n` : "",
+    ...buildStrategicSections(strategicSituation).map(([label, text]) => `## ${label}\n${text}\n`),
     sourceText ? `## Source Message\n${sourceText}\n` : "",
     "",
     "---",
@@ -98,6 +127,6 @@ export function buildDecisionReport({ sections = {}, routerDecision, domainLabel
   return {
     filename,
     markdown,
-    html: buildPrintableHtml(normalizedSections, routerDecision, domainLabel, dateText),
+    html: buildPrintableHtml(normalizedSections, routerDecision, domainLabel, dateText, strategicSituation),
   };
 }
