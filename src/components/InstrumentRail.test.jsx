@@ -66,7 +66,8 @@ describe("InstrumentRail", () => {
       />
     );
 
-    expect(screen.getByText(/Routing will select the cheapest capable model/)).toBeTruthy();
+    expect(screen.getByText(/REI chooses a model that fits each job/i)).toBeTruthy();
+    expect(screen.getByText(/which model answered, why it was chosen, and what it cost/i)).toBeTruthy();
     expect(screen.queryByText("Escalations")).not.toBeInTheDocument();
   });
 

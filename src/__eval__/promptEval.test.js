@@ -17,36 +17,40 @@ describe("Prompt Eval — domain system messages", () => {
     expect(copy).toContain("Iterate");
   });
 
-  test("assistant system message is initialized", () => {
+  test("assistant system message explains the job in plain language", () => {
     const msg = buildDomainSystemMessage("assistant", DOMAIN_PROFILES[0]);
-    expect(msg).toMatch(/^Hey! I'm REI/);
-    expect(msg).toContain("CARDO framework");
+    expect(msg).toMatch(/^You're in REI\.ai — The Generalist/);
+    expect(msg).toContain("Ask everyday questions");
+    expect(msg).toContain("show the route and cost");
   });
 
-  test("coding system message mentions domain", () => {
+  test("coding system message explains the job in plain language", () => {
     const msg = buildDomainSystemMessage("coding", DOMAIN_PROFILES[1]);
-    expect(msg).toContain("coding session");
     expect(msg).toContain("Engineer");
-    expect(msg).toContain("CARDO REI");
+    expect(msg).toContain("Build, debug, and improve code");
+    expect(msg).toContain("show the route and cost");
   });
 
-  test("genealogy system message mentions domain", () => {
+  test("genealogy system message explains the job in plain language", () => {
     const msg = buildDomainSystemMessage("genealogy", DOMAIN_PROFILES[2]);
-    expect(msg).toContain("research analysis");
     expect(msg).toContain("Archivist");
-    expect(msg).toContain("Evidence");
+    expect(msg).toContain("Research family history");
+    expect(msg).toContain("show the route and cost");
   });
 
-  test("story system message mentions domain", () => {
+  test("story system message explains the job in plain language", () => {
     const msg = buildDomainSystemMessage("story", DOMAIN_PROFILES[3]);
-    expect(msg).toContain("story building");
     expect(msg).toContain("Storyteller");
+    expect(msg).toContain("Write stories, scenes, characters, and worlds");
+    expect(msg).toContain("show the route and cost");
   });
 
   test("unknown domain falls back gracefully", () => {
     const fallbackProfile = { id: "unknown", label: "Fallback", description: "generic" };
     const msg = buildDomainSystemMessage("unknown", fallbackProfile);
-    expect(msg).toContain("System initialized");
+    expect(msg).toMatch(/^You're in REI\.ai — Fallback/);
+    expect(msg).toContain("Ask everyday questions");
+    expect(msg).toContain("show the route and cost");
   });
 
   test("every HARD STOP prompt that allows creative output carries a Direct Instructions Override escape valve", () => {

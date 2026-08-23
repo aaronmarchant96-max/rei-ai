@@ -136,7 +136,7 @@ export default function InstrumentRail({
           <div className="rei-instrument-rail__header-title">
             <BarChart3 size={15} style={{ color: "var(--accent-cyan, #38bdf8)" }} />
             <span className="rei-instrument-rail__title">
-              {focusedDecision ? "Decision Report" : "Live Telemetry"}
+              {focusedDecision ? "Decision Report" : "How REI handled it"}
             </span>
           </div>
 
@@ -234,12 +234,10 @@ export default function InstrumentRail({
         })() : null}
 
         <div className="rei-side-card rei-side-card--session">
-          <div className="rei-side-card__heading">This Session</div>
+          <div className="rei-side-card__heading">This conversation</div>
           {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
             <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
-              Routing will select the cheapest capable model for each query.
-              Typical savings vs. calling GPT-4o directly: ~90%+ (ceiling-based).
-              Numbers appear here after your first response.
+              REI chooses a model that fits each job. After the first answer, this panel shows which model answered, why it was chosen, and what it cost.
             </div>
           ) : (
             <>
@@ -292,7 +290,7 @@ export default function InstrumentRail({
         </div>
 
         <div className="rei-side-card rei-side-card--models">
-          <div className="rei-side-card__heading">Models</div>
+          <div className="rei-side-card__heading">Models used</div>
           {(() => {
             const validModels = Object.entries(modelBreakdown).filter(([model, tokens]) =>
               typeof model === "string" &&
@@ -308,7 +306,7 @@ export default function InstrumentRail({
             if (validModels.length === 0) {
               return (
                 <div className="rei-side-empty">
-                  No model calls yet.<br />Routing shows up here after your first message.
+                  No model calls yet.<br />After your first answer, you&apos;ll see which model REI chose.
                 </div>
               );
             }

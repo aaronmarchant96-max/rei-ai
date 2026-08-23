@@ -16,6 +16,7 @@ import { logEval } from "./lib/evalLog";
 import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
+import { PRODUCT_STORY, getDomainPublicCopy } from "./data/productCopy.js";
 import { parseAssistantStyleReply, extractDeliverableAndScaffolding } from "./lib/replyParser.js";
 import { isSimpleGreeting } from "./lib/routingConstants.js";
 import { getDomainProfiles, getDomainPrompt, getDomain } from "./domains/_index.js";
@@ -78,15 +79,8 @@ export function getAssistantWelcomeCopy() {
 
 export function buildDomainSystemMessage(domainId, currentDomain) {
   const domainLabel = currentDomain?.label || "REI.ai";
-  const domainDescription = currentDomain?.description || "reasoning assistant";
-
-  if (domainId === "assistant") {
-    return "Hey! I'm REI — The Generalist. I use the CARDO framework to help you think through problems, separate facts from assumptions, and find the hinge that changes the answer. What's on your mind?";
-  }
-
-  const domainConfig = getDomain(domainId);
-  const sessionLabel = domainConfig?.sessionLabel || "session";
-  return `System initialized. Welcome to REI.ai ${domainLabel}. ${domainDescription} Let's begin our ${sessionLabel}!`;
+  const domainDescription = getDomainPublicCopy(domainId).description;
+  return `You're in REI.ai — ${domainLabel}. ${domainDescription} ${PRODUCT_STORY.workspaceHint}`;
 }
 
 function readStoredMessages(selectedDomain) {
@@ -545,7 +539,7 @@ export default function REI({ initialPrompt } = {}) {
     try {
       let systemContext = getDomainPrompt(selectedDomain);
       const historyPayload = messages
-        .filter(msg => !msg.text.startsWith("System initialized. Welcome to REI.ai"))
+        .filter((msg, index) => !(index === 0 && msg.sender === "rei"))
         .slice(-10)
         .map(msg => ({
           role: msg.sender === "user" ? "user" : "assistant",

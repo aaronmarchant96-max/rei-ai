@@ -534,9 +534,9 @@ describe("Storyteller delivery contract", function () {
     expect(system).toContain("SENIOR EDITOR PASS");
     expect(system).toContain("one-sentence premise");
     expect(system).toContain("causal tonal braid");
-    expect(system).toContain("apparently minor but memorable detail");
-    expect(system).toContain("materially affect the outcome and acquire a different meaning");
-    expect(system).toContain("comic-to-tragic is one possible form, never a universal template");
+    expect(system).toContain("small, memorable detail early");
+    expect(system).toContain("Make it matter to what happens later");
+    expect(system).toContain("it does not always have to turn a joke into tragedy");
     expect(system).toContain("Remove generic rescue beats");
     expect(system).toContain("Limit the prose to a small set of memorable images");
     expect(system).toContain("Return only the revised story");

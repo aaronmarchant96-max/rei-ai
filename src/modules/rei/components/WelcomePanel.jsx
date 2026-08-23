@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Scale, Bug, ClipboardList, BookOpen, PenLine, Globe, Lightbulb, Swords, FlaskConical, Atom, Wrench, Microscope, Fingerprint, Search, ScrollText, Shield, BarChart3, Pencil } from "lucide-react";
 import EvidenceLedgerModal from "./EvidenceLedgerModal.jsx";
+import { getDomainPublicCopy } from "../../../data/productCopy.js";
 
 const ICON_MAP = {
   "⚖️": Scale,
@@ -48,41 +49,8 @@ const GENERIC_STARTERS = [
   { label: "Sort out a decision", sub: "Weigh options against what you actually know", prompt: "Help me sort this out", icon: "💡" },
   { label: "Analyze a debate", sub: "See where two sides genuinely disagree", prompt: "Separate facts from assumptions in this argument", icon: "⚔️" },
   { label: "Test an argument", sub: "Find the assumption it depends on", prompt: "What would change my mind about this?", icon: "🧪" },
-  { label: "Scan for prompt injections", sub: "Detect injection attacks before they reach a model", prompt: "Take me to the red team scanner — I want to test a prompt for adversarial patterns.", icon: "🛡️" },
+  { label: "Check a claim", sub: "Separate what is known from what is assumed", prompt: "Help me check this claim and separate the evidence from the assumptions", icon: "🛡️" },
 ];
-
-const DOMAIN_WELCOME = {
-  assistant: {
-    title: "Cognitive Engine",
-    eyebrow: "Evidence-aware reasoning workspace",
-    description: "Turn an uncertain question into a clear hinge, an evidence map, and a next move you can defend.",
-    signal: "Deterministic routing",
-  },
-  coding: {
-    title: "The Engineer",
-    eyebrow: "Architecture · verification · delivery",
-    description: "Move from a fuzzy requirement or failing build to the architectural hinge, a tested change, and a clean handoff.",
-    signal: "Verification-first code",
-  },
-  genealogy: {
-    title: "The Archivist",
-    eyebrow: "Sources · identity · provenance",
-    description: "Separate records from inference, resolve conflicting identities, and build a family-history conclusion that shows its work.",
-    signal: "Evidence tiering",
-  },
-  story: {
-    title: "The Storyteller",
-    eyebrow: "Character · tension · consequence",
-    description: "Find the emotional hinge, pressure-test the arc, and shape a story where every major turn earns its place.",
-    signal: "Narrative coherence",
-  },
-  legal: {
-    title: "The Precedent Engine",
-    eyebrow: "Authority · facts · decisive rule",
-    description: "Trace the controlling authority, isolate the fact that changes the rule, and make the legal reasoning auditable.",
-    signal: "Precedent mapping",
-  },
-};
 
 export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: propDomain }) {
   const [activeDomain, setActiveDomain] = useState(propDomain || null);
@@ -129,7 +97,7 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
 
   const starters = activeDomain ? (DOMAIN_STARTERS[activeDomain] || GENERIC_STARTERS) : GENERIC_STARTERS;
   const currentDomainLabel = activeDomain ? activeDomain.charAt(0).toUpperCase() + activeDomain.slice(1) : "Generalist";
-  const welcome = DOMAIN_WELCOME[activeDomain] || DOMAIN_WELCOME.assistant;
+  const welcome = getDomainPublicCopy(activeDomain);
 
   return (
     <div className="rei-chat-card">
@@ -153,13 +121,13 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
             className="rei-chat-intro__ledger"
           >
             <BarChart3 size={13} />
-            Evidence Ledger
+            See the evidence
           </button>
         </div>
         <div className="rei-chat-intro__trust" aria-label="Workspace capabilities">
-          <span>CARDO v3.4</span>
+          <span>Model matched to the job</span>
           <span>{welcome.signal}</span>
-          <span>Verifiable receipts</span>
+          <span>Route and cost shown</span>
         </div>
       </div>
 

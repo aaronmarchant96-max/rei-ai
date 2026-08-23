@@ -34,7 +34,9 @@ describe("REI", () => {
 
     render(<REI />);
 
-    expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist.*show the route and cost after it answers/i)).toBeInTheDocument();
+    expect(screen.getByText("Check a claim")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /see the evidence/i })).toBeInTheDocument();
     const stored = JSON.parse(window.localStorage.getItem("rei_chat_history_assistant") || "{}");
     expect(stored.version).toBe("hcm_v1");
     expect(stored.domainId).toBe("assistant");
@@ -311,14 +313,14 @@ describe("REI", () => {
   it("switches domain when clicking a domain tab", async () => {
     render(<REI />);
 
-    expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist/i)).toBeInTheDocument();
 
     // Click "Coding" domain tab — it shows "The Hinge Finder"
     const codingTab = screen.getByText("The Engineer");
     fireEvent.click(codingTab);
 
     await waitFor(() => {
-      expect(screen.getByText(/System initialized. Welcome to REI.ai The Engineer/i)).toBeInTheDocument();
+      expect(screen.getByText(/You're in REI\.ai — The Engineer/i)).toBeInTheDocument();
     }, { timeout: 3000 });
   });
 
@@ -361,7 +363,7 @@ describe("REI", () => {
     fireEvent.click(screen.getByText(/Try a Case/i));
 
     await waitFor(() => {
-      expect(screen.getByText(/System initialized. Welcome to REI.ai The Precedent Engine/i)).toBeInTheDocument();
+      expect(screen.getByText(/You're in REI\.ai — The Precedent Engine/i)).toBeInTheDocument();
     }, { timeout: 3000 });
 
     await waitFor(() => {
@@ -387,7 +389,7 @@ describe("REI", () => {
       expect(screen.queryByText("hello world")).not.toBeInTheDocument();
     }, { timeout: 3000 });
 
-    expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist/i)).toBeInTheDocument();
   });
 
   it("shows fallback text when the API call fails", async () => {
@@ -516,7 +518,7 @@ describe("REI Workspace Transition & Progressive Disclosure", () => {
     window.localStorage.setItem("rei_selected_domain", "non_existent_domain_xyz");
     render(<REI />);
 
-    expect(screen.getByText(/Hey! I'm REI — The Generalist/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist/i)).toBeInTheDocument();
   });
 
   test("compact decision proof badge renders formatted cost when present and hides cost when absent", async () => {

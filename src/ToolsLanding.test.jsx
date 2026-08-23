@@ -7,6 +7,11 @@ describe("ToolsLanding", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
     expect(screen.getByText(/Aaron Marchant/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /one place to ask.*a model matched to the job/i })).toBeInTheDocument();
+    expect(screen.getByText(/looks at the job, chooses an AI model suited to it/i)).toBeInTheDocument();
+    expect(screen.getByText("Use it")).toBeInTheDocument();
+    expect(screen.getByText("Connect it")).toBeInTheDocument();
+    expect(screen.getByText("Inspect it")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /try rei\.ai/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /view engineering case study/i })).toBeInTheDocument();
   });

@@ -3,6 +3,7 @@ import coding from "./coding/index.js";
 import genealogy from "./genealogy/index.js";
 import story from "./story/index.js";
 import legal from "./legal/index.js";
+import { getDomainPublicCopy } from "../data/productCopy.js";
 
 export const DOMAINS = [assistant, coding, genealogy, story, legal];
 
@@ -15,7 +16,8 @@ export function getDomainProfiles() {
     id: d.id,
     label: d.label,
     badge: d.badge,
-    description: d.description,
+    subtitle: getDomainPublicCopy(d.id).eyebrow,
+    description: getDomainPublicCopy(d.id).description,
     rules: d.rules,
     exemplar: d.exemplar,
   }));

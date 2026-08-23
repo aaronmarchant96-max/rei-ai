@@ -46,5 +46,7 @@ describe("domain registry", () => {
     expect(profiles[0]).toHaveProperty("label");
     expect(profiles[0]).toHaveProperty("description");
     expect(profiles[0]).toHaveProperty("rules");
+    expect(profiles.find((profile) => profile.id === "assistant").description).toBe("Ask everyday questions, compare choices, and turn uncertainty into a clear next step.");
+    expect(profiles.find((profile) => profile.id === "story").description).toBe("Write stories, scenes, characters, and worlds with strong continuity and meaningful payoffs.");
   });
 });

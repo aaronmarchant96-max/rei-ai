@@ -8,6 +8,7 @@ import claimsData from "./data/claims.json";
 import { verifyAll } from "./lib/claimGateway";
 import "./__eval__/claimRegistry";
 import ClaimsGate from "./components/ClaimsGate.jsx";
+import { PRODUCT_STORY } from "./data/productCopy.js";
 
 const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 
@@ -204,46 +205,49 @@ export default function ToolsLanding({ onOpenTool }) {
         
         <div className="relative font-mono text-xs font-semibold tracking-wide text-gray-300 mb-4 z-10 bg-[#18181b]/90 border border-border/80 px-4 py-2 rounded-full inline-flex items-center gap-2 max-w-2xl text-center shadow-lg">
           <span className="w-2 h-2 rounded-full bg-[var(--amber)] shrink-0 animate-pulse" />
-          <span>Built by <strong className="text-white font-bold">Aaron Marchant</strong> — AI systems engineer specializing in deterministic routing, evaluation systems, and auditable LLM infrastructure.</span>
+          <span>Built by <strong className="text-white font-bold">Aaron Marchant</strong> — a transparent way to use more than one AI model.</span>
         </div>
         
         <h1 
           className="relative text-4xl sm:text-5xl md:text-7xl font-medium leading-[1.08] mb-5 md:mb-6 z-10"
           style={{ fontFamily: "'Fraunces', serif" }}
         >
-          Your AI bill is leaking money — <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">quietly</span>.
+          {PRODUCT_STORY.headlineLead} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">{PRODUCT_STORY.headlineAccent}</span>
         </h1>
         
         <p className="relative text-[#EDEFF5] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light z-10">
-          Every request you send to an expensive flagship model that a sub-cent model could answer is wasted capital. REI.ai is an OpenAI-compatible FinOps proxy and routing engine that executes deterministic model selection before token spend — with auditable receipts on every turn.
+          {PRODUCT_STORY.summary}
         </p>
 
-        {/* 3 Clear Delivery Modes: Proxy, Library, Studio */}
+        {/* Three ways to understand and use REI */}
         <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mb-8 w-full text-left">
           <div className="bg-[#18181b]/90 border border-border/80 rounded-xl p-3.5 shadow-md">
             <div className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider font-bold mb-1 flex items-center gap-1.5">
-              <span>⚡</span> Drop-in Proxy
+              <span>💬</span> {PRODUCT_STORY.modes[0].label}
             </div>
-            <div className="text-xs text-gray-300 leading-relaxed">Point your OpenAI SDK or agent (<code className="text-white bg-black/40 px-1 py-0.5 rounded text-[11px]">/v1</code>) in Cursor, Cline, or LangChain.</div>
+            <div className="text-sm text-white font-medium mb-1">{PRODUCT_STORY.modes[0].title}</div>
+            <div className="text-xs text-gray-300 leading-relaxed">{PRODUCT_STORY.modes[0].description}</div>
           </div>
           <div className="bg-[#18181b]/90 border border-border/80 rounded-xl p-3.5 shadow-md">
             <div className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider font-bold mb-1 flex items-center gap-1.5">
-              <span>📦</span> Embedded Engine
+              <span>🔌</span> {PRODUCT_STORY.modes[1].label}
             </div>
-            <div className="text-xs text-gray-300 leading-relaxed">Embed the lightweight zero-overhead TypeScript router directly into your microservices.</div>
+            <div className="text-sm text-white font-medium mb-1">{PRODUCT_STORY.modes[1].title}</div>
+            <div className="text-xs text-gray-300 leading-relaxed">{PRODUCT_STORY.modes[1].description}</div>
           </div>
           <div className="bg-[#18181b]/90 border border-border/80 rounded-xl p-3.5 shadow-md">
             <div className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider font-bold mb-1 flex items-center gap-1.5">
-              <span>📊</span> FinOps Studio
+              <span>📊</span> {PRODUCT_STORY.modes[2].label}
             </div>
-            <div className="text-xs text-gray-300 leading-relaxed">Explore domain reasoning agents, inspect fallback traces, and audit live cost savings.</div>
+            <div className="text-sm text-white font-medium mb-1">{PRODUCT_STORY.modes[2].title}</div>
+            <div className="text-xs text-gray-300 leading-relaxed">{PRODUCT_STORY.modes[2].description}</div>
           </div>
         </div>
 
         {/* Verified Evidence & Savings Grid */}
         <div className="relative z-10 w-full max-w-3xl mx-auto mb-7 md:mb-8">
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
-            Empirical Evidence: 94–96% Paid Routing Savings
+            Measured routing results
           </div>
           <div className="grid grid-cols-3 gap-2 md:grid-cols-3 md:gap-4">
             <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
@@ -268,7 +272,7 @@ export default function ToolsLanding({ onOpenTool }) {
         </div>
 
         <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-8 z-10 px-1">
-          Your provider bills you for tokens. It does not tell you whether a smaller model could have handled the job. REI isn't replacing provider billing — it fixes the decision that happens before the bill.
+          {PRODUCT_STORY.benefit} REI does not replace your AI providers; it improves the choice made before each request is sent.
         </p>
 
         {/* Dual Primary Action Paths: Try REI.ai vs View Engineering Case Study */}
