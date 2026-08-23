@@ -497,3 +497,41 @@ describe("controlled continuation (NEVER SILENTLY TRUNCATE)", function () {
     expect(result.usage.total_tokens).toBe(33);
   });
 });
+
+describe("Storyteller delivery contract", function () {
+  async function runStory(input) {
+    process.env.GROQ_API_KEY = "test-key";
+    var { handleCfaiRequest, clearProviderCooldown } = await import("../../api/cfai.js");
+    clearProviderCooldown();
+    mockFetchQueue([{ data: providerResponse("A complete story.", "stop") }]);
+    await handleCfaiRequest("score", [], input, "You are The Storyteller.", [], {
+      id: "story-architect",
+      domain: "story",
+      model: "llama-3.3-70b-versatile",
+      maxTokens: 2048,
+    });
+    return JSON.parse(global.fetch.mock.calls[0][1].body);
+  }
+
+  it("binds requested genres, continuity, repetition control, and a definitive ending", async function () {
+    var body = await runStory("Tell me a fantasy ranger story with comedy and tragedy");
+    var system = body.messages.find(function (m) { return m.role === "system"; }).content;
+
+    expect(system).toContain("STORY DELIVERY CONTRACT");
+    expect(system).toContain("every explicitly requested genre and tone");
+    expect(system).toContain("must not speak, laugh, move, or attack later");
+    expect(system).toContain("Do not repeat an action beat");
+    expect(system).toContain("End once, after the decisive consequence");
+  });
+
+  it("does not expose research tools for a wholly invented fantasy prompt", async function () {
+    var body = await runStory("Tell me a fantasy ranger story with comedy and tragedy");
+    expect(body.tools).toBeUndefined();
+  });
+
+  it("retains research tools when a story explicitly requests historical grounding", async function () {
+    var body = await runStory("Write historical fiction set during the real Battle of Berlin in 1945");
+    expect(body.tools).toBeDefined();
+    expect(body.tools.length).toBeGreaterThan(0);
+  });
+});

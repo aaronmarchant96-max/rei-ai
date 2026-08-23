@@ -637,7 +637,7 @@ export default function REI({ initialPrompt } = {}) {
 
       const inputPayload = isGreeting
         ? userMsg.text
-        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`;
+        : `${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`.trim();
 
       retryPayloadRef.current = {
         inputPayload,
@@ -660,7 +660,7 @@ export default function REI({ initialPrompt } = {}) {
           command: "score",
           input: inputPayload,
           prompt: userMsg.text,
-          systemPrompt: systemPrompt + fileBlock,
+          systemPrompt,
           history: historyPayload,
           routerDecision,
           requestId,

@@ -222,7 +222,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
       </div>
 
       <span className="rei-chat-meta">
-        {msg.sender === "user" ? "You" : "REI.ai Cognitive Engine"} • {msg.timestamp}
+        {msg.sender === "user" ? "You" : domainLabel} • {msg.timestamp}
       </span>
     </div>
   );

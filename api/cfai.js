@@ -1088,7 +1088,27 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
 
 // ── Main API router: primary backend + fallback chain ──
 
+const STORY_DELIVERY_CONTRACT = `
+
+[STORY DELIVERY CONTRACT]
+- Treat every explicitly requested genre and tone as a binding acceptance criterion. When comedy and tragedy are both requested, include at least two distinct comic beats arising from character or circumstance and one irreversible tragic consequence caused by an event in the story.
+- Maintain a silent state ledger for every named character, object, injury, location, and resolved event. A character who dies or becomes incapacitated must not speak, laugh, move, or attack later unless the story explicitly establishes why.
+- Do not repeat an action beat, sentence frame, sensory image, or dramatic exchange merely to extend the response. Every paragraph must change the situation.
+- Resolve conspicuous setups before concluding. End once, after the decisive consequence, on a concrete action, image, line of dialogue, or revelation. Do not restart the action or introduce a new unresolved beat after the ending.
+- Before returning prose, silently revise once for genre adherence, repeated language, causal continuity, and ending completeness. Return only the finished story.`;
+
+function isStoryRoute(routerDecision) {
+  return routerDecision?.domain === "story" || routerDecision?.id === "story-architect";
+}
+
+function storyNeedsResearch(prompt) {
+  return /\b(?:historical|history|real[- ]world|actual|authentic|period[- ]accurate|battle of|war of|in \d{4}|\d{4}s)\b/i.test(prompt || "");
+}
+
 async function callModelAPI(prompt, systemPrompt, history, routerDecision, messagesOverride, modelOverride) {
+  const isGreeting = routerDecision?.id === "simple-greeting";
+  const isStory = isStoryRoute(routerDecision);
+  const toolsToPass = isGreeting || (isStory && !storyNeedsResearch(prompt)) ? null : AVAILABLE_TOOLS;
   var messages;
   if (messagesOverride && Array.isArray(messagesOverride) && messagesOverride.length > 0) {
     messages = messagesOverride;
@@ -1104,8 +1124,11 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
         content: content,
       };
     });
-    const toolDirective = "\n\n[CAPABILITIES & TOOLS]: You have access to two autonomous tools:\n1. web_search: Searches the live web via Exa neural search. Use it whenever you need authentic historical facts, real-world locations, period details, technical terminology, current events, or lore to ground your response.\n2. fetch_url: Fetches and reads live web pages or GitHub repository documentation from URLs.\nAlways execute tool calls directly when real-world facts or links are relevant.";
-    const activeSystemPrompt = (systemPrompt || REI_SYSTEM_PROMPT) + toolDirective;
+    const toolDirective = toolsToPass
+      ? "\n\n[CAPABILITIES & TOOLS]: You have access to two autonomous tools:\n1. web_search: Searches the live web via Exa neural search. Use it whenever you need authentic historical facts, real-world locations, period details, technical terminology, current events, or lore to ground your response.\n2. fetch_url: Fetches and reads live web pages or GitHub repository documentation from URLs.\nAlways execute tool calls directly when real-world facts or links are relevant."
+      : "";
+    const storyContract = isStory ? STORY_DELIVERY_CONTRACT : "";
+    const activeSystemPrompt = (systemPrompt || REI_SYSTEM_PROMPT) + storyContract + toolDirective;
     messages = [
       { role: "system", content: activeSystemPrompt },
       ...formattedHistory,
@@ -1114,9 +1137,7 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
   }
 
   const targetModel = modelOverride || routerDecision?.model || "deepseek-chat";
-  const isGreeting = routerDecision?.id === "simple-greeting";
   const maxTokens = Math.max(routerDecision?.maxTokens || 4096, isGreeting ? 200 : 50);
-  const toolsToPass = isGreeting ? null : AVAILABLE_TOOLS;
   const primaryModel = targetModel;
   const primaryBackend = getBackendForModel(primaryModel);
   const temperature = routerDecision?.temperature ?? 0.7;
