@@ -405,14 +405,26 @@ export default function REI({ initialPrompt } = {}) {
     const isGreeting = routeId === "simple-greeting";
 
     if (!isGreeting) {
+      const parsedSections = parseAssistantStyleReply(aiText);
+      const resolvedRouterDecision = data.routerDecision || routerDecision || {};
+      const actualTokens = usage?.total_tokens
+        ?? ((usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0));
+
       logDecision({
-        domain: selectedDomain,
-        routeId: routeId,
-        model: modelUsed,
-        hingeScore: routerDecision?.hingeScore || 0,
-        estimatedCost: actualCost,
-        tokenCount: (usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0),
-        rationale: routerDecision?.rationale || "Auto-routed by CARDO",
+        id: `${Date.now()}-${selectedDomain.slice(0, 8)}-${Math.random().toString(36).slice(2, 6)}`,
+        requestId,
+        sections: parsedSections,
+        routerDecision: {
+          label: resolvedRouterDecision.label || routeId,
+          model: modelUsed,
+          matchedTerms: resolvedRouterDecision.matchedTerms,
+          hingeScore: resolvedRouterDecision.hingeScore,
+        },
+        domainLabel: currentDomain?.label || selectedDomain,
+        inputPreview: (promptText || "").slice(0, 200),
+        createdAt: new Date().toISOString(),
+        actualTokens,
+        actualCost,
       });
       trackMessage({
         cost: actualCost,

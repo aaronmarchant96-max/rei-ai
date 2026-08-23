@@ -1,5 +1,6 @@
 const STORAGE_KEY = "rei_decision_store";
 const MAX_ENTRIES = 200;
+const SECTION_KEYS = ["Hinge", "Facts", "Assumptions", "Evaluation", "ChangeMind", "Move", "intro"] as const;
 
 export interface DecisionEntry {
   id: string;
@@ -28,8 +29,35 @@ export interface DecisionEntry {
   durationMs?: number;
 }
 
+function isDecisionEntry(value: unknown): value is DecisionEntry {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+
+  const entry = value as Partial<DecisionEntry>;
+  const hasValidDate = typeof entry.createdAt === "string" && !Number.isNaN(Date.parse(entry.createdAt));
+  const hasSections = Boolean(
+    entry.sections
+    && typeof entry.sections === "object"
+    && !Array.isArray(entry.sections)
+    && SECTION_KEYS.some((key) => typeof entry.sections?.[key] === "string" && entry.sections[key]!.trim().length > 0)
+  );
+
+  return Boolean(
+    typeof entry.id === "string"
+    && entry.id.trim()
+    && typeof entry.domainLabel === "string"
+    && entry.domainLabel.trim()
+    && typeof entry.inputPreview === "string"
+    && hasValidDate
+    && hasSections
+  );
+}
+
 export function logDecision(entry: DecisionEntry): void {
   if (typeof window === "undefined") return;
+  if (!isDecisionEntry(entry)) {
+    console.warn("Refusing to persist malformed CARDO decision record");
+    return;
+  }
   try {
     const store = getDecisions();
     store.unshift(entry);
@@ -46,7 +74,8 @@ export function getDecisions(filter?: { domain?: string }): DecisionEntry[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    const all: DecisionEntry[] = raw ? JSON.parse(raw) : [];
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    const all = Array.isArray(parsed) ? parsed.filter(isDecisionEntry) : [];
     if (!filter?.domain) return all;
     return all.filter((e) => e.domainLabel === filter.domain);
   } catch {

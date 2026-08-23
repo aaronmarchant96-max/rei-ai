@@ -58,6 +58,38 @@ describe("REI", () => {
     }, { timeout: 3000 });
   });
 
+  it("persists a complete CARDO decision record for non-greeting responses", async () => {
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "Help me compare these two options carefully" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const stored = JSON.parse(window.localStorage.getItem("rei_decision_store") || "[]");
+      expect(stored).toHaveLength(1);
+      expect(stored[0]).toEqual(expect.objectContaining({
+        id: expect.any(String),
+        requestId: expect.any(String),
+        domainLabel: "The Generalist",
+        inputPreview: "Help me compare these two options carefully",
+        createdAt: expect.any(String),
+        actualTokens: expect.any(Number),
+        actualCost: expect.any(Number),
+      }));
+      expect(Number.isNaN(Date.parse(stored[0].createdAt))).toBe(false);
+      expect(stored[0].sections).toEqual(expect.objectContaining({
+        Hinge: "The core pivot point.",
+        Facts: "What is known.",
+        Move: "Next step.",
+      }));
+      expect(stored[0].routerDecision).toEqual(expect.objectContaining({
+        label: expect.any(String),
+        model: "llama-3.1-8b-instant",
+      }));
+    }, { timeout: 3000 });
+  });
+
   it("sends a short prompt (not the full domain prompt) for simple greetings", async () => {
     render(<REI />);
 
