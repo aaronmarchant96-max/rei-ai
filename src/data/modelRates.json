@@ -5,6 +5,12 @@
     "output": 0.0100,
     "ceiling": 0.0125
   },
+  "gemini-3.6-flash": {
+    "input": 0.00075,
+    "output": 0.00375,
+    "ceiling": 0.00450,
+    "cacheHit": 0.00003
+  },
   "deepseek-chat": {
     "input": 0.00014,
     "output": 0.00028,
