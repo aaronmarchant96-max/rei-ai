@@ -1,7 +1,7 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-23T06:32:29.034Z
+> Last updated: 2026-08-23T06:33:13.276Z
 > Span: 2026-08-08 → 2026-08-23 (172 tagged commits, 175 total tags)
 
 ## Tag Taxonomy
@@ -26,7 +26,7 @@
 
 | Commit | Date | Subject | Tags & Context |
 |---|---|---|---|
-| `077f8f5` | 2026-08-23 | fix(analytics): restore CARDO decision record contract [caught: manual] | `manual` — fix(analytics): restore CARDO decision record contract |
+| `16da615` | 2026-08-23 | fix(analytics): restore CARDO decision record contract [caught: manual] | `manual` — fix(analytics): restore CARDO decision record contract |
 | `d2cef8f` | 2026-08-22 | fix(gateway): preserve execution evidence integrity [caught: test] | `test` — fix(gateway): preserve execution evidence integrity |
 | `47b486b` | 2026-08-22 | feat(chat): polish workspace visual system [caught: test] | `test` — feat(chat): polish workspace visual system |
 | `f617b19` | 2026-08-20 | fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and... | `test` — fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and cite full benchmark evidence |

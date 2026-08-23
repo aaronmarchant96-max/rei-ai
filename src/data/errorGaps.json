@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-08-23T06:32:29.034Z",
+  "generatedAt": "2026-08-23T06:33:13.276Z",
   "entries": [
     {
-      "hash": "077f8f5",
+      "hash": "16da615",
       "date": "2026-08-23",
       "subject": "fix(analytics): restore CARDO decision record contract [caught: manual]",
       "tags": [
