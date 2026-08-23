@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-23T08:52:35.659Z
-> Span: 2026-08-08 → 2026-08-23 (175 tagged commits, 178 total tags)
+> Last updated: 2026-08-23T20:12:32.666Z
+> Span: 2026-08-08 → 2026-08-23 (176 tagged commits, 179 total tags)
 
 ## Tag Taxonomy
 
@@ -17,7 +17,7 @@
 
 | Tag | Count |
 |---|---|
-| `manual` | 105 |
+| `manual` | 106 |
 | `test` | 59 |
 | `claim-gate` | 13 |
 | `ai-cross-check` | 1 |
@@ -30,6 +30,7 @@
 | `b0e7976` | 2026-08-23 | fix(gateway): skip retry-after delay during fallback [caught: manual] | `manual` — fix(gateway): skip retry-after delay during fallback |
 | `627a104` | 2026-08-23 | fix(claims): make suite baseline single-source | `manual` — P0 auth bypass and active documentation drift escaped the intended red-team and claim gates |
 | `16da615` | 2026-08-23 | fix(analytics): restore CARDO decision record contract [caught: manual] | `manual` — fix(analytics): restore CARDO decision record contract |
+| `008c8be` | 2026-08-23 | chore(cache): make cache-policy prefix rule version-neutral and harden verify-ca... | `manual` — 2026-07-20 through 2026-08-14 billing export |
 | `d2cef8f` | 2026-08-22 | fix(gateway): preserve execution evidence integrity [caught: test] | `test` — fix(gateway): preserve execution evidence integrity |
 | `47b486b` | 2026-08-22 | feat(chat): polish workspace visual system [caught: test] | `test` — feat(chat): polish workspace visual system |
 | `f617b19` | 2026-08-20 | fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and... | `test` — fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and cite full benchmark evidence |
@@ -204,11 +205,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 175 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 176 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **175 tagged commits** across 1 month(s).
+- **176 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T08:52:35.659Z",
+  "generatedAt": "2026-08-23T20:12:32.666Z",
   "entries": [
     {
       "hash": "d7843c1",
@@ -36,6 +36,15 @@
         "manual"
       ],
       "context": "fix(analytics): restore CARDO decision record contract"
+    },
+    {
+      "hash": "008c8be",
+      "date": "2026-08-23",
+      "subject": "chore(cache): make cache-policy prefix rule version-neutral and harden verify-cache-spend CLI contract",
+      "tags": [
+        "manual"
+      ],
+      "context": "2026-07-20 through 2026-08-14 billing export"
     },
     {
       "hash": "d2cef8f",
@@ -1581,16 +1590,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 175,
-    "totalTags": 178,
+    "totalEntries": 176,
+    "totalTags": 179,
     "byTag": {
-      "manual": 105,
+      "manual": 106,
       "test": 59,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 175
+      "2026-08": 176
     }
   }
 }

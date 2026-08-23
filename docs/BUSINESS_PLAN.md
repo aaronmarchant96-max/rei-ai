@@ -41,7 +41,7 @@ The **REI Method** supplies the five-question standard. The **REI Engine** appli
 - **Founder**: Aaron Marchant — AI Systems Engineer & Software Architect.
 - **Headcount Strategy**: **100% Solo Founder (Zero Hiring)**. No hiring or team expansion planned. All platform engineering, routing maintenance, pilot reconciliation, and onboarding are fully automated via AI pair-engineering and serverless edge functions.
 - **Track Record**: Processed **1.848 Billion development & evaluation tokens** through the OpenCode/DeepSeek workflow for **$23.52 total API spend** (97.35% input-cache hit rate across 1,000+ deployments).
-- **Test Infrastructure**: Built and maintains a 100% green test suite comprising **1,167 automated tests across 99 test suites**.
+- **Test Infrastructure**: Built and maintains a 100% green test suite comprising **1,167 automated tests across 104 test suites**.
 
 ### 2.2 Infrastructure & Capital Efficiency
 - **Operating Overhead**: ~$60/month total infrastructure budget.
