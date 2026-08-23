@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-23T07:13:22.847Z
-> Span: 2026-08-08 → 2026-08-23 (174 tagged commits, 177 total tags)
+> Last updated: 2026-08-23T08:52:35.659Z
+> Span: 2026-08-08 → 2026-08-23 (175 tagged commits, 178 total tags)
 
 ## Tag Taxonomy
 
@@ -17,7 +17,7 @@
 
 | Tag | Count |
 |---|---|
-| `manual` | 104 |
+| `manual` | 105 |
 | `test` | 59 |
 | `claim-gate` | 13 |
 | `ai-cross-check` | 1 |
@@ -28,6 +28,7 @@
 |---|---|---|---|
 | `d7843c1` | 2026-08-23 | fix(story): enforce coherent genre-complete delivery [caught: manual] | `manual` — fix(story): enforce coherent genre-complete delivery |
 | `b0e7976` | 2026-08-23 | fix(gateway): skip retry-after delay during fallback [caught: manual] | `manual` — fix(gateway): skip retry-after delay during fallback |
+| `627a104` | 2026-08-23 | fix(claims): make suite baseline single-source | `manual` — P0 auth bypass and active documentation drift escaped the intended red-team and claim gates |
 | `16da615` | 2026-08-23 | fix(analytics): restore CARDO decision record contract [caught: manual] | `manual` — fix(analytics): restore CARDO decision record contract |
 | `d2cef8f` | 2026-08-22 | fix(gateway): preserve execution evidence integrity [caught: test] | `test` — fix(gateway): preserve execution evidence integrity |
 | `47b486b` | 2026-08-22 | feat(chat): polish workspace visual system [caught: test] | `test` — feat(chat): polish workspace visual system |
@@ -203,11 +204,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 174 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 175 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **174 tagged commits** across 1 month(s).
+- **175 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 

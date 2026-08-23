@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T07:13:22.847Z",
+  "generatedAt": "2026-08-23T08:52:35.659Z",
   "entries": [
     {
       "hash": "d7843c1",
@@ -18,6 +18,15 @@
         "manual"
       ],
       "context": "fix(gateway): skip retry-after delay during fallback"
+    },
+    {
+      "hash": "627a104",
+      "date": "2026-08-23",
+      "subject": "fix(claims): make suite baseline single-source",
+      "tags": [
+        "manual"
+      ],
+      "context": "P0 auth bypass and active documentation drift escaped the intended red-team and claim gates"
     },
     {
       "hash": "16da615",
@@ -1572,16 +1581,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 174,
-    "totalTags": 177,
+    "totalEntries": 175,
+    "totalTags": 178,
     "byTag": {
-      "manual": 104,
+      "manual": 105,
       "test": 59,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 174
+      "2026-08": 175
     }
   }
 }
