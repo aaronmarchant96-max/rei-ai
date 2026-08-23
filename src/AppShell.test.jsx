@@ -32,7 +32,7 @@ describe("AppShell", () => {
     await waitFor(() => {
       expect(document.title).toBe("PromptHound Labs | Tools");
     });
-    await screen.findByText(/CARDO REI Pipeline/i, {}, { timeout: 5000 });
+    await screen.findByRole("heading", { name: /the rei method/i }, { timeout: 5000 });
   });
 
   it("opens Story Forge from the landing page", async () => {

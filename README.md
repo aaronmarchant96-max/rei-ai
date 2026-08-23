@@ -10,7 +10,7 @@ superseded_by: null
 archived_at: null
 ---
 
-# REI.ai — OpenAI-Compatible AI FinOps Proxy & Inference Router
+# REI.ai — An Executable Method for Building Accountable AI
 
 > **"You're not just saving money. You're building better, faster."**
 > 
@@ -29,9 +29,16 @@ archived_at: null
 
 ## 🎯 What is REI.ai?
 
-**The Primary Product:** An **OpenAI-compatible FinOps proxy and dynamic inference router** (`/v1/chat/completions`). It sits in front of your AI agents, coding assistants (Cursor, Cline, Aider), and backend pipelines to automatically route routine requests to sub-cent fast models while reserving expensive frontier models for complex architectural reasoning — demonstrated **81–92% modeled and replayed inference savings** across documented provider scenarios (workload-specific quality preservation requires bounded non-inferiority evaluation).
+**REI is a method for making AI decisions accountable.** Before an AI system sends a request, accepts an answer, or claims savings, it asks five questions: What is the job? Which model should handle it? What rules must the answer follow? Did it finish correctly? Can we prove what happened and what it cost?
 
-**The Underlying Methodology:** Powered by **CARDO REI**, a formal cognitive architecture that enforces pre-flight quality gates, isolates the decisive "Hinge" of every prompt, separates verified facts from assumptions, and returns auditable execution receipts.
+The product has four parts:
+
+- **REI Method** — the repeatable five-question standard.
+- **REI Engine** — the control layer that applies the method inside an AI product.
+- **REI Studio** — the live workspace where people use REI and inspect its decisions.
+- **REI Decision Audit** — a bounded first engagement that finds missing routing rules, quality contracts, delivery checks, and evidence before a team replaces its stack.
+
+The OpenAI-compatible FinOps proxy and dynamic inference router (`/v1/chat/completions`) is the first production implementation of the method. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** is the formal execution cycle under the hood.
 
 Backed by **1112 automated tests across 98 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
 

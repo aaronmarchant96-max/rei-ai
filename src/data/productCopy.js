@@ -22,6 +22,52 @@ export const PRODUCT_STORY = Object.freeze({
       description: "Review the selected model, the reason for the route, the response status, and the reported cost.",
     },
   ],
+  methodQuestions: [
+    {
+      number: "01",
+      question: "What kind of job is this?",
+      answer: "Define the task and what a good result must do.",
+    },
+    {
+      number: "02",
+      question: "Which model should handle it?",
+      answer: "Choose for capability, cost, and risk—not brand loyalty.",
+    },
+    {
+      number: "03",
+      question: "What rules must the answer follow?",
+      answer: "Set the quality, safety, and evidence contract before execution.",
+    },
+    {
+      number: "04",
+      question: "Did it finish correctly?",
+      answer: "Reject incomplete or invalid delivery instead of calling it success.",
+    },
+    {
+      number: "05",
+      question: "Can we prove what happened?",
+      answer: "Keep the route, model, result status, evidence, and cost receipt.",
+    },
+  ],
+  productLayers: [
+    {
+      label: "REI Method",
+      description: "The repeatable five-question standard for accountable AI decisions.",
+    },
+    {
+      label: "REI Engine",
+      description: "The control layer that applies the method inside an AI product.",
+    },
+    {
+      label: "REI Studio",
+      description: "The live workspace where people can use REI and inspect its decisions.",
+    },
+  ],
+  entryOffer: {
+    label: "REI Decision Audit",
+    description: "Replay a bounded sample of your AI traffic to find missing routing rules, quality contracts, delivery checks, and evidence before replacing your current stack.",
+    cta: "Start a Decision Audit",
+  },
 });
 
 export const DOMAIN_PUBLIC_COPY = Object.freeze({

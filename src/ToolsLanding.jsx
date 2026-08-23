@@ -693,16 +693,44 @@ export default function ToolsLanding({ onOpenTool }) {
         </a>
       </motion.section>
 
-      {/* ── 3. The True CARDO Pipeline ── */}
+      {/* ── 3. The REI Method and formal CARDO execution cycle ── */}
       <motion.section 
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
         className="relative z-10 max-w-6xl mx-auto py-24"
       >
-        <div className="text-center mb-16">
-          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">Structural Methodology</div>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold">The CARDO REI Pipeline</h2>
+        <div className="text-center mb-12">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">A method builders can install</div>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold">The REI Method</h2>
+          <p className="text-foreground-muted max-w-3xl mx-auto mt-4 leading-relaxed">
+            Before an AI system sends a request, accepts an answer, or claims savings, it should answer five questions.
+          </p>
         </div>
 
+        <motion.div variants={staggerContainer} className="grid md:grid-cols-5 gap-3 mb-14">
+          {PRODUCT_STORY.methodQuestions.map((item) => (
+            <motion.div key={item.number} variants={fadeIn} className="rounded-lg border border-border bg-surface p-5">
+              <div className="font-mono text-xs font-bold text-hinge-bright mb-3">{item.number}</div>
+              <h3 className="font-heading text-lg font-bold leading-snug mb-2">{item.question}</h3>
+              <p className="text-sm text-foreground-muted leading-relaxed">{item.answer}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-4 mb-14">
+          {PRODUCT_STORY.productLayers.map((layer) => (
+            <div key={layer.label} className="rounded-lg border-2 border-border bg-background p-6">
+              <h3 className="font-heading text-xl font-bold mb-2">{layer.label}</h3>
+              <p className="text-sm text-foreground-muted leading-relaxed">{layer.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center mb-8">
+          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-3">Under the hood</div>
+          <p className="text-sm text-foreground-muted max-w-2xl mx-auto leading-relaxed">
+            CARDO is the formal execution cycle behind the REI Method. It turns each question into a repeatable, testable control.
+          </p>
+        </div>
         <motion.div variants={staggerContainer} className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {CARDO_STEPS.map((step) => (
             <motion.div 
@@ -725,6 +753,21 @@ export default function ToolsLanding({ onOpenTool }) {
             </motion.div>
           ))}
         </motion.div>
+
+        <div className="mt-14 rounded-xl border-2 border-hinge/60 bg-hinge-bright/5 p-7 md:p-9 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="max-w-3xl">
+            <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">First engagement</div>
+            <h3 className="font-heading text-2xl font-bold mb-3">{PRODUCT_STORY.entryOffer.label}</h3>
+            <p className="text-sm text-foreground-muted leading-relaxed">{PRODUCT_STORY.entryOffer.description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onOpenTool({ tool: "pilot" })}
+            className="shrink-0 rounded-md bg-hinge px-5 py-3 font-bold text-background hover:bg-hinge-bright transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hinge focus-visible:ring-offset-2"
+          >
+            {PRODUCT_STORY.entryOffer.cta}
+          </button>
+        </div>
       </motion.section>
 
       {/* ── 4. Original Domain Experiments → bundled into REI personas ── */}

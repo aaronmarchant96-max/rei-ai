@@ -5,10 +5,13 @@
 
 ## Terminology
 
-- **CARDO Method** — the framework: find the hinge, every decision.
-- **CARDO REI** — the product.
+- **REI Method** — the public five-question standard. Lead with this.
+- **REI Engine** — the software controls that enforce the method.
+- **REI Studio** — the live workspace where the method can be used and inspected.
+- **REI Decision Audit** — the first bounded customer engagement.
+- **CARDO** — the formal execution cycle under the hood. Explain it after the plain-language method; do not lead with the acronym.
 
-This copy-tone guardrail is **CARDO Method applied to marketing**: the hinge on
+This copy-tone guardrail is **the REI Method applied to marketing**: the hinge on
 the landing page is *the one measured number that earns the hype*, and the
 detector keeps the copy around it authentic. The framework name is used
 deliberately, never as decoration.
