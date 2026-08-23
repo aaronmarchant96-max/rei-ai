@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T06:47:02.313Z",
+  "generatedAt": "2026-08-23T07:13:22.847Z",
   "entries": [
     {
       "hash": "d7843c1",
@@ -9,6 +9,15 @@
         "manual"
       ],
       "context": "fix(story): enforce coherent genre-complete delivery"
+    },
+    {
+      "hash": "b0e7976",
+      "date": "2026-08-23",
+      "subject": "fix(gateway): skip retry-after delay during fallback [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(gateway): skip retry-after delay during fallback"
     },
     {
       "hash": "16da615",
@@ -1563,16 +1572,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 173,
-    "totalTags": 176,
+    "totalEntries": 174,
+    "totalTags": 177,
     "byTag": {
-      "manual": 103,
+      "manual": 104,
       "test": 59,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 173
+      "2026-08": 174
     }
   }
 }

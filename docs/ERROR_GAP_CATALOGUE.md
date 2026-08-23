@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-23T06:47:02.313Z
-> Span: 2026-08-08 → 2026-08-23 (173 tagged commits, 176 total tags)
+> Last updated: 2026-08-23T07:13:22.847Z
+> Span: 2026-08-08 → 2026-08-23 (174 tagged commits, 177 total tags)
 
 ## Tag Taxonomy
 
@@ -17,7 +17,7 @@
 
 | Tag | Count |
 |---|---|
-| `manual` | 103 |
+| `manual` | 104 |
 | `test` | 59 |
 | `claim-gate` | 13 |
 | `ai-cross-check` | 1 |
@@ -27,6 +27,7 @@
 | Commit | Date | Subject | Tags & Context |
 |---|---|---|---|
 | `d7843c1` | 2026-08-23 | fix(story): enforce coherent genre-complete delivery [caught: manual] | `manual` — fix(story): enforce coherent genre-complete delivery |
+| `b0e7976` | 2026-08-23 | fix(gateway): skip retry-after delay during fallback [caught: manual] | `manual` — fix(gateway): skip retry-after delay during fallback |
 | `16da615` | 2026-08-23 | fix(analytics): restore CARDO decision record contract [caught: manual] | `manual` — fix(analytics): restore CARDO decision record contract |
 | `d2cef8f` | 2026-08-22 | fix(gateway): preserve execution evidence integrity [caught: test] | `test` — fix(gateway): preserve execution evidence integrity |
 | `47b486b` | 2026-08-22 | feat(chat): polish workspace visual system [caught: test] | `test` — feat(chat): polish workspace visual system |
@@ -202,11 +203,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 173 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 174 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **173 tagged commits** across 1 month(s).
+- **174 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 
