@@ -16,25 +16,20 @@ export default function ChatInput() {
   }, [inputRef]);
 
   return (
-    <div className="rei-input-shell" style={{ position: "sticky", bottom: 0, zIndex: 40, padding: mobile ? "10px 10px 12px" : "12px 16px 16px", background: "var(--surface)", backdropFilter: "blur(12px)", borderTop: "1px solid var(--border)" }}>
-      <div style={{ maxWidth: "960px", margin: "0 auto" }}>
+    <div className={`rei-input-shell ${mobile ? "is-mobile" : ""}`}>
+      <div className="rei-input-shell__inner">
 
         {attachedFiles && attachedFiles.length > 0 && (
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", paddingBottom: "8px" }}>
+          <div className="rei-attachment-list">
             {attachedFiles.map((f, i) => (
               <span
                 key={i}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "4px",
-                  padding: "2px 8px", borderRadius: "6px", fontSize: "11px",
-                  background: "var(--cardo-bg, #1e293b)", color: "var(--foreground-muted, #94a3b8)",
-                  border: "1px solid var(--border, #334155)", maxWidth: "200px",
-                }}
+                className="rei-attachment-chip"
               >
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                <span className="rei-attachment-chip__name">{f.name}</span>
                 <X
                   size={12}
-                  style={{ cursor: "pointer", flexShrink: 0, color: "var(--foreground-muted, #64748b)" }}
+                  className="rei-attachment-chip__remove"
                   onClick={() => {
                     setAttachedFiles((prev) => prev.filter((_, j) => j !== i));
                     setFileErrors([]);
@@ -46,9 +41,9 @@ export default function ChatInput() {
         )}
 
         {fileErrors.length > 0 && (
-          <div style={{ paddingBottom: "8px" }}>
+          <div className="rei-input-errors">
             {fileErrors.map((msg, i) => (
-              <div key={i} style={{ fontSize: "11px", color: "#ef4444", lineHeight: 1.5, fontFamily: "monospace" }}>
+              <div key={i} className="rei-input-error">
                 {msg}
               </div>
             ))}

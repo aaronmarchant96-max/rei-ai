@@ -8,38 +8,32 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
       {/* Compact bar — always visible */}
       <div
         onClick={() => setExpanded(!expanded)}
-        style={{
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          padding: "8px 0", cursor: "pointer", userSelect: "none",
+        className="rei-domain-banner__summary"
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setExpanded(!expanded);
+          }
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{
-            display: "inline-block", width: "7px", height: "7px", borderRadius: "50%",
-            background: "var(--amber-fill)", boxShadow: "0 0 8px var(--amber-border)", flexShrink: 0,
-          }} />
-          <span style={{
-            fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "15px",
-            color: "var(--text)",
-          }}>
+        <div className="rei-domain-banner__identity">
+          <span className="rei-domain-banner__signal" />
+          <span className="rei-domain-banner__name">
             {currentDomain.label}
           </span>
-          <span style={{
-            fontSize: "12.5px", color: "var(--text-secondary, #cbd5e1)", fontWeight: 400,
-            maxWidth: "360px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-          }}>
+          <span className="rei-domain-banner__description">
             {currentDomain.description}
           </span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "10.5px", color: "var(--text-muted, #94a3b8)", fontFamily: "monospace" }}>
+        <div className="rei-domain-banner__controls">
+          <span className="rei-domain-banner__protocol">
             CARDO v3.4
           </span>
-          <span style={{
-            fontSize: "11px", color: "var(--text-muted, #94a3b8)", transition: "transform 0.2s",
-            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-          }}>
+          <span className={`rei-domain-banner__chevron ${expanded ? "is-expanded" : ""}`}>
             ▼
           </span>
         </div>
@@ -47,41 +41,37 @@ export default function DomainBanner({ currentDomain, selectedDomain, reasoningL
 
       {/* Expanded detail panel */}
       {expanded && (
-        <div style={{
-          marginTop: "6px", padding: "12px 14px",
-          background: "var(--surface)", borderRadius: "6px",
-          border: "1px solid var(--border)",
-        }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div className="rei-domain-banner__meta" style={{ fontSize: "12px" }}>
+        <div className="rei-domain-banner__detail">
+          <div className="rei-domain-banner__detail-copy">
+            <div className="rei-domain-banner__meta">
               <span className="rei-domain-banner__label">Mode:</span>
               <span>{currentDomain.description}</span>
             </div>
-            <div className="rei-domain-banner__meta rei-domain-banner__meta--secondary" style={{ fontSize: "12px" }}>
+            <div className="rei-domain-banner__meta rei-domain-banner__meta--secondary">
               <span className="rei-domain-banner__label">Voice Cues:</span>
               <span>{currentDomain.rules.join(" | ")}</span>
             </div>
           </div>
 
           {selectedDomain === "assistant" && (
-            <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid var(--border)" }}>
-              <div style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", color: "var(--amber-text)", textTransform: "uppercase", marginBottom: "8px" }}>
+            <div className="rei-domain-banner__pipeline">
+              <div className="rei-domain-banner__pipeline-label">
                 CARDO Cognitive Pipeline (Pivot Dissection)
               </div>
-              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px" }}>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "var(--page)", border: "1px solid var(--border)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
+              <div className="rei-domain-banner__steps">
+                <span className="rei-domain-banner__step">
                   C · Collect Raw Data
                 </span>
-                <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "var(--page)", border: "1px solid var(--border)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
+                <span className="rei-domain-banner__arrow">→</span>
+                <span className="rei-domain-banner__step">
                   A · Analyze Patterns
                 </span>
-                <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "rgba(240,201,101,0.2)", border: "1px solid var(--amber-border)", color: "var(--amber-text)", padding: "3px 8px", borderRadius: "4px", boxShadow: "0 0 12px rgba(240,201,101,0.2)" }}>
-                  📌 R · Record Hinge
+                <span className="rei-domain-banner__arrow">→</span>
+                <span className="rei-domain-banner__step is-hinge">
+                  R · Record Hinge
                 </span>
-                <span style={{ color: "var(--amber-text)", opacity: 0.5, fontSize: "10px" }}>─►</span>
-                <span className="rei-domain-banner__step" style={{ fontSize: "11px", background: "var(--page)", border: "1px solid var(--border)", color: "var(--text)", padding: "3px 8px", borderRadius: "4px" }}>
+                <span className="rei-domain-banner__arrow">→</span>
+                <span className="rei-domain-banner__step">
                   DO · Execute Move
                 </span>
               </div>

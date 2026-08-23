@@ -133,14 +133,14 @@ export default function InstrumentRail({
         aria-label="Decision Inspection and Telemetry"
       >
         <div className="rei-instrument-rail__header">
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="rei-instrument-rail__header-title">
             <BarChart3 size={15} style={{ color: "var(--accent-cyan, #38bdf8)" }} />
             <span className="rei-instrument-rail__title">
               {focusedDecision ? "Decision Report" : "Live Telemetry"}
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <div className="rei-instrument-rail__header-actions">
             {/* Pin Toggle for persistent desktop preference */}
             <button
               type="button"
@@ -188,7 +188,7 @@ export default function InstrumentRail({
               : "Cost unavailable · Provider usage telemetry missing";
 
           return (
-            <div className="rei-side-card" style={{ borderLeft: "3px solid var(--accent-cyan, #38bdf8)" }}>
+            <div className="rei-side-card rei-side-card--decision">
               <div className="rei-side-card__heading" style={{ color: "var(--accent-cyan, #38bdf8)" }}>
                 Inspecting: {focusedDecision.label || focusedDecision.id || "Decision"}
               </div>
@@ -233,7 +233,7 @@ export default function InstrumentRail({
           );
         })() : null}
 
-        <div className="rei-side-card">
+        <div className="rei-side-card rei-side-card--session">
           <div className="rei-side-card__heading">This Session</div>
           {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
             <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
@@ -291,7 +291,7 @@ export default function InstrumentRail({
           )}
         </div>
 
-        <div className="rei-side-card">
+        <div className="rei-side-card rei-side-card--models">
           <div className="rei-side-card__heading">Models</div>
           {(() => {
             const validModels = Object.entries(modelBreakdown).filter(([model, tokens]) =>
@@ -349,7 +349,7 @@ export default function InstrumentRail({
           </div>
         )}
 
-        <div className="rei-side-card">
+        <div className="rei-side-card rei-side-card--protocol">
           <div className="rei-side-card__heading">Protocol Architecture</div>
           <div className="rei-side-chips">
             <span className="rei-side-chip">CARDO v3.4</span>

@@ -99,36 +99,33 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
 
   return (
     <div className="rei-chat-card">
-      <div className="rei-chat-intro" style={{ padding: "18px 20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap" }}>
-          <div>
-            <h1 className="rei-chat-intro__headline" style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 4px" }}>
+      <div className="rei-chat-intro">
+        <div className="rei-chat-intro__header">
+          <div className="rei-chat-intro__copy">
+            <div className="rei-chat-intro__eyebrow">
+              <span className="rei-chat-intro__signal" aria-hidden="true" />
+              Evidence-aware reasoning workspace
+            </div>
+            <h1 className="rei-chat-intro__headline">
               REI<span className="rei-chat-intro__suffix">.ai</span> Cognitive Engine
             </h1>
-            <p className="rei-chat-intro__text" style={{ fontSize: "13.5px", color: "var(--text-secondary, #cbd5e1)", margin: "0 0 8px" }}>
-              Deterministic inference routing, prompt-cache optimization, and evidence-verified reasoning.
+            <p className="rei-chat-intro__text">
+              Turn an uncertain question into a clear hinge, an evidence map, and a next move you can defend.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowLedger(true)}
-            style={{
-              background: "rgba(240, 201, 101, 0.12)",
-              border: "1px solid rgba(240, 201, 101, 0.3)",
-              color: "var(--amber-text, #f0c965)",
-              borderRadius: "6px",
-              padding: "5px 12px",
-              fontSize: "11.5px",
-              fontWeight: 600,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
+            className="rei-chat-intro__ledger"
           >
             <BarChart3 size={13} />
             Evidence Ledger
           </button>
+        </div>
+        <div className="rei-chat-intro__trust" aria-label="Workspace capabilities">
+          <span>CARDO v3.4</span>
+          <span>Deterministic routing</span>
+          <span>Verifiable receipts</span>
         </div>
       </div>
 

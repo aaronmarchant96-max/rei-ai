@@ -720,7 +720,7 @@ export default function REI({ initialPrompt } = {}) {
       >
         {/* Top Header with 5 Primary Domain Chips & Secondary Kebab Menu */}
         <header className="safe-top rei-header">
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+          <div className="rei-header__protocol">
             {!mobile && <span className="rei-header__version" title="CARDO REI protocol version">CARDO v3.4</span>}
           </div>
 
@@ -741,7 +741,7 @@ export default function REI({ initialPrompt } = {}) {
           </nav>
 
           {/* Right Controls: Compact Activity Pill & Accessible Kebab Menu */}
-          <div className="rei-header__actions" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="rei-header__actions">
             <button
               type="button"
               onClick={(e) => {
@@ -829,8 +829,8 @@ export default function REI({ initialPrompt } = {}) {
         </header>
 
         {/* Unified workspace area: conversation + attached composer on left, instrument rail on right */}
-        <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, height: "100%", overflow: "hidden" }}>
+        <div className="rei-workspace">
+          <div className="rei-workspace__conversation">
             <main className="flex-1 overflow-y-auto px-4 py-4 rei-main-content">
               {(messages.length > 1 || isTyping || selectedDomain !== "assistant") && (
                 <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
