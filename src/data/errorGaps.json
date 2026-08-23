@@ -1,6 +1,69 @@
 {
-  "generatedAt": "2026-08-22T08:01:40.439Z",
+  "generatedAt": "2026-08-23T19:44:11.123Z",
   "entries": [
+    {
+      "hash": "d7843c1",
+      "date": "2026-08-23",
+      "subject": "fix(story): enforce coherent genre-complete delivery [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(story): enforce coherent genre-complete delivery"
+    },
+    {
+      "hash": "b0e7976",
+      "date": "2026-08-23",
+      "subject": "fix(gateway): skip retry-after delay during fallback [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(gateway): skip retry-after delay during fallback"
+    },
+    {
+      "hash": "627a104",
+      "date": "2026-08-23",
+      "subject": "fix(claims): make suite baseline single-source",
+      "tags": [
+        "manual"
+      ],
+      "context": "P0 auth bypass and active documentation drift escaped the intended red-team and claim gates"
+    },
+    {
+      "hash": "16da615",
+      "date": "2026-08-23",
+      "subject": "fix(analytics): restore CARDO decision record contract [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "fix(analytics): restore CARDO decision record contract"
+    },
+    {
+      "hash": "008c8be",
+      "date": "2026-08-23",
+      "subject": "chore(cache): make cache-policy prefix rule version-neutral and harden verify-cache-spend CLI contract",
+      "tags": [
+        "manual"
+      ],
+      "context": "2026-07-20 through 2026-08-14 billing export"
+    },
+    {
+      "hash": "d2cef8f",
+      "date": "2026-08-22",
+      "subject": "fix(gateway): preserve execution evidence integrity [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(gateway): preserve execution evidence integrity"
+    },
+    {
+      "hash": "47b486b",
+      "date": "2026-08-22",
+      "subject": "feat(chat): polish workspace visual system [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "feat(chat): polish workspace visual system"
+    },
     {
       "hash": "f617b19",
       "date": "2026-08-20",
@@ -1527,16 +1590,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 169,
-    "totalTags": 172,
+    "totalEntries": 176,
+    "totalTags": 179,
     "byTag": {
-      "test": 57,
-      "manual": 101,
+      "manual": 106,
+      "test": 59,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 169
+      "2026-08": 176
     }
   }
 }

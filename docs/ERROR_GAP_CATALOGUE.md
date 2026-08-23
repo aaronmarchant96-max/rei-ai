@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-22T08:01:40.439Z
-> Span: 2026-08-08 → 2026-08-20 (169 tagged commits, 172 total tags)
+> Last updated: 2026-08-23T19:44:11.123Z
+> Span: 2026-08-08 → 2026-08-23 (176 tagged commits, 179 total tags)
 
 ## Tag Taxonomy
 
@@ -17,8 +17,8 @@
 
 | Tag | Count |
 |---|---|
-| `manual` | 101 |
-| `test` | 57 |
+| `manual` | 106 |
+| `test` | 59 |
 | `claim-gate` | 13 |
 | `ai-cross-check` | 1 |
 
@@ -26,6 +26,13 @@
 
 | Commit | Date | Subject | Tags & Context |
 |---|---|---|---|
+| `d7843c1` | 2026-08-23 | fix(story): enforce coherent genre-complete delivery [caught: manual] | `manual` — fix(story): enforce coherent genre-complete delivery |
+| `b0e7976` | 2026-08-23 | fix(gateway): skip retry-after delay during fallback [caught: manual] | `manual` — fix(gateway): skip retry-after delay during fallback |
+| `627a104` | 2026-08-23 | fix(claims): make suite baseline single-source | `manual` — P0 auth bypass and active documentation drift escaped the intended red-team and claim gates |
+| `16da615` | 2026-08-23 | fix(analytics): restore CARDO decision record contract [caught: manual] | `manual` — fix(analytics): restore CARDO decision record contract |
+| `008c8be` | 2026-08-23 | chore(cache): make cache-policy prefix rule version-neutral and harden verify-ca... | `manual` — 2026-07-20 through 2026-08-14 billing export |
+| `d2cef8f` | 2026-08-22 | fix(gateway): preserve execution evidence integrity [caught: test] | `test` — fix(gateway): preserve execution evidence integrity |
+| `47b486b` | 2026-08-22 | feat(chat): polish workspace visual system [caught: test] | `test` — feat(chat): polish workspace visual system |
 | `f617b19` | 2026-08-20 | fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and... | `test` — fix(landing): simplify hero copy, clarify proxy/library/studio form factors, and cite full benchmark evidence |
 | `f42be11` | 2026-08-20 | docs: create PORTFOLIO_OVERVIEW.md with 3-pillar hierarchy, add Start Here guide... | `manual` — docs: create PORTFOLIO_OVERVIEW.md with 3-pillar hierarchy, add Start Here guide, and reconcile test milestone history |
 | `f1c67d4` | 2026-08-20 | docs(readme): correct Super Bowl LVIII score, clarify primary product pitch, and... | `manual` — docs(readme): correct Super Bowl LVIII score, clarify primary product pitch, and highlight 976 tests and 4.66 spend |
@@ -198,11 +205,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 169 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 176 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **169 tagged commits** across 1 month(s).
+- **176 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 
