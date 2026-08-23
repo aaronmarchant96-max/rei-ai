@@ -21,7 +21,7 @@ archived_at: null
 
 ## 🟢 Verification & Claim Baseline
 
-- **Tests:** 1,167 unit & integration tests / 104 suites passing 100% green (`npm test`)
+- **Tests:** 1,195 unit & integration tests / 105 suites passing 100% green (`npm test`)
 - **Claims Synchronization:** `node scripts/gen-claims.mjs --check` (94 markdown files 100% clean)
 - **Prebuild Integrity:** `node scripts/extract-error-gaps.mjs --check` (use current command output; do not copy a historical count here)
 - **TypeScript:** `npx tsc --noEmit` 0 errors clean
