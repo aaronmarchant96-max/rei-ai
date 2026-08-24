@@ -1,6 +1,8 @@
 import { getDecisions, type DecisionEntry } from "./decisionStore";
 import { getEvals, type EvalEntry } from "./evalLog";
 import { getLogs, type RoutingLogEntry } from "./routingLog";
+import { getPredictions } from "./routePredictionLog";
+import type { RoutePrediction } from "./routePredictionTypes";
 import {
   ACTIVITY_SCHEMA_VERSION,
   type ActivityEvent,
@@ -12,6 +14,8 @@ export interface ActivitySources {
   routing: RoutingLogEntry[];
   decisions: DecisionEntry[];
   evaluations: EvalEntry[];
+  /** Optional additive source. Absence never downgrades projection completeness. */
+  predictions?: RoutePrediction[];
 }
 
 function stableHash(value: string): string {
@@ -75,6 +79,8 @@ export function projectActivity(requestId: string, sources: ActivitySources): Ac
   const routing = sources.routing.find((entry) => entry.requestId === requestId);
   const decision = sources.decisions.find((entry) => entry.requestId === requestId);
   const evaluations = sources.evaluations.filter((entry) => entry.requestId === requestId);
+  const predictions = (sources.predictions || []).filter((entry) => entry.requestId === requestId);
+  const prediction = predictions[0] || undefined;
   const routingState = sourceState(routing);
   const decisionState = sourceState(decision, true);
   const evaluationState: ActivitySourceState = evaluations.length
@@ -94,6 +100,46 @@ export function projectActivity(requestId: string, sources: ActivitySources): Ac
       "route",
       "Request routed",
       { routeId: routing.routeId, model: routing.resolvedModel || routing.model, status: routing.status }
+    ));
+    if (routing.outcomeObservedAt) {
+      events.push(event(
+        requestId,
+        "routing",
+        sourceId,
+        routing.outcomeObservedAt,
+        "routing.outcome_observed",
+        "routing",
+        "outcome",
+        "Route outcome observed",
+        {
+          status: routing.status,
+          resolvedModel: routing.resolvedModel,
+          finalTruncated: routing.finalTruncated,
+          rescue: routing.rescue,
+          continuations: routing.continuations,
+        }
+      ));
+    }
+  }
+  if (prediction) {
+    events.push(event(
+      requestId,
+      "prediction",
+      prediction.id,
+      prediction.predictedAt,
+      "prediction.shadow_created",
+      "prediction",
+      "predict",
+      "Shadow delivery-risk prediction recorded",
+      {
+        target: prediction.target,
+        predictorVersion: prediction.predictorVersion,
+        failureRisk: prediction.failureRisk,
+        support: prediction.support.total,
+        evidenceQuality: prediction.evidenceQuality,
+        precedentTier: prediction.precedentTier,
+        riskInterval95: prediction.riskInterval95,
+      }
     ));
   }
   if (decision) {
@@ -169,13 +215,19 @@ export function projectStoredActivity(requestId: string): ActivityProjection {
     routing: getLogs(),
     decisions: getDecisions(),
     evaluations: getEvals(),
+    predictions: getPredictions(),
   });
 }
 
 export function projectStoredSessionActivity(): ActivityProjection[] {
-  const sources = { routing: getLogs(), decisions: getDecisions(), evaluations: getEvals() };
+  const sources = {
+    routing: getLogs(),
+    decisions: getDecisions(),
+    evaluations: getEvals(),
+    predictions: getPredictions(),
+  };
   const requestIds = new Set<string>();
-  for (const record of [...sources.routing, ...sources.decisions, ...sources.evaluations]) {
+  for (const record of [...sources.routing, ...sources.decisions, ...sources.evaluations, ...sources.predictions]) {
     if (record.requestId) requestIds.add(record.requestId);
   }
   return [...requestIds].map((requestId) => projectActivity(requestId, sources));

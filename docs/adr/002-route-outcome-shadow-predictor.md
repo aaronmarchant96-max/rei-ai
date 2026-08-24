@@ -30,6 +30,9 @@ REI already records dense execution evidence (`routingLog`: durable IDs, request
 18. Metrics are coverage (`scorable / eligible`), Brier score, fixed-bin calibration, and AUROC (null for single-class populations). These are distinct: coverage ≠ accuracy, AUROC ≠ calibration.
 19. Baselines are compared only on the **matched population** — requests where both the predictor and the baseline produced a score. A predictor that wins on its own population but loses on the matched population is reported as losing.
 20. PR 3 must remain frozen during evaluation. No tier/threshold/band tuning while measuring. A result where the predictor loses to a simpler baseline is valid and useful evidence.
+21. Activity reads the evidence; it never creates it. Shadow predictions and observed outcomes project as two additive event types — `prediction.shadow_created` and `routing.outcome_observed` — with durable IDs (`<source-id>:<type>`). `prediction.evaluated` is deliberately absent: walk-forward evaluation is a batch computation, not a per-request persisted source.
+22. Prediction is an **optional additive Activity source**. Its absence never downgrades projection completeness; pre-prediction requests stay `complete`, never flip to `partial`. `routing.outcome_observed` is emitted only when `outcomeObservedAt` exists — no fabricated outcome event, no invented latency (timestamps are not a latency contract).
+23. A null `failureRisk` surfaces as "no historical support" / unavailable — never `0%` — all the way through summary, details, and UI.
 
 ## Trust boundary
 

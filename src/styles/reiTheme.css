@@ -3220,6 +3220,14 @@
   text-transform: uppercase;
 }
 
+.rei-activity-event-detail {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 9px;
+  grid-column: 1 / -1;
+  line-height: 1.4;
+  text-transform: none;
+}
+
 .rei-activity-event-dot {
   background: var(--accent-cyan, #38bdf8);
   border-radius: 50%;
