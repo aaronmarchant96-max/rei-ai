@@ -15,7 +15,7 @@
 - 💰 **94–96% Paid Routing Savings**: Verified cost reduction across multi-model workloads.
 - 🛡️ **Delivery-Gated-v1 Receipts**: Truncated/incomplete turns yield **$0.00 eligible savings**—you only pay for quality-passed responses.
 - 🔑 **Bring Your Own Key (BYOK)**: Customer-owned provider keys; zero inference balance-sheet liability.
-- 🧪 **100% Green Test Battery**: Backed by **1,195 automated tests across 105 test suites**.
+- 🧪 **100% Green Test Battery**: Backed by **1,248 automated tests across 107 test suites**.
 
 🌐 **Live System**: [prompthound-labs.vercel.app](https://prompthound-labs.vercel.app)  
 📦 **Repository**: [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
@@ -30,7 +30,7 @@
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ • Tokens Processed ──► 1.848 Billion development & evaluation tokens        │
 │ • Total Build Spend ──► $23.52 API spend (97.35% measured input-cache hits) │
-│ • Automated Tests  ──► 1,195 tests across 105 suites (100% Green CI)         │
+│ • Automated Tests  ──► 1,248 tests across 107 suites (100% Green CI)         │
 │ • Operating Budget ──► ~$60/month lean infrastructure model                │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
