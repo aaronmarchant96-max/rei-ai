@@ -177,7 +177,7 @@ Pin these in the test file *before* implementing. Then the first pass is the fin
 
 ## Tactic 11: The ~1,000 Test Ceiling & Consolidation Policy
 
-- **Cap Test Count at ~1,000 (Current: 1270 tests / 108 suites):** Adding endless individual tests creates diminishing returns and bloats full-suite verification from ~15s to >100s.
+- **Cap Test Count at ~1,000 (Current: 1287 tests / 110 suites):** Adding endless individual tests creates diminishing returns and bloats full-suite verification from ~15s to >100s.
 - **1-In, 1-Out Policy:** Never add net-new tests past ~1,000 without pruning or consolidating redundant checks.
 - **Table Parameterization (`test.each`):** When adding coverage for new edge cases, consolidate individual `it(...)` blocks into a single parameterized `test.each` matrix to eliminate suite setup/teardown latency.
 - **Fast Lane Execution:** Run only the affected test file during development (<3s feedback loop).
