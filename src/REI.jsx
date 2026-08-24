@@ -5,14 +5,18 @@ import { getModelCosts, computeActualCost } from "./lib/costHelpers";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import { logDecision } from "./lib/decisionStore";
-import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
+import { logRoutingDecision, updateLatestLogEntry, getLogs } from "./lib/routingLog";
 import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
 import { isAdversarialRequest } from "./lib/nightShiftRouter";
 import { buildSelfAuditContext } from "./lib/selfAuditContext";
 import { buildSourceContext } from "./lib/sourceContext";
 import { deriveProvider } from "./lib/provider";
 import { scanRedTeamInput } from "./lib/redTeamScanner";
-import { logEval } from "./lib/evalLog";
+import { logEval, getEvals } from "./lib/evalLog";
+import { buildRouteOutcome } from "./lib/routeOutcome";
+import { derivePredictionFeatures } from "./lib/routePredictionFeatures";
+import { computePrecedentRisk, PREDICTOR_VERSION } from "./lib/routePrecedents";
+import { buildRoutePrediction, logRoutePrediction, getPredictions } from "./lib/routePredictionLog";
 import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
@@ -448,6 +452,7 @@ export default function REI({ initialPrompt } = {}) {
       status: "success",
       resolvedModel: modelUsed,
       chunks: data.chunks || 1,
+      outcomeObservedAt: new Date().toISOString(),
     }, requestId);
 
     try {
@@ -601,6 +606,58 @@ export default function REI({ initialPrompt } = {}) {
         inputRedTeamVerdict: inputScan?.verdict ?? null,
         inputRedTeamEscalate: inputScan?.escalateToD2 ?? false,
       });
+
+      // Shadow prediction: derive pre-execution features and record a
+      // delivery-failure risk estimate before the provider runs. Fail-closed —
+      // any error here must never break routing or the user response.
+      try {
+        const features = derivePredictionFeatures({
+          routeId: routerDecision.id,
+          domain: selectedDomain,
+          selectedModel: routerDecision.model,
+          hingeScore: routerDecision.hingeScore,
+          structured: routerDecision.id !== "simple-greeting",
+          escalationExpected: Boolean(escalation?.escalate),
+          adversarialVerdict: inputScan?.verdict ?? null,
+          inputLength: userMsg.text.length,
+        });
+        if (features) {
+          const priorPredictions = getPredictions();
+          const priorLogs = getLogs();
+          const priorEvals = getEvals();
+          const evalsByRequest = new Map();
+          for (const e of priorEvals) {
+            const list = evalsByRequest.get(e.requestId) || [];
+            list.push(e);
+            evalsByRequest.set(e.requestId, list);
+          }
+          const outcomes = priorLogs
+            .map((entry) => buildRouteOutcome(entry, evalsByRequest.get(entry.requestId) || []))
+            .filter((o) => o !== null);
+          const risk = computePrecedentRisk(
+            features,
+            requestId,
+            new Date().toISOString(),
+            priorPredictions,
+            outcomes
+          );
+          logRoutePrediction(
+            buildRoutePrediction({
+              requestId,
+              predictorVersion: PREDICTOR_VERSION,
+              features,
+              failureRisk: risk.failureRisk,
+              riskInterval95: risk.riskInterval95,
+              support: risk.support,
+              evidenceQuality: risk.evidenceQuality,
+              precedentTier: risk.precedentTier,
+              corpusWindow: risk.corpusWindow,
+            })
+          );
+        }
+      } catch (e) {
+        console.warn("Shadow prediction failed (routing unaffected):", e);
+      }
 
       const isGreeting = routerDecision.id === "simple-greeting";
       const systemPrompt = isGreeting

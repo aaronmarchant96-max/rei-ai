@@ -8,6 +8,7 @@ export type DeliveryStatus = "success" | "failure" | "unknown";
 export type QualityStatus = "pass" | "fail" | "unknown";
 export type SafetyStatus = "pass" | "fail" | "unknown";
 export type RoutingPolicyStatus = "correct" | "incorrect" | "unknown";
+export type ObservedAtProvenance = "routing-outcome" | "evaluation" | "unavailable";
 
 /** Which raw routing signals were present and considered in the delivery
  * derivation. Ordered deterministically. */
@@ -54,6 +55,9 @@ export interface RouteOutcome {
   routingPolicy: {
     status: RoutingPolicyStatus;
   };
+  /** When the outcome became observable (not execution latency). */
+  observedAt?: string;
+  observedAtProvenance: ObservedAtProvenance;
   createdAt?: string;
 }
 
@@ -169,6 +173,29 @@ function deriveRoutingPolicy(evals: EvalEntry[]): { status: RoutingPolicyStatus 
 }
 
 /**
+ * Outcome observability proof. Prefer the explicit post-execution timestamp
+ * (routing-outcome); fall back to the latest downstream evaluation timestamp
+ * (evaluation); otherwise unavailable. Never infer from routing order — that
+ * would leak future evidence into the precedent corpus under concurrency.
+ */
+function deriveObservedAt(
+  routing: RoutingLogEntry,
+  evals: EvalEntry[]
+): { observedAt?: string; observedAtProvenance: ObservedAtProvenance } {
+  if (nonEmpty(routing.outcomeObservedAt)) {
+    return { observedAt: routing.outcomeObservedAt, observedAtProvenance: "routing-outcome" };
+  }
+  const evalTimes = evals
+    .map((e) => e.evaluation?.evaluatedAt)
+    .filter((t): t is string => typeof t === "string" && !Number.isNaN(Date.parse(t)))
+    .sort();
+  if (evalTimes.length > 0) {
+    return { observedAt: evalTimes[evalTimes.length - 1], observedAtProvenance: "evaluation" };
+  }
+  return { observedAt: undefined, observedAtProvenance: "unavailable" };
+}
+
+/**
  * Pure deterministic join of a routing record and its correlated evaluations into
  * a canonical RouteOutcome. No new store — projection over existing authorities.
  * Returns null when the routing record cannot be correlated (missing requestId).
@@ -185,6 +212,7 @@ export function buildRouteOutcome(
   const quality = deriveQuality(evals);
   const safety = deriveSafety(evals);
   const routingPolicy = deriveRoutingPolicy(evals);
+  const observed = deriveObservedAt(routing, evals);
 
   return {
     schemaVersion: ROUTE_OUTCOME_SCHEMA_VERSION,
@@ -211,6 +239,8 @@ export function buildRouteOutcome(
     quality,
     safety,
     routingPolicy,
+    observedAt: observed.observedAt,
+    observedAtProvenance: observed.observedAtProvenance,
     createdAt: nonEmpty(routing.timestamp),
   };
 }

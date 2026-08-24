@@ -21,6 +21,11 @@ REI already records dense execution evidence (`routingLog`: durable IDs, request
 9. Shadow predictions are recorded **before** execution with a `predictedAt` that must precede the outcome it claims to predict. No retroactive prediction counts as evidence.
 10. The authority ladder is `shadow` → `advisory` → `policy-candidate`; **automatic routing influence is out of scope**.
 11. `policyProposalEngine` remains self-informed, not self-modifying. C-Activity learning signals become proposals for human review only.
+12. Outcome observability requires a proof timestamp: `outcomeObservedAt` written at the final post-provider patch seam, propagated to `RouteOutcome.observedAt`/`observedAtProvenance`. Legacy outcomes with only an evaluation timestamp are eligible (`provenance: evaluation`); outcomes with neither are never eligible. Never infer observability from routing order.
+13. The precedent corpus is composed only of pre-execution feature snapshots (PR 2) joined to outcomes that were **provably observable before** the current prediction. `outcome.observedAt < current.predictedAt` is the hard gate.
+14. Cohort selection is a frozen deterministic hierarchy — EXACT (model, route, domain, hinge, structured, adversarial, size) → RELAXED (drops domain + adversarial) → MODEL_ROUTE (model + route) — with `MIN_TIER_SUPPORT = 5` and `SUPPORTED_EVIDENCE = 20` as operational constants, not proven thresholds. No semantic similarity, embeddings, or keywords.
+15. The claim is route-plan failure, not intrinsic model failure: a `selectedModel` snapshot joined to a fallback `executedModel` outcome is still legitimate evidence about the *selected* route plan. Missing `selectedModel` → no precedent (no "unknown model" pooling).
+16. Risk is `failures / (successes + failures)` with a Wilson 95% binomial interval (`z = 1.96`), no smoothing. Zero evidence → null risk; zero failures with nonzero evidence → risk 0 with a wide interval (evidence exists, it is weak).
 
 ## Trust boundary
 

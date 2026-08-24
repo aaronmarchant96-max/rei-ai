@@ -27,15 +27,17 @@ export interface BuildPredictionInput {
   predictedAt?: string;
   /** PR 2 has no predictor yet — risk/support default to the no-evidence state. */
   failureRisk?: number | null;
+  riskInterval95?: { low: number; high: number } | null;
   support?: { total: number; successes: number; failures: number };
   evidenceQuality?: RoutePrediction["evidenceQuality"];
   precedentTier?: RoutePrediction["precedentTier"];
+  corpusWindow?: { before: string; earliest?: string };
 }
 
 /**
  * Construct a RoutePrediction. Defaults to the "no predictor" state that PR 2
  * legitimately produces: null risk, zero support, unavailable evidence, none tier.
- * The corpus window is anchored to predictedAt (no historical lookup yet).
+ * The corpus window is anchored to predictedAt unless a fuller window is supplied.
  */
 export function buildRoutePrediction(input: BuildPredictionInput): RoutePrediction {
   const predictedAt = input.predictedAt || new Date().toISOString();
@@ -49,10 +51,11 @@ export function buildRoutePrediction(input: BuildPredictionInput): RoutePredicti
     predictedAt,
     features: input.features,
     failureRisk: input.failureRisk ?? null,
+    riskInterval95: input.riskInterval95 ?? null,
     support,
     evidenceQuality: input.evidenceQuality ?? "unavailable",
     precedentTier: input.precedentTier ?? "none",
-    corpusWindow: { before: predictedAt },
+    corpusWindow: input.corpusWindow ?? { before: predictedAt },
   };
 }
 

@@ -38,6 +38,10 @@ export interface RoutingLogEntry {
   inputRedTeamScore?: number | null;
   inputRedTeamVerdict?: string | null;
   inputRedTeamEscalate?: boolean;
+  /** Post-execution timestamp proving the outcome was observable by this time.
+   * Written at the same seam that patches status/truncation/actuals. Not latency
+   * telemetry — do not subtract from another timestamp to claim execution duration. */
+  outcomeObservedAt?: string;
 }
 
 function createRoutingEntryId(entry: RoutingLogEntry): string {

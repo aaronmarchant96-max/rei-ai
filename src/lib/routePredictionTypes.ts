@@ -29,6 +29,8 @@ export interface RoutePrediction {
   predictedAt: string;
   features: RoutePredictionFeatures;
   failureRisk: number | null;
+  /** Wilson 95% binomial interval. Absent when there is no evidence. */
+  riskInterval95?: { low: number; high: number } | null;
   support: {
     total: number;
     successes: number;
@@ -107,6 +109,21 @@ export function isRoutePrediction(value: unknown): value is RoutePrediction {
     if (p.failureRisk < 0 || p.failureRisk > 1) return false;
   }
   if (support.total === 0 && p.failureRisk !== null && p.failureRisk !== undefined) {
+    return false;
+  }
+
+  // riskInterval95: optional; when present must be a bounded 0..1 interval.
+  if (p.riskInterval95 !== undefined && p.riskInterval95 !== null) {
+    const interval = p.riskInterval95;
+    if (!interval || typeof interval !== "object" || Array.isArray(interval)) return false;
+    const low = (interval as { low?: unknown }).low;
+    const high = (interval as { high?: unknown }).high;
+    if (typeof low !== "number" || !Number.isFinite(low) || low < 0 || low > 1) return false;
+    if (typeof high !== "number" || !Number.isFinite(high) || high < 0 || high > 1) return false;
+    if (low > high) return false;
+  }
+  // A risk interval without evidence is invalid (same no-evidence rule).
+  if (support.total === 0 && p.riskInterval95 !== undefined && p.riskInterval95 !== null) {
     return false;
   }
 

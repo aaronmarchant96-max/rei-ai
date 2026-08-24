@@ -39,7 +39,8 @@ describe("buildRoutePrediction — no-evidence default state", () => {
     const keys = Object.keys(p).sort();
     expect(keys).toEqual([
       "corpusWindow", "evidenceQuality", "failureRisk", "features", "id",
-      "precedentTier", "predictedAt", "predictorVersion", "requestId", "schemaVersion", "support", "target",
+      "precedentTier", "predictedAt", "predictorVersion", "requestId", "riskInterval95",
+      "schemaVersion", "support", "target",
     ]);
     const serialized = JSON.stringify(p);
     for (const leak of ["resolvedModel", "actualCost", "actualTokens", "finalTruncated", "rescue", "continuations", "qualityScore", "safetyVerdict", "routeCorrect", "model-B"]) {
