@@ -26,6 +26,10 @@ REI already records dense execution evidence (`routingLog`: durable IDs, request
 14. Cohort selection is a frozen deterministic hierarchy — EXACT (model, route, domain, hinge, structured, adversarial, size) → RELAXED (drops domain + adversarial) → MODEL_ROUTE (model + route) — with `MIN_TIER_SUPPORT = 5` and `SUPPORTED_EVIDENCE = 20` as operational constants, not proven thresholds. No semantic similarity, embeddings, or keywords.
 15. The claim is route-plan failure, not intrinsic model failure: a `selectedModel` snapshot joined to a fallback `executedModel` outcome is still legitimate evidence about the *selected* route plan. Missing `selectedModel` → no precedent (no "unknown model" pooling).
 16. Risk is `failures / (successes + failures)` with a Wilson 95% binomial interval (`z = 1.96`), no smoothing. Zero evidence → null risk; zero failures with nonzero evidence → risk 0 with a wide interval (evidence exists, it is weak).
+17. Evaluation is walk-forward: for a prediction at time T, only outcomes observed strictly before T may inform baselines, and the prediction's own outcome must be observed strictly after T to be scorable. Equal timestamps are excluded.
+18. Metrics are coverage (`scorable / eligible`), Brier score, fixed-bin calibration, and AUROC (null for single-class populations). These are distinct: coverage ≠ accuracy, AUROC ≠ calibration.
+19. Baselines are compared only on the **matched population** — requests where both the predictor and the baseline produced a score. A predictor that wins on its own population but loses on the matched population is reported as losing.
+20. PR 3 must remain frozen during evaluation. No tier/threshold/band tuning while measuring. A result where the predictor loses to a simpler baseline is valid and useful evidence.
 
 ## Trust boundary
 
