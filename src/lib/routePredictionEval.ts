@@ -8,6 +8,20 @@ export interface EvalPoint {
   predictedRisk: number;
 }
 
+/** A canonical prediction↔outcome observation (eligible: resolved delivery, temporally valid). */
+export interface CanonicalObservation {
+  prediction: RoutePrediction;
+  outcome: RouteOutcome;
+  actualFailure: number; // 0 (success) | 1 (failure)
+  predictedRisk: number | null; // null when the predictor produced no estimate
+}
+
+export interface CanonicalObservationResult {
+  observations: CanonicalObservation[];
+  eligible: number;
+  duplicatePredictionIds: string[];
+}
+
 export interface CalibrationBin {
   binLow: number;
   binHigh: number;
