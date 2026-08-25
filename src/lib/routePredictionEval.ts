@@ -130,16 +130,10 @@ function cohortRisk(outcomes: RouteOutcome[]): number | null {
   return total > 0 ? failures / total : null;
 }
 
-/**
- * Walk-forward evaluation. For each prediction at time T, only historical
- * outcomes observed strictly before T may inform baselines; the prediction's
- * own outcome must have been observed strictly after T to be scorable. Equal
- * timestamps are excluded. Deterministic regardless of input array order.
- */
-export function evaluateWalkForward(
+export function extractCanonicalObservations(
   predictions: RoutePrediction[],
   outcomes: RouteOutcome[]
-): WalkForwardResult {
+): CanonicalObservationResult {
   const outcomeByRequest = new Map<string, RouteOutcome>();
   for (const o of outcomes) {
     if (o.requestId) outcomeByRequest.set(o.requestId, o);
@@ -164,9 +158,7 @@ export function evaluateWalkForward(
     return true;
   });
 
-  const labeledOutcomes = outcomes.filter((o) => actualFailureOf(o) !== null);
-
-  const points: EvalPoint[] = [];
+  const observations: CanonicalObservation[] = [];
   let eligible = 0;
 
   for (const p of unique) {
@@ -176,11 +168,44 @@ export function evaluateWalkForward(
     if (actual === null) continue;
     if (!outcome.observedAt) continue;
     if (!(outcome.observedAt > p.predictedAt)) continue; // strict: equal excluded
+    
     eligible += 1;
-    if (typeof p.failureRisk === "number" && Number.isFinite(p.failureRisk)) {
-      points.push({ prediction: p, actualFailure: actual, predictedRisk: p.failureRisk });
-    }
+    
+    observations.push({
+      prediction: p,
+      outcome: outcome,
+      actualFailure: actual,
+      predictedRisk: (typeof p.failureRisk === "number" && Number.isFinite(p.failureRisk)) ? p.failureRisk : null
+    });
   }
+
+  return {
+    observations,
+    eligible,
+    duplicatePredictionIds
+  };
+}
+
+/**
+ * Walk-forward evaluation. For each prediction at time T, only historical
+ * outcomes observed strictly before T may inform baselines; the prediction's
+ * own outcome must have been observed strictly after T to be scorable. Equal
+ * timestamps are excluded. Deterministic regardless of input array order.
+ */
+export function evaluateWalkForward(
+  predictions: RoutePrediction[],
+  outcomes: RouteOutcome[]
+): WalkForwardResult {
+  const { observations, eligible, duplicatePredictionIds } = extractCanonicalObservations(predictions, outcomes);
+  const labeledOutcomes = outcomes.filter((o) => actualFailureOf(o) !== null);
+
+  const points: EvalPoint[] = observations
+    .filter((o) => o.predictedRisk !== null)
+    .map((o) => ({
+      prediction: o.prediction,
+      actualFailure: o.actualFailure,
+      predictedRisk: o.predictedRisk as number,
+    }));
 
   const scorable = points.length;
   const coverage = eligible > 0 ? scorable / eligible : null;

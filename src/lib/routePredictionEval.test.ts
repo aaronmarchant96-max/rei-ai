@@ -1,4 +1,4 @@
-import { brierScore, computeAuroc, calibrationBins } from "./routePredictionEval";
+import { brierScore, computeAuroc, calibrationBins, extractCanonicalObservations } from "./routePredictionEval";
 
 describe("brierScore", () => {
   it("empty → null", () => {
