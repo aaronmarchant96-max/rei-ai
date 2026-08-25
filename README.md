@@ -12,6 +12,8 @@ archived_at: null
 
 # REI.ai — OpenAI-Compatible AI FinOps Proxy & Inference Router
 
+[![CI Tests](https://github.com/aaronmarchant96-max/rei-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/aaronmarchant96-max/rei-ai/actions)
+
 > **"You're not just saving money. You're building better, faster."**
 > 
 > *Route each task to the right model, verify the result, and keep the evidence.*
@@ -58,7 +60,7 @@ Backed by **1099 automated tests across 102 test suites** (100% green CI), REI.a
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor & Fast Local Loop:** Backed by 1,099 automated tests across 97 test suites with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
+- **Empirical Rigor & Fast Local Loop:** Backed by 1099 automated tests across 102 test suites with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -227,7 +229,7 @@ npm run server
 # Run fast test loop (~11.4s on 12-thread machine via 50% maxWorkers)
 npm run test:fast
 
-# Run serial test suite (97 test suites, 1099 tests)
+# Run serial test suite (102 test suites, 1099 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

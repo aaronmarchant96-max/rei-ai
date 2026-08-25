@@ -120,7 +120,7 @@ archived_at: null
 
 | Metric | Verified Value | Verification Source / Producing Command |
 | :--- | :--- | :--- |
-| **Automated Passing Tests** | **997 tests** (83 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
+| **Automated Passing Tests** | **1099 tests** (102 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
 | **Input Cache Hit Rate** | **97.35%** | `npm run verify:cache` · `data/cache-spend.csv` |
 | **Effective Multi-Turn Cache Ratio** | **88.0%** | Reconstructed $N=1,500$ model turns · `docs/CACHING_RULES.md` |
 | **Modeled & Replayed Savings** | **81–92%** | Provider scenario sensitivity · `docs/CLAIM_LEDGER.md` |
