@@ -13,7 +13,7 @@ const fingerprints = JSON.parse(fs.readFileSync(fingerprintsPath, "utf8"));
 
 const DOMAIN_MAP = {
   genealogy: "genealogy-deep-dive",
-  coding: "coding-deep-dive",
+  coding: "coding-hinge",
   story: "creative-story",
   creative: "creative-story",
   legal: "case-hinge-legal",
@@ -64,19 +64,40 @@ export function buildServerRouterDecision({ input = "", domain = null, model = n
     }
   }
 
-  // 3. Simple Greeting Check
+  // 3. Simple Greeting Check (only if input is genuinely a simple greeting)
   const greetingFp = fingerprints.find((f) => f.id === "simple-greeting");
-  if (greetingFp && greetingFp.matchTerms.some((term) => promptText === term || promptText.startsWith(term + " "))) {
-    return {
-      id: greetingFp.id,
-      label: greetingFp.label,
-      model: greetingFp.model,
-      jobType: greetingFp.jobType,
-      estimatedCost: greetingFp.costPer1kInput * 0.05 + greetingFp.costPer1kOutput * 0.05,
-      maxTokens: greetingFp.maxTokens,
-      temperature: greetingFp.temperature,
-      selectionReason: "Matched simple greeting pattern"
-    };
+  if (greetingFp) {
+    const isGreetingMatch = greetingFp.matchTerms.some((term) => {
+      if (promptText === term) return true;
+      if (
+        promptText.startsWith(term + " ") ||
+        promptText.startsWith(term + "\n") ||
+        promptText.startsWith(term + "!") ||
+        promptText.startsWith(term + ",") ||
+        promptText.startsWith(term + ".")
+      ) {
+        const rest = promptText.slice(term.length).trim();
+        return (
+          rest.length <= 25 &&
+          !/\b(design|implement|code|function|class|story|family|ancestor|legal|runway|tradeoff|decision|build|fix|refactor|cache|api|database|lru|ttl)\b/i.test(
+            rest
+          )
+        );
+      }
+      return false;
+    });
+    if (isGreetingMatch) {
+      return {
+        id: greetingFp.id,
+        label: greetingFp.label,
+        model: greetingFp.model,
+        jobType: greetingFp.jobType,
+        estimatedCost: greetingFp.costPer1kInput * 0.05 + greetingFp.costPer1kOutput * 0.05,
+        maxTokens: greetingFp.maxTokens,
+        temperature: greetingFp.temperature,
+        selectionReason: "Matched simple greeting pattern"
+      };
+    }
   }
 
   // 4. Term-Matching Ranking across Catalog
@@ -125,12 +146,28 @@ export function buildServerRouterDecision({ input = "", domain = null, model = n
 }
 
 export function computeServerCost(modelName = "deepseek-chat", inputTokens = 0, outputTokens = 0) {
-  const rates = DEFAULT_MODEL_RATES[modelName] || DEFAULT_MODEL_RATES["deepseek-chat"];
+  const canonicalModel = String(modelName || "")
+    .replace(/\s*\(fallback\)\s*$/i, "")
+    .trim();
+  const rates = DEFAULT_MODEL_RATES[canonicalModel];
+
+  if (!rates) {
+    return {
+      canonicalModel,
+      modelRated: false,
+      observedCostUsd: null,
+      counterfactualCostUsd: null,
+      modeledDifferenceUsd: null
+    };
+  }
+
   const observedCostUsd = ((inputTokens / 1000) * rates.input) + ((outputTokens / 1000) * rates.output);
   const counterfactualCostUsd = ((inputTokens / 1000) * rates.premiumBasis) + ((outputTokens / 1000) * rates.premiumBasis);
   const modeledDifferenceUsd = Math.max(0, counterfactualCostUsd - observedCostUsd);
 
   return {
+    canonicalModel,
+    modelRated: true,
     observedCostUsd: Number(observedCostUsd.toFixed(6)),
     counterfactualCostUsd: Number(counterfactualCostUsd.toFixed(6)),
     modeledDifferenceUsd: Number(modeledDifferenceUsd.toFixed(6))
@@ -138,10 +175,28 @@ export function computeServerCost(modelName = "deepseek-chat", inputTokens = 0, 
 }
 
 export function normalizeFinishReason(rawReason) {
-  if (!rawReason) return "stop";
+  if (!rawReason) return "unknown";
   const r = String(rawReason).toLowerCase().trim();
+  if (r === "stop" || r === "end_turn" || r === "stop_sequence") return "stop";
   if (r === "length" || r === "max_tokens" || r === "max_tokens_exceeded") return "length";
   if (r === "content_filter" || r === "safety") return "content_filter";
   if (r === "cancelled" || r === "abort") return "cancelled";
-  return "stop";
+  return "unknown";
+}
+
+export function evaluateDeliveryIntegrity({ rawContent = "", finishReason = null, transportCompleted = true }) {
+  const normalizedFinish = normalizeFinishReason(finishReason);
+  const failureReasons = [];
+
+  if (!transportCompleted) failureReasons.push("transport_incomplete");
+  if (normalizedFinish !== "stop") failureReasons.push(`invalid_termination:${normalizedFinish}`);
+  if (!rawContent || rawContent.trim().length === 0) failureReasons.push("empty_content");
+
+  const deliveryGatePassed = failureReasons.length === 0;
+
+  return {
+    deliveryGatePassed,
+    finishStatus: deliveryGatePassed ? "complete" : (normalizedFinish === "stop" ? "incomplete" : normalizedFinish),
+    failureReasons
+  };
 }

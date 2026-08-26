@@ -135,14 +135,14 @@ export default function InstrumentRail({
         aria-label="Decision Inspection and Telemetry"
       >
         <div className="rei-instrument-rail__header">
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="rei-instrument-rail__header-title">
             <BarChart3 size={15} style={{ color: "var(--accent-cyan, #38bdf8)" }} />
             <span className="rei-instrument-rail__title">
-              {focusedDecision ? "Decision Report" : "Live Telemetry"}
+              {focusedDecision ? "Decision Report" : "How REI handled it"}
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          <div className="rei-instrument-rail__header-actions">
             {/* Pin Toggle for persistent desktop preference */}
             <button
               type="button"
@@ -190,7 +190,7 @@ export default function InstrumentRail({
               : "Cost unavailable · Provider usage telemetry missing";
 
           return (
-            <div className="rei-side-card" style={{ borderLeft: "3px solid var(--accent-cyan, #38bdf8)" }}>
+            <div className="rei-side-card rei-side-card--decision">
               <div className="rei-side-card__heading" style={{ color: "var(--accent-cyan, #38bdf8)" }}>
                 Inspecting: {focusedDecision.label || focusedDecision.id || "Decision"}
               </div>
@@ -244,9 +244,7 @@ export default function InstrumentRail({
           <div className="rei-side-card__heading">This Session</div>
           {sessionCost === 0 && sessionTokens === 0 && sessionMessages === 0 ? (
             <div className="rei-side-empty" style={{ border: "none", padding: "8px 0" }}>
-              Routing will select the cheapest capable model for each query.
-              Typical savings vs. calling GPT-4o directly: ~90%+ (ceiling-based).
-              Numbers appear here after your first response.
+              REI chooses a model that fits each job. After the first answer, this panel shows which model answered, why it was chosen, and what it cost.
             </div>
           ) : (
             <>
@@ -298,8 +296,8 @@ export default function InstrumentRail({
           )}
         </div>
 
-        <div className="rei-side-card">
-          <div className="rei-side-card__heading">Models</div>
+        <div className="rei-side-card rei-side-card--models">
+          <div className="rei-side-card__heading">Models used</div>
           {(() => {
             const validModels = Object.entries(modelBreakdown).filter(([model, tokens]) =>
               typeof model === "string" &&
@@ -315,7 +313,7 @@ export default function InstrumentRail({
             if (validModels.length === 0) {
               return (
                 <div className="rei-side-empty">
-                  No model calls yet.<br />Routing shows up here after your first message.
+                  No model calls yet.<br />After your first answer, you&apos;ll see which model REI chose.
                 </div>
               );
             }
@@ -356,7 +354,7 @@ export default function InstrumentRail({
           </div>
         )}
 
-        <div className="rei-side-card">
+        <div className="rei-side-card rei-side-card--protocol">
           <div className="rei-side-card__heading">Protocol Architecture</div>
           <div className="rei-side-chips">
             <span className="rei-side-chip">CARDO v3.4</span>

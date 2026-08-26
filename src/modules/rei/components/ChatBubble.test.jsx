@@ -56,6 +56,21 @@ describe("ChatBubble", () => {
     expect(screen.getByTitle("Copy message")).toBeInTheDocument();
   });
 
+  it("labels assistant output with the active domain persona", () => {
+    render(
+      <ChatBubble
+        msg={baseMsg}
+        selectedDomain="story"
+        mobile={false}
+        onCopy={jest.fn()}
+        domainLabel="The Storyteller"
+      />
+    );
+
+    expect(screen.getByText("The Storyteller • 12:00")).toBeInTheDocument();
+    expect(screen.queryByText(/REI\.ai Cognitive Engine/)).not.toBeInTheDocument();
+  });
+
   it("fires onCopy with the message text and shows feedback when Copy is clicked", async () => {
     const onCopy = jest.fn().mockResolvedValue(true);
     render(<ChatBubble msg={baseMsg} selectedDomain="assistant" mobile={false} onCopy={onCopy} />);

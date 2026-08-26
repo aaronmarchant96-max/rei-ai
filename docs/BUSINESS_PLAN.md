@@ -12,27 +12,25 @@ archived_at: null
 
 # REI.ai — Comprehensive Business Plan & Commercial Strategy
 
-> **"You pay REI because REI makes the total number smaller."**
+> **"Know which AI should do the job, what its answer must prove, and whether it actually delivered."**
 > 
-> *The Inference FinOps Proxy and Quality-Gated Policy Control Plane for Production AI Agents.*
+> *An executable method and control layer for accountable multi-model AI.*
 
 ---
 
 ## 1. Executive Summary
 
 ### 1.1 The Vision
-**REI.ai** is an OpenAI-compatible FinOps proxy and dynamic inference router (`/v1/chat/completions`). It sits directly in front of AI agents, coding tools (Cursor, Cline, Aider), and backend pipelines to automatically route routine requests to sub-cent fast models while reserving expensive frontier models (GPT-4o) for complex architectural reasoning.
+**REI.ai** turns a repeatable decision method into software. It helps builders define the job, select an eligible model, set the answer contract, reject incomplete delivery, and retain a receipt. The OpenAI-compatible proxy (`/v1/chat/completions`) is its first production implementation; the broader product is the method and controls teams can apply to their own AI systems.
 
 ### 1.2 The Problem
-Production AI deployments leak **80–90% of their monthly API budgets** by blindly sending simple prompts to flagship frontier models. Engineering teams face a false choice:
-1. **Pay frontier prices** ($10k–$100k+/mo) for routine queries.
-2. **Downgrade to cheaper models** manually and risk silent quality degradation, hallucinations, and broken workflows.
+Teams can connect models quickly, but often lack a repeatable answer to five operational questions: what job is being done, why a model was selected, what its answer must satisfy, whether delivery completed, and what evidence supports the result and cost. That gap creates waste, silent quality failures, and claims that cannot survive buyer review.
 
 ### 1.3 The Solution
-REI.ai introduces a **zero-inference pre-spend router** (<10ms resolution) backed by **CARDO REI**, a formal cognitive framework that evaluates prompt complexity, isolates the load-bearing "Hinge" of the query, and executes policy-compliant routing. Every turn produces an auditable **RequestEvidence receipt** with guaranteed **delivery-gated-v1 economics** ($0 savings attributed on truncated/incomplete responses).
+The **REI Method** supplies the five-question standard. The **REI Engine** applies it as routing, quality, delivery, and evidence controls. **REI Studio** demonstrates the controls in a usable workspace. The first offer, a **REI Decision Audit**, evaluates a bounded sample before asking a customer to replace infrastructure. CARDO remains the formal execution cycle under the hood.
 
 ### 1.4 Immediate Target & Trajectory
-- **Immediate Target**: Onboard 1 external developer to swap their OpenAI `base_url` to REI, process real traffic for 2 weeks, receive a defensible cost-and-quality reconciliation report, and convert to a paid contract.
+- **Immediate Target**: Complete one REI Decision Audit for an external AI builder, deliver a defensible control-gap and cost-quality report, and earn authorization for a bounded pilot.
 - **12-Month Trajectory**: $250k ARR across 25 paid teams by Month 12.
 
 ---
@@ -43,7 +41,7 @@ REI.ai introduces a **zero-inference pre-spend router** (<10ms resolution) backe
 - **Founder**: Aaron Marchant — AI Systems Engineer & Software Architect.
 - **Headcount Strategy**: **100% Solo Founder (Zero Hiring)**. No hiring or team expansion planned. All platform engineering, routing maintenance, pilot reconciliation, and onboarding are fully automated via AI pair-engineering and serverless edge functions.
 - **Track Record**: Processed **1.848 Billion development & evaluation tokens** through the OpenCode/DeepSeek workflow for **$23.52 total API spend** (97.35% input-cache hit rate across 1,000+ deployments).
-- **Test Infrastructure**: Built and maintains a 100% green test suite comprising **1,099 automated tests across 97 test files**.
+- **Test Infrastructure**: Built and maintains a 100% green test suite comprising **1,320 automated tests across 113 test suites**.
 
 ### 2.2 Infrastructure & Capital Efficiency
 - **Operating Overhead**: ~$60/month total infrastructure budget.
@@ -88,7 +86,7 @@ REI.ai introduces a **zero-inference pre-spend router** (<10ms resolution) backe
 ## 4. Market Opportunity & Ideal Customer Profile (ICP)
 
 ### 4.1 Target Market
-- **Primary ICP**: Mid-stage AI startups, dev agencies, and power-user engineering teams running autonomous coding agents (Cursor, Cline, Aider, LangChain).
+- **Primary ICP**: Small AI product teams and development agencies with a live use case, more than one model or provider, and a buyer asking for clearer quality, cost, or decision evidence.
 - **Monthly API Spend Range**: $2,000 to $50,000/month on LLM inference.
 - **Pain Point**: High API bills restricting agent iteration frequency and scaling margin.
 
@@ -102,10 +100,10 @@ REI.ai introduces a **zero-inference pre-spend router** (<10ms resolution) backe
 ## 5. 4-Phase Go-To-Market (GTM) Strategy
 
 ### Phase 1: Validation & Readiness (Current)
-- **Model**: Unpaid Design Partners ($0 revenue).
-- **Target**: Onboard 3–5 design partners for 14-day production traffic validation.
-- **Deliverable**: Weekly automated reconciliation report (`scripts/generate-pilot-report.mjs`).
-- **Success Gate**: At least 3 partners integrated via `/v1/chat/completions`, with 1 asking to convert to a paid contract.
+- **Model**: Bounded REI Decision Audits for design partners.
+- **Target**: Complete 3–5 audits without requiring customers to replace their stack.
+- **Deliverable**: Control-gap inventory, replay evidence, and a recommendation to stop, test further, or begin a bounded pilot.
+- **Success Gate**: At least one partner authorizes a pilot because the audit exposed a material, testable gap.
 
 ### Phase 2: Paid Bounded Pilots
 - **Model**: 30–60 Day Paid Pilots ($500–$1,500/month flat fee).

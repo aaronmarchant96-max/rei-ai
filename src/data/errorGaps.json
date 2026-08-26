@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T19:44:11.123Z",
+  "generatedAt": "2026-08-23T20:22:26.240Z",
   "entries": [
     {
       "hash": "d7843c1",
@@ -18,6 +18,15 @@
         "manual"
       ],
       "context": "fix(gateway): skip retry-after delay during fallback"
+    },
+    {
+      "hash": "b0371bd",
+      "date": "2026-08-23",
+      "subject": "fix(reconcile): restore input-payload dedup and close media query block",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(reconcile): restore input-payload dedup and close media query block"
     },
     {
       "hash": "627a104",
@@ -1590,16 +1599,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 176,
-    "totalTags": 179,
+    "totalEntries": 177,
+    "totalTags": 180,
     "byTag": {
+      "test": 60,
       "manual": 106,
-      "test": 59,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 176
+      "2026-08": 177
     }
   }
 }

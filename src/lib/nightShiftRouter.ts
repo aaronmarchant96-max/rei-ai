@@ -295,10 +295,16 @@ function getComplexityTier(text: string): string {
 
 function getHighStructureSignals(text: string): string[] {
   return HIGH_STRUCTURE_TERMS.filter((term) => text.includes(term));
+}function hasComparisonFraming(text: string): boolean {
+  return /\btrade-?offs?\b|\bpros and cons\b|\bpressure[- ]?test\b/i.test(text);
 }
 
-function hasComparisonFraming(text: string): boolean {
-  return /\btrade-?offs?\b|\bpros and cons\b|\bpressure[- ]?test\b/i.test(text);
+function hasDecisionFraming(text: string): boolean {
+  return /\b(runway|trade-?offs?|tradeoffs?|pros and cons|choose a path|decision[- ]making|decision framework|stakeholders?|investors?|ethics|launch vs|what should i do|break (?:this|the) deadlock|how do i make this decision|live with it|dilemma)\b/i.test(text);
+}
+
+function hasExplicitCodingAction(text: string): boolean {
+  return /\b(implement|debug|fix(?:ing|es)?|refactor|write code|build a (?:function|component|hook|module)|unit test|integration test|stack trace|nullpointerexception|syntaxerror|typescript error|npm test|git commit|pr)\b/i.test(text);
 }
 
 /**
@@ -314,6 +320,7 @@ function hasComparisonFraming(text: string): boolean {
 function hasNarrativeFraming(text: string): boolean {
   return /(?:write|tell|build|create|make(?:\s+up)?|generate|craft|compose|draft|pen)\s+(?:(?:me|us|them|him|her|it)\s+)?(?:(?:a|an|the|one|another)\s+)?(?:funny|short|little|quick|long|creative|epic|scary|silly|heartwarming|children'?s|bedtime)?\s*(?:story|tale|narrative)\b/i.test(text);
 }
+
 
 function getStoredPreferenceForContext(text: string, domainName: string): string | null {
   const storedPreference = getStoredRoutePreference();
@@ -456,7 +463,9 @@ export function buildRouterDecision({
     return decision;
   }
 
-  if (domainName === "coding" || (domainName === "assistant" && !hasComparisonFraming(text) && !hasNarrativeFraming(text) && catalogRoute?.id === "coding-hinge")) {
+  const isDecisionQuery = hasDecisionFraming(text) && !hasExplicitCodingAction(text);
+
+  if (domainName === "coding" || (domainName === "assistant" && !hasComparisonFraming(text) && !hasNarrativeFraming(text) && !isDecisionQuery && catalogRoute?.id === "coding-hinge")) {
     const routeTerms = actualMatchedTerms("coding-hinge", text);
     const decision = buildDecision("coding-hinge", {
       rationale: "Coding language detected; route through the verification-first coding path.",

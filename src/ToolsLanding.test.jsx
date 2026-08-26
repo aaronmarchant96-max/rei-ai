@@ -7,6 +7,11 @@ describe("ToolsLanding", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
     expect(screen.getByText(/Aaron Marchant/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /one place to ask.*a model matched to the job/i })).toBeInTheDocument();
+    expect(screen.getByText(/looks at the job, chooses an AI model suited to it/i)).toBeInTheDocument();
+    expect(screen.getByText("Use it")).toBeInTheDocument();
+    expect(screen.getByText("Connect it")).toBeInTheDocument();
+    expect(screen.getByText("Inspect it")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /try rei\.ai/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /view engineering case study/i })).toBeInTheDocument();
   });
@@ -19,10 +24,19 @@ describe("ToolsLanding", () => {
     expect(screen.getByText("Router Accuracy (implemented routes)")).toBeInTheDocument();
   });
 
-  it("renders CARDO pipeline steps", () => {
+  it("explains the REI Method, product layers, entry offer, and formal CARDO engine", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByText(/CARDO REI Pipeline/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /the rei method/i })).toBeInTheDocument();
+    expect(screen.getByText(/what kind of job is this/i)).toBeInTheDocument();
+    expect(screen.getByText(/which model should handle it/i)).toBeInTheDocument();
+    expect(screen.getByText(/what rules must the answer follow/i)).toBeInTheDocument();
+    expect(screen.getByText(/did it finish correctly/i)).toBeInTheDocument();
+    expect(screen.getByText(/can we prove what happened/i)).toBeInTheDocument();
+    expect(screen.getByText("REI Engine")).toBeInTheDocument();
+    expect(screen.getByText("REI Studio")).toBeInTheDocument();
+    expect(screen.getByText("REI Decision Audit")).toBeInTheDocument();
+    expect(screen.getByText(/CARDO is the formal execution cycle/i)).toBeInTheDocument();
     expect(screen.getByText("Collect")).toBeInTheDocument();
     expect(screen.getByText(/gather raw inputs/i)).toBeInTheDocument();
     expect(screen.getByText("Record")).toBeInTheDocument();

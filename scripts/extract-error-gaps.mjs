@@ -20,32 +20,28 @@
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { execSync } from "node:child_process";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { execFileSync } from "node:child_process";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dataPath = join(root, "src", "data", "errorGaps.json");
 const cataloguePath = join(root, "docs", "ERROR_GAP_CATALOGUE.md");
-const checkOnly = process.argv.includes("--check");
 
-const VALID_TAGS = new Set(["manual", "ai-cross-check", "test", "claim-gate"]);
+export const VALID_TAGS = new Set(["manual", "ai-cross-check", "test", "claim-gate"]);
 
 // ── Extract tags from git log ───────────────────────────────────────────────
-function extractEntries() {
+function readGitLog(targetRoot = root) {
   // %x00-delimited: hash, date, subject, body. Uses null byte to handle
   // multi-line commit bodies safely.
   const format = "%H%x00%ad%x00%s%x00%b%x00%x01";
-  let raw;
-  try {
-    raw = execSync(
-      `git log --format="${format}" --date=short --all`,
-      { cwd: root, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }
-    );
-  } catch (err) {
-    console.error("extract-error-gaps: git log failed:", err.message);
-    process.exit(1);
-  }
+  return execFileSync(
+    "git",
+    ["log", `--format=${format}`, "--date=short", "--all"],
+    { cwd: targetRoot, encoding: "utf8", maxBuffer: 16 * 1024 * 1024 }
+  );
+}
 
+export function parseCommitLog(raw) {
   const entries = [];
   const commits = raw.split("\x01").filter(Boolean);
 
@@ -82,8 +78,12 @@ function extractEntries() {
   return entries;
 }
 
+function extractEntries(targetRoot = root) {
+  return parseCommitLog(readGitLog(targetRoot));
+}
+
 // ── Compute summary ──────────────────────────────────────────────────────────
-function computeSummary(entries) {
+export function computeSummary(entries) {
   const byTag = {};
   const byMonth = {};
   let totalTags = 0;
@@ -107,16 +107,16 @@ function computeSummary(entries) {
 }
 
 // ── Build JSON payload ───────────────────────────────────────────────────────
-function buildJson(entries, summary) {
+export function buildJson(entries, summary, generatedAt = new Date().toISOString()) {
   return {
-    generatedAt: new Date().toISOString(),
-    entries: entries.sort((a, b) => b.date.localeCompare(a.date) || b.hash.localeCompare(a.hash)),
+    generatedAt,
+    entries: [...entries].sort((a, b) => b.date.localeCompare(a.date) || b.hash.localeCompare(a.hash)),
     summary,
   };
 }
 
 // ── Generate markdown catalogue ───────────────────────────────────────────────
-function generateCatalogue(json) {
+export function generateCatalogue(json) {
   const { entries, summary } = json;
 
   const tagTally = Object.entries(summary.byTag)
@@ -188,38 +188,170 @@ Run \`node scripts/extract-error-gaps.mjs\` to regenerate this catalogue. CI run
 `;
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────────
-const entries = extractEntries();
-const summary = computeSummary(entries);
-const json = buildJson(entries, summary);
-const rendered = JSON.stringify(json, null, 2) + "\n";
-
-// Determine what changed
-let existing = null;
-try {
-  existing = existsSync(dataPath) ? JSON.parse(readFileSync(dataPath, "utf8")) : null;
-} catch { existing = null; }
-
-const entriesMatch =
-  existing &&
-  existing.entries &&
-  JSON.stringify(existing.entries) === JSON.stringify(json.entries);
-
-if (entriesMatch) {
-  console.log(`errorGaps.json: up to date (${summary.totalEntries} tagged commits)`);
-  process.exit(0);
+function objectEntriesMatch(left, right) {
+  if (!left || !right || typeof left !== "object" || typeof right !== "object") return false;
+  const normalize = (value) => Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)));
+  return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
 }
 
-if (checkOnly) {
-  console.error(
-    `errorGaps.json: STALE (file: ${existing?.entries?.length ?? 0} entries, git: ${summary.totalEntries} entries) — run \`node scripts/extract-error-gaps.mjs\` and commit the update`
-  );
-  process.exit(1);
+export function validateArtifact(artifact) {
+  const errors = [];
+
+  if (!artifact || typeof artifact !== "object" || Array.isArray(artifact)) {
+    return { valid: false, errors: ["artifact must be an object"] };
+  }
+  if (typeof artifact.generatedAt !== "string" || Number.isNaN(Date.parse(artifact.generatedAt))) {
+    errors.push("generatedAt must be a valid timestamp");
+  }
+  if (!Array.isArray(artifact.entries) || artifact.entries.length === 0) {
+    errors.push("entries must be a non-empty array");
+  } else {
+    artifact.entries.forEach((entry, index) => {
+      if (!entry || typeof entry !== "object") {
+        errors.push(`entries[${index}] must be an object`);
+        return;
+      }
+      if (typeof entry.hash !== "string" || !/^[0-9a-f]{7}$/i.test(entry.hash)) {
+        errors.push(`entries[${index}].hash must be a seven-character commit hash`);
+      }
+      if (typeof entry.date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
+        errors.push(`entries[${index}].date must use YYYY-MM-DD`);
+      }
+      if (typeof entry.subject !== "string" || typeof entry.context !== "string") {
+        errors.push(`entries[${index}] must contain string subject and context fields`);
+      }
+      if (!Array.isArray(entry.tags) || entry.tags.length === 0) {
+        errors.push(`entries[${index}].tags must be a non-empty array`);
+      } else if (entry.tags.some((tag) => !VALID_TAGS.has(tag))) {
+        errors.push(`entries[${index}].tags contains an unsupported tag`);
+      }
+    });
+  }
+
+  if (!artifact.summary || typeof artifact.summary !== "object" || Array.isArray(artifact.summary)) {
+    errors.push("summary must be an object");
+  } else if (Array.isArray(artifact.entries)) {
+    const expected = computeSummary(artifact.entries);
+    if (artifact.summary.totalEntries !== expected.totalEntries) {
+      errors.push("summary.totalEntries does not match entries");
+    }
+    if (artifact.summary.totalTags !== expected.totalTags) {
+      errors.push("summary.totalTags does not match entries");
+    }
+    if (!objectEntriesMatch(artifact.summary.byTag, expected.byTag)) {
+      errors.push("summary.byTag does not match entries");
+    }
+    if (!objectEntriesMatch(artifact.summary.byMonth, expected.byMonth)) {
+      errors.push("summary.byMonth does not match entries");
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
 }
 
-writeFileSync(dataPath, rendered);
-console.log(`errorGaps.json: wrote ${summary.totalEntries} entries (${summary.totalTags} tags)`);
+export function isShallowRepository(targetRoot = root) {
+  try {
+    const result = execFileSync("git", ["rev-parse", "--is-shallow-repository"], {
+      cwd: targetRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    }).trim();
+    return result !== "false";
+  } catch {
+    // Source archives and isolated builders cannot prove complete history.
+    return true;
+  }
+}
 
-const catalogue = generateCatalogue(json);
-writeFileSync(cataloguePath, catalogue);
-console.log(`docs/ERROR_GAP_CATALOGUE.md: regenerated (${summary.totalEntries} entries)`);
+export function evaluateErrorGapState({ isShallow, checkOnly, existing, rawGitLog = "" }) {
+  const artifactValidation = validateArtifact(existing);
+
+  if (isShallow) {
+    return {
+      success: artifactValidation.valid,
+      mode: "shallow-artifact-validation",
+      skipWrite: !checkOnly && artifactValidation.valid,
+      staleDetected: false,
+      errors: artifactValidation.errors,
+    };
+  }
+
+  const entries = parseCommitLog(rawGitLog);
+  const summary = computeSummary(entries);
+  const json = buildJson(entries, summary);
+  const entriesMatch = Array.isArray(existing?.entries)
+    && JSON.stringify(existing.entries) === JSON.stringify(json.entries);
+  const upToDate = entriesMatch && artifactValidation.valid;
+
+  return {
+    success: upToDate || !checkOnly,
+    mode: "full-history-comparison",
+    skipWrite: false,
+    staleDetected: !upToDate,
+    errors: upToDate ? [] : artifactValidation.errors,
+    json,
+    summary,
+  };
+}
+
+function readExistingArtifact() {
+  if (!existsSync(dataPath)) return null;
+  try {
+    return JSON.parse(readFileSync(dataPath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function runCli() {
+  const checkOnly = process.argv.includes("--check");
+  const shallow = isShallowRepository(root);
+  const existing = readExistingArtifact();
+
+  try {
+    const rawGitLog = shallow ? "" : readGitLog(root);
+    const result = evaluateErrorGapState({
+      isShallow: shallow,
+      checkOnly,
+      existing,
+      rawGitLog,
+    });
+
+    if (shallow) {
+      if (!result.success) {
+        console.error(`errorGaps.json: INVALID committed artifact in shallow history — ${result.errors.join("; ")}`);
+        process.exitCode = 1;
+        return;
+      }
+      if (result.skipWrite) {
+        console.warn("errorGaps.json: shallow history detected; validated committed artifact and skipped overwrite");
+      } else {
+        console.log(`errorGaps.json: shallow history detected; committed artifact valid (${existing.entries.length} tagged commits)`);
+      }
+      return;
+    }
+
+    if (!result.staleDetected) {
+      console.log(`errorGaps.json: up to date (${result.summary.totalEntries} tagged commits)`);
+      return;
+    }
+    if (checkOnly) {
+      console.error(
+        `errorGaps.json: STALE (file: ${existing?.entries?.length ?? 0} entries, git: ${result.summary.totalEntries} entries) — run \`node scripts/extract-error-gaps.mjs\` and commit the update`
+      );
+      process.exitCode = 1;
+      return;
+    }
+
+    writeFileSync(dataPath, JSON.stringify(result.json, null, 2) + "\n");
+    console.log(`errorGaps.json: wrote ${result.summary.totalEntries} entries (${result.summary.totalTags} tags)`);
+    writeFileSync(cataloguePath, generateCatalogue(result.json));
+    console.log(`docs/ERROR_GAP_CATALOGUE.md: regenerated (${result.summary.totalEntries} entries)`);
+  } catch (err) {
+    console.error("extract-error-gaps: git log failed:", err.message);
+    process.exitCode = 1;
+  }
+}
+
+const invokedPath = process.argv[1] ? pathToFileURL(process.argv[1]).href : null;
+if (invokedPath === import.meta.url) runCli();

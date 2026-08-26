@@ -991,6 +991,11 @@
 
 .rei-concept-layer h3 {
   font-size: 14px;
+  scrollbar-width: none;
+}
+
+.rei-input-area::-webkit-scrollbar {
+  display: none;
   color: var(--amber);
   margin: 0 0 6px 0;
   border-left: 3px solid var(--amber);
@@ -1992,6 +1997,1174 @@
   box-shadow: 0 6px 24px rgba(240, 201, 101, 0.28) !important;
 }
 
+/* ── Relume-grade chat workspace polish ────────────────────────────────
+ * A single terminal layer intentionally resolves legacy chat selectors.
+ * It mirrors the landing page's obsidian canvas, restrained amber accent,
+ * architectural borders, and generous editorial spacing. */
+.rei-shell {
+  --rei-canvas: #090909;
+  --rei-panel: rgba(17, 17, 17, 0.88);
+  --rei-panel-solid: #111111;
+  --rei-panel-raised: #171717;
+  --rei-line: rgba(255, 255, 255, 0.085);
+  --rei-line-strong: rgba(255, 255, 255, 0.14);
+  --rei-amber-soft: rgba(226, 163, 61, 0.1);
+  --rei-amber-line: rgba(226, 163, 61, 0.34);
+  --rei-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 48% -18%, rgba(226, 163, 61, 0.11), transparent 35%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent 22%),
+    var(--rei-canvas) !important;
+}
+
+.rei-shell::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: 0.38;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.rei-header {
+  min-height: 68px;
+  padding: 10px clamp(18px, 2.5vw, 34px);
+  gap: 18px;
+  background: rgba(9, 9, 9, 0.78) !important;
+  border-bottom-color: var(--rei-line) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+}
+
+.rei-header__protocol {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.rei-header__version {
+  padding: 6px 9px;
+  border-color: var(--rei-line-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #b8b8b0;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+}
+
+.rei-domain-tabs {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 4px;
+  padding: 4px;
+  border-color: var(--rei-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.024);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  scrollbar-width: none;
+}
+
+.rei-domain-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.rei-domain-tab {
+  min-height: 36px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  color: #999f9a;
+  font-size: 12px;
+  font-weight: 560;
+}
+
+.rei-domain-tab:hover {
+  background: rgba(255, 255, 255, 0.055);
+  color: #f1f1eb;
+}
+
+.rei-domain-tab.is-active {
+  border-color: var(--rei-amber-line) !important;
+  background: linear-gradient(180deg, rgba(226, 163, 61, 0.18), rgba(226, 163, 61, 0.09)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 220, 156, 0.12), 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+.rei-header__actions {
+  gap: 8px;
+  padding-left: 14px;
+  border-left-color: var(--rei-line);
+}
+
+.rei-activity-pill,
+.rei-action-btn--kebab {
+  min-height: 38px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rei-activity-pill {
+  padding: 8px 13px;
+  border-color: rgba(226, 163, 61, 0.22);
+  color: #d8b46b;
+}
+
+.rei-activity-pill:hover,
+.rei-activity-pill:focus-visible {
+  border-color: var(--rei-amber-line);
+  background: var(--rei-amber-soft);
+  color: #f0bf62;
+}
+
+.rei-action-btn--kebab {
+  min-width: 38px;
+  padding: 7px 10px;
+  border-color: var(--rei-line);
+}
+
+.rei-workspace {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  max-width: 1480px;
+  min-height: 0;
+  margin: 0 auto;
+  overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.025);
+  border-left: 1px solid rgba(255, 255, 255, 0.025);
+}
+
+.rei-workspace__conversation {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.rei-main-content {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(18px, 2.4vw, 34px) clamp(16px, 2.5vw, 34px) !important;
+  scrollbar-color: rgba(226, 163, 61, 0.25) transparent;
+  scrollbar-width: thin;
+}
+
+.rei-main-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rei-main-content::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(226, 163, 61, 0.24);
+}
+
+.rei-main-content:has(.rei-chat-card) .rei-chat-history {
+  display: none;
+}
+
+.rei-chat-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rei-line);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 12% -28%, rgba(226, 163, 61, 0.15), transparent 36%),
+    linear-gradient(145deg, rgba(24, 24, 24, 0.98), rgba(13, 13, 13, 0.98));
+  box-shadow: var(--rei-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.rei-chat-card::before {
+  position: absolute;
+  top: 0;
+  right: 11%;
+  left: 11%;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(226, 163, 61, 0.9), transparent);
+}
+
+.rei-chat-intro {
+  padding: clamp(26px, 3.5vw, 44px) clamp(24px, 4vw, 52px) 30px !important;
+  text-align: left;
+  border-bottom-color: var(--rei-line);
+  background: transparent;
+}
+
+.rei-chat-intro__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.rei-chat-intro__copy {
+  max-width: 680px;
+}
+
+.rei-chat-intro__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  color: #d8ad5b;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.rei-chat-intro__signal,
+.rei-domain-banner__signal {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 0 4px rgba(226, 163, 61, 0.1), 0 0 18px rgba(226, 163, 61, 0.55);
+}
+
+.rei-chat-intro__headline {
+  margin: 0 0 12px !important;
+  color: #f4f4ee;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(30px, 3.25vw, 46px) !important;
+  font-weight: 650 !important;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.rei-chat-intro__suffix {
+  color: #b99249;
+  font-weight: inherit;
+}
+
+.rei-chat-intro__text {
+  max-width: 620px;
+  margin: 0 !important;
+  color: #a9aea7 !important;
+  font-size: 15px !important;
+  line-height: 1.65;
+}
+
+.rei-chat-intro__ledger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 14px;
+  flex: 0 0 auto;
+  border: 1px solid var(--rei-amber-line);
+  border-radius: 999px;
+  background: var(--rei-amber-soft);
+  color: #e7ba63;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.rei-chat-intro__ledger:hover,
+.rei-chat-intro__ledger:focus-visible {
+  border-color: rgba(226, 163, 61, 0.62);
+  background: rgba(226, 163, 61, 0.16);
+  transform: translateY(-1px);
+}
+
+.rei-chat-intro__trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 25px;
+  color: #777d77;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rei-chat-intro__trust span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rei-chat-intro__trust span::before {
+  width: 3px;
+  height: 3px;
+  content: "";
+  border-radius: 50%;
+  background: rgba(226, 163, 61, 0.75);
+}
+
+.rei-starters {
+  gap: 12px;
+  padding: 24px clamp(24px, 4vw, 52px) clamp(28px, 4vw, 44px);
+}
+
+.rei-starters.is-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rei-starters__label {
+  margin-bottom: 4px;
+  color: #777d77;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.rei-starter-row-container {
+  position: relative;
+  gap: 0;
+}
+
+.rei-starter-row-container .rei-starter-row {
+  min-height: 82px;
+  padding: 16px 50px 16px 17px;
+  gap: 14px;
+  border-color: var(--rei-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.rei-starter-row-container .rei-starter-row:hover,
+.rei-starter-row-container .rei-starter-row:focus-visible {
+  border-color: var(--rei-amber-line);
+  background: linear-gradient(120deg, rgba(226, 163, 61, 0.105), rgba(255, 255, 255, 0.025));
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  transform: translateY(-2px);
+}
+
+.rei-starter-row__glyph {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(226, 163, 61, 0.16);
+  border-radius: 11px;
+  background: rgba(226, 163, 61, 0.075);
+  color: #bd9650;
+}
+
+.rei-starter-row__txt {
+  color: #ededE7;
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.rei-starter-row__sub {
+  margin-top: 4px;
+  color: #858b85;
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.rei-starter-row__hint {
+  display: none;
+}
+
+.rei-starter-row__edit-btn {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 11px;
+  width: 32px;
+  height: 32px;
+  border-color: transparent;
+  border-radius: 9px;
+  background: transparent;
+  transform: translateY(-50%);
+}
+
+.rei-starter-row__edit-btn:hover,
+.rei-starter-row__edit-btn:focus-visible {
+  border-color: var(--rei-line-strong);
+  background: rgba(255, 255, 255, 0.065);
+  color: #e5b85f;
+}
+
+.rei-domain-banner {
+  padding: 0;
+  overflow: hidden;
+  border-color: var(--rei-line) !important;
+  border-radius: 16px;
+  background: var(--rei-panel) !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.rei-domain-banner__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 62px;
+  padding: 14px 17px;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rei-domain-banner__summary:focus-visible {
+  outline: 2px solid rgba(226, 163, 61, 0.7);
+  outline-offset: -3px;
+}
+
+.rei-domain-banner__identity,
+.rei-domain-banner__controls {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 11px;
+}
+
+.rei-domain-banner__name {
+  flex: 0 0 auto;
+  color: #f1f1eb;
+  font-size: 14px;
+  font-weight: 680;
+}
+
+.rei-domain-banner__description {
+  max-width: 440px;
+  overflow: hidden;
+  color: #8f958f;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rei-domain-banner__protocol {
+  color: #777d77;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.rei-domain-banner__chevron {
+  color: #777d77;
+  font-size: 9px;
+  transition: transform 180ms ease;
+}
+
+.rei-domain-banner__chevron.is-expanded {
+  transform: rotate(180deg);
+}
+
+.rei-domain-banner__detail {
+  padding: 18px;
+  border-top: 1px solid var(--rei-line);
+  background: rgba(0, 0, 0, 0.17);
+}
+
+.rei-domain-banner__detail-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.rei-domain-banner__meta {
+  gap: 8px;
+  color: #a4aaa3;
+  font-size: 12px;
+}
+
+.rei-domain-banner__pipeline {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rei-line);
+}
+
+.rei-domain-banner__pipeline-label {
+  margin-bottom: 10px;
+  color: #c89e50;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.rei-domain-banner__steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.rei-domain-banner__step {
+  padding: 6px 9px;
+  border: 1px solid var(--rei-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  color: #aeb3ad;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+}
+
+.rei-domain-banner__step.is-hinge {
+  border-color: var(--rei-amber-line);
+  background: var(--rei-amber-soft);
+  color: #e6b75f;
+}
+
+.rei-domain-banner__arrow {
+  color: #646963;
+  font-size: 11px;
+}
+
+.rei-chat-history {
+  gap: 20px;
+}
+
+.rei-chat-message {
+  width: min(100%, 920px);
+  max-width: 100% !important;
+}
+
+.rei-chat-message--user {
+  width: min(86%, 760px);
+  margin-left: auto;
+}
+
+.rei-chat-bubble {
+  padding: 18px 64px 20px 20px !important;
+  border-radius: 16px;
+}
+
+.rei-chat-bubble--rei {
+  border-color: var(--rei-line) !important;
+  background: linear-gradient(145deg, rgba(22, 22, 22, 0.96), rgba(14, 14, 14, 0.96)) !important;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.rei-chat-bubble--user {
+  border-color: rgba(226, 163, 61, 0.2);
+  background: rgba(226, 163, 61, 0.075);
+}
+
+.rei-chat-meta {
+  margin-top: 7px;
+  color: #727872;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+}
+
+.rei-cardo-response {
+  display: grid;
+  gap: 14px;
+}
+
+.rei-cardo-response__intro {
+  padding-right: 30px;
+  color: #d8dbd6;
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+
+.rei-cardo-hinge-box,
+.rei-cardo-card {
+  position: relative;
+  margin: 0;
+  padding: 16px 17px;
+  overflow: hidden;
+  border: 1px solid var(--rei-line);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.rei-cardo-hinge-box {
+  border-color: var(--rei-amber-line);
+  background: linear-gradient(120deg, rgba(226, 163, 61, 0.13), rgba(226, 163, 61, 0.035));
+  box-shadow: none;
+  animation: none;
+}
+
+.rei-cardo-hinge-box::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  content: "";
+  background: var(--amber);
+}
+
+.rei-cardo-hinge-box:hover {
+  border-color: rgba(226, 163, 61, 0.52) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+.rei-cardo-card__label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #d7aa56;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rei-cardo-card__label span {
+  color: #686e68;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.rei-cardo-hinge-box__text {
+  color: #f0f0e9;
+  font-size: 15px;
+  font-weight: 620;
+  line-height: 1.6;
+}
+
+.rei-cardo-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rei-cardo-comparison.is-mobile {
+  grid-template-columns: 1fr;
+}
+
+.rei-cardo-card__body {
+  color: #b8bdb7;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.rei-cardo-card--facts {
+  border-color: rgba(93, 170, 184, 0.22);
+}
+
+.rei-cardo-card--facts .rei-cardo-card__label {
+  color: #78b8c1;
+}
+
+.rei-cardo-card--assumptions {
+  border-color: rgba(209, 135, 77, 0.22);
+}
+
+.rei-cardo-card--assumptions .rei-cardo-card__label {
+  color: #d29261;
+}
+
+.rei-cardo-card--move {
+  border-color: rgba(112, 168, 124, 0.26);
+  background: rgba(82, 132, 93, 0.075);
+}
+
+.rei-cardo-card--move .rei-cardo-card__label {
+  color: #86b68f;
+}
+
+.rei-cardo-card--move .rei-cardo-card__body {
+  color: #e3e9e1;
+  font-weight: 580;
+}
+
+.rei-bubble-actions {
+  top: auto;
+  right: 13px;
+  bottom: 11px;
+}
+
+.rei-bubble-actions .rei-copy-btn {
+  border-radius: 999px;
+  background: rgba(9, 9, 9, 0.68);
+}
+
+.rei-input-shell {
+  position: sticky;
+  z-index: 40;
+  bottom: 0;
+  padding: 14px clamp(16px, 2.5vw, 34px) 18px !important;
+  border-top: 0;
+  background: linear-gradient(to top, rgba(9, 9, 9, 0.99) 58%, rgba(9, 9, 9, 0.78) 82%, transparent) !important;
+  backdrop-filter: blur(18px);
+}
+
+.rei-input-shell__inner {
+  width: 100%;
+  max-width: 1012px;
+  margin: 0 auto;
+}
+
+.rei-input-form:focus-within {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.rei-input-row {
+  min-height: 62px;
+  gap: 8px;
+  padding: 7px 8px 7px 10px;
+  border-color: var(--rei-line-strong);
+  border-radius: 17px;
+  background: rgba(22, 22, 22, 0.95);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.rei-input-row:focus-within {
+  border-color: rgba(226, 163, 61, 0.5);
+  background: rgba(24, 24, 24, 0.98);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(226, 163, 61, 0.08);
+}
+
+.rei-clip-btn {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-color: var(--rei-line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.rei-input-area {
+  min-height: 40px;
+  padding: 9px 5px;
+  color: #ededE7;
+  font-size: 14px;
+}
+
+.rei-input-area::placeholder {
+  color: #777d77;
+}
+
+.rei-touch-button--send {
+  min-width: 76px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(226, 163, 61, 0.16);
+}
+
+.rei-touch-button--send:hover {
+  box-shadow: 0 12px 30px rgba(226, 163, 61, 0.28);
+  transform: translateY(-1px);
+}
+
+.rei-attachment-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-bottom: 9px;
+}
+
+.rei-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 220px;
+  gap: 6px;
+  padding: 5px 9px;
+  border: 1px solid var(--rei-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #9ca29b;
+  font-size: 10.5px;
+}
+
+.rei-attachment-chip__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rei-attachment-chip__remove {
+  flex: 0 0 auto;
+  color: #777d77;
+  cursor: pointer;
+}
+
+.rei-input-errors {
+  padding-bottom: 8px;
+}
+
+.rei-input-error {
+  color: #f87171;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.rei-instrument-rail {
+  width: 286px;
+  padding: 20px 15px;
+  gap: 14px;
+  border-left-color: var(--rei-line) !important;
+  background: rgba(12, 12, 12, 0.9) !important;
+  box-shadow: -18px 0 50px rgba(0, 0, 0, 0.12);
+}
+
+.rei-instrument-rail__header-title,
+.rei-instrument-rail__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rei-instrument-rail__header {
+  padding: 0 3px 8px;
+  border-bottom: 1px solid var(--rei-line);
+}
+
+.rei-instrument-rail__title {
+  color: #cfa552;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+}
+
+.rei-instrument-rail__toggle-btn,
+.rei-instrument-rail__pin-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--rei-line) !important;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.rei-instrument-rail.is-collapsed {
+  width: 54px !important;
+  padding: 14px 6px !important;
+  background: rgba(12, 12, 12, 0.84) !important;
+}
+
+.rei-instrument-rail__collapsed-hero {
+  width: 100%;
+  margin-top: 34px;
+  padding: 12px 0;
+  border-top: 1px solid var(--rei-line);
+  border-bottom: 1px solid var(--rei-line);
+}
+
+.rei-instrument-rail__collapsed-hero-value {
+  color: #a9833f;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-shadow: none;
+}
+
+.rei-side-card {
+  gap: 3px;
+  padding: 16px;
+  border-color: var(--rei-line);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.rei-instrument-rail .rei-side-card:first-of-type {
+  padding-left: 16px;
+}
+
+.rei-side-card--session {
+  border-color: rgba(226, 163, 61, 0.18);
+  background: linear-gradient(145deg, rgba(226, 163, 61, 0.075), rgba(255, 255, 255, 0.018));
+}
+
+.rei-side-card--decision {
+  border-left: 3px solid #d1a34e;
+}
+
+.rei-side-card__heading {
+  margin-bottom: 11px;
+  color: #8c928c;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.rei-side-stat {
+  padding: 9px 0;
+}
+
+.rei-side-stat__label {
+  color: #9ca29b;
+  font-size: 11.5px;
+}
+
+.rei-side-stat__value {
+  color: #ecece5;
+  font-size: 12px;
+}
+
+.rei-side-empty {
+  padding: 13px 2px;
+  border: 0;
+  color: #777d77;
+  text-align: left;
+}
+
+.rei-side-chip {
+  border-color: var(--rei-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.rei-instrument-rail--drawer {
+  width: 390px;
+  max-width: min(92vw, 390px);
+  background: rgba(12, 12, 12, 0.98) !important;
+  box-shadow: -28px 0 80px rgba(0, 0, 0, 0.55);
+}
+
+.rei-kebab-popover {
+  border-color: var(--rei-line-strong);
+  border-radius: 13px;
+  background: rgba(17, 17, 17, 0.98);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.52);
+}
+
+@media (max-width: 900px) {
+  .rei-starters.is-three {
+    grid-template-columns: 1fr;
+  }
+
+  .rei-header {
+    min-height: 60px;
+    padding-inline: 14px;
+    gap: 9px;
+  }
+
+  .rei-header__protocol {
+    display: none;
+  }
+
+  .rei-header__actions {
+    padding-left: 9px;
+  }
+
+  .rei-activity-pill span:last-child {
+    display: none;
+  }
+
+  .rei-activity-pill {
+    width: 38px;
+    justify-content: center;
+    padding: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .rei-shell::before {
+    opacity: 0.24;
+    background-size: 44px 44px;
+  }
+
+  .rei-header {
+    min-height: 56px;
+    padding: 7px 10px;
+  }
+
+  .rei-header .rei-domain-tabs {
+    padding: 3px;
+    scroll-padding-inline: 8px;
+    scroll-snap-type: x proximity;
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 18px), transparent 100%);
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 18px), transparent 100%);
+  }
+
+  .rei-header .rei-domain-tab {
+    min-height: 34px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+    scroll-snap-align: start;
+  }
+
+  .rei-header__actions {
+    gap: 6px;
+    padding-left: 5px;
+  }
+
+  .rei-action-btn--kebab {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .rei-main-content {
+    padding: 13px 10px calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+    scroll-padding-bottom: 24px;
+  }
+
+  .rei-chat-card {
+    border-radius: 17px;
+  }
+
+  .rei-chat-intro {
+    padding: 22px 19px 20px !important;
+  }
+
+  .rei-chat-intro__header {
+    display: block;
+  }
+
+  .rei-chat-intro__eyebrow {
+    margin-bottom: 12px;
+    font-size: 8.5px;
+  }
+
+  .rei-chat-intro__headline {
+    margin-bottom: 9px !important;
+    font-size: clamp(25px, 8vw, 34px) !important;
+  }
+
+  .rei-chat-intro__text {
+    font-size: 13px !important;
+    line-height: 1.55;
+  }
+
+  .rei-chat-intro__ledger {
+    min-height: 38px;
+    margin-top: 17px;
+  }
+
+  .rei-chat-intro__trust {
+    gap: 7px 12px;
+    margin-top: 18px;
+    font-size: 8px;
+  }
+
+  .rei-starters {
+    gap: 8px;
+    padding: 16px 14px 18px;
+  }
+
+  .rei-starter-row-container .rei-starter-row {
+    min-height: 66px;
+    padding: 12px 44px 12px 12px;
+  }
+
+  .rei-starter-row__glyph {
+    width: 34px;
+    height: 34px;
+  }
+
+  .rei-domain-banner {
+    border-radius: 14px;
+  }
+
+  .rei-domain-banner__summary {
+    min-height: 54px;
+    padding: 12px 13px;
+  }
+
+  .rei-domain-banner__description,
+  .rei-domain-banner__protocol {
+    display: none;
+  }
+
+  .rei-domain-banner__arrow {
+    display: none;
+  }
+
+  .rei-domain-banner__steps {
+    align-items: stretch;
+  }
+
+  .rei-domain-banner__step {
+    flex: 1 1 45%;
+    text-align: center;
+  }
+
+  .rei-chat-message--user {
+    width: 92%;
+  }
+
+  .rei-chat-bubble {
+    padding: 15px 48px 18px 15px !important;
+  }
+
+  .rei-cardo-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .rei-input-shell {
+    padding: 9px 9px max(11px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .rei-input-row {
+    min-height: 56px;
+    gap: 6px;
+    padding-inline: 7px;
+    border-radius: 15px;
+  }
+
+  .rei-input-area {
+    min-width: 0;
+    padding-inline: 4px;
+  }
+
+  .rei-clip-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .rei-touch-button--send {
+    min-width: 62px;
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  .rei-instrument-rail.is-collapsed {
+    display: none;
+  }
+}
+
+@media (max-height: 600px) and (max-width: 720px) {
+  .rei-chat-intro {
+    padding-block: 16px 14px !important;
+  }
+
+  .rei-chat-intro__eyebrow,
+  .rei-chat-intro__trust {
+    display: none;
+  }
+
+  .rei-chat-intro__headline {
+    font-size: 24px !important;
+  }
+
+  .rei-chat-intro__ledger {
+    min-height: 34px;
+    margin-top: 11px;
+  }
+
+  .rei-starters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-block: 11px 13px;
+  }
+
+  .rei-starter-row-container .rei-starter-row {
+    min-height: 55px;
+  }
+
+  .rei-starter-row__sub,
+  .rei-starter-row__glyph {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rei-chat-card *,
+  .rei-chat-message,
+  .rei-cardo-hinge-box {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 .rei-activity-group {
   border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
   padding: 8px 0;
@@ -2045,6 +3218,14 @@
   color: var(--text-secondary, #94a3b8);
   font-size: 9px;
   text-transform: uppercase;
+}
+
+.rei-activity-event-detail {
+  color: var(--text-secondary, #94a3b8);
+  font-size: 9px;
+  grid-column: 1 / -1;
+  line-height: 1.4;
+  text-transform: none;
 }
 
 .rei-activity-event-dot {

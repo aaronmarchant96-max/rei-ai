@@ -33,7 +33,7 @@ export interface ActivityEvent {
   status: ActivityStatus;
   summary: string;
   details?: Record<string, unknown>;
-  sourceStore: "routing" | "decision" | "evaluation";
+  sourceStore: "routing" | "decision" | "evaluation" | "prediction";
   sourceRecordId: string;
 }
 

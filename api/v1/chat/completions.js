@@ -4,7 +4,7 @@
 
 import "dotenv/config";
 import { handleCfaiRequest } from "../../cfai.js";
-import { buildServerRouterDecision, computeServerCost, normalizeFinishReason } from "../../../shared/lib/serverRouter.js";
+import { buildServerRouterDecision, computeServerCost, normalizeFinishReason, evaluateDeliveryIntegrity } from "../../../shared/lib/serverRouter.js";
 import { parseApiKeyHeader, resolveTenantContext } from "../../../shared/lib/authTenantEngine.js";
 
 const ERROR_CODES = {
@@ -36,20 +36,31 @@ function errorReply(res, status, code, message, param = null) {
 }
 
 function normalizeUsage(rawUsage, userPrompt, contentText) {
-  const promptTok = typeof rawUsage?.prompt_tokens === "number" && rawUsage.prompt_tokens > 0
+  const isValidTokenCount = (value) => Number.isFinite(value) && value >= 0;
+  const hasPrompt = isValidTokenCount(rawUsage?.prompt_tokens);
+  const hasCompletion = isValidTokenCount(rawUsage?.completion_tokens);
+  const hasTotal = isValidTokenCount(rawUsage?.total_tokens);
+  const allObserved = hasPrompt && hasCompletion && hasTotal
+    && rawUsage.total_tokens === rawUsage.prompt_tokens + rawUsage.completion_tokens;
+  const noneObserved = !hasPrompt && !hasCompletion && !hasTotal;
+
+  const promptTok = hasPrompt
     ? rawUsage.prompt_tokens
     : Math.max(1, Math.ceil((userPrompt || "").length / 4));
-  const compTok = typeof rawUsage?.completion_tokens === "number" && rawUsage.completion_tokens > 0
+  const compTok = hasCompletion
     ? rawUsage.completion_tokens
     : Math.max(1, Math.ceil((contentText || "").length / 4));
-  const totalTok = typeof rawUsage?.total_tokens === "number" && rawUsage.total_tokens > 0
+  const totalTok = allObserved
     ? rawUsage.total_tokens
     : promptTok + compTok;
 
   return {
-    prompt_tokens: promptTok,
-    completion_tokens: compTok,
-    total_tokens: totalTok,
+    usage: {
+      prompt_tokens: promptTok,
+      completion_tokens: compTok,
+      total_tokens: totalTok,
+    },
+    provenance: allObserved ? "observed" : (noneObserved ? "estimated" : "mixed"),
   };
 }
 
@@ -126,9 +137,13 @@ export default async function handler(req, res) {
     }
 
     const userPrompt = messages.map((m) => m.content).join("\n");
+    const latestUserMsg = Array.isArray(messages)
+      ? [...messages].reverse().find((m) => m && m.role === "user")?.content || ""
+      : "";
+    const promptForRouting = latestUserMsg.trim() || userPrompt;
 
-    // 2. Server Router Decision
-    const routerDecision = buildServerRouterDecision({ input: userPrompt, domain, model });
+    // 2. Server Router Decision (evaluated on current turn input)
+    const routerDecision = buildServerRouterDecision({ input: promptForRouting, domain, model });
     const selectedModel = routerDecision.model;
 
     // 3. Delegate to serverless CFAI request executor
@@ -150,16 +165,28 @@ export default async function handler(req, res) {
     if (!cfaiRes || cfaiRes.rateLimited || cfaiRes.success === false || replyText.includes("All reasoning backends are unavailable") || (cfaiRes.reply === undefined && cfaiRes.content === undefined && cfaiRes.result === undefined)) {
       return errorReply(res, 503, ERROR_CODES.CF_MODEL_UNAVAILABLE, "All upstream model backends unavailable");
     }
-    const rawFinishReason = cfaiRes.finishReason || (cfaiRes.isTruncated ? "length" : "stop");
-    const normalizedFinish = normalizeFinishReason(rawFinishReason);
-    const isComplete = normalizedFinish === "stop";
 
-    const usage = normalizeUsage(cfaiRes.usage, userPrompt, replyText);
-    const costs = computeServerCost(selectedModel, usage.prompt_tokens, usage.completion_tokens);
+    const rawExecutedModel = cfaiRes.model || selectedModel;
+    const executedModel = String(rawExecutedModel).replace(/\s*\([^)]*\)/g, "").trim();
+    const isTruncated = Boolean(cfaiRes.truncated || cfaiRes.isTruncated);
+    const rawFinishReason = isTruncated ? "length" : (cfaiRes.finishReason ?? null);
+    const deliveryGate = evaluateDeliveryIntegrity({
+      rawContent: replyText,
+      finishReason: rawFinishReason,
+      transportCompleted: true
+    });
+    const normalizedFinish = normalizeFinishReason(rawFinishReason);
+    const isComplete = deliveryGate.deliveryGatePassed && !isTruncated;
+
+    const normalizedUsage = normalizeUsage(cfaiRes.usage, userPrompt, replyText);
+    const usage = normalizedUsage.usage;
+    const usageProvenance = normalizedUsage.provenance;
+    const costs = computeServerCost(executedModel, usage.prompt_tokens, usage.completion_tokens);
+    const savingsEligible = isComplete && usageProvenance === "observed" && costs.modelRated;
 
     if (typeof res.setHeader === "function") {
-      res.setHeader("X-REI-Pathway", selectedModel);
-      res.setHeader("X-REI-Savings", String(costs.modeledDifferenceUsd));
+      res.setHeader("X-REI-Pathway", executedModel);
+      res.setHeader("X-REI-Savings", String(savingsEligible ? costs.modeledDifferenceUsd : 0));
     }
 
     const requestId = cfaiRes.requestId || `req_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -170,26 +197,32 @@ export default async function handler(req, res) {
     const receipt = {
       request_id: requestId,
       tenant_id: tenantCtx.tenantId,
-      observed_cost_usd: costs.observedCostUsd,
+      selected_model: selectedModel,
+      executed_model: executedModel,
+      fallback_executed: Boolean(cfaiRes.fallbackExecuted),
+      observed_cost_usd: usageProvenance === "observed" && costs.modelRated ? costs.observedCostUsd : null,
+      modeled_cost_usd: costs.modelRated ? costs.observedCostUsd : null,
       modeled_difference_usd: costs.modeledDifferenceUsd,
-      eligible_savings_usd: isComplete ? costs.modeledDifferenceUsd : 0,
+      eligible_savings_usd: savingsEligible ? costs.modeledDifferenceUsd : 0,
       savings_policy_version: "delivery-gated-v1",
-      savings_eligibility: isComplete ? "eligible" : "excluded",
-      finish_status: isComplete ? "complete" : normalizedFinish,
+      savings_eligibility: savingsEligible ? "eligible" : "excluded",
+      finish_status: isComplete ? "complete" : deliveryGate.finishStatus,
+      usage_provenance: usageProvenance,
+      cost_provenance: costs.modelRated ? "modeled" : "unavailable",
       single_flight_coalesced: Boolean(cfaiRes.singleFlightCoalesced),
       execution_role: cfaiRes.executionRole || "leader"
     };
 
     // 5. Streaming vs Non-Streaming OpenAI Response
     if (stream) {
-      return sendStreamingResponse(res, completionId, createdTime, selectedModel, replyText, usage, normalizedFinish, receipt);
+      return sendStreamingResponse(res, completionId, createdTime, executedModel, replyText, usage, normalizedFinish, receipt);
     }
 
     return res.status(200).json({
       id: completionId,
       object: "chat.completion",
       created: createdTime,
-      model: selectedModel,
+      model: executedModel,
       choices: [
         {
           index: 0,

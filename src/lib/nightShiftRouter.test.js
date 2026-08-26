@@ -59,6 +59,24 @@ describe("nightShiftRouter (Parameterized Routing Matrix)", () => {
     expect(decision.id).toBe("structured-reasoning");
   });
 
+  describe("Executive Decision Routing Regression (Cancer Model / Runway Prompt)", () => {
+    const executivePrompt =
+      "We have developed an AI medical diagnostic model for cancer detection. Clinical testing shows a 0.7% false-negative rate disparity in a specific patient subgroup. Our company runway is 6 months, but retraining the model to resolve the subgroup disparity will take 14 months. Our investors want to launch next week, our ethics lead threatens to resign if we launch with the disparity, and hospitals want access now. How do I make this decision and live with it?";
+
+    it("diagnostic inspection: logs current routing decision details for the executive prompt", () => {
+      const decision = buildRouterDecision({ input: executivePrompt, domain: "assistant" });
+      console.log("DIAGNOSTIC EXECUTIVE ROUTE DECISION:", {
+        id: decision.id,
+        label: decision.label,
+        model: decision.model,
+        rationale: decision.rationale,
+        routingSignals: decision.routingSignals,
+      });
+      expect(decision.id).toBe("structured-reasoning");
+      expect(decision.id).not.toBe("coding-hinge");
+    });
+  });
+
   test("uses stored route preferences and isolates history by active domain", () => {
     window.localStorage.setItem(
       "night-shift-history-coding",

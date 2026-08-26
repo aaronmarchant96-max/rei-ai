@@ -22,29 +22,14 @@ export const singleFlightGroup = new SingleFlightGroup();
 var providerCooldown = new Map();
 var THROTTLE_COOLDOWN_MS = 15000;
 var INTER_FALLBACK_MS = 300;
-var DEFAULT_RETRY_AFTER_MS = 1500;
 
 function sleep(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
 
-function parseRetryAfter(res) {
-  try {
-    var header = res.headers.get("Retry-After");
-    if (!header) return DEFAULT_RETRY_AFTER_MS;
-    var seconds = Number(header);
-    if (!isNaN(seconds) && seconds > 0) return seconds * 1000;
-    var date = Date.parse(header);
-    if (!isNaN(date)) return Math.max(0, date - Date.now());
-  } catch (_) { /* fall through */ }
-  return DEFAULT_RETRY_AFTER_MS;
-}
-
-function recordThrottle(provider, res) {
-  var retryAfter = parseRetryAfter(res);
+function recordThrottle(provider) {
   providerCooldown.set(provider, Date.now() + THROTTLE_COOLDOWN_MS);
   console.warn(provider + " rate-limited — cooling down for " + (THROTTLE_COOLDOWN_MS / 1000) + "s");
-  return sleep(retryAfter);
 }
 
 export function getProviderCooldown() {
@@ -428,7 +413,7 @@ async function callDeepSeek(messages, maxTokens, modelOverride, temperature = 0.
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("deepseek", res); }
+      if (res.status === 429) { recordThrottle("deepseek"); }
       else {
         var errText = await res.text().catch(function () { return "(unreadable)"; });
         console.warn("DeepSeek status " + res.status + ": " + errText.slice(0, 300));
@@ -493,7 +478,7 @@ async function callGemini(messages, maxTokens, modelOverride, temperature = 0.7,
       });
       if (!res.ok) {
         if (res.status === 429) {
-          await recordThrottle("gemini", res);
+          recordThrottle("gemini");
           return null;
         }
 
@@ -578,7 +563,7 @@ async function callGroq(messages, maxTokens, modelOverride, temperature = 0.7, t
         });
         if (!res.ok) {
           if (res.status === 429) {
-            await recordThrottle("groq", res);
+            recordThrottle("groq");
             return null;
           }
           if (res.status === 404 || res.status === 413) {
@@ -627,7 +612,7 @@ async function callOpenAI(messages, maxTokens, temperature = 0.7, tools = null) 
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("openai", res); }
+      if (res.status === 429) { recordThrottle("openai"); }
       return null;
     }
     const data = await res.json();
@@ -668,7 +653,7 @@ async function callGLM(messages, maxTokens, temperature = 0.7, tools = null) {
       body: JSON.stringify(payload),
     });
     if (!res.ok) {
-      if (res.status === 429) { await recordThrottle("glm", res); }
+      if (res.status === 429) { recordThrottle("glm"); }
       else {
         const errText = await res.text().catch(function () { return ""; });
         console.warn("GLM status " + res.status + ": " + errText.slice(0, 200));
@@ -719,6 +704,15 @@ function appendContinuationTurns(messages, partialContent) {
   ]);
 }
 
+export function sanitizeContinuationOutput(text) {
+  if (!text || typeof text !== "string") return "";
+  let cleaned = text
+    .replace(/^\s*(?:\)\.\s*|\bSo we need to continue as if\b|\bContinue exactly where\b|\bThe prior message didn't contain\b|\bProvide detailed design, code snippets\b|\bSince there was no content\b|\bShould be consistent with being REI persona\b)[^\n]*\n?/gi, "")
+    .replace(/Continue exactly where the previous response ended\.[^\n]*\n?/gi, "")
+    .trim();
+  return cleaned;
+}
+
 async function completeWithContinuation(runBackend, messages, firstResult) {
   var full = firstResult.content || "";
   var usage = sumUsage(null, firstResult.usage);
@@ -750,8 +744,10 @@ async function completeWithContinuation(runBackend, messages, firstResult) {
     }
   }
 
+  var sanitized = sanitizeContinuationOutput(full);
+
   return {
-    content: full,
+    content: sanitized || full,
     usage: usage,
     truncated: stillTruncated,
     finishReason: finishReason,
@@ -1088,7 +1084,35 @@ function finalizeResult(result, runBackend, messages, modelLabel, routerDecision
 
 // ── Main API router: primary backend + fallback chain ──
 
-async function callModelAPI(prompt, systemPrompt, history, routerDecision, messagesOverride) {
+const STORY_DELIVERY_CONTRACT = `
+
+[STORY DELIVERY CONTRACT]
+- [SENIOR EDITOR PASS — perform silently before answering]
+  1. Write a one-sentence premise built around a specific contradiction rather than a stock genre setup.
+  2. Identify the protagonist's concrete want, private fear, decisive hinge, and the causal chain that makes the ending possible.
+  3. Build a causal tonal braid: requested tones must affect the same events and consequences, not appear as disconnected passages.
+  4. Introduce a small, memorable detail early. Make it matter to what happens later. By the ending, it should mean something different. Let the story's genre and tone decide how its meaning changes; it does not always have to turn a joke into tragedy.
+  5. Draft the story, then revise it as a senior editor. Remove generic rescue beats, convenient strangers, inherited mentor slogans, redundant atmospheric description, and any paragraph that does not change the situation.
+  6. Limit the prose to a small set of memorable images. Prefer precise recurring objects with changing meaning over a stream of interchangeable similes.
+  7. Check the state ledger, causal continuity, genre fulfillment, and ending. Return only the revised story—never the brief, blueprint, checklist, or editorial notes.
+- Treat every explicitly requested genre and tone as a binding acceptance criterion. When comedy and tragedy are both requested, include at least two distinct comic beats arising from character or circumstance and one irreversible tragic consequence caused by an event in the story.
+- Maintain a silent state ledger for every named character, object, injury, location, and resolved event. A character who dies or becomes incapacitated must not speak, laugh, move, or attack later unless the story explicitly establishes why.
+- Do not repeat an action beat, sentence frame, sensory image, or dramatic exchange merely to extend the response. Every paragraph must change the situation.
+- Resolve conspicuous setups before concluding. End once, after the decisive consequence, on a concrete action, image, line of dialogue, or revelation. Do not restart the action or introduce a new unresolved beat after the ending.
+- Before returning prose, silently revise once for genre adherence, repeated language, causal continuity, and ending completeness. Return only the finished story.`;
+
+function isStoryRoute(routerDecision) {
+  return routerDecision?.domain === "story" || routerDecision?.id === "story-architect";
+}
+
+function storyNeedsResearch(prompt) {
+  return /\b(?:historical|history|real[- ]world|actual|authentic|period[- ]accurate|battle of|war of|in \d{4}|\d{4}s)\b/i.test(prompt || "");
+}
+
+async function callModelAPI(prompt, systemPrompt, history, routerDecision, messagesOverride, modelOverride) {
+  const isGreeting = routerDecision?.id === "simple-greeting";
+  const isStory = isStoryRoute(routerDecision);
+  const toolsToPass = isGreeting || (isStory && !storyNeedsResearch(prompt)) ? null : AVAILABLE_TOOLS;
   var messages;
   if (messagesOverride && Array.isArray(messagesOverride) && messagesOverride.length > 0) {
     messages = messagesOverride;
@@ -1104,8 +1128,11 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
         content: content,
       };
     });
-    const toolDirective = "\n\n[CAPABILITIES & TOOLS]: You have access to two autonomous tools:\n1. web_search: Searches the live web via Exa neural search. Use it whenever you need authentic historical facts, real-world locations, period details, technical terminology, current events, or lore to ground your response.\n2. fetch_url: Fetches and reads live web pages or GitHub repository documentation from URLs.\nAlways execute tool calls directly when real-world facts or links are relevant.";
-    const activeSystemPrompt = (systemPrompt || REI_SYSTEM_PROMPT) + toolDirective;
+    const toolDirective = toolsToPass
+      ? "\n\n[CAPABILITIES & TOOLS]: You have access to two autonomous tools:\n1. web_search: Searches the live web via Exa neural search. Use it whenever you need authentic historical facts, real-world locations, period details, technical terminology, current events, or lore to ground your response.\n2. fetch_url: Fetches and reads live web pages or GitHub repository documentation from URLs.\nAlways execute tool calls directly when real-world facts or links are relevant."
+      : "";
+    const storyContract = isStory ? STORY_DELIVERY_CONTRACT : "";
+    const activeSystemPrompt = (systemPrompt || REI_SYSTEM_PROMPT) + storyContract + toolDirective;
     messages = [
       { role: "system", content: activeSystemPrompt },
       ...formattedHistory,
@@ -1113,24 +1140,21 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
     ];
   }
 
-  const isGreeting = routerDecision?.id === "simple-greeting";
+  const targetModel = modelOverride || routerDecision?.model || "deepseek-chat";
   const maxTokens = Math.max(routerDecision?.maxTokens || 4096, isGreeting ? 200 : 50);
-  const toolsToPass = isGreeting ? null : AVAILABLE_TOOLS;
-  const primaryModel = routerDecision?.model || "deepseek-chat";
+  const primaryModel = targetModel;
   const primaryBackend = getBackendForModel(primaryModel);
   const temperature = routerDecision?.temperature ?? 0.7;
-  // Only pass the routed model to Groq when Groq IS the primary backend —
-  // as a fallback it must use the default model (a non-Groq routed model
-  // like deepseek-chat would be rejected by Groq's API).
+  
   const deepseekModel = primaryBackend === "deepseek" ? primaryModel : "deepseek-chat";
-  const groqModel = primaryBackend === "groq" ? primaryModel : null;
-  const geminiModel = primaryBackend === "gemini" ? primaryModel : null;
+  const groqModel = primaryBackend === "groq" ? primaryModel : "llama-3.3-70b-versatile";
+  const geminiModel = primaryBackend === "gemini" ? primaryModel : "gemini-1.5-flash";
 
   // Map of available backends (each accepts an optional message override so
   // the continuation & tool loops can re-call the SAME backend with appended turns)
   var backends = {};
-  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs, passTools, modelOverride) { return callDeepSeek(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : deepseekModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
-  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools, modelOverride) { return callGroq(msgs || messages, maxTokens, modelOverride !== undefined ? modelOverride : groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
+  if (process.env.DEEPSEEK_API_KEY || process.env.deepseek) backends.deepseek = function (msgs, passTools, mOverride) { return callDeepSeek(msgs || messages, maxTokens, mOverride !== undefined ? mOverride : deepseekModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
+  if (process.env.GROQ_API_KEY) backends.groq = function (msgs, passTools, mOverride) { return callGroq(msgs || messages, maxTokens, mOverride !== undefined ? mOverride : groqModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GEMINI_API_KEY) backends.gemini = function (msgs, passTools) { return callGemini(msgs || messages, maxTokens, geminiModel, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.GLM_API_KEY || process.env.AI_GATEWAY_TOKEN || process.env.VERCEL_OIDC_TOKEN) backends.glm = function (msgs, passTools) { return callGLM(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
   if (process.env.OPENAI_API_KEY) backends.openai = function (msgs, passTools) { return callOpenAI(msgs || messages, maxTokens, temperature, passTools !== undefined ? passTools : toolsToPass); };
@@ -1163,7 +1187,9 @@ async function callModelAPI(prompt, systemPrompt, history, routerDecision, messa
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", routerDecision, backends);
+        const finalRes = await finalizeResult(result, backends[backend], messages, result.model || "deepseek-chat", routerDecision, backends);
+        finalRes.fallbackExecuted = true;
+        return finalRes;
       }
       await sleep(INTER_FALLBACK_MS);
     }
@@ -1199,12 +1225,20 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
   if (primaryBackend && backends[primaryBackend]) {
     var cooldownUntil = providerCooldown.get(primaryBackend);
     if (cooldownUntil && Date.now() < cooldownUntil) {
-      console.warn("Skipping primary backend " + primaryBackend + " — in cooldown (" + Math.ceil((cooldownUntil - Date.now()) / 1000) + "s remaining)");
+      console.warn("Skipping direct model backend " + primaryBackend + " — in cooldown");
     } else {
       var result = await backends[primaryBackend]();
       if (result) {
         providerCooldown.delete(primaryBackend);
-        return await finalizeResult(result, backends[primaryBackend], messages, model, null, backends);
+        return {
+          content: result.content,
+          model: model,
+          usage: result.usage,
+          truncated: result.truncated || false,
+          finishReason: result.finishReason || null,
+          rateLimited: false,
+          fallbackExecuted: false,
+        };
       }
     }
   }
@@ -1222,21 +1256,23 @@ export async function callModelDirect(model, messages, maxTokens, temperature) {
       result = await backends[backend]();
       if (result) {
         providerCooldown.delete(backend);
-        return await finalizeResult(result, backends[backend], messages, result.model + " (fallback)", null, backends);
+        const finalRes = await finalizeResult(result, backends[backend], messages, result.model || model, null, backends);
+        finalRes.fallbackExecuted = true;
+        return finalRes;
       }
       await sleep(INTER_FALLBACK_MS);
     }
   }
 
   return {
-    content: "[REI.AI NOTICE] All reasoning backends are unavailable. Please wait a moment and try again.",
-    model: "none",
+    content: "[REI.AI NOTICE] Model execution failed for " + model + ".",
+    model: model,
     rateLimited: true,
-    retryAfter: "~30s",
   };
 }
 
 export async function handleCfaiRequest(command, args, input, systemPrompt, history, routerDecision, messagesOverride) {
+  let modelOverride = null;
   if (command && typeof command === "object" && !Array.isArray(command)) {
     const opts = command;
     input = opts.prompt || opts.input || "";
@@ -1244,6 +1280,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
     history = opts.history || [];
     routerDecision = opts.routerDecision || opts.router || null;
     messagesOverride = opts.messagesOverride || opts.messages || null;
+    modelOverride = opts.modelOverride || opts.model || null;
     command = opts.command || "chat";
     args = opts.args || [];
   } else {
@@ -1258,7 +1295,7 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
   if (!localCliExists) {
     try {
       const payload = input || (args.length > 0 ? args.join(" ") : "help");
-      const response = await callModelAPI(payload, systemPrompt, history, routerDecision, messagesOverride);
+      const response = await callModelAPI(payload, systemPrompt, history, routerDecision, messagesOverride, modelOverride);
       return {
         success: true,
         result: response.content,
@@ -1267,7 +1304,8 @@ export async function handleCfaiRequest(command, args, input, systemPrompt, hist
         usage: response.usage || null,
         research: response.research || null,
         truncated: response.truncated || false,
-        finishReason: response.finishReason || null,
+        finishReason: response.finishReason || (response.truncated ? "length" : null),
+        fallbackExecuted: Boolean(response.fallbackExecuted),
         continuation: response.continuation || { attempted: false, chunks: 1, truncatedChunks: 0, finalTruncated: false },
         timestamp: new Date().toISOString(),
       };

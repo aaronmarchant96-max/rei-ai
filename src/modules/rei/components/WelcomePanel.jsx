@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Scale, Bug, ClipboardList, BookOpen, PenLine, Globe, Lightbulb, Swords, FlaskConical, Atom, Wrench, Microscope, Fingerprint, Search, ScrollText, Shield, BarChart3, Pencil } from "lucide-react";
 import EvidenceLedgerModal from "./EvidenceLedgerModal.jsx";
+import { getDomainPublicCopy } from "../../../data/productCopy.js";
 
 const ICON_MAP = {
   "⚖️": Scale,
@@ -48,7 +49,7 @@ const GENERIC_STARTERS = [
   { label: "Sort out a decision", sub: "Weigh options against what you actually know", prompt: "Help me sort this out", icon: "💡" },
   { label: "Analyze a debate", sub: "See where two sides genuinely disagree", prompt: "Separate facts from assumptions in this argument", icon: "⚔️" },
   { label: "Test an argument", sub: "Find the assumption it depends on", prompt: "What would change my mind about this?", icon: "🧪" },
-  { label: "Scan for prompt injections", sub: "Detect injection attacks before they reach a model", prompt: "Take me to the red team scanner — I want to test a prompt for adversarial patterns.", icon: "🛡️" },
+  { label: "Check a claim", sub: "Separate what is known from what is assumed", prompt: "Help me check this claim and separate the evidence from the assumptions", icon: "🛡️" },
 ];
 
 export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: propDomain }) {
@@ -96,39 +97,37 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
 
   const starters = activeDomain ? (DOMAIN_STARTERS[activeDomain] || GENERIC_STARTERS) : GENERIC_STARTERS;
   const currentDomainLabel = activeDomain ? activeDomain.charAt(0).toUpperCase() + activeDomain.slice(1) : "Generalist";
+  const welcome = getDomainPublicCopy(activeDomain);
 
   return (
     <div className="rei-chat-card">
-      <div className="rei-chat-intro" style={{ padding: "18px 20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", flexWrap: "wrap" }}>
-          <div>
-            <h1 className="rei-chat-intro__headline" style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 4px" }}>
-              REI<span className="rei-chat-intro__suffix">.ai</span> Cognitive Engine
+      <div className="rei-chat-intro">
+        <div className="rei-chat-intro__header">
+          <div className="rei-chat-intro__copy">
+            <div className="rei-chat-intro__eyebrow">
+              <span className="rei-chat-intro__signal" aria-hidden="true" />
+              {welcome.eyebrow}
+            </div>
+            <h1 className="rei-chat-intro__headline">
+              REI<span className="rei-chat-intro__suffix">.ai</span> {welcome.title}
             </h1>
-            <p className="rei-chat-intro__text" style={{ fontSize: "13.5px", color: "var(--text-secondary, #cbd5e1)", margin: "0 0 8px" }}>
-              Deterministic inference routing, prompt-cache optimization, and evidence-verified reasoning.
+            <p className="rei-chat-intro__text">
+              {welcome.description}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowLedger(true)}
-            style={{
-              background: "rgba(240, 201, 101, 0.12)",
-              border: "1px solid rgba(240, 201, 101, 0.3)",
-              color: "var(--amber-text, #f0c965)",
-              borderRadius: "6px",
-              padding: "5px 12px",
-              fontSize: "11.5px",
-              fontWeight: 600,
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
+            className="rei-chat-intro__ledger"
           >
             <BarChart3 size={13} />
-            Evidence Ledger
+            See the evidence
           </button>
+        </div>
+        <div className="rei-chat-intro__trust" aria-label="Workspace capabilities">
+          <span>Model matched to the job</span>
+          <span>{welcome.signal}</span>
+          <span>Route and cost shown</span>
         </div>
       </div>
 
@@ -150,7 +149,7 @@ export default function WelcomePanel({ onStart, onEdit, onResume, activeDomain: 
         </div>
       )}
 
-      <div className="rei-starters">
+      <div className={`rei-starters ${starters.length === 3 ? "is-three" : ""}`}>
         <div className="rei-starters__label">Pick a starting point</div>
         {starters.map((s) => {
           const Icon = ICON_MAP[s.icon];

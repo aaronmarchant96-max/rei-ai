@@ -34,7 +34,9 @@ describe("REI", () => {
 
     render(<REI />);
 
-    expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist.*show the route and cost after it answers/i)).toBeInTheDocument();
+    expect(screen.getByText("Check a claim")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /see the evidence/i })).toBeInTheDocument();
     const stored = JSON.parse(window.localStorage.getItem("rei_chat_history_assistant") || "{}");
     expect(stored.version).toBe("hcm_v1");
     expect(stored.domainId).toBe("assistant");
@@ -58,6 +60,38 @@ describe("REI", () => {
     }, { timeout: 3000 });
   });
 
+  it("persists a complete CARDO decision record for non-greeting responses", async () => {
+    render(<REI />);
+
+    const input = screen.getByPlaceholderText(/what are you trying to think through/i);
+    fireEvent.change(input, { target: { value: "Help me compare these two options carefully" } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const stored = JSON.parse(window.localStorage.getItem("rei_decision_store") || "[]");
+      expect(stored).toHaveLength(1);
+      expect(stored[0]).toEqual(expect.objectContaining({
+        id: expect.any(String),
+        requestId: expect.any(String),
+        domainLabel: "The Generalist",
+        inputPreview: "Help me compare these two options carefully",
+        createdAt: expect.any(String),
+        actualTokens: expect.any(Number),
+        actualCost: expect.any(Number),
+      }));
+      expect(Number.isNaN(Date.parse(stored[0].createdAt))).toBe(false);
+      expect(stored[0].sections).toEqual(expect.objectContaining({
+        Hinge: "The core pivot point.",
+        Facts: "What is known.",
+        Move: "Next step.",
+      }));
+      expect(stored[0].routerDecision).toEqual(expect.objectContaining({
+        label: expect.any(String),
+        model: "llama-3.1-8b-instant",
+      }));
+    }, { timeout: 3000 });
+  });
+
   it("sends a short prompt (not the full domain prompt) for simple greetings", async () => {
     render(<REI />);
 
@@ -74,6 +108,27 @@ describe("REI", () => {
       expect(body.systemPrompt).toContain("Reply to this greeting in one short, friendly sentence");
       // input must not carry the full 6K-char Generalist prompt for a greeting
       expect(body.input).toBe("hello");
+    }, { timeout: 3000 });
+  });
+
+  it("sends the Storyteller system prompt exactly once and keeps the user payload focused", async () => {
+    render(<REI />);
+
+    fireEvent.click(screen.getByRole("button", { name: /The Storyteller/i }));
+    const input = screen.getByPlaceholderText(/Describe the story seed/i);
+    const prompt = "Tell me a fantasy ranger story with comedy and tragedy";
+    fireEvent.change(input, { target: { value: prompt } });
+    fireEvent.click(screen.getByRole("button", { name: /send/i }));
+
+    await waitFor(() => {
+      const cfaiCall = global.fetch.mock.calls.find(function (c) { return String(c[0]).includes("/api/cfai"); });
+      const body = JSON.parse(cfaiCall[1].body);
+      const combined = `${body.systemPrompt}\n${body.input}`;
+      expect((combined.match(/master story architect/gi) || [])).toHaveLength(1);
+      expect(body.systemPrompt).toContain("master story architect");
+      expect(body.input).not.toContain("## Narrative Directives & Literary Standards");
+      expect(body.input).toContain(`User Query: ${prompt}`);
+      expect((body.input.match(new RegExp(prompt, "g")) || [])).toHaveLength(1);
     }, { timeout: 3000 });
   });
 
@@ -276,14 +331,14 @@ describe("REI", () => {
   it("switches domain when clicking a domain tab", async () => {
     render(<REI />);
 
-    expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist/i)).toBeInTheDocument();
 
     // Click "Coding" domain tab — it shows "The Hinge Finder"
     const codingTab = screen.getByText("The Engineer");
     fireEvent.click(codingTab);
 
     await waitFor(() => {
-      expect(screen.getByText(/System initialized. Welcome to REI.ai The Engineer/i)).toBeInTheDocument();
+      expect(screen.getByText(/You're in REI\.ai — The Engineer/i)).toBeInTheDocument();
     }, { timeout: 3000 });
   });
 
@@ -326,7 +381,7 @@ describe("REI", () => {
     fireEvent.click(screen.getByText(/Try a Case/i));
 
     await waitFor(() => {
-      expect(screen.getByText(/System initialized. Welcome to REI.ai The Precedent Engine/i)).toBeInTheDocument();
+      expect(screen.getByText(/You're in REI\.ai — The Precedent Engine/i)).toBeInTheDocument();
     }, { timeout: 3000 });
 
     await waitFor(() => {
@@ -352,7 +407,7 @@ describe("REI", () => {
       expect(screen.queryByText("hello world")).not.toBeInTheDocument();
     }, { timeout: 3000 });
 
-    expect(screen.getByText(/Hey! I'm REI/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist/i)).toBeInTheDocument();
   });
 
   it("shows fallback text when the API call fails", async () => {
@@ -513,7 +568,7 @@ describe("REI Workspace Transition & Progressive Disclosure", () => {
     window.localStorage.setItem("rei_selected_domain", "non_existent_domain_xyz");
     render(<REI />);
 
-    expect(screen.getByText(/Hey! I'm REI — The Generalist/i)).toBeInTheDocument();
+    expect(screen.getByText(/You're in REI\.ai — The Generalist/i)).toBeInTheDocument();
   });
 
   test("compact decision proof badge renders formatted cost when present and hides cost when absent", async () => {

@@ -62,7 +62,6 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
   return (
     <div
       className={`rei-chat-message ${msg.sender === "user" ? "rei-chat-message--user" : "rei-chat-message--rei"}`}
-      style={{ maxWidth: "95%", width: "100%" }}
       onAnimationEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
       {msg.sender === "user" && msg.attachedRecord && (
@@ -77,7 +76,6 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
 
       <div
         className={`rei-chat-bubble ${msg.sender === "user" ? "rei-chat-bubble--user" : "rei-chat-bubble--rei"}`}
-        style={{ padding: "16px 52px 16px 20px" }}
       >
         {isAssistantStructuredReply ? (
           (() => {
@@ -86,24 +84,18 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
             }
 
             return (
-              <div style={{ display: "grid", gap: "22px", paddingRight: "36px" }}>
-                {sections.intro && <div style={{ fontSize: "15px", lineHeight: "1.45" }}>{sections.intro}</div>}
+              <div className="rei-cardo-response">
+                {sections.intro && <div className="rei-cardo-response__intro">{sections.intro}</div>}
 
                 {/* 📌 1. THE HINGE FOCUS CONTAINER */}
                 {hasHinge && (
                   <div
                     className="rei-cardo-hinge-box"
-                    style={{
-                      borderLeft: "4px solid var(--amber-border)",
-                      marginBottom: "12px",
-                      borderRadius: "0 10px 10px 0",
-                      padding: "12px 16px",
-                    }}
                   >
-                    <div style={{ color: "var(--amber-text)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 800, marginBottom: "4px" }}>
-                      📌 THE HINGE (Core Pivot Point)
+                    <div className="rei-cardo-card__label">
+                      THE HINGE <span>Core pivot point</span>
                     </div>
-                    <div style={{ color: "var(--text)", fontSize: "14.5px", fontWeight: 600, lineHeight: "1.5" }}>
+                    <div className="rei-cardo-hinge-box__text">
                       {sections.Hinge}
                     </div>
                   </div>
@@ -111,21 +103,21 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
 
                 {/* 🔬 2. COMPARATIVE GRID: FACTS vs ASSUMPTIONS */}
                 {(hasFacts || hasAssumptions) && (
-                  <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: "12px" }}>
+                  <div className={`rei-cardo-comparison ${mobile ? "is-mobile" : ""}`}>
                     {hasFacts && (
-                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(240, 201, 101, 0.15)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                        <div style={{ color: "var(--cardo-facts)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                             🔬 FACTS (Known Reality)
+                      <div className="rei-cardo-card rei-cardo-card--facts">
+                        <div className="rei-cardo-card__label">
+                          FACTS <span>Known reality</span>
                         </div>
-                        <div style={{ fontSize: "13.5px", color: "var(--text-secondary)", lineHeight: "1.45" }}>{sections.Facts}</div>
+                        <div className="rei-cardo-card__body">{sections.Facts}</div>
                       </div>
                     )}
                     {hasAssumptions && (
-                      <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(251, 146, 60, 0.15)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                        <div style={{ color: "var(--cardo-assumptions)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                             ❓ ASSUMPTIONS (Uncertainty)
+                      <div className="rei-cardo-card rei-cardo-card--assumptions">
+                        <div className="rei-cardo-card__label">
+                          ASSUMPTIONS <span>Uncertainty</span>
                         </div>
-                        <div style={{ fontSize: "13.5px", color: "var(--text-secondary)", lineHeight: "1.45" }}>{sections.Assumptions}</div>
+                        <div className="rei-cardo-card__body">{sections.Assumptions}</div>
                       </div>
                     )}
                   </div>
@@ -133,30 +125,30 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
 
                 {/* ⚖️ 3. EVALUATION & CHANGE MIND */}
                 {hasEval && (
-                  <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                    <div style={{ color: "var(--amber-text)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                         ⚖️ EVALUATION & RISK
+                  <div className="rei-cardo-card rei-cardo-card--evaluation">
+                    <div className="rei-cardo-card__label">
+                      EVALUATION <span>Risk and tradeoffs</span>
                     </div>
-                    <div style={{ fontSize: "13.5px", color: "var(--text)", lineHeight: "1.45" }}>{sections.Evaluation}</div>
+                    <div className="rei-cardo-card__body">{sections.Evaluation}</div>
                   </div>
                 )}
 
                 {hasChange && (
-                  <div style={{ background: "rgba(255, 255, 255, 0.02)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                    <div style={{ color: "var(--cardo-change)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                         🔄 WHAT WOULD CHANGE MY MIND
+                  <div className="rei-cardo-card rei-cardo-card--change">
+                    <div className="rei-cardo-card__label">
+                      WHAT WOULD CHANGE MY MIND
                     </div>
-                    <div style={{ fontSize: "13.5px", color: "var(--text)", lineHeight: "1.45" }}>{sections.ChangeMind}</div>
+                    <div className="rei-cardo-card__body">{sections.ChangeMind}</div>
                   </div>
                 )}
 
                 {/* 🚀 4. NEXT MOVE */}
                 {hasMove && (
-                  <div style={{ background: "rgba(240, 201, 101, 0.06)", border: "1px solid rgba(240, 201, 101, 0.2)", borderRadius: "10px", padding: "12px", marginBottom: "12px" }}>
-                    <div style={{ color: "var(--cardo-move)", fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 700, marginBottom: "6px" }}>
-                         🚀 NEXT MOVE
+                  <div className="rei-cardo-card rei-cardo-card--move">
+                    <div className="rei-cardo-card__label">
+                      NEXT MOVE <span>Recommended action</span>
                     </div>
-                    <div style={{ fontSize: "14px", color: "var(--text)", fontWeight: 600, lineHeight: "1.45" }}>{sections.Move}</div>
+                    <div className="rei-cardo-card__body">{sections.Move}</div>
                   </div>
                 )}
 
@@ -177,7 +169,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
         )}
 
         {/* Bubble Bottom Actions */}
-        <div style={{ position: "absolute", bottom: "10px", right: "12px", display: "flex", gap: "6px" }}>
+        <div className="rei-bubble-actions">
           <button
             onClick={() => handleCopy(cleanDeliverableText)}
             className="rei-copy-btn touch-target"
@@ -231,7 +223,7 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
       </div>
 
       <span className="rei-chat-meta">
-        {msg.sender === "user" ? "You" : "REI.ai Cognitive Engine"} • {msg.timestamp}
+        {msg.sender === "user" ? "You" : domainLabel} • {msg.timestamp}
       </span>
     </div>
   );

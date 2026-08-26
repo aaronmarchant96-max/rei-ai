@@ -1,14 +1,32 @@
-# CARDO REI — Formal methodology for trustworthy AI development
+# The REI Method
 
-> **Purpose:** the one-sheet specification of the CARDO REI method, kept in-repo
-> so any agent or reader can orient without the external `CARDO_REI.md`.
-> **CARDO Method** is the framework (find the hinge). **CARDO REI** is the
-> product that makes it visible, auditable, and cost-aware.
+> **Purpose:** a plain-language standard for building AI systems whose choices,
+> results, and claims can be inspected. CARDO is the formal execution cycle
+> that implements the method; it is not the first thing a customer must learn.
+
+## The five questions
+
+| Question | What it prevents |
+|---|---|
+| **1. What kind of job is this?** | Treating every prompt as the same problem. |
+| **2. Which model should handle it?** | Choosing by habit or brand instead of capability, cost, and risk. |
+| **3. What rules must the answer follow?** | Deciding what “good enough” means only after seeing the output. |
+| **4. Did it finish correctly?** | Counting incomplete or invalid delivery as success. |
+| **5. Can we prove what happened?** | Making quality, routing, or savings claims without a receipt. |
+
+## The product
+
+- **REI Method:** the five-question standard.
+- **REI Engine:** software controls that apply it inside an AI application.
+- **REI Studio:** the live workspace that makes those controls visible.
+- **REI Decision Audit:** a bounded replay of existing traffic that identifies
+  missing controls before a team changes its production stack.
+
+## The formal CARDO execution cycle
 
 ```text
-             CARDO REI
-     Formal methodology for
-       trustworthy AI development
+          THE REI METHOD
+   Five accountable questions
                   │
                   ▼
              FIND THE HINGE
@@ -31,7 +49,7 @@
               Iterate
 ```
 
-## How this maps to the repo
+## How CARDO maps to the repo
 
 | Box | Where it lives in the code |
 |-----|----------------------------|
@@ -45,5 +63,6 @@
 
 ## The invariant
 
-Everything is the hinge. Everything is CARDO. Everything is REI.
-The name is used deliberately, never as decoration.
+Missing evidence stays missing. Incomplete delivery is not success. A modeled
+or replayed value never becomes an observed value through presentation alone.
+The artifact proposes; the human decides.

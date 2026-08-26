@@ -10,9 +10,7 @@ superseded_by: null
 archived_at: null
 ---
 
-# REI.ai — OpenAI-Compatible AI FinOps Proxy & Inference Router
-
-[![CI Tests](https://github.com/aaronmarchant96-max/rei-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/aaronmarchant96-max/rei-ai/actions)
+# REI.ai — An Executable Method for Building Accountable AI
 
 > **"You're not just saving money. You're building better, faster."**
 > 
@@ -31,11 +29,18 @@ archived_at: null
 
 ## 🎯 What is REI.ai?
 
-**The Primary Product:** An **OpenAI-compatible FinOps proxy and dynamic inference router** (`/v1/chat/completions`). It sits in front of your AI agents, coding assistants (Cursor, Cline, Aider), and backend pipelines to automatically route routine requests to sub-cent fast models while reserving expensive frontier models for complex architectural reasoning — demonstrated **81–92% modeled and replayed inference savings** across documented provider scenarios (workload-specific quality preservation requires bounded non-inferiority evaluation).
+**REI is a method for making AI decisions accountable.** Before an AI system sends a request, accepts an answer, or claims savings, it asks five questions: What is the job? Which model should handle it? What rules must the answer follow? Did it finish correctly? Can we prove what happened and what it cost?
 
-**The Underlying Methodology:** Powered by **CARDO REI**, a formal cognitive architecture that enforces pre-flight quality gates, isolates the decisive "Hinge" of every prompt, separates verified facts from assumptions, and returns auditable execution receipts.
+The product has four parts:
 
-Backed by **1099 automated tests across 102 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
+- **REI Method** — the repeatable five-question standard.
+- **REI Engine** — the control layer that applies the method inside an AI product.
+- **REI Studio** — the live workspace where people use REI and inspect its decisions.
+- **REI Decision Audit** — a bounded first engagement that finds missing routing rules, quality contracts, delivery checks, and evidence before a team replaces its stack.
+
+The OpenAI-compatible FinOps proxy and dynamic inference router (`/v1/chat/completions`) is the first production implementation of the method. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** is the formal execution cycle under the hood.
+
+Backed by **1320 automated tests across 113 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -60,7 +65,7 @@ Backed by **1099 automated tests across 102 test suites** (100% green CI), REI.a
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor & Fast Local Loop:** Backed by 1099 automated tests across 102 test suites with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
+- **Empirical Rigor:** Backed by 1320 automated tests across 113 test suites with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -199,7 +204,7 @@ export OPENAI_API_KEY="local-dev-key"
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **1099 passing tests across 102 suites** |
+| Automated Tests | **1320 passing tests across 113 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) *(orig. Celeron J4105)* |
 | Monthly Operating Budget | ~$60/month *(expanded evaluation & tool testing volume)* |
@@ -229,7 +234,7 @@ npm run server
 # Run fast test loop (~11.4s on 12-thread machine via 50% maxWorkers)
 npm run test:fast
 
-# Run serial test suite (102 test suites, 1099 tests)
+# Run serial test suite (113 test suites, 1320 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

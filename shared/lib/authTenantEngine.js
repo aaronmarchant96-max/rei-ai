@@ -12,7 +12,7 @@ export function parseApiKeyHeader(authHeader) {
   if (parts.length === 2 && /^Bearer$/i.test(parts[0])) {
     return parts[1].trim();
   }
-  if (parts.length === 1 && parts[0].startsWith("rei_key_")) {
+  if (parts.length === 1 && parts[0].length > 0) {
     return parts[0].trim();
   }
   return null;
@@ -23,9 +23,30 @@ export function resolveTenantContext(apiKey) {
     return { isAllowed: false, status: 401, code: "CF_AUTH_REQUIRED", message: "Authentication required. Provide a valid Bearer key (e.g. Bearer rei_key_...)." };
   }
 
-  // Parse REI_API_KEYS env var (format: "key:tenantId:quotaPerMin:rateLimit,key2:tenant2:...")
-  const keysEnv = process.env.REI_API_KEYS || process.env.REI_API_KEY || "";
-  const keyEntries = keysEnv.split(",").filter(Boolean);
+  const isProduction = process.env.NODE_ENV === "production";
+  const envKeys = process.env.REI_API_KEYS;
+  const singleKey = process.env.REI_API_KEY;
+
+  let keyEntries = [];
+  if (envKeys) {
+    keyEntries = envKeys.split(",").map((s) => s.trim()).filter(Boolean);
+  } else if (isProduction) {
+    if (singleKey) {
+      keyEntries = [`${singleKey}:pilot:100:60`];
+    }
+  } else {
+    // Non-production (development / test) default keys
+    keyEntries = [
+      "rei_key_pilot:pilot:100:60",
+      "rei_key_quota_test:quota_test:10:60",
+      "rei_key_pilot_test:pilot_test:100:60",
+      "rei_key_dev:pilot:100:60",
+      "rei_key_dev_probe:pilot:100:60"
+    ];
+    if (singleKey) {
+      keyEntries.push(`${singleKey}:pilot:100:60`);
+    }
+  }
 
   let matchedTenant = null;
 
@@ -40,23 +61,6 @@ export function resolveTenantContext(apiKey) {
       };
       break;
     }
-  }
-
-  // Allow single REI_API_KEY env match
-  const singleKey = process.env.REI_API_KEY;
-  if (!matchedTenant && singleKey && apiKey === singleKey) {
-    matchedTenant = { apiKey, tenantId: "pilot", quotaPerMin: 100, rateLimitPerMin: 60 };
-  }
-
-  // Allow pilot fallback key if REI_API_KEYS is unconfigured
-  if (!matchedTenant && (apiKey.startsWith("rei_key_") || apiKey.includes("test"))) {
-    const tenantId = apiKey.startsWith("rei_key_") ? apiKey.replace("rei_key_", "") : "pilot";
-    matchedTenant = {
-      apiKey,
-      tenantId: tenantId || "pilot",
-      quotaPerMin: 100,
-      rateLimitPerMin: 60
-    };
   }
 
   if (!matchedTenant) {

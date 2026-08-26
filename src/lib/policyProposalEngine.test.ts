@@ -265,3 +265,131 @@ describe("policyProposalEngine — negative controls (absence of evidence is not
     expect(generateProposals(evals, [], [])).toEqual([]);
   });
 });
+
+describe("policyProposalEngine — PR7 C-Activity policy adapter", () => {
+  const sampleReport: any = {
+    schemaVersion: 1,
+    detectorVersion: "route-learning-v1",
+    corpus: { eligible: 50 },
+    examined: { cohorts: 2, calibrationBins: 10 },
+    suppressed: { insufficientSupport: 0, overlappingIntervals: 0, unavailableComparator: 0 },
+    signals: [
+      {
+        id: "learning:persistent-delivery-risk:cohort-hash-123",
+        type: "persistent-delivery-risk",
+        cohortHash: "cohort-hash-123",
+        model: "deepseek-v4-flash",
+        routeId: "structured-reasoning",
+        cohortRiskInterval: { low: 0.4, high: 0.6 },
+        comparatorRiskInterval: { low: 0.1, high: 0.2 },
+      },
+      {
+        id: "learning:prediction-miscalibration:route-learning-v1:deepseek-v4-flash:0.1",
+        type: "prediction-miscalibration",
+        model: "deepseek-v4-flash",
+        binLow: 0.1,
+        binHigh: 0.2,
+        meanPredicted: 0.15,
+        actualInterval: { low: 0.35, high: 0.55 },
+        direction: "underpredicting",
+        support: 25,
+      },
+      {
+        id: "learning:cohort-drift:cohort-hash-123",
+        type: "cohort-drift",
+        cohortHash: "cohort-hash-123",
+        model: "deepseek-v4-flash",
+        routeId: "structured-reasoning",
+        previousInterval: { low: 0.05, high: 0.15 },
+        recentInterval: { low: 0.35, high: 0.55 },
+        direction: "increasing",
+      },
+    ],
+  };
+
+  it("maps persistent-delivery-risk to an explicit PolicyProposal", () => {
+    const report = { ...sampleReport, signals: [sampleReport.signals[0]] };
+    const props = generateProposals([], [], [], report);
+    expect(props).toHaveLength(1);
+    expect(props[0].signal).toBe("persistent-delivery-risk");
+    expect(props[0].category).toBe("learning");
+    expect(props[0].id).toBe("policy-proposal:policy-adapter-v1:learning:persistent-delivery-risk:cohort-hash-123");
+    expect(props[0].evidence).toContain("Observed cohort pattern:");
+    expect(props[0].evidence).toContain("strictly exceeds comparator risk interval");
+    expect(props[0].evidence).toContain("Source signal: \"learning:persistent-delivery-risk:cohort-hash-123\"");
+    expect(props[0].suggestedChange).toContain("Review candidate policy: evaluate whether this route/model cohort needs a routing-policy adjustment");
+  });
+
+  it("maps prediction-miscalibration to an explicit PolicyProposal", () => {
+    const report = { ...sampleReport, signals: [sampleReport.signals[1]] };
+    const props = generateProposals([], [], [], report);
+    expect(props).toHaveLength(1);
+    expect(props[0].signal).toBe("prediction-miscalibration");
+    expect(props[0].category).toBe("learning");
+    expect(props[0].evidence).toContain("predictor is underpredicting");
+    expect(props[0].suggestedChange).toContain("Review candidate policy: evaluate whether predictor calibration");
+  });
+
+  it("maps cohort-drift to an explicit PolicyProposal", () => {
+    const report = { ...sampleReport, signals: [sampleReport.signals[2]] };
+    const props = generateProposals([], [], [], report);
+    expect(props).toHaveLength(1);
+    expect(props[0].signal).toBe("cohort-drift");
+    expect(props[0].category).toBe("learning");
+    expect(props[0].evidence).toContain("failure rate for cohort on model \"deepseek-v4-flash\"");
+    expect(props[0].suggestedChange).toContain("Review candidate policy: evaluate whether a recently changing cohort warrants investigation");
+  });
+
+  it("enforces idempotence by suppressing duplicate source signal IDs", () => {
+    const reportWithDuplicates = {
+      ...sampleReport,
+      signals: [sampleReport.signals[0], sampleReport.signals[0]],
+    };
+    const props = generateProposals([], [], [], reportWithDuplicates);
+    expect(props).toHaveLength(1);
+  });
+
+  it("produces deterministic, byte-equivalent proposals regardless of signal input order", () => {
+    const reportReverse = {
+      ...sampleReport,
+      signals: [...sampleReport.signals].reverse(),
+    };
+    const props1 = generateProposals([], [], [], sampleReport);
+    const props2 = generateProposals([], [], [], reportReverse);
+    expect(JSON.stringify(props1)).toBe(JSON.stringify(props2));
+  });
+
+  it("fails closed on unknown signal types", () => {
+    const reportUnknown = {
+      ...sampleReport,
+      signals: [{ id: "sig-999", type: "unknown-future-signal" }],
+    };
+    const props = generateProposals([], [], [], reportUnknown);
+    expect(props).toEqual([]);
+  });
+
+  it("fails closed on malformed or unsupported report versions", () => {
+    const malformedReport1: any = { schemaVersion: 2, detectorVersion: "route-learning-v1", signals: sampleReport.signals };
+    const malformedReport2: any = { schemaVersion: 1, detectorVersion: "route-learning-v1", signals: null };
+    const unsupportedDetectorReport: any = { schemaVersion: 1, detectorVersion: "future-detector-v99", signals: sampleReport.signals };
+
+    expect(generateProposals([], [], [], malformedReport1)).toEqual([]);
+    expect(generateProposals([], [], [], malformedReport2)).toEqual([]);
+    expect(generateProposals([], [], [], unsupportedDetectorReport)).toEqual([]);
+    expect(generateProposals([], [], [], undefined)).toEqual([]);
+  });
+
+  it("ensures proposals contain no prompt or prompt-bearing user input text in entire serialized object", () => {
+    const props = generateProposals([], [], [], sampleReport);
+    for (const p of props) {
+      const serialized = JSON.stringify(p);
+      expect(serialized).not.toMatch(/prompt|user_input|inputPreview|notes/i);
+    }
+  });
+
+  it("proves that policy proposal generation does not mutate routing state", () => {
+    const propsBefore = generateProposals([], [], [], sampleReport);
+    const propsAfter = generateProposals([], [], [], sampleReport);
+    expect(propsBefore).toEqual(propsAfter);
+  });
+});

@@ -1,4 +1,4 @@
-# REI.ai — Commercial Pilot Brief (Executive Summary)
+# REI Decision Audit & Commercial Pilot
 
 **Document:** Customer-Facing 1-Page Pilot Overview  
 **Model:** Bring Your Own Key (BYOK) — Zero Inference Cash-Flow Liability  
@@ -9,7 +9,9 @@
 
 ## 1. Purpose & Value Proposition
 
-REI.ai is an intelligent cognitive control plane that evaluates whether policy-based, deterministic LLM routing can reduce multi-provider inference costs while preserving output quality within an agreed non-inferiority margin ($\delta = 3\text{ percentage points}$).
+This offer is for teams already building with AI but unable to clearly explain why a model was selected, what rules its answer had to pass, whether it completed correctly, or which cost and quality claims are supported by evidence.
+
+The engagement begins with a **REI Decision Audit**. It replays a bounded sample against the REI Method without replacing the customer's current stack. A team can then decide whether a controlled pilot is justified. The pilot evaluates whether policy-based routing can reduce multi-provider inference costs while preserving output quality within an agreed non-inferiority margin ($\delta = 3\text{ percentage points}$).
 
 $$\text{Customer Value} = \text{Reduced Provider Spend} + \text{REI Platform Fee} \ll \text{Original Unmanaged Baseline Spend}$$
 
@@ -40,7 +42,7 @@ To execute the graduated pilot, the customer provides:
 ## 4. Three Graduated Pilot Stages & Gates
 
 ```
-Stage 1 — Offline Replay Audit: Deterministic Replayed Cost Estimate
+Stage 1 — REI Decision Audit: Bounded Offline Replay
   • Evidence: Modeled replay estimate under versioned pricing rate cards (Zero token spend).
   • Gate: Recommended modeled savings signal ≥ 20%.
 
@@ -70,7 +72,7 @@ Live routing in Stage 3 is constrained by explicit, customer-approved boundaries
 
 ## 6. Deliverables
 
-1. **Stage 1 Replay Audit Report**: Detailed distribution and modeled counterfactual savings.
+1. **REI Decision Audit Report**: Control gaps, route distribution, and modeled counterfactual savings.
 2. **Stage 2 Quality Experiment Report**: Statistical non-inferiority validation results.
 3. **Stage 3 Reconciled Telemetry Package**: Observed provider billing reconciliation, latency profiles, rescue counts, and commercial transition recommendation.
 

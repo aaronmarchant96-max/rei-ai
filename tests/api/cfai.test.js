@@ -136,6 +136,8 @@ describe("handler", function () {
     expect(res._status).toBe(200);
     expect(res._body.result).toContain("mock ok");
     expect(res._body.model).toBeDefined();
+    expect(res._body.model).not.toContain("(fallback)");
+    expect(res._body.fallbackExecuted).toBe(false);
   });
 
   it("handles GET requests", async function () {
@@ -171,9 +173,10 @@ describe("handler", function () {
   });
 
   it("records provider cooldown on 429 and falls back to next provider", async function () {
+    var timeoutSpy = jest.spyOn(global, "setTimeout");
     global.fetch = jest.fn()
       .mockImplementationOnce(function () {
-        return Promise.resolve(fetchOnceResponse({ error: "rate limited" }, 429, false, { "Retry-After": "3" }));
+        return Promise.resolve(fetchOnceResponse({ error: "rate limited" }, 429, false, { "Retry-After": "0.05" }));
       })
       .mockImplementationOnce(function () {
         return Promise.resolve(fetchOnceResponse(
@@ -197,6 +200,8 @@ describe("handler", function () {
     var dsCooldown = cooldown.filter(function (c) { return c.provider === "deepseek"; });
     expect(dsCooldown.length).toBe(1);
     expect(dsCooldown[0].remaining).toBeGreaterThan(0);
+    expect(timeoutSpy.mock.calls.some(function (call) { return call[1] === 50; })).toBe(false);
+    timeoutSpy.mockRestore();
   });
 
   it("skips in-cooldown provider and continues fallback to remaining backend", async function () {
@@ -225,7 +230,8 @@ describe("handler", function () {
 
     expect(res._status).toBe(200);
     expect(res._body.result).toContain("gemini fallback ok");
-    expect(res._body.model).toContain("fallback");
+    expect(res._body.model).not.toContain("(fallback)");
+    expect(res._body.fallbackExecuted).toBe(true);
 
     var cooldown = mod.getProviderCooldown();
     var cooled = cooldown.filter(function (c) { return c.provider === "deepseek" || c.provider === "groq"; });
@@ -361,7 +367,8 @@ describe("provider timeout (AbortError) falls back instead of hard-failing", fun
     var result = await handleCfaiRequest("score", [], "tell me a story", "You are REI.", [], { id: "story-architect", model: "gemini-2.5-flash", maxTokens: 2048 });
     expect(result.success).toBe(true);
     expect(result.result).toBe("Fell back to Groq.");
-    expect(result.model).toContain("fallback");
+    expect(result.model).not.toContain("(fallback)");
+    expect(result.fallbackExecuted).toBe(true);
     expect(global.fetch).toHaveBeenCalledTimes(2);
   });
 
@@ -493,5 +500,77 @@ describe("controlled continuation (NEVER SILENTLY TRUNCATE)", function () {
     expect(result.usage.prompt_tokens).toBe(22);   // 10 + 12
     expect(result.usage.completion_tokens).toBe(11); // 5 + 6
     expect(result.usage.total_tokens).toBe(33);
+  });
+});
+
+describe("Storyteller delivery contract", function () {
+  async function runStory(input) {
+    process.env.GROQ_API_KEY = "test-key";
+    var { handleCfaiRequest, clearProviderCooldown } = await import("../../api/cfai.js");
+    clearProviderCooldown();
+    mockFetchQueue([{ data: providerResponse("A complete story.", "stop") }]);
+    await handleCfaiRequest("score", [], input, "You are The Storyteller.", [], {
+      id: "story-architect",
+      domain: "story",
+      model: "llama-3.3-70b-versatile",
+      maxTokens: 2048,
+    });
+    return JSON.parse(global.fetch.mock.calls[0][1].body);
+  }
+
+  it("binds requested genres, continuity, repetition control, and a definitive ending", async function () {
+    var body = await runStory("Tell me a fantasy ranger story with comedy and tragedy");
+    var system = body.messages.find(function (m) { return m.role === "system"; }).content;
+
+    expect(system).toContain("STORY DELIVERY CONTRACT");
+    expect(system).toContain("every explicitly requested genre and tone");
+    expect(system).toContain("must not speak, laugh, move, or attack later");
+    expect(system).toContain("Do not repeat an action beat");
+    expect(system).toContain("End once, after the decisive consequence");
+  });
+
+  it("runs the universal senior-editor sequence inside every story request", async function () {
+    var body = await runStory("Write a quiet family drama about an inherited workshop");
+    var system = body.messages.find(function (m) { return m.role === "system"; }).content;
+
+    expect(system).toContain("SENIOR EDITOR PASS");
+    expect(system).toContain("one-sentence premise");
+    expect(system).toContain("causal tonal braid");
+    expect(system).toContain("small, memorable detail early");
+    expect(system).toContain("Make it matter to what happens later");
+    expect(system).toContain("it does not always have to turn a joke into tragedy");
+    expect(system).toContain("Remove generic rescue beats");
+    expect(system).toContain("Limit the prose to a small set of memorable images");
+    expect(system).toContain("Return only the revised story");
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not expose research tools for a wholly invented fantasy prompt", async function () {
+    var body = await runStory("Tell me a fantasy ranger story with comedy and tragedy");
+    expect(body.tools).toBeUndefined();
+  });
+
+  it("retains research tools when a story explicitly requests historical grounding", async function () {
+    var body = await runStory("Write historical fiction set during the real Battle of Berlin in 1945");
+    expect(body.tools).toBeDefined();
+    expect(body.tools.length).toBeGreaterThan(0);
+  });
+
+  it("does not impose the Storyteller editorial protocol on non-story routes", async function () {
+    process.env.GROQ_API_KEY = "test-key";
+    var { handleCfaiRequest, clearProviderCooldown } = await import("../../api/cfai.js");
+    clearProviderCooldown();
+    mockFetchQueue([{ data: providerResponse("A structured answer.", "stop") }]);
+    await handleCfaiRequest("score", [], "Help me compare two options", "You are The Generalist.", [], {
+      id: "structured-reasoning",
+      domain: "assistant",
+      model: "llama-3.3-70b-versatile",
+      maxTokens: 2048,
+    });
+
+    var body = JSON.parse(global.fetch.mock.calls[0][1].body);
+    var system = body.messages.find(function (m) { return m.role === "system"; }).content;
+    expect(system).not.toContain("STORY DELIVERY CONTRACT");
+    expect(system).not.toContain("SENIOR EDITOR PASS");
   });
 });

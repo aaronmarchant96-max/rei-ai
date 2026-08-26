@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-23T19:44:11.123Z
-> Span: 2026-08-08 → 2026-08-23 (176 tagged commits, 179 total tags)
+> Last updated: 2026-08-23T20:22:26.240Z
+> Span: 2026-08-08 → 2026-08-23 (177 tagged commits, 180 total tags)
 
 ## Tag Taxonomy
 
@@ -18,7 +18,7 @@
 | Tag | Count |
 |---|---|
 | `manual` | 106 |
-| `test` | 59 |
+| `test` | 60 |
 | `claim-gate` | 13 |
 | `ai-cross-check` | 1 |
 
@@ -28,6 +28,7 @@
 |---|---|---|---|
 | `d7843c1` | 2026-08-23 | fix(story): enforce coherent genre-complete delivery [caught: manual] | `manual` — fix(story): enforce coherent genre-complete delivery |
 | `b0e7976` | 2026-08-23 | fix(gateway): skip retry-after delay during fallback [caught: manual] | `manual` — fix(gateway): skip retry-after delay during fallback |
+| `b0371bd` | 2026-08-23 | fix(reconcile): restore input-payload dedup and close media query block | `test` — fix(reconcile): restore input-payload dedup and close media query block |
 | `627a104` | 2026-08-23 | fix(claims): make suite baseline single-source | `manual` — P0 auth bypass and active documentation drift escaped the intended red-team and claim gates |
 | `16da615` | 2026-08-23 | fix(analytics): restore CARDO decision record contract [caught: manual] | `manual` — fix(analytics): restore CARDO decision record contract |
 | `008c8be` | 2026-08-23 | chore(cache): make cache-policy prefix rule version-neutral and harden verify-ca... | `manual` — 2026-07-20 through 2026-08-14 billing export |
@@ -205,11 +206,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 176 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 177 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **176 tagged commits** across 1 month(s).
+- **177 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 

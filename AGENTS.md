@@ -1,6 +1,6 @@
 ---
 verified: true
-last_reviewed: 2026-08-22
+last_reviewed: 2026-08-23
 stale_after_hours: 24
 ---
 
@@ -156,10 +156,10 @@ constraints:
 
 To sustain a 90%+ prompt cache hit rate across LLM providers (e.g. Gemini 70-90% caching discount, DeepSeek prompt caching):
 
-1. **Frozen Prefix Order:** The file ordering in `opencode.json` under `instructions` must remain frozen. Changes to instruction ordering or `REI_SYSTEM_PROMPT` invalidate the cached prefix.
+1. **Frozen Prefix Order:** Freeze the byte sequence of instruction sources actually emitted by the active client. Treat `opencode.json.instructions` as part of that prefix only when the installed runtime demonstrably resolves those entries. Changes to instruction ordering or `REI_SYSTEM_PROMPT` invalidate the cached prefix.
 2. **Deterministic Keys:** Cache keys are derived from SHA256 of the normalized prompt prefix, system prompt, user query, domain, and static routing signals. Dynamic tokens (e.g. client timestamps, random seeds, volatile session IDs) must never contaminate the cache key.
 3. **Safety Bypass:** All requests flagged for `adversarial-validation` or escalated by security scanners must explicitly bypass the cache.
-4. **Summary Compression:** Compress closed conversational context into HCM summaries (<=500 tokens) via `saveChatHistoryHCM()` on key decision hinges rather than every turn. See `memories/repo/caching_rules.md` for full policy.
+4. **Summary Compression:** Compress closed conversational context into HCM summaries (<=500 tokens) via `saveChatHistoryHCM()` on key decision hinges rather than every turn. See `docs/CACHING_RULES.md` for full policy.
 
 ---
 
@@ -319,8 +319,8 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 | `docs/REI_CODE_PATTERNS.md` | Code patterns to follow |
 | `TOKEN_SAVERS.md` | Token efficiency tactics |
 | `docs/CACHE_PRICING_LANDSCAPE.md` | External LLM cache pricing and provider benchmarks |
-| `memories/repo/caching_rules.md` | Core prompt-freeze and cache invalidation rules |
+| `docs/CACHING_RULES.md` | Core prompt-freeze and cache invalidation rules |
 
 ---
 
-*Last reviewed: 2026-08-22 (repaired extract-error-gaps to scan commit subjects + bodies [169 entries], added --check to prebuild, refreshed review timestamp, and added mandatory Codex/agent instruction stack directive). Stale after: 2026-08-23. Verify rules before executing.*
+*Last reviewed: 2026-08-23 (repointed `memories/repo/caching_rules.md` dangling references to `docs/CACHING_RULES.md`, made the prompt-freeze prefix rule version-neutral for OpenCode V2, refreshed review timestamp). Stale after: 2026-08-24. Verify rules before executing.*

@@ -5,17 +5,22 @@ import { getModelCosts, computeActualCost } from "./lib/costHelpers";
 import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import { logDecision } from "./lib/decisionStore";
-import { logRoutingDecision, updateLatestLogEntry } from "./lib/routingLog";
+import { logRoutingDecision, updateLatestLogEntry, getLogs } from "./lib/routingLog";
 import { shouldEscalateToRemote } from "./lib/cardoGuard.js";
 import { isAdversarialRequest } from "./lib/nightShiftRouter";
 import { buildSelfAuditContext } from "./lib/selfAuditContext";
 import { buildSourceContext } from "./lib/sourceContext";
 import { deriveProvider } from "./lib/provider";
 import { scanRedTeamInput } from "./lib/redTeamScanner";
-import { logEval } from "./lib/evalLog";
+import { logEval, getEvals } from "./lib/evalLog";
+import { buildRouteOutcome } from "./lib/routeOutcome";
+import { derivePredictionFeatures } from "./lib/routePredictionFeatures";
+import { computePrecedentRisk, PREDICTOR_VERSION } from "./lib/routePrecedents";
+import { buildRoutePrediction, logRoutePrediction, getPredictions } from "./lib/routePredictionLog";
 import "./__eval__/claimRegistry";
 import "./styles/reiTheme.css";
 import { GENERALIST_PROMPTS, REASONING_LOOP_STEPS } from "./data/promptConfig.js";
+import { PRODUCT_STORY, getDomainPublicCopy } from "./data/productCopy.js";
 import { parseAssistantStyleReply, extractDeliverableAndScaffolding } from "./lib/replyParser.js";
 import { detectStrategicSituation } from "./lib/strategic/detectStrategicSituation";
 import { extractStrategicEnvelope } from "./lib/strategic/strategicEnvelope";
@@ -82,15 +87,8 @@ export function getAssistantWelcomeCopy() {
 
 export function buildDomainSystemMessage(domainId, currentDomain) {
   const domainLabel = currentDomain?.label || "REI.ai";
-  const domainDescription = currentDomain?.description || "reasoning assistant";
-
-  if (domainId === "assistant") {
-    return "Hey! I'm REI — The Generalist. I use the CARDO framework to help you think through problems, separate facts from assumptions, and find the hinge that changes the answer. What's on your mind?";
-  }
-
-  const domainConfig = getDomain(domainId);
-  const sessionLabel = domainConfig?.sessionLabel || "session";
-  return `System initialized. Welcome to REI.ai ${domainLabel}. ${domainDescription} Let's begin our ${sessionLabel}!`;
+  const domainDescription = getDomainPublicCopy(domainId).description;
+  return `You're in REI.ai — ${domainLabel}. ${domainDescription} ${PRODUCT_STORY.workspaceHint}`;
 }
 
 function readStoredMessages(selectedDomain) {
@@ -454,6 +452,7 @@ export default function REI({ initialPrompt } = {}) {
       status: "success",
       resolvedModel: modelUsed,
       chunks: data.chunks || 1,
+      outcomeObservedAt: new Date().toISOString(),
     }, requestId);
 
     try {
@@ -552,7 +551,7 @@ export default function REI({ initialPrompt } = {}) {
     try {
       let systemContext = getDomainPrompt(selectedDomain);
       const historyPayload = messages
-        .filter(msg => !msg.text.startsWith("System initialized. Welcome to REI.ai"))
+        .filter((msg, index) => !(index === 0 && msg.sender === "rei"))
         .slice(-10)
         .map(msg => ({
           role: msg.sender === "user" ? "user" : "assistant",
@@ -608,6 +607,58 @@ export default function REI({ initialPrompt } = {}) {
         inputRedTeamEscalate: inputScan?.escalateToD2 ?? false,
       });
 
+      // Shadow prediction: derive pre-execution features and record a
+      // delivery-failure risk estimate before the provider runs. Fail-closed —
+      // any error here must never break routing or the user response.
+      try {
+        const features = derivePredictionFeatures({
+          routeId: routerDecision.id,
+          domain: selectedDomain,
+          selectedModel: routerDecision.model,
+          hingeScore: routerDecision.hingeScore,
+          structured: routerDecision.id !== "simple-greeting",
+          escalationExpected: Boolean(escalation?.escalate),
+          adversarialVerdict: inputScan?.verdict ?? null,
+          inputLength: userMsg.text.length,
+        });
+        if (features) {
+          const priorPredictions = getPredictions();
+          const priorLogs = getLogs();
+          const priorEvals = getEvals();
+          const evalsByRequest = new Map();
+          for (const e of priorEvals) {
+            const list = evalsByRequest.get(e.requestId) || [];
+            list.push(e);
+            evalsByRequest.set(e.requestId, list);
+          }
+          const outcomes = priorLogs
+            .map((entry) => buildRouteOutcome(entry, evalsByRequest.get(entry.requestId) || []))
+            .filter((o) => o !== null);
+          const risk = computePrecedentRisk(
+            features,
+            requestId,
+            new Date().toISOString(),
+            priorPredictions,
+            outcomes
+          );
+          logRoutePrediction(
+            buildRoutePrediction({
+              requestId,
+              predictorVersion: PREDICTOR_VERSION,
+              features,
+              failureRisk: risk.failureRisk,
+              riskInterval95: risk.riskInterval95,
+              support: risk.support,
+              evidenceQuality: risk.evidenceQuality,
+              precedentTier: risk.precedentTier,
+              corpusWindow: risk.corpusWindow,
+            })
+          );
+        }
+      } catch (e) {
+        console.warn("Shadow prediction failed (routing unaffected):", e);
+      }
+
       const isGreeting = routerDecision.id === "simple-greeting";
       const systemPrompt = isGreeting
         ? `You are REI — the "${currentDomain.label}" persona (${currentDomain.subtitle}). Reply to this greeting in one short, friendly sentence in-character.`
@@ -645,7 +696,7 @@ export default function REI({ initialPrompt } = {}) {
 
       const inputPayload = isGreeting
         ? userMsg.text
-        : `${systemContext}\n\nDomain: ${currentDomain.label}\nRules: ${currentDomain.rules.join(", ")}${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`;
+        : `${recordBlock}${fileBlock}${selfAuditBlock}${sourceBlock}\n\nUser Query: ${userMsg.text}`.trim();
       const effectiveSystemPrompt = systemPrompt + fileBlock + (strategicDetection.detected ? STRATEGIC_OUTPUT_DIRECTIVE : "");
 
       retryPayloadRef.current = {
@@ -741,7 +792,7 @@ export default function REI({ initialPrompt } = {}) {
       >
         {/* Top Header with 5 Primary Domain Chips & Secondary Kebab Menu */}
         <header className="safe-top rei-header">
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+          <div className="rei-header__protocol">
             {!mobile && <span className="rei-header__version" title="CARDO REI protocol version">CARDO v3.4</span>}
           </div>
 
@@ -762,7 +813,7 @@ export default function REI({ initialPrompt } = {}) {
           </nav>
 
           {/* Right Controls: Compact Activity Pill & Accessible Kebab Menu */}
-          <div className="rei-header__actions" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="rei-header__actions">
             <button
               type="button"
               onClick={(e) => {
@@ -850,8 +901,8 @@ export default function REI({ initialPrompt } = {}) {
         </header>
 
         {/* Unified workspace area: conversation + attached composer on left, instrument rail on right */}
-        <div style={{ display: "flex", flex: 1, minHeight: 0, overflow: "hidden", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, height: "100%", overflow: "hidden" }}>
+        <div className="rei-workspace">
+          <div className="rei-workspace__conversation">
             <main className="flex-1 overflow-y-auto px-4 py-4 rei-main-content">
               {(messages.length > 1 || isTyping || selectedDomain !== "assistant") && (
                 <DomainBanner currentDomain={currentDomain} selectedDomain={selectedDomain} reasoningLoopSteps={REASONING_LOOP_STEPS} />
@@ -871,7 +922,7 @@ export default function REI({ initialPrompt } = {}) {
                 />
               )}
 
-              {selectedDomain === "assistant" && messages.length <= 1 && !isTyping && (
+              {messages.length <= 1 && !isTyping && (
                 <WelcomePanel
                   activeDomain={selectedDomain}
                   onResume={(domainId) => setSelectedDomain(domainId)}

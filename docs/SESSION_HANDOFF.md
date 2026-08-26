@@ -3,7 +3,7 @@ status: active
 authority_scope: session-handoff-and-active-state
 owner: Aaron Marchant
 last_verified: 2026-08-22
-verified_against_commit: 7c844e2
+verified_against_commit: current-head-at-handoff
 claims_source: docs/CLAIM_LEDGER.md
 supersedes: []
 superseded_by: null
@@ -12,8 +12,8 @@ archived_at: null
 
 # Active Session Handoff — August 22, 2026
 
-- **Branch:** `main` at `7c844e2`
-- **Repo (GitHub):** https://github.com/aaronmarchant96-max/rei-ai
+- **Branch:** `integration/bitbucket-security-hardening` — resolve the exact revision with `git rev-parse HEAD`
+- **Canonical Remote:** https://bitbucket.org/rei-ai/rei.ai
 - **Production URL:** `https://prompthound-labs.vercel.app`
 - **Legacy URL Alias:** `https://debate-furnace.vercel.app`
 
@@ -21,9 +21,9 @@ archived_at: null
 
 ## 🟢 Verification & Claim Baseline
 
-- **Tests:** 1,099 unit & integration tests / 97 suites passing 100% green (`npm test`)
+- **Tests:** 1,320 unit & integration tests / 113 suites passing 100% green (`npm test`)
 - **Claims Synchronization:** `node scripts/gen-claims.mjs --check` (94 markdown files 100% clean)
-- **Prebuild Integrity:** `node scripts/extract-error-gaps.mjs --check` (169 tagged commits / 172 tags)
+- **Prebuild Integrity:** `node scripts/extract-error-gaps.mjs --check` (use current command output; do not copy a historical count here)
 - **TypeScript:** `npx tsc --noEmit` 0 errors clean
 - **Production Build:** `npm run build` passing cleanly (Vite 5.4)
 

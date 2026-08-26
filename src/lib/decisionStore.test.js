@@ -102,6 +102,29 @@ describe("decisionStore", () => {
     expect(store).toEqual([]);
   });
 
+  it("filters legacy routing telemetry that does not satisfy the decision contract", () => {
+    const valid = { ...baseEntry(), id: "valid-decision" };
+    const malformed = {
+      domain: "assistant",
+      routeId: "generalist",
+      model: "llama-3.1-8b-instant",
+      hingeScore: 0.42,
+      estimatedCost: 0,
+      tokenCount: 120,
+      rationale: "Auto-routed by CARDO",
+    };
+    localStorage.setItem("rei_decision_store", JSON.stringify([malformed, valid]));
+
+    expect(getDecisions()).toEqual([valid]);
+  });
+
+  it("refuses to persist malformed decisions at runtime", () => {
+    logDecision({ domain: "assistant", routeId: "generalist" });
+
+    expect(getDecisions()).toEqual([]);
+    expect(localStorage.getItem("rei_decision_store")).toBeNull();
+  });
+
   it("does not throw when routerDecision is omitted", () => {
     const entry = { ...baseEntry(), id: "no-router", routerDecision: undefined };
     logDecision(entry);
