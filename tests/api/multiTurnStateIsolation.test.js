@@ -59,6 +59,8 @@ beforeEach(() => {
   });
 
   process.env.GROQ_API_KEY = "test-key";
+  process.env.GEMINI_API_KEY = "test-key";
+  process.env.DEEPSEEK_API_KEY = "test-key";
   process.env.REI_API_KEYS = "rei_key_pilot:pilot:100:60";
   delete process.env.CFAI_PATH;
   jest.clearAllMocks();
