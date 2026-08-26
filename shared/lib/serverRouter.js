@@ -100,6 +100,13 @@ export function buildServerRouterDecision({ input = "", domain = null, model = n
     }
   }
 
+function keywordMatches(text, term) {
+  const escaped = String(term || "").trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+  if (!escaped) return false;
+  const pattern = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i");
+  return pattern.test(text);
+}
+
   // 4. Term-Matching Ranking across Catalog
   let bestMatch = null;
   let maxScore = 0;
@@ -108,7 +115,7 @@ export function buildServerRouterDecision({ input = "", domain = null, model = n
     if (!fp.matchTerms) continue;
     let score = 0;
     for (const term of fp.matchTerms) {
-      if (promptText.includes(term.toLowerCase())) {
+      if (keywordMatches(promptText, term)) {
         score += term.length > 4 ? 2 : 1;
       }
     }

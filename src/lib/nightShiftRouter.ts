@@ -276,7 +276,16 @@ export function isAdversarialRequest(text: string): boolean {
 }
 
 function isMetaQuery(text: string): boolean {
-  return /\bhow (do|are) you|who are you|what (is|are) you|what is carlo|explain (how|what)|tell me about (yourself|you)\b/i.test(text);
+  if (
+    /\b(design|implement|code|function|class|story|family|ancestor|legal|runway|tradeoff|decision|build|fix|refactor|cache|api|database|lru|ttl)\b/i.test(
+      text
+    )
+  ) {
+    return false;
+  }
+  return /\b(who are you|what (is|are) you|what is carlo|tell me about (yourself|you)|how do you work|how are you( doing)?)\b/i.test(
+    text
+  );
 }
 
 function isSelfEvaluation(text: string): boolean {

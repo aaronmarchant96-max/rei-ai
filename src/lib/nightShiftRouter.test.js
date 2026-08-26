@@ -38,6 +38,7 @@ describe("nightShiftRouter (Parameterized Routing Matrix)", () => {
     ["i need a review of my github https://github.com/aaronmarchant96-max/family-archive", "assistant", "coding-hinge", "gemini-2.5-flash", null],
     ["Find the 1880 census records for John Marchant", "assistant", "genealogy-deep-dive", null, null],
     ["Compare the narrative precedent in this case", "assistant", "structured-reasoning", null, null],
+    ["Design a thread-safe, in-memory cache for a high-traffic web service handling 50,000 RPS. How do you handle the TTL sweep?", "assistant", "coding-hinge", null, null],
   ])("routes '%s' (domain: %s) -> route: %s", (input, domain, expectedRouteId, expectedModel, expectedTokens) => {
     const decision = buildRouterDecision({ input, domain });
     expect(decision.id).toBe(expectedRouteId);
