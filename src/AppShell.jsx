@@ -13,7 +13,7 @@ const CardoGuard = lazy(() => import("./CardoGuard.jsx"));
 const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
 const Analytics = lazy(() => import("./Analytics.jsx"));
 const RedTeam = lazy(() => import("./RedTeam.jsx"));
-const PilotOnboarding = lazy(() => import("./modules/rei/components/PilotOnboarding.jsx"));
+const PilotWorkspace = lazy(() => import("./modules/pilot/PilotWorkspace.jsx"));
 
 function LoadingShell() {
   return (
@@ -80,6 +80,7 @@ const TOP_LEVEL = [
 function getInitialTool() {
   if (typeof window === "undefined") return "tools";
   const hash = (window.location.hash || "").toLowerCase();
+  if (hash === "#pilot") return "pilot";
   if (hash === "#rei" || hash === "#cfai") return "rei";
   if (hash === "#furnace") return "furnace";
   if (hash === "#story-forge") return "story-forge";
@@ -93,6 +94,7 @@ function getInitialTool() {
 
 function getToolPath(tool) {
   if (tool === "tools") return "/";
+  if (tool === "pilot") return "/#pilot";
   if (tool === "story-forge") return "/#story-forge";
   if (tool === "storm-replay") return "/#storm-replay";
   if (tool === "cardo-guard") return "/#cardo-guard";
@@ -210,7 +212,7 @@ export default function AppShell() {
               }} />
             </ErrorBoundary>
           ) : tool === "pilot" ? (
-            <ErrorBoundary toolName="Developers"><PilotOnboarding /></ErrorBoundary>
+            <ErrorBoundary toolName="Pilot Workspace"><PilotWorkspace /></ErrorBoundary>
           ) : tool === "story-forge" ? (
             <ErrorBoundary toolName="Story Forge"><CreativeEngine /></ErrorBoundary>
           ) : tool === "storm-replay" ? (
