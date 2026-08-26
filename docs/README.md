@@ -28,7 +28,7 @@ If you are evaluating this repository for the first time, follow this reading pa
 | [**Defense-in-Depth Control Matrix**](DEFENSE_IN_DEPTH_CONTROL_MATRIX.md) | **Authoritative.** 8-stage control pipeline mapping human, multi-model, and machine verification to neutralize LLM cognitive failure modes | Canonical |
 | [**Information-Theoretic Architecture**](INFORMATION_THEORETIC_ARCHITECTURE.md) | **Authoritative.** Formal spec: CARDO REI 8-phase loop, complexity index, CARDO GUARD equation, claim stratification, testable hypotheses | Canonical |
 | [**Architecture Decision Records**](DECISIONS.md) | **Authoritative.** Dated ADRs with trade-offs, alternatives, and code references | Canonical |
-| [**Testing Strategy**](TESTING.md) | 114 suites, 841 tests, testing philosophy, how to write new tests | Active |
+| [**Testing Strategy**](TESTING.md) | 114 suites, 1323 tests, testing philosophy, how to write new tests | Active |
 | [**Claim Ledger**](CLAIM_LEDGER.md) | Reproducible evidence map: every public metric tied to a command | Active |
 
 ## 📋 Detailed references
