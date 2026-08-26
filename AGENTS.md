@@ -230,9 +230,17 @@ if [ "$PLAN_COMMIT" != "$HEAD_COMMIT" ]; then
 fi
 ```
 
-### Document staleness
+### Document staleness (execution gate)
 
-This document carries `stale_after_hours: 24` in its frontmatter. Any agent reading it after 24 hours should flag it as potentially stale and re-verify the workflow rules against current practice.
+This document carries `stale_after_hours: 24` in its frontmatter. Staleness is an **execution gate**, not a warning. If the document was last reviewed more than 24 hours ago:
+
+1. **Stop before implementation.**
+2. Re-read `docs/SESSION_HANDOFF.md`, `AGENTS.md`, and `WORKFLOW_QUICKREF.md`.
+3. Verify branch, current HEAD, active plan, and hard-stop rules.
+4. If any documents disagree or the active plan no longer matches repository state → **stop and request reconciliation**.
+5. Resume only after the workflow context is confirmed current.
+
+This gate does not force a human interruption when nothing has changed — it forces the agent to verify that nothing has changed before proceeding.
 
 ---
 
@@ -244,7 +252,10 @@ Before any agent claims a task is complete:
 2. `npm run build` — must succeed
 3. `git diff --stat` — confirm only intended files changed
 4. If AGY plan: confirm all steps marked complete
-5. If Fast Lane: confirm fewer than 5 files touched
+5. If Fast Lane: confirm **both** of the following:
+   - Fewer than 5 files touched
+   - **Zero critical primitives touched** (see [Critical Primitive Files](#critical-primitive-files-always-route-to-agy-regardless-of-file-count))
+   - If a primitive was touched, Fast Lane is **invalid** even if only 1 file changed. Stop, escalate to AGY, and re-plan before committing.
 
 **DO NOT claim completion without passing the verification gate.**
 
@@ -256,12 +267,13 @@ When documenting an error in a commit message, tag it with what caught it — sh
 
 | Tag | Meaning |
 |-----|---------|
-| `[caught: manual]` | Spotted by a human reading output / dashboard / dashboard. |
+| `[caught: manual]` | Spotted by a human reading output, dashboard, or live observation. |
 | `[caught: ai-cross-check]` | Caught by one model family cross-checking another's output. |
-| `[caught: test]` | Caught by the test suite (ci or local). |
+| `[caught: test]` | Caught by the test suite (CI or local). |
 | `[caught: claim-gate]` | Caught by the FEYNMAN GATE / claimRegistry `verifyAll()`. |
+| `[caught: review]` | Caught during code review, PR review, adversarial review, or human/agent inspection after implementation but before accepted release. |
 
-This adds almost no cost at commit time and over months produces a dataset showing which class of errors the test suite actually catches vs. which require human or multi-model intervention.
+This adds almost no cost at commit time and over months produces a dataset showing which class of errors the test suite actually catches vs. which require human, review, or multi-model intervention.
 
 ---
 
@@ -315,6 +327,27 @@ session may be working in this repo:
 
 A commit appearing after plan creation does **not** automatically make the plan stale —
 but if HEAD changed, the plan's pinned execution context must be **revalidated**.
+
+---
+
+## Production Deployment Hard Stop
+
+**Agents MUST NOT execute any of the following without explicit user authorization:**
+
+- Deploy to production (`vercel --prod`, `vercel deploy`, production release pipelines)
+- Promote or merge to production `main` for deployment purposes
+- Trigger production release workflows, CI/CD pipelines targeting live environments
+- Push to branches that auto-deploy (e.g. branches wired to Vercel production targets)
+
+**What agents ARE allowed to do without authorization:**
+- Run `npm run build` locally to verify the build
+- Run `vercel` (preview, not production) to generate a preview URL
+- Prepare, stage, and verify deployment artifacts
+- Push feature branches and open PRs
+
+If there is any ambiguity about whether an action triggers a production deploy → **STOP and ask first.**
+
+This hard stop exists at L0 in `WORKFLOW_QUICKREF.md` ("Deploy / Vercel") but was not previously defined here. This section is the canonical definition.
 
 ---
 

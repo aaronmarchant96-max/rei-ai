@@ -52,7 +52,7 @@ L4 — OPTIMIZATION (token economy, tooling tactics)
 
 ## Step-by-Step Operating Grammar
 
-1. **Triage:** research/plan OR 5+ files OR reasoning → **AGY** (plan w/ YAML `git_commit`, `reversible`, `stop_conditions`) · else **Fast Lane** (<5 files, mechanical, reversible)
+1. **Triage:** research/plan OR 5+ files OR **critical primitive touched** OR reasoning → **AGY** (plan w/ YAML `git_commit`, `reversible`, `stop_conditions`) · else **Fast Lane** (<5 files, no primitives, mechanical, reversible). See canonical primitive list in `AGENTS.md § Critical Primitive Files`.
 2. **Pre-Execution Gates:**
    - *HEAD gate:* `git rev-parse HEAD` must match the plan's pinned `git_commit`
    - *Worktree gate:* `git status --short && git diff --stat` — unrelated dirty files are OUT-OF-SCOPE; never modify/stage/reset/commit them; if scope overlaps a dirty file → STOP
