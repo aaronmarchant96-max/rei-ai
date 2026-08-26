@@ -4,7 +4,7 @@ import { getEvals } from "./lib/evalLog";
 import { deriveProvider } from "./lib/provider";
 import { verifyAll } from "./lib/claimGateway";
 import "./__eval__/claimRegistry";
-import { generateProposals, SIGNAL_LABEL } from "./lib/policyProposalEngine";
+import { generateProposals, exportProposalAsFixture, SIGNAL_LABEL } from "./lib/policyProposalEngine";
 import {
   getProposals,
   upsertProposals,
@@ -931,6 +931,24 @@ export default function Analytics() {
                             }}
                           >
                             Copy proposal
+                          </button>
+                          <button
+                            onClick={function () {
+                              var snippet = exportProposalAsFixture(p);
+                              if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(snippet).catch(function () { alert(snippet); });
+                              } else {
+                                alert(snippet);
+                              }
+                            }}
+                            style={{
+                              fontSize: "11px", padding: "4px 10px", borderRadius: "6px",
+                              border: "1px solid " + colors.border, background: "transparent",
+                              color: colors.amber, cursor: "pointer", fontWeight: 600,
+                            }}
+                            title="Copy Jest test fixture for this proposal"
+                          >
+                            Copy Test Fixture
                           </button>
                           {p.status === "proposed" && (
                             <button

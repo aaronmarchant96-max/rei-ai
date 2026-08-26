@@ -1,4 +1,4 @@
-import { generateProposals } from "./policyProposalEngine";
+import { generateProposals, exportProposalAsFixture } from "./policyProposalEngine";
 import type { PolicyProposal } from "./policyProposalEngine";
 import type { EvalEntry } from "./evalLog";
 import type { RoutingLogEntry } from "./routingLog";
@@ -391,5 +391,15 @@ describe("policyProposalEngine — PR7 C-Activity policy adapter", () => {
     const propsBefore = generateProposals([], [], [], sampleReport);
     const propsAfter = generateProposals([], [], [], sampleReport);
     expect(propsBefore).toEqual(propsAfter);
+  });
+
+  it("exports proposal as a runnable Jest test fixture snippet string", () => {
+    const props = generateProposals([], [], [], sampleReport);
+    expect(props.length).toBeGreaterThan(0);
+    const snippet = exportProposalAsFixture(props[0]);
+    expect(snippet).toContain("// Auto-generated regression test fixture for proposal:");
+    expect(snippet).toContain("describe(");
+    expect(snippet).toContain("it(");
+    expect(exportProposalAsFixture(null as any)).toBe("");
   });
 });

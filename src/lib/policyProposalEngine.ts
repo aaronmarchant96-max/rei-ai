@@ -324,4 +324,29 @@ export function generateProposals(
   ].sort(bySignalThenId);
 }
 
+/**
+ * Format a policy proposal into a runnable Jest test snippet string
+ * that engineers can paste directly into a test file to verify the proposed fix.
+ */
+export function exportProposalAsFixture(proposal: PolicyProposal): string {
+  if (!proposal) return "";
+  const idsStr = proposal.requestIds && proposal.requestIds.length > 0 ? proposal.requestIds.join(", ") : "N/A";
+  const cleanTitle = (proposal.title || "Untitled proposal").replace(/"/g, '\\"');
+  const cleanEvidence = (proposal.evidence || "").replace(/\n/g, " ");
+  const cleanChange = (proposal.suggestedChange || "").replace(/\n/g, " ");
+
+  return [
+    `// Auto-generated regression test fixture for proposal: ${proposal.id}`,
+    `// Signal: ${proposal.signal} | Category: ${proposal.category}`,
+    `// Request IDs: ${idsStr}`,
+    `describe("Regression test for ${proposal.id}", () => {`,
+    `  it("${cleanTitle}", () => {`,
+    `    // Evidence: ${cleanEvidence}`,
+    `    // Suggested Change: ${cleanChange}`,
+    `    // TODO: Add specific assertions matching ${proposal.signal}`,
+    `  });`,
+    `});`,
+  ].join("\n");
+}
+
 export { SIGNAL_LABEL, SIGNAL_CATEGORY };
