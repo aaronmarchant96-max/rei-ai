@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-26T09:16:42.491Z",
+  "generatedAt": "2026-08-26T20:44:06.065Z",
   "entries": [
     {
       "hash": "e81c975",
@@ -9,6 +9,15 @@
         "test"
       ],
       "context": "fix(systemPrompts): fix newline escapes in CODING_PROMPT concurrency rules"
+    },
+    {
+      "hash": "b3a306a",
+      "date": "2026-08-26",
+      "subject": "feat(landing): align REI homepage with CARDO horizon [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "feat(landing): align REI homepage with CARDO horizon"
     },
     {
       "hash": "7c3edff",
@@ -1617,16 +1626,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 179,
-    "totalTags": 182,
+    "totalEntries": 180,
+    "totalTags": 183,
     "byTag": {
+      "manual": 108,
       "test": 61,
-      "manual": 107,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 179
+      "2026-08": 180
     }
   }
 }

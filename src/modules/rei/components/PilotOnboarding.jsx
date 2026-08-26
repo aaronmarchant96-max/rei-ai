@@ -7,7 +7,7 @@ export default function PilotOnboarding() {
   const [testResult, setTestResult] = useState(null);
   const [testLoading, setTestLoading] = useState(false);
 
-  const baseUrl = "https://prompthound-labs.vercel.app/api/v1";
+  const baseUrl = typeof window !== "undefined" ? `${window.location.origin}/v1` : "https://rei.ai/v1";
   const defaultKey = "rei_key_pilot_demo";
 
   useEffect(() => {

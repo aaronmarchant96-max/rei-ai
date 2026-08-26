@@ -319,7 +319,7 @@ export async function executeWebSearch(query, numResults = 3) {
     const wikiUrl = "https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=" + encodeURIComponent(query) + "&utf8=&format=json&srlimit=" + limit;
     const res = await fetch(wikiUrl, {
       signal: controller.signal,
-      headers: { "User-Agent": "REI-Bot/1.0 (https://prompthound-labs.vercel.app)" }
+      headers: { "User-Agent": "REI-Bot/1.0 (https://rei.ai)" }
     });
     if (res.ok) {
       const data = await res.json();

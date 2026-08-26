@@ -35,7 +35,9 @@
     "claims:gen": "node scripts/gen-claims.mjs",
     "claims:check": "node scripts/gen-claims.mjs --check",
     "evidence:pack": "tsx scripts/export-evidence-package.mjs",
-    "eval:storyteller:replay": "node scripts/run-storyteller-adherence-replay.mjs"
+    "eval:storyteller:replay": "node scripts/run-storyteller-adherence-replay.mjs",
+    "overnight:gate": "tsx scripts/run-overnight-local-gate.mjs",
+    "overnight:stage2": "tsx scripts/run-stage2-replay-battle.mjs"
   },
   "dependencies": {
     "@azure/functions": "^4.7.0",

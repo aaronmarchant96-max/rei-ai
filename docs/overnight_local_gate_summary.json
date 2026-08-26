@@ -1,0 +1,19 @@
+{
+  "contractVersion": "OVERNIGHT LOCAL MODEL GATE v1",
+  "modelTag": "llama3.1:8b",
+  "modelDigest": "unknown_digest",
+  "corpusHash": "ceb97cfe8904a8664868b9c31c4c1d72d9225fe4808a076e19674fbc2c4c5df7",
+  "totalPrompts": 136,
+  "completedPrompts": 0,
+  "hardFailuresCount": 136,
+  "passRatePercent": 0,
+  "benchmarks": {
+    "avgLatencyMs": 0,
+    "avgTokensPerSec": 0,
+    "avgCardoStructurePercent": 0,
+    "avgEpistemicCorrectnessPercent": 0,
+    "avgAntiSlopPercent": 0
+  },
+  "promotionGateStatus": "REJECTED_NEEDS_IMPROVEMENT",
+  "executedAt": "2026-08-26T10:26:47.250Z"
+}
