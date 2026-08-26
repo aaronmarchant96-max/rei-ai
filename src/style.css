@@ -5551,6 +5551,7 @@ input:focus:not(:focus-visible) {
 }
 .rei-brand:hover .rei-cardo-mark svg {
   transform: rotateY(-48deg);
+  transform-origin: 30px 32px;
 }
 .rei-brand__wordmark {
   font-family: "Fraunces", serif;

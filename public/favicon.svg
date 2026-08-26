@@ -9,10 +9,10 @@
   <path
     fill="none"
     stroke="url(#g)"
-    stroke-width="9"
+    stroke-width="8"
     stroke-linecap="round"
     stroke-linejoin="round"
-    d="M44 18H30C24 18 20 22 20 28V36C20 42 24 46 30 46H44"
+    d="M47 20H33C26 20 22 24 22 30V34C22 40 26 44 33 44H47"
   />
-  <circle cx="22" cy="32" r="3.4" fill="url(#g)"/>
+  <circle cx="26" cy="32" r="4" fill="url(#g)"/>
 </svg>
