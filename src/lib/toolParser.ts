@@ -252,10 +252,47 @@ export function parseToolCalls(result: { content?: string; tool_calls?: any[] } 
     }
   }
 
+  // 4. DSML style <｜｜DSML｜｜invoke name="NAME"><｜｜DSML｜｜parameter name="KEY">VAL</｜｜DSML｜｜parameter></｜｜DSML｜｜invoke>
+  const dsmlInvokeRegex = /<[|｜]{2}DSML[|｜]{2}invoke name="([^"]+)">([\s\S]*?)<\/[|｜]{2}DSML[|｜]{2}invoke>/gi;
+  while ((match = dsmlInvokeRegex.exec(contentWithoutThinking)) !== null) {
+    const fnName = match[1].trim();
+    const inner = match[2].trim();
+
+    let extractedArgs: Record<string, any> = {};
+    const dsmlParamRegex = /<[|｜]{2}DSML[|｜]{2}parameter name="([^"]+)"(?:\s+string="(?:true|false)")?>([\s\S]*?)<\/[|｜]{2}DSML[|｜]{2}parameter>/gi;
+    let paramMatch;
+    while ((paramMatch = dsmlParamRegex.exec(inner)) !== null) {
+      let val: any = paramMatch[2].trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      } else if (!isNaN(Number(val))) {
+        val = Number(val);
+      }
+      extractedArgs[paramMatch[1]] = val;
+    }
+
+    const validation = validateToolArguments(fnName, extractedArgs);
+    if (validation.valid && validation.cleanArgs) {
+      validToolCalls.push({
+        id: `call_${Date.now()}_${validToolCalls.length}`,
+        type: "function",
+        function: {
+          name: fnName as any,
+          arguments: JSON.stringify(validation.cleanArgs),
+        },
+        parsedArgs: validation.cleanArgs,
+      });
+    } else if (validation.error) {
+      validationErrors.push(validation.error);
+    }
+  }
+
   // Strip tool envelopes from clean content
   workingContent = workingContent
     .replace(/<tool_call>[\s\S]*?<\/tool_call>/gi, "")
     .replace(/<function=[a-zA-Z0-9_-]+>[\s\S]*?<\/function>/gi, "")
+    .replace(/<[|｜]{2}DSML[|｜]{2}tool_calls>[\s\S]*?<\/[|｜]{2}DSML[|｜]{2}tool_calls>/gi, "")
+    .replace(/<[|｜]{2}DSML[|｜]{2}invoke name="[^"]+">[\s\S]*?<\/[|｜]{2}DSML[|｜]{2}invoke>/gi, "")
     .trim();
 
   return {

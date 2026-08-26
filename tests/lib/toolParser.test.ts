@@ -131,15 +131,16 @@ describe("toolParser & thinking tag extraction", () => {
       expect(parsed.validToolCalls[0].parsedArgs.query).toBe("Rust async channels");
     });
 
-    it("rejects malformed XML/JSON without silent failure", () => {
+    it("parses DeepSeek DSML format <｜｜DSML｜｜invoke name=...>", () => {
       const result = {
-        content: '<tool_call>{"name": "web_search", "arguments": {}}</tool_call>',
+        content: `<｜｜DSML｜｜tool_calls>\n<｜｜DSML｜｜invoke name="web_search">\n<｜｜DSML｜｜parameter name="query" string="true">Ohio 1863 Civil War draft enrollment records John Miller Mahoning County</｜｜DSML｜｜parameter>\n<｜｜DSML｜｜parameter name="num_results" string="false">3</｜｜DSML｜｜parameter>\n</｜｜DSML｜｜invoke>\n</｜｜DSML｜｜tool_calls>`,
       };
 
       const parsed = parseToolCalls(result);
-      expect(parsed.validToolCalls).toHaveLength(0);
-      expect(parsed.validationErrors.length).toBeGreaterThan(0);
-      expect(parsed.validationErrors[0]).toContain("query");
+      expect(parsed.validToolCalls).toHaveLength(1);
+      expect(parsed.validToolCalls[0].function.name).toBe("web_search");
+      expect(parsed.validToolCalls[0].parsedArgs.query).toBe("Ohio 1863 Civil War draft enrollment records John Miller Mahoning County");
+      expect(parsed.cleanContent).toBe("");
     });
   });
 });
