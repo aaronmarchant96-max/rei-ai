@@ -40,7 +40,7 @@ The product has four parts:
 
 The OpenAI-compatible FinOps proxy and dynamic inference router (`/v1/chat/completions`) is the first production implementation of the method. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** is the formal execution cycle under the hood.
 
-Backed by **1341 automated tests across 117 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
+Backed by **1343 automated tests across 118 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -65,7 +65,7 @@ Backed by **1341 automated tests across 117 test suites** (100% green CI), REI.a
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
 - **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 1341 automated tests across 117 test suites with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
+- **Empirical Rigor:** Backed by 1343 automated tests across 118 test suites with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -204,7 +204,7 @@ export OPENAI_API_KEY="local-dev-key"
 | Total API Spend | **$14.66** |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **1341 passing tests across 117 suites** |
+| Automated Tests | **1343 passing tests across 118 suites** |
 | Deployments | **1,000+ Vercel production deployments** |
 | Development Hardware | Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) *(orig. Celeron J4105)* |
 | Monthly Operating Budget | ~$60/month *(expanded evaluation & tool testing volume)* |
@@ -234,7 +234,7 @@ npm run server
 # Run fast test loop (~11.4s on 12-thread machine via 50% maxWorkers)
 npm run test:fast
 
-# Run serial test suite (117 test suites, 1341 tests)
+# Run serial test suite (118 test suites, 1343 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)
