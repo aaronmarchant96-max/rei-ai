@@ -9,7 +9,7 @@ describe("ToolsLanding", () => {
     expect(screen.getByText(/Aaron Marchant/i)).toBeInTheDocument();
     expect(container.querySelector(".rei-landing-hero__art")).toHaveAttribute(
       "src",
-      "/rei-cardo-horizon.webp"
+      "/rei-cardo-horizon-noc.webp"
     );
     expect(container.querySelector(".rei-landing-hero__art")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("heading", { name: /one place to ask.*a model matched to the job/i })).toBeInTheDocument();

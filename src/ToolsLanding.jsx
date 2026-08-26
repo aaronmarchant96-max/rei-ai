@@ -193,7 +193,7 @@ export default function ToolsLanding({ onOpenTool }) {
       >
         <img
           className="rei-landing-hero__art"
-          src="/rei-cardo-horizon.webp"
+          src="/rei-cardo-horizon-noc.webp"
           alt=""
           aria-hidden="true"
         />
