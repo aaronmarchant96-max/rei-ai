@@ -23,7 +23,7 @@ archived_at: null
 - **Inference Optimization & FinOps**: Deterministic `< 1ms` pre-flight model selection, OpenAI-compatible proxy gateways, and prompt-freeze caching achieving **96.0% build spend reduction** ($23.52 billed vs $590.57 no-cache counterfactual across 1.848B tokens).
 - **Adversarial Security & Evaluation**: 14-category prompt-injection detection, ground-truth benchmarking, and formal epistemic claim ledgers.
 - **Full-Stack AI Engineering**: End-to-end React/TypeScript interfaces, serverless streaming backends, structured reasoning pipelines, and complex provenance architectures.
-- **Empirical Rigor**: **1320 automated tests across 113 suites** (100% green CI) with machine-reproducible claim verification.
+- **Empirical Rigor**: **1321 automated tests across 113 suites** (100% green CI) with machine-reproducible claim verification.
 
 ---
 
@@ -33,7 +33,7 @@ archived_at: null
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                             THE 3-PILLAR TRIAD                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 1. REI.ai          ──► AI Systems & FinOps (Proxy, <1ms Routing, 1320 Tests) │
+│ 1. REI.ai          ──► AI Systems & FinOps (Proxy, <1ms Routing, 1321 Tests) │
 │ 2. Arena Harness   ──► AI Security & Evals (Adversarial, Red Team, D1-D3)   │
 │ 3. Family Archive  ──► Full-Stack Product (GPS Evidence Tiers, Provenance)  │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -51,7 +51,7 @@ archived_at: null
   - **Prompt-Freeze Caching**: Frozen instruction prefixes and SHA-256 cache keys yielding an **88.0% effective multi-turn cache ratio** and **97.35% input cache hit rate**.
   - **Epistemic Trace Receipts**: Every turn outputs audit headers stamped with explicit evidence tiers (`(Observed)`, `(Derived)`, `(Modeled)`). Missing telemetry explicitly renders `"Evidence unavailable"`—zero synthetic data.
 * **Measured Result**:
-  - **1320 passing automated tests** across 113 test suites.
+  - **1321 passing automated tests** across 113 test suites.
   - **1.848B development-agent tokens** processed through OpenCode/DeepSeek build workflow for **$23.52** (saving $567.06 vs $590.57 no-cache counterfactual).
   - **81–92% modeled and replayed inference savings** across documented provider scenarios (workload-specific quality preservation requires bounded non-inferiority evaluation).
   - **< 40ms end-to-end routing latency** (< 1ms in-memory resolution).
@@ -120,7 +120,7 @@ archived_at: null
 
 | Metric | Verified Value | Verification Source / Producing Command |
 | :--- | :--- | :--- |
-| **Automated Passing Tests** | **1320 tests** (113 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
+| **Automated Passing Tests** | **1321 tests** (113 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
 | **Input Cache Hit Rate** | **97.35%** | `npm run verify:cache` · `data/cache-spend.csv` |
 | **Effective Multi-Turn Cache Ratio** | **88.0%** | Reconstructed $N=1,500$ model turns · `docs/CACHING_RULES.md` |
 | **Modeled & Replayed Savings** | **81–92%** | Provider scenario sensitivity · `docs/CLAIM_LEDGER.md` |
