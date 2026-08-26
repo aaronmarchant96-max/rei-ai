@@ -4908,19 +4908,19 @@ input:focus:not(:focus-visible) {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(0, 640px) 1fr;
-  grid-template-rows: minmax(560px, 1fr) auto;
-  gap: 28px 72px;
+  grid-template-columns: minmax(0, 620px) 1fr;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 40px 64px;
   width: min(100% - 64px, 1440px);
   min-height: calc(100svh - 69px);
   margin: 0 auto;
-  padding: clamp(58px, 7vh, 100px) 0 28px;
+  padding: clamp(48px, 6vh, 84px) 0 32px;
 }
 
 .rei-landing-hero__copy {
   align-self: center;
-  max-width: 630px;
-  padding: 28px 0 34px;
+  max-width: 620px;
+  padding: 0;
 }
 
 .rei-landing-hero__signature,
@@ -4942,7 +4942,7 @@ input:focus:not(:focus-visible) {
   flex-wrap: wrap;
   gap: 8px;
   width: fit-content;
-  margin-bottom: 30px;
+  margin-bottom: 22px;
   color: rgba(232, 226, 212, 0.7);
   font-size: 10px;
   line-height: 1.4;
@@ -4973,7 +4973,7 @@ input:focus:not(:focus-visible) {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   color: var(--rei-horizon-gold);
   font-size: 11px;
   font-weight: 700;
@@ -5007,13 +5007,13 @@ input:focus:not(:focus-visible) {
 }
 
 .rei-landing-hero h1 {
-  max-width: 12ch;
+  max-width: 20ch;
   margin: 0;
   color: #fffdf8;
-  font-size: clamp(46px, 5vw, 78px);
+  font-size: clamp(44px, 5vw, 72px);
   font-weight: 520;
   line-height: 0.98;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.05em;
   text-wrap: balance;
   text-shadow: 0 3px 32px rgba(0, 0, 0, 0.72);
 }
@@ -5029,11 +5029,11 @@ input:focus:not(:focus-visible) {
 
 .rei-landing-hero__summary {
   max-width: 570px;
-  margin: 24px 0 0;
+  margin: 20px 0 0;
   color: rgba(244, 239, 228, 0.86);
   font-size: clamp(17px, 1.45vw, 21px);
   font-weight: 350;
-  line-height: 1.6;
+  line-height: 1.55;
   text-shadow: 0 2px 18px #000;
 }
 
@@ -5046,7 +5046,7 @@ input:focus:not(:focus-visible) {
 }
 
 .rei-landing-hero__actions {
-  margin-top: 30px;
+  margin-top: 26px;
 }
 
 .rei-landing-hero__primary,
@@ -5096,7 +5096,7 @@ input:focus:not(:focus-visible) {
 
 .rei-landing-hero__benefit {
   max-width: 570px;
-  margin: 22px 0 0;
+  margin: 18px 0 0;
   color: rgba(205, 198, 183, 0.62);
   font-size: 13px;
   line-height: 1.6;
@@ -5106,7 +5106,7 @@ input:focus:not(:focus-visible) {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  margin-top: 14px;
+  margin-top: 12px;
   border: 0;
   padding: 0;
   background: transparent;
