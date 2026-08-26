@@ -29,34 +29,59 @@ This file defines the two-agent model (AGY = analysis/plan, EXEC = execution) pl
 Before AGY is invoked, classify the task:
 
 ```
-┌─────────────────────────────────┐
-│  Is this a research/plan task?  │
-│  OR                             │
-│  Does it touch 5+ files?        │
-│  OR                             │
-│  Does it involve reasoning?     │
-│      │                          │
-│      ├── YES → Route to AGY     │
-│      │         (full CARDO REI) │
-│      │                          │
-│      └── NO  → Fast Lane        │
-│                (skip AGY,        │
-│                 execute direct)  │
-└─────────────────────────────────┘
+┌──────────────────────────────────────────────────┐
+│  Is this a research/plan task?                   │
+│  OR                                              │
+│  Does it touch 5+ files?                         │
+│  OR                                              │
+│  Does it involve reasoning?                      │
+│  OR                                              │
+│  Does it touch a CRITICAL PRIMITIVE?             │
+│    (routing · auth · caching · telemetry ·       │
+│     claim ledger · test contract · cost model)   │
+│      │                                           │
+│      ├── YES → Route to AGY                      │
+│      │         (full CARDO REI)                  │
+│      │                                           │
+│      └── NO  → Fast Lane                         │
+│                (skip AGY, execute direct)        │
+└──────────────────────────────────────────────────┘
 ```
+
+> **Why the primitive check exists:** File count is a surface-area measure, not a complexity measure.
+> A single-line change to `serverRouter.js`, `cfai.js`, or `src/lib/routingConstants.js` can
+> have more blast radius than a 10-file docs update. The primitive check catches high-risk
+> single-file changes that would otherwise slip through to Fast Lane.
 
 ### Fast Lane Criteria (skip AGY)
 
-All three must be true:
+All **four** must be true:
 
 - [ ] Fewer than 5 files affected
 - [ ] No reasoning/analysis required (pure mechanical change)
 - [ ] Reversible: rollback is a single `git checkout` or equivalent
+- [ ] Does **not** touch a critical primitive (see list below)
+
+### Critical Primitive Files (always route to AGY, regardless of file count)
+
+Any change to the following files or their direct callers **forces AGY**, even if only 1 line changes:
+
+| Category | Files / Patterns |
+|----------|------------------|
+| **Routing** | `shared/lib/serverRouter.js`, `src/lib/routingConstants.js`, `src/lib/nightShiftRouter.ts`, `data/fingerprints.json` |
+| **Auth / Trust** | `api/v1/chat/completions.js` (auth gate), `shared/lib/tenantGuard.js`, any `*Guard*` or `*Auth*` file |
+| **Caching** | `api/cfai.js` (cache key, prompt-freeze, continuation logic), `docs/CACHING_RULES.md` |
+| **Telemetry / Receipts** | `receipt` shape in any response handler, `usage` provenance fields |
+| **Claim Ledger / Cost Model** | `src/data/claims.json`, `data/cache-spend.csv`, `scripts/verify-cache-spend.mjs` |
+| **Test Contract** | Any `*.test.js` touching routing, auth, or caching; `src/__eval__/` |
 
 **Examples:**
 - "Add a comment to `src/REI.jsx` line 42" → **Fast Lane**
 - "Update all 8 domain prompt files with new disclaimer text" → **AGY** (5+ files)
 - "Should we refactor the router or add a new layer?" → **AGY** (reasoning required)
+- "Add one keyword to `data/fingerprints.json`" → **AGY** (critical primitive — routing)
+- "Fix a typo in `shared/lib/serverRouter.js`" → **AGY** (critical primitive — routing)
+- "Update `README.md` spelling" → **Fast Lane** (docs, not a primitive)
 
 ---
 
