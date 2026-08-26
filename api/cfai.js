@@ -704,6 +704,15 @@ function appendContinuationTurns(messages, partialContent) {
   ]);
 }
 
+export function sanitizeContinuationOutput(text) {
+  if (!text || typeof text !== "string") return "";
+  let cleaned = text
+    .replace(/^\s*(?:\)\.\s*|\bSo we need to continue as if\b|\bContinue exactly where\b|\bThe prior message didn't contain\b|\bProvide detailed design, code snippets\b|\bSince there was no content\b|\bShould be consistent with being REI persona\b)[^\n]*\n?/gi, "")
+    .replace(/Continue exactly where the previous response ended\.[^\n]*\n?/gi, "")
+    .trim();
+  return cleaned;
+}
+
 async function completeWithContinuation(runBackend, messages, firstResult) {
   var full = firstResult.content || "";
   var usage = sumUsage(null, firstResult.usage);
@@ -735,8 +744,10 @@ async function completeWithContinuation(runBackend, messages, firstResult) {
     }
   }
 
+  var sanitized = sanitizeContinuationOutput(full);
+
   return {
-    content: full,
+    content: sanitized || full,
     usage: usage,
     truncated: stillTruncated,
     finishReason: finishReason,

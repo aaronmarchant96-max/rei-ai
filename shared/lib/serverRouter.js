@@ -64,19 +64,40 @@ export function buildServerRouterDecision({ input = "", domain = null, model = n
     }
   }
 
-  // 3. Simple Greeting Check
+  // 3. Simple Greeting Check (only if input is genuinely a simple greeting)
   const greetingFp = fingerprints.find((f) => f.id === "simple-greeting");
-  if (greetingFp && greetingFp.matchTerms.some((term) => promptText === term || promptText.startsWith(term + " "))) {
-    return {
-      id: greetingFp.id,
-      label: greetingFp.label,
-      model: greetingFp.model,
-      jobType: greetingFp.jobType,
-      estimatedCost: greetingFp.costPer1kInput * 0.05 + greetingFp.costPer1kOutput * 0.05,
-      maxTokens: greetingFp.maxTokens,
-      temperature: greetingFp.temperature,
-      selectionReason: "Matched simple greeting pattern"
-    };
+  if (greetingFp) {
+    const isGreetingMatch = greetingFp.matchTerms.some((term) => {
+      if (promptText === term) return true;
+      if (
+        promptText.startsWith(term + " ") ||
+        promptText.startsWith(term + "\n") ||
+        promptText.startsWith(term + "!") ||
+        promptText.startsWith(term + ",") ||
+        promptText.startsWith(term + ".")
+      ) {
+        const rest = promptText.slice(term.length).trim();
+        return (
+          rest.length <= 25 &&
+          !/\b(design|implement|code|function|class|story|family|ancestor|legal|runway|tradeoff|decision|build|fix|refactor|cache|api|database|lru|ttl)\b/i.test(
+            rest
+          )
+        );
+      }
+      return false;
+    });
+    if (isGreetingMatch) {
+      return {
+        id: greetingFp.id,
+        label: greetingFp.label,
+        model: greetingFp.model,
+        jobType: greetingFp.jobType,
+        estimatedCost: greetingFp.costPer1kInput * 0.05 + greetingFp.costPer1kOutput * 0.05,
+        maxTokens: greetingFp.maxTokens,
+        temperature: greetingFp.temperature,
+        selectionReason: "Matched simple greeting pattern"
+      };
+    }
   }
 
   // 4. Term-Matching Ranking across Catalog

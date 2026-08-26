@@ -137,9 +137,13 @@ export default async function handler(req, res) {
     }
 
     const userPrompt = messages.map((m) => m.content).join("\n");
+    const latestUserMsg = Array.isArray(messages)
+      ? [...messages].reverse().find((m) => m && m.role === "user")?.content || ""
+      : "";
+    const promptForRouting = latestUserMsg.trim() || userPrompt;
 
-    // 2. Server Router Decision
-    const routerDecision = buildServerRouterDecision({ input: userPrompt, domain, model });
+    // 2. Server Router Decision (evaluated on current turn input)
+    const routerDecision = buildServerRouterDecision({ input: promptForRouting, domain, model });
     const selectedModel = routerDecision.model;
 
     // 3. Delegate to serverless CFAI request executor
