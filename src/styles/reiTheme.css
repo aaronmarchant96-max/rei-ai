@@ -791,20 +791,30 @@
   box-shadow: 0 0 15px rgba(226, 163, 61, 0.08);
 }
 
-/* Bubble action buttons: flex row anchored top-right (no manual offsets) */
+/* Bubble action buttons: flex row in natural layout flow (never overlaps text or headers) */
 .rei-bubble-actions {
-  position: absolute;
-  top: 8px;
-  right: 8px;
+  position: static;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
+  margin-top: 10px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   z-index: 2;
 }
 .rei-bubble-actions .rei-copy-btn {
   position: static;
   margin: 0;
   white-space: nowrap;
+  border-radius: 6px;
+  background: rgba(17, 17, 17, 0.6);
+  font-size: 11px;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Input Shell */
@@ -2674,14 +2684,8 @@
   font-weight: 580;
 }
 
-.rei-bubble-actions {
-  top: auto;
-  right: 13px;
-  bottom: 11px;
-}
-
 .rei-bubble-actions .rei-copy-btn {
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(9, 9, 9, 0.68);
 }
 

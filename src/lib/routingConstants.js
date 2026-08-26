@@ -40,10 +40,15 @@ export function isSimpleGreeting(text = "") {
     if (t.startsWith(term)) {
       const nextChar = t[term.length];
       if (nextChar === undefined || /[\s!?.,:;]/.test(nextChar)) {
-        const rest = t.slice(term.length).trim();
+        const rest = t.slice(term.length).replace(/^[!?.,:;\s]+/, "").trim();
+        if (!rest) return true;
+        if (/^(there|friend|everyone|team|all|how are you|how are you doing|how goes it|hows it going)[!?.]*$/i.test(rest)) {
+          return true;
+        }
         if (
-          rest.length > 25 ||
-          /\b(design|implement|code|function|class|story|family|ancestor|legal|runway|tradeoff|decision|build|fix|refactor|cache|api|database|lru|ttl)\b/i.test(
+          rest.includes("?") ||
+          rest.length > 15 ||
+          /\b(what|why|how|who|where|when|can|could|would|will|write|create|build|help|explain|tell|show|make|analyze|solve|generate|design|implement|code|function|class|story|family|ancestor|legal|runway|tradeoff|decision|fix|refactor|cache|api|database|search|find|query)\b/i.test(
             rest
           )
         ) {
