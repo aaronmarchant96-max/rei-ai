@@ -1,29 +1,29 @@
 {
   "$schema": "https://rei.ai/schemas/evidence-package-v1.json",
   "metadata": {
-    "generatedAt": "2026-08-20T14:23:54.814Z",
-    "gitCommit": "153ad12b4e9390a571d4f537802e6d502bf2984d",
+    "generatedAt": "2026-08-22T08:41:56.999Z",
+    "gitCommit": "941a104bcc3855d3a6fd788e4c71d97f4feaff2a",
     "gitBranch": "main",
-    "nodeVersion": "v20.20.2",
+    "nodeVersion": "v22.23.2",
     "platform": "linux"
   },
   "freshTestRunnerExecution": {
-    "executedAt": "2026-08-20T14:23:54.820Z",
-    "durationMs": 248850,
+    "executedAt": "2026-08-22T08:41:56.999Z",
+    "durationMs": 38050,
     "exitCode": 0,
     "status": "PASS",
-    "totalSuites": 81,
-    "passedSuites": 81,
+    "totalSuites": 97,
+    "passedSuites": 97,
     "failedSuites": 0,
-    "totalTests": 976,
-    "passedTests": 976,
+    "totalTests": 1099,
+    "passedTests": 1099,
     "failedTests": 0
   },
   "routerBenchmark": {
     "dataset": "Pooled calibration corpus",
     "uniqueScoredSamples": 136,
-    "correctRoutes": 99,
-    "measuredAccuracyPct": 72.8,
+    "correctRoutes": 97,
+    "measuredAccuracyPct": 71.3,
     "claimedRange": "60–80%",
     "status": "PASS"
   },
@@ -94,7 +94,7 @@
       "dataset": "Pooled calibration corpus combining held-out Blind V1, Blind V2, V3, and semantic benchmark fixtures",
       "uniqueScoredSamples": 136,
       "producingCode": "src/__eval__/hingeCalibrationDebate.js (buildPool + computeRouterScores)",
-      "measured": "99/136 = 72.8%",
+      "measured": "97/136 = 71.3%",
       "reproductionCommand": "npm test -- src/__eval__/claimsSync.test.js"
     },
     {
