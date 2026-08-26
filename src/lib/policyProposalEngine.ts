@@ -1,33 +1,42 @@
 import type { EvalEntry } from "./evalLog";
 import type { RoutingLogEntry } from "./routingLog";
 import type { ClaimReport } from "./claimGateway";
+import { DETECTOR_VERSION, type CActivitySignalReport } from "./cActivitySignals";
 
 /**
  * Deterministic policy-proposal engine.
  *
  * REI is self-informed, NOT self-modifying. This module reads observed evidence
- * (the deterministic eval log, the routing log, and the claims gate's own
- * verifyAll() reports) and emits *proposals* for human review. It NEVER mutates
- * routing thresholds, weights, fingerprints, scanner patterns, or claim
- * definitions. See docs/POLICY_LOOP.md for the boundary.
+ * (the deterministic eval log, the routing log, the claims gate's own
+ * verifyAll() reports, and C-Activity learning signal reports) and emits *proposals*
+ * for human review. It NEVER mutates routing thresholds, weights, fingerprints,
+ * scanner patterns, claim definitions, or provider configs. See docs/POLICY_LOOP.md for the boundary.
  *
  * Invariants:
  *  - pure: same inputs → same proposals (no Date.now, no random, no network)
  *  - $0: no LLM calls
  *  - evidence-driven: every signal requires an observable downstream signal;
  *    absence of evidence never becomes evidence
+ *  - non-autonomous: PR7 maps validated evidence into proposals; it never reinterprets,
+ *    strengthens, or acts on evidence.
  */
+
+export const ADAPTER_VERSION = "policy-adapter-v1";
+
 
 export type PolicySignal =
   | "missed-escalation"
   | "false-positive-escalation"
   | "cheap-route-opportunity"
-  | "claim-drift";
+  | "claim-drift"
+  | "persistent-delivery-risk"
+  | "prediction-miscalibration"
+  | "cohort-drift";
 
-export type ProposalCategory = "routing" | "scanner" | "claims" | "measurement";
+export type ProposalCategory = "routing" | "scanner" | "claims" | "measurement" | "learning";
 
 export interface PolicyProposal {
-  /** Deterministic id derived from the signal + its anchor (requestId or claimId). */
+  /** Deterministic id derived from the signal + its anchor (requestId, claimId, or sourceSignalId). */
   id: string;
   signal: PolicySignal;
   category: ProposalCategory;
@@ -60,6 +69,9 @@ const SIGNAL_LABEL: Record<PolicySignal, string> = {
   "false-positive-escalation": "False-positive escalation",
   "cheap-route-opportunity": "Cheap-route opportunity",
   "claim-drift": "Claim drift",
+  "persistent-delivery-risk": "Persistent delivery risk",
+  "prediction-miscalibration": "Prediction miscalibration",
+  "cohort-drift": "Cohort drift",
 };
 
 const SIGNAL_CATEGORY: Record<PolicySignal, ProposalCategory> = {
@@ -67,6 +79,9 @@ const SIGNAL_CATEGORY: Record<PolicySignal, ProposalCategory> = {
   "false-positive-escalation": "scanner",
   "cheap-route-opportunity": "routing",
   "claim-drift": "claims",
+  "persistent-delivery-risk": "learning",
+  "prediction-miscalibration": "learning",
+  "cohort-drift": "learning",
 };
 
 function bySignalThenId(a: PolicyProposal, b: PolicyProposal): number {
@@ -211,24 +226,101 @@ function claimDriftProposals(claims: ClaimReport[]): PolicyProposal[] {
     });
 }
 
+/** C-Activity Signals Adapter (PR7)
+ *  Translates validated PR6 statistical learning signals into human-reviewable proposals.
+ *  Idempotent, deterministic, non-autonomous mapping layer.
+ */
+function cActivitySignalProposals(report?: CActivitySignalReport): PolicyProposal[] {
+  if (
+    !report ||
+    report.schemaVersion !== 1 ||
+    report.detectorVersion !== DETECTOR_VERSION ||
+    !Array.isArray(report.signals)
+  ) {
+    return [];
+  }
+
+
+  const proposals: PolicyProposal[] = [];
+  const seenSignalIds = new Set<string>();
+
+  for (const s of report.signals) {
+    if (!s || !s.id || !s.type || seenSignalIds.has(s.id)) {
+      continue;
+    }
+    seenSignalIds.add(s.id);
+
+    const proposalId = `policy-proposal:${ADAPTER_VERSION}:${s.id}`;
+
+    if (s.type === "persistent-delivery-risk") {
+      proposals.push({
+        id: proposalId,
+        signal: "persistent-delivery-risk",
+        category: SIGNAL_CATEGORY["persistent-delivery-risk"],
+        title: `Persistent delivery risk in cohort on ${s.model} / ${s.routeId}`,
+        evidence:
+          `Observed cohort pattern: cohort risk interval [${s.cohortRiskInterval.low.toFixed(3)}, ${s.cohortRiskInterval.high.toFixed(3)}] ` +
+          `strictly exceeds comparator risk interval [${s.comparatorRiskInterval.low.toFixed(3)}, ${s.comparatorRiskInterval.high.toFixed(3)}] ` +
+          `for model "${s.model}" and route "${s.routeId}". Source signal: "${s.id}". Detector version: "${report.detectorVersion}".`,
+        suggestedChange:
+          `Review candidate policy: evaluate whether this route/model cohort needs a routing-policy adjustment or fallback handling.`,
+        requestIds: [],
+      });
+    } else if (s.type === "prediction-miscalibration") {
+      proposals.push({
+        id: proposalId,
+        signal: "prediction-miscalibration",
+        category: SIGNAL_CATEGORY["prediction-miscalibration"],
+        title: `Prediction miscalibration (${s.direction}) on ${s.model}`,
+        evidence:
+          `Observed cohort pattern: predictor is ${s.direction} for model "${s.model}" in bin [${s.binLow.toFixed(1)}, ${s.binHigh.toFixed(1)}). ` +
+          `Mean predicted: ${s.meanPredicted.toFixed(3)}, actual failure interval: [${s.actualInterval.low.toFixed(3)}, ${s.actualInterval.high.toFixed(3)}] ` +
+          `across support count of ${s.support}. Source signal: "${s.id}". Detector version: "${report.detectorVersion}".`,
+        suggestedChange:
+          `Review candidate policy: evaluate whether predictor calibration or confidence threshold interpretation needs adjustment for model "${s.model}".`,
+        requestIds: [],
+      });
+    } else if (s.type === "cohort-drift") {
+      proposals.push({
+        id: proposalId,
+        signal: "cohort-drift",
+        category: SIGNAL_CATEGORY["cohort-drift"],
+        title: `Cohort failure rate drift (${s.direction}) on ${s.model} / ${s.routeId}`,
+        evidence:
+          `Observed cohort pattern: failure rate for cohort on model "${s.model}" / route "${s.routeId}" is ${s.direction} ` +
+          `(recent 20 interval [${s.recentInterval.low.toFixed(3)}, ${s.recentInterval.high.toFixed(3)}] vs previous 20 interval [${s.previousInterval.low.toFixed(3)}, ${s.previousInterval.high.toFixed(3)}]). ` +
+          `Source signal: "${s.id}". Detector version: "${report.detectorVersion}".`,
+        suggestedChange:
+          `Review candidate policy: evaluate whether a recently changing cohort warrants investigation or route monitoring.`,
+        requestIds: [],
+      });
+    }
+  }
+
+  return proposals;
+}
+
 /**
  * Generate all policy proposals from observed evidence.
  *
- * @param evals  deterministic eval-log entries
- * @param logs   routing-log entries
- * @param claims ClaimReport[] from claimGateway.verifyAll() — the claims gate's
- *               own output, so claim drift is judged by existing machinery.
+ * @param evals           deterministic eval-log entries
+ * @param logs            routing-log entries
+ * @param claims          ClaimReport[] from claimGateway.verifyAll() — the claims gate's
+ *                        own output, so claim drift is judged by existing machinery.
+ * @param cActivityReport Optional CActivitySignalReport from cActivitySignals.detectCActivitySignals()
  */
 export function generateProposals(
   evals: EvalEntry[],
   logs: RoutingLogEntry[],
-  claims: ClaimReport[]
+  claims: ClaimReport[],
+  cActivityReport?: CActivitySignalReport
 ): PolicyProposal[] {
   return [
     ...missedEscalationProposals(evals),
     ...falsePositiveEscalationProposals(evals),
     ...cheapRouteOpportunityProposals(evals, logs),
     ...claimDriftProposals(claims),
+    ...cActivitySignalProposals(cActivityReport),
   ].sort(bySignalThenId);
 }
 
