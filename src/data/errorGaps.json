@@ -1,6 +1,24 @@
 {
-  "generatedAt": "2026-08-23T20:22:26.240Z",
+  "generatedAt": "2026-08-26T09:16:42.491Z",
   "entries": [
+    {
+      "hash": "e81c975",
+      "date": "2026-08-26",
+      "subject": "fix(systemPrompts): fix newline escapes in CODING_PROMPT concurrency rules [caught: test]",
+      "tags": [
+        "test"
+      ],
+      "context": "fix(systemPrompts): fix newline escapes in CODING_PROMPT concurrency rules"
+    },
+    {
+      "hash": "7c3edff",
+      "date": "2026-08-26",
+      "subject": "docs(workflow): document dual-remote deploy configuration [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(workflow): document dual-remote deploy configuration"
+    },
     {
       "hash": "d7843c1",
       "date": "2026-08-23",
@@ -1599,16 +1617,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 177,
-    "totalTags": 180,
+    "totalEntries": 179,
+    "totalTags": 182,
     "byTag": {
-      "test": 60,
-      "manual": 106,
+      "test": 61,
+      "manual": 107,
       "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-08": 177
+      "2026-08": 179
     }
   }
 }

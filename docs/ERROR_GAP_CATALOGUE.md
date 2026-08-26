@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-23T20:22:26.240Z
-> Span: 2026-08-08 → 2026-08-23 (177 tagged commits, 180 total tags)
+> Last updated: 2026-08-26T09:16:42.491Z
+> Span: 2026-08-08 → 2026-08-26 (179 tagged commits, 182 total tags)
 
 ## Tag Taxonomy
 
@@ -17,8 +17,8 @@
 
 | Tag | Count |
 |---|---|
-| `manual` | 106 |
-| `test` | 60 |
+| `manual` | 107 |
+| `test` | 61 |
 | `claim-gate` | 13 |
 | `ai-cross-check` | 1 |
 
@@ -26,6 +26,8 @@
 
 | Commit | Date | Subject | Tags & Context |
 |---|---|---|---|
+| `e81c975` | 2026-08-26 | fix(systemPrompts): fix newline escapes in CODING_PROMPT concurrency rules [caug... | `test` — fix(systemPrompts): fix newline escapes in CODING_PROMPT concurrency rules |
+| `7c3edff` | 2026-08-26 | docs(workflow): document dual-remote deploy configuration [caught: manual] | `manual` — docs(workflow): document dual-remote deploy configuration |
 | `d7843c1` | 2026-08-23 | fix(story): enforce coherent genre-complete delivery [caught: manual] | `manual` — fix(story): enforce coherent genre-complete delivery |
 | `b0e7976` | 2026-08-23 | fix(gateway): skip retry-after delay during fallback [caught: manual] | `manual` — fix(gateway): skip retry-after delay during fallback |
 | `b0371bd` | 2026-08-23 | fix(reconcile): restore input-payload dedup and close media query block | `test` — fix(reconcile): restore input-payload dedup and close media query block |
@@ -206,11 +208,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 177 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 179 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **177 tagged commits** across 1 month(s).
+- **179 tagged commits** across 1 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 

@@ -2,7 +2,7 @@
 
 **Live System**: [https://rei.ai](https://rei.ai)  
 **Repository**: [https://github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)  
-**Incident Reference**: [`docs/INCIDENT-001-ROUTING-MEASUREMENT.md`](file:///home/aaron/repos/rei-ai/docs/INCIDENT-001-ROUTING-MEASUREMENT.md)
+**Incident Reference**: [INCIDENT-001-ROUTING-MEASUREMENT.md](./INCIDENT-001-ROUTING-MEASUREMENT.md)
 
 ---
 
@@ -65,8 +65,8 @@ Applying REI's counterfactual replay engine (`pilotEval.ts`) to our internal dev
 
 ## 5. Supporting Code & Documentation
 
-- **Ingestion & Normalization**: [`src/lib/pilotIngest/index.ts`](file:///home/aaron/repos/rei-ai/src/lib/pilotIngest/index.ts)
-- **Replay & Segmentation**: [`src/lib/pilotReport.ts`](file:///home/aaron/repos/rei-ai/src/lib/pilotReport.ts)
-- **Canonical Export**: [`src/lib/pilotExport/index.ts`](file:///home/aaron/repos/rei-ai/src/lib/pilotExport/index.ts)
-- **Execution Controller**: [`src/lib/executionController.ts`](file:///home/aaron/repos/rei-ai/src/lib/executionController.ts)
-- **Customer Pilot Workspace**: [`src/modules/pilot/PilotWorkspace.jsx`](file:///home/aaron/repos/rei-ai/src/modules/pilot/PilotWorkspace.jsx)
+- **Ingestion & Normalization**: [src/lib/pilotIngest/index.ts](../src/lib/pilotIngest/index.ts)
+- **Replay & Segmentation**: [src/lib/pilotReport.ts](../src/lib/pilotReport.ts)
+- **Canonical Export**: [src/lib/pilotExport/index.ts](../src/lib/pilotExport/index.ts)
+- **Execution Controller**: [src/lib/executionController.ts](../src/lib/executionController.ts)
+- **Customer Pilot Workspace**: [src/modules/pilot/PilotWorkspace.jsx](../src/modules/pilot/PilotWorkspace.jsx)
