@@ -4873,6 +4873,12 @@ input:focus:not(:focus-visible) {
   color: #f8f5ed;
 }
 
+@keyframes rei-hero-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1.055); }
+  50%  { transform: translate3d(-18px, 12px, 0) scale(1.075); }
+  100% { transform: translate3d(0, 0, 0) scale(1.055); }
+}
+
 .rei-landing-hero__art {
   position: absolute;
   inset: 0;
@@ -4881,6 +4887,7 @@ input:focus:not(:focus-visible) {
   object-fit: cover;
   object-position: center top;
   user-select: none;
+  animation: rei-hero-drift 42s ease-in-out infinite;
 }
 
 .rei-landing-hero__veil {
@@ -5603,6 +5610,16 @@ input:focus:not(:focus-visible) {
 @media (prefers-reduced-motion: reduce) {
   .rei-brand:hover .rei-cardo-mark svg {
     transform: none !important;
+  }
+  .rei-landing-hero__art {
+    animation: none !important;
+  }
+}
+
+/* Ultra-wide: pull framing toward the central peak so the far right isn't empty */
+@media (min-width: 1720px) {
+  .rei-landing-hero__art {
+    object-position: 56% top;
   }
 }
 
