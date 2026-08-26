@@ -4,7 +4,7 @@
 
 import "dotenv/config";
 import { handleCfaiRequest } from "../../cfai.js";
-import { buildServerRouterDecision, computeServerCost, normalizeFinishReason, evaluateDeliveryIntegrity } from "../../../shared/lib/serverRouter.js";
+import { buildServerRouterDecision, computeServerCost, normalizeFinishReason, evaluateDeliveryIntegrity, requiredSectionsForRoute } from "../../../shared/lib/serverRouter.js";
 import { parseApiKeyHeader, resolveTenantContext } from "../../../shared/lib/authTenantEngine.js";
 
 const ERROR_CODES = {
@@ -173,7 +173,8 @@ export default async function handler(req, res) {
     const deliveryGate = evaluateDeliveryIntegrity({
       rawContent: replyText,
       finishReason: rawFinishReason,
-      transportCompleted: true
+      transportCompleted: true,
+      requiredSections: requiredSectionsForRoute(routerDecision.id)
     });
     const normalizedFinish = normalizeFinishReason(rawFinishReason);
     const isComplete = deliveryGate.deliveryGatePassed && !isTruncated;

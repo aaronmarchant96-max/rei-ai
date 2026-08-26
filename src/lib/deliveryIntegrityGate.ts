@@ -4,6 +4,8 @@
  * Proves delivery completeness, NOT universal algorithm quality.
  */
 
+import { detectUnfinishedNarration, missingRequiredSections } from "./acceptanceContract";
+
 export interface ArtifactRequirements {
   language?: string;
   functionName?: string;
@@ -22,6 +24,8 @@ export interface DeliveryGateInput {
   providerFinishReason?: string | null;
   transportCompleted?: boolean;
   requiredArtifacts?: ArtifactRequirements | null;
+  /** Domain acceptance contract: section labels that MUST be present in the answer. */
+  requiredSections?: string[] | null;
 }
 
 export interface DeliveryGateResult {
@@ -30,6 +34,8 @@ export interface DeliveryGateResult {
   parseIntegrityPassed: boolean;
   markdownIntegrityPassed: boolean;
   explicitArtifactsPassed: boolean;
+  requiredSectionsPassed: boolean;
+  narrationPassed: boolean;
   deliveryGatePassed: boolean;
   failureReasons: string[];
 }
@@ -112,12 +118,30 @@ export function evaluateDeliveryIntegrity(input: DeliveryGateInput): DeliveryGat
     }
   }
 
+  // 6. Domain Acceptance Contract (required sections present)
+  let requiredSectionsPassed = true;
+  if (input.requiredSections && input.requiredSections.length > 0) {
+    const missing = missingRequiredSections(displayContent, input.requiredSections);
+    if (missing.length > 0) {
+      requiredSectionsPassed = false;
+      failureReasons.push(`missing_required_section:${missing.join(",")}`);
+    }
+  }
+
+  // 7. Unfinished-work narration suppression
+  const narrationPassed = !detectUnfinishedNarration(displayContent);
+  if (!narrationPassed) {
+    failureReasons.push("unfinished_work_narration");
+  }
+
   const deliveryGatePassed =
     transportIntegrityPassed &&
     terminationIntegrityPassed &&
     parseIntegrityPassed &&
     markdownIntegrityPassed &&
-    explicitArtifactsPassed;
+    explicitArtifactsPassed &&
+    requiredSectionsPassed &&
+    narrationPassed;
 
   return {
     transportIntegrityPassed,
@@ -125,6 +149,8 @@ export function evaluateDeliveryIntegrity(input: DeliveryGateInput): DeliveryGat
     parseIntegrityPassed,
     markdownIntegrityPassed,
     explicitArtifactsPassed,
+    requiredSectionsPassed,
+    narrationPassed,
     deliveryGatePassed,
     failureReasons
   };

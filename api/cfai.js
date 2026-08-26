@@ -709,6 +709,11 @@ export function sanitizeContinuationOutput(text) {
   let cleaned = text
     .replace(/^\s*(?:\)\.\s*|\bSo we need to continue as if\b|\bContinue exactly where\b|\bThe prior message didn't contain\b|\bProvide detailed design, code snippets\b|\bSince there was no content\b|\bShould be consistent with being REI persona\b)[^\n]*\n?/gi, "")
     .replace(/Continue exactly where the previous response ended\.[^\n]*\n?/gi, "")
+    // Unfinished-work narration: model describing what it will do next instead of doing it.
+    .replace(/\bi'?ll\s+continue\b[^.\n]*\.?/gi, "")
+    .replace(/\blet\s+me\s+first\s+(?:verify|check|confirm|address|look)\b[^.\n]*\.?/gi, "")
+    .replace(/\bcontinue\s+the\s+analysis\b[^.\n]*\.?/gi, "")
+    .replace(/\bto\s+be\s+continued\b[^.\n]*\.?/gi, "")
     .trim();
   return cleaned;
 }

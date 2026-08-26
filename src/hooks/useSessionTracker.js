@@ -106,6 +106,15 @@ export function useSessionTracker() {
     setEscalationCount(0);
   }, []);
 
+  // Monotonicity invariant: the lifetime total must include the current session.
+  // Both are on the same accounting plane, so session <= lifetime always holds.
+  // Without this, "Historical Cumulative" (pre-session) can read LOWER than
+  // "This Session", which is an accounting contradiction.
+  const committedCost = Number.isFinite(lifetimeCost) ? lifetimeCost : 0;
+  const committedSavings = Number.isFinite(lifetimeSavings) ? lifetimeSavings : 0;
+  const totalCost = committedCost + (Number.isFinite(sessionCost) ? sessionCost : 0);
+  const totalSavings = committedSavings + (Number.isFinite(savingsVsPremium) ? savingsVsPremium : 0);
+
   return {
     sessionTokens,
     sessionMessages,
@@ -119,6 +128,8 @@ export function useSessionTracker() {
     lifetimeCost,
     lifetimeSavings,
     lifetimePremium,
+    totalCost,
+    totalSavings,
     trackMessage,
     resetSession,
   };

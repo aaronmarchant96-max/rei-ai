@@ -340,7 +340,7 @@ export default function REI({ initialPrompt } = {}) {
   }, [messages]);
   const activityCount = useMemo(() => activityProjections.reduce((count, projection) => count + projection.events.length, 0), [activityProjections]);
 
-  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, sessionChunks, escalationCount, trackMessage, lifetimeCost, lifetimeSavings, resetSession } = useSessionTracker();
+  const { sessionCost, modelBreakdown, savingsVsPremium, sessionTokens, sessionMessages, sessionChunks, escalationCount, trackMessage, totalCost, totalSavings, resetSession } = useSessionTracker();
 
   useEffect(() => {
     if (initialPrompt) {
@@ -452,6 +452,9 @@ export default function REI({ initialPrompt } = {}) {
       status: "success",
       resolvedModel: modelUsed,
       chunks: data.chunks || 1,
+      truncated: Boolean(data.truncated),
+      finalTruncated: Boolean(data.finalTruncated ?? data.truncated),
+      continuations: data.continuation?.chunks ? Math.max(0, data.continuation.chunks - 1) : 0,
       outcomeObservedAt: new Date().toISOString(),
     }, requestId);
 
@@ -986,8 +989,8 @@ export default function REI({ initialPrompt } = {}) {
             savingsVsPremium={savingsVsPremium}
             escalationCount={escalationCount}
             modelBreakdown={modelBreakdown}
-            lifetimeCost={lifetimeCost}
-            lifetimeSavings={lifetimeSavings}
+            lifetimeCost={totalCost}
+            lifetimeSavings={totalSavings}
             activityCount={activityCount}
             activityProjections={activityProjections}
             telemetryMode={telemetryMode}

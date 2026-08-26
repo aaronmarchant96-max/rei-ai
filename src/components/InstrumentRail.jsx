@@ -336,7 +336,7 @@ export default function InstrumentRail({
 
         {lifetimeCost > 0 && (
           <div className="rei-side-card">
-            <div className="rei-side-card__heading">Historical Cumulative</div>
+            <div className="rei-side-card__heading">Lifetime cumulative</div>
             <div className="rei-side-stat">
               <span className="rei-side-stat__label">Total cost</span>
               <span className="rei-side-stat__value mono">${lifetimeCost.toFixed(4)}</span>

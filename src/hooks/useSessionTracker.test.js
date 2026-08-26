@@ -44,4 +44,26 @@ describe("useSessionTracker", () => {
       "gemini-3.6-flash": 800,
     });
   });
+
+  it("enforces lifetime monotonicity: totalCost >= sessionCost (same accounting plane)", () => {
+    localStorage.setItem("rei_lifetime_cost", "0.0007");
+    localStorage.setItem("rei_lifetime_savings", "0.07");
+
+    const { result } = renderHook(() => useSessionTracker());
+
+    act(() => {
+      result.current.trackMessage({
+        cost: 0.0052,
+        premiumCost: 0.1887,
+        tokens: 3000,
+        model: "deepseek-chat",
+      });
+    });
+
+    // The lifetime cumulative includes the current session, so it can never
+    // read lower than the session cost.
+    expect(result.current.totalCost).toBeGreaterThanOrEqual(result.current.sessionCost);
+    expect(result.current.totalCost).toBeCloseTo(0.0007 + 0.0052, 4);
+    expect(result.current.totalSavings).toBeCloseTo(0.07 + (0.1887 - 0.0052), 4);
+  });
 });

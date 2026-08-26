@@ -3195,6 +3195,12 @@
 .rei-activity-status.is-legacy { color: var(--amber, #f0c965); }
 .rei-activity-status.is-orphaned { color: var(--danger, #ef4444); }
 
+/* Delivery status (separate from evidence coverage) */
+.rei-activity-status.is-delivery-complete { color: var(--success, #22c55e); }
+.rei-activity-status.is-delivery-incomplete { color: var(--amber, #f0c965); }
+.rei-activity-status.is-delivery-failed { color: var(--danger, #ef4444); }
+.rei-activity-status.is-delivery-unknown { color: var(--text-secondary, #94a3b8); }
+
 .rei-activity-sources {
   color: var(--text-secondary, #94a3b8);
   font-size: 9px;

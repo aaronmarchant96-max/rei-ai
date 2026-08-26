@@ -90,6 +90,60 @@ test("Activity projection preserves correlation, identity, ordering, retention t
   expect(JSON.stringify(redacted)).not.toContain("secret");
 });
 
+test("Delivery status is split from evidence coverage (complete evidence, incomplete delivery)", () => {
+  const routing: RoutingLogEntry[] = [{
+    id: "routing:req-a",
+    requestId: "req-a",
+    routeId: "legal-hinge",
+    model: "m",
+    status: "success",
+    finalTruncated: true,
+    truncated: true,
+    timestamp: "2026-01-01T00:00:00Z",
+  }];
+  const decisions: DecisionEntry[] = [{
+    schemaVersion: 1,
+    id: "decision:req-a",
+    requestId: "req-a",
+    sections: { Hinge: "h" },
+    domainLabel: "The Precedent Engine",
+    inputPreview: "case",
+    createdAt: "2026-01-01T00:00:01Z",
+  }];
+  const evaluations: EvalEntry[] = [{
+    id: "eval:req-a:d:red-team-v1:2026-01-01T00:00:02Z",
+    requestId: "req-a",
+    evaluator: "deterministic",
+    evaluatorVersion: "red-team-v1",
+    evaluation: { safetyVerdict: "clean", evaluatedAt: "2026-01-01T00:00:02Z" },
+  }];
+
+  const projected = projectActivity("req-a", { routing, decisions, evaluations });
+  // Evidence coverage: all three sources present.
+  expect(projected.status).toBe("complete");
+  // Delivery: answer was truncated mid-delivery.
+  expect(projected.delivery).toBe("incomplete");
+});
+
+test("Delivery status is 'failed' on routing error and 'complete' on clean finish", () => {
+  const errored = projectActivity("req-e", {
+    routing: [{ id: "routing:req-e", requestId: "req-e", status: "error", timestamp: "2026-01-01T00:00:00Z" }],
+    decisions: [],
+    evaluations: [],
+  });
+  expect(errored.delivery).toBe("failed");
+
+  const clean = projectActivity("req-f", {
+    routing: [{ id: "routing:req-f", requestId: "req-f", status: "success", finalTruncated: false, timestamp: "2026-01-01T00:00:00Z" }],
+    decisions: [],
+    evaluations: [],
+  });
+  expect(clean.delivery).toBe("complete");
+
+  const noRouting = projectActivity("req-g", { routing: [], decisions: [], evaluations: [] });
+  expect(noRouting.delivery).toBe("unknown");
+});
+
 test("prediction and outcome events project as optional additive activity", () => {
   const routing: RoutingLogEntry[] = [{
     id: "routing:req-a",

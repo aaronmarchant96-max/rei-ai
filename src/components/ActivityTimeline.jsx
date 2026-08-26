@@ -19,10 +19,12 @@ export default function ActivityTimeline({ projections = [] }) {
         <details className="rei-activity-group" key={projection.requestId} open={index === projections.length - 1}>
           <summary>
             <span>Request {index + 1}</span>
-            <span className={`rei-activity-status is-${projection.status}`}>{projection.status}</span>
+            <span className={`rei-activity-status is-delivery-${projection.delivery ?? "unknown"}`}>
+              {projection.delivery ?? "unknown"}
+            </span>
           </summary>
           <div className="rei-activity-sources">
-            Routing: {projection.sources.routing} · Decision: {projection.sources.decision} · Evaluation: {projection.sources.evaluation}
+            Delivery: {projection.delivery ?? "unknown"} · Evidence: {projection.status} · Routing: {projection.sources.routing} · Decision: {projection.sources.decision} · Evaluation: {projection.sources.evaluation}
           </div>
           <ol>
             {projection.events.map((event) => (

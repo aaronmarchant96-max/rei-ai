@@ -8,6 +8,7 @@ import {
   type ActivityEvent,
   type ActivityProjection,
   type ActivitySourceState,
+  type DeliveryStatus,
 } from "./activityTypes";
 
 export interface ActivitySources {
@@ -197,10 +198,13 @@ export function projectActivity(requestId: string, sources: ActivitySources): Ac
         ? "legacy"
         : "complete";
 
+  const delivery = deriveDeliveryStatus(routing);
+
   return {
     schemaVersion: ACTIVITY_SCHEMA_VERSION,
     requestId,
     status,
+    delivery,
     sources: {
       routing: routingState === "not_expected" ? "missing" : routingState,
       decision: decisionState === "not_expected" ? "missing" : decisionState,
@@ -208,6 +212,24 @@ export function projectActivity(requestId: string, sources: ActivitySources): Ac
     },
     events,
   };
+}
+
+/**
+ * Derive delivery completeness from raw routing signals, independent of evidence
+ * coverage. A `status === "error"` is a hard failure. `finalTruncated === true`
+ * means the answer stopped mid-delivery. Missing signals → unknown, never complete.
+ */
+function deriveDeliveryStatus(routing?: RoutingLogEntry | undefined): DeliveryStatus {
+  if (!routing) return "unknown";
+  if (routing.status === "error") return "failed";
+  if (routing.finalTruncated === true) return "incomplete";
+  if (routing.status === "success" && routing.finalTruncated === false) return "complete";
+  if (routing.status === "success") {
+    // Success with no truncation signal: treat as complete only if we have an
+    // outcome observation proving the response actually finished.
+    return "unknown";
+  }
+  return "unknown";
 }
 
 export function projectStoredActivity(requestId: string): ActivityProjection {

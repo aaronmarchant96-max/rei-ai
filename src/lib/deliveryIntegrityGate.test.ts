@@ -109,4 +109,46 @@ describe("Delivery Integrity Gate — Unit & Fault Injection Battery", () => {
       expect(res.failureReasons).toEqual([]);
     });
   });
+
+  describe("4. Domain Acceptance Contract (legal required sections)", () => {
+    const legalSections = ["HINGE", "FACTS", "ASSUMPTIONS", "EVALUATION", "WHAT WOULD CHANGE THE OUTCOME", "MOVE"];
+
+    test("passes when all required legal sections are present", () => {
+      const content = legalSections.map((s) => `**${s}**: present`).join("\n");
+      const res = evaluateDeliveryIntegrity({
+        rawContent: content,
+        displayContent: content,
+        finishReason: "stop",
+        requiredSections: legalSections
+      });
+      expect(res.deliveryGatePassed).toBe(true);
+      expect(res.requiredSectionsPassed).toBe(true);
+    });
+
+    test("fails with missing_required_section when a truncated legal answer stops mid-analysis", () => {
+      const truncated = "**HINGE**: whether separate-but-equal violates equal protection.\nI'll continue the analysis.";
+      const res = evaluateDeliveryIntegrity({
+        rawContent: truncated,
+        displayContent: truncated,
+        finishReason: "stop",
+        requiredSections: legalSections
+      });
+      expect(res.deliveryGatePassed).toBe(false);
+      expect(res.requiredSectionsPassed).toBe(false);
+      expect(res.failureReasons.some((r) => r.startsWith("missing_required_section"))).toBe(true);
+    });
+
+    test("fails with unfinished_work_narration even when sections are present", () => {
+      const content = legalSections.map((s) => `**${s}**: present`).join("\n") + "\nI'll continue the analysis in the next section.";
+      const res = evaluateDeliveryIntegrity({
+        rawContent: content,
+        displayContent: content,
+        finishReason: "stop",
+        requiredSections: legalSections
+      });
+      expect(res.narrationPassed).toBe(false);
+      expect(res.failureReasons).toContain("unfinished_work_narration");
+      expect(res.deliveryGatePassed).toBe(false);
+    });
+  });
 });

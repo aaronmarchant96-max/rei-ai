@@ -191,13 +191,27 @@ export function normalizeFinishReason(rawReason) {
   return "unknown";
 }
 
-export function evaluateDeliveryIntegrity({ rawContent = "", finishReason = null, transportCompleted = true }) {
+export function evaluateDeliveryIntegrity({ rawContent = "", finishReason = null, transportCompleted = true, requiredSections = null }) {
   const normalizedFinish = normalizeFinishReason(finishReason);
   const failureReasons = [];
 
   if (!transportCompleted) failureReasons.push("transport_incomplete");
   if (normalizedFinish !== "stop") failureReasons.push(`invalid_termination:${normalizedFinish}`);
   if (!rawContent || rawContent.trim().length === 0) failureReasons.push("empty_content");
+
+  // Domain acceptance contract: required sections must be present.
+  if (Array.isArray(requiredSections) && requiredSections.length > 0) {
+    const text = String(rawContent || "").toLowerCase();
+    const missing = requiredSections.filter((section) => !text.includes(String(section).toLowerCase()));
+    if (missing.length > 0) {
+      failureReasons.push(`missing_required_section:${missing.join(",")}`);
+    }
+  }
+
+  // Unfinished-work narration suppression.
+  if (detectUnfinishedNarration(rawContent)) {
+    failureReasons.push("unfinished_work_narration");
+  }
 
   const deliveryGatePassed = failureReasons.length === 0;
 
@@ -206,4 +220,37 @@ export function evaluateDeliveryIntegrity({ rawContent = "", finishReason = null
     finishStatus: deliveryGatePassed ? "complete" : (normalizedFinish === "stop" ? "incomplete" : normalizedFinish),
     failureReasons
   };
+}
+
+const UNFINISHED_NARRATION_PATTERNS = [
+  /\bi'?ll\s+continue\b[^.\n]{0,80}/i,
+  /\blet\s+me\s+first\s+(verify|check|confirm|address|look)\b[^.\n]{0,80}/i,
+  /\bi\s+will\s+(continue|now\s+analyze|now\s+address|next\s+turn\s+to)\b[^.\n]{0,80}/i,
+  /\bcontinue\s+the\s+analysis\b/i,
+  /\bto\s+be\s+continued\b/i,
+  /\bi'?ll\s+(analyze|address|cover|complete)\s+(the\s+)?(next|remaining|second|following)\b[^.\n]{0,80}/i,
+  /\bthis\s+(response|analysis)\s+is\s+incomplete\b/i,
+  /\bplease\s+let\s+me\s+know\s+if\s+you\s+want\s+me\s+to\s+continue\b/i,
+];
+
+export function detectUnfinishedNarration(content) {
+  if (!content) return false;
+  return UNFINISHED_NARRATION_PATTERNS.some((re) => re.test(content));
+}
+
+const LEGAL_REQUIRED_SECTIONS = [
+  "HINGE",
+  "FACTS",
+  "ASSUMPTIONS",
+  "EVALUATION",
+  "WHAT WOULD CHANGE THE OUTCOME",
+  "MOVE",
+];
+
+export function requiredSectionsForRoute(routeId) {
+  const id = String(routeId || "").toLowerCase();
+  if (id === "legal-hinge" || id === "case-hinge-legal" || id === "legal") {
+    return [...LEGAL_REQUIRED_SECTIONS];
+  }
+  return null;
 }
