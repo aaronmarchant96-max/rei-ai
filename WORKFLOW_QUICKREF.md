@@ -105,3 +105,17 @@ Every externally visible metric identifies: numerator · denominator · baseline
 ## The One-Liner
 
 > **Triage → gates → CARDO → claim/acceptance contract → implement → observe → CARDO → commit gate → one commit → push only on request.**
+
+---
+
+## Deploy Reminder
+
+> [!IMPORTANT]
+> **Two remotes. Both must be pushed for changes to reach production.**
+>
+> ```bash
+> git push origin main && git push bitbucket main
+> ```
+>
+> Vercel deploys from **`bitbucket` only**. Pushing to `origin` (GitHub) alone does not update the live site.
+> See `AGENTS.md § Repository & Deploy Configuration` for the full rule.

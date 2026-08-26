@@ -366,6 +366,35 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 
 ---
 
+## Repository & Deploy Configuration
+
+> [!IMPORTANT]
+> This repository has **two remotes**. Pushes to GitHub alone do NOT update the live site.
+
+| Remote | URL | Purpose |
+|--------|-----|---------|
+| `origin` | `https://github.com/aaronmarchant96-max/rei-ai.git` | GitHub — code review, PRs, CI |
+| `bitbucket` | `git@bitbucket.org:rei-ai/rei.ai.git` | **Vercel source of truth — live site deploys from here** |
+
+**Vercel is wired to `bitbucket`, production branch `main`.**
+
+Every change that must reach the live site at `rei.ai` must be pushed to **both** remotes:
+
+```bash
+git push origin main       # GitHub (CI, PRs, code review)
+git push bitbucket main    # Bitbucket → triggers Vercel production deploy
+```
+
+Or as a one-liner after confirming the build is clean:
+
+```bash
+git push origin main && git push bitbucket main
+```
+
+**Agents MUST push to `bitbucket main` for any change intended for production.** Pushing to `origin` only is incomplete. This was discovered on 2026-08-26 when the routing fix sat on GitHub `main` for 30+ minutes while the live app continued serving the old Bitbucket build.
+
+---
+
 ## File Map
 
 | File | Purpose |
@@ -381,4 +410,4 @@ If a task reaches its budget with work remaining, **compress the closed ranges a
 
 ---
 
-*Last reviewed: 2026-08-23 (repointed `memories/repo/caching_rules.md` dangling references to `docs/CACHING_RULES.md`, made the prompt-freeze prefix rule version-neutral for OpenCode V2, refreshed review timestamp). Stale after: 2026-08-24. Verify rules before executing.*
+*Last reviewed: 2026-08-26 (added dual-remote deploy configuration, critical-primitive triage gate, deployment hard stop, staleness execution gate, [caught: review] tag). Stale after: 2026-08-27. Verify rules before executing.*
