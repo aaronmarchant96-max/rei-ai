@@ -61,3 +61,8 @@ If you are evaluating this repository for the first time, follow this reading pa
 | [Debate Furnace Origin](Debate_Furnace_Origin.md) | June 2026 (superseded) |
 | [Debate Furnace Rich Script Reference](Debate_Furnace_Rich_Script_Reference.md) | June 2026 (superseded) |
 | Hinge Meter / Hinge Market docs | June 2026 (deferred) |
+
+---
+
+### Trademark Notice & Disambiguation
+*CARDO REI* and the *CARDO Method* are open cognitive decision frameworks developed by PromptHound Labs (*cardo* = Latin for "hinge of the matter"). PromptHound Labs and the REI.ai platform are independent entities and are **not affiliated with, sponsored by, or endorsed by Cardo AI** (the fintech platform founded in 2018).

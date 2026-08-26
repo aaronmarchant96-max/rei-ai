@@ -58,6 +58,11 @@
 | **Claim → Measure it** | `CLAIM_LEDGER.md` maps every public metric to a reproducing command; `gen-claims.mjs` snapshots the suite. |
 | **System → Trace it** | Routing + cost are deterministic: `nightShiftRouter.ts`, `hingeClassifier.ts`, `cardoGuard.js`. Savings telemetry via `/api/savings` over KV traces. |
 | **Verified evidence** | Claims are stratified by evidence class (measured / replayed / estimated / modeled). A transformation, calculation, or repetition cannot upgrade an evidence class by itself. |
+
+---
+
+### Trademark Notice & Disambiguation
+*CARDO REI* and the *CARDO Method* are open cognitive decision frameworks developed by PromptHound Labs (*cardo* = Latin for "hinge of the matter"). PromptHound Labs and the REI.ai platform are independent entities and are **not affiliated with, sponsored by, or endorsed by Cardo AI** (the fintech platform founded in 2018).
 | **Human / Claims Gate** | The artifact proposes, the human decides. The system never auto-mutates policy; proposals pass a human gate. |
 | **Iterate** | Neurath's boat — reconstruct plank-by-plank while at sea, commit by commit. |
 
