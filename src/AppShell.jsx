@@ -178,7 +178,7 @@ export default function AppShell() {
           }
         }}>
           <div className="rei-cardo-mark">
-            <HingeMark size={20} animated={false} color="#E2A33D" />
+            <HingeMark size={26} animated={false} color="#E2A33D" />
           </div>
           <div>
             <div className="rei-brand__wordmark">REI<span className="rei-brand__suffix">.ai</span></div>

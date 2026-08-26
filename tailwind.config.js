@@ -21,7 +21,7 @@ export default {
         border: "#27272A",
         muted: "#3F3F46",
         foreground: "#F8FAFC",
-        "foreground-muted": "#94A3B8",
+        "foreground-muted": "#A6AFC4",
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],

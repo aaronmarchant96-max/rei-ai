@@ -435,6 +435,8 @@ export default function ToolsLanding({ onOpenTool }) {
         </a>
       </motion.section>
 
+      <div className="rei-section-axis" aria-hidden="true" />
+
       {/* ── 2. The Flagship (REI.ai) ── */}
       <motion.section 
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
@@ -676,10 +678,12 @@ export default function ToolsLanding({ onOpenTool }) {
         </a>
       </motion.section>
 
+      <div className="rei-section-axis" aria-hidden="true" />
+
       {/* ── 3. The REI Method and formal CARDO execution cycle ── */}
       <motion.section 
         initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeIn}
-        className="relative z-10 max-w-6xl mx-auto py-24"
+        className="relative z-10 max-w-6xl mx-auto py-20"
       >
         <div className="text-center mb-12">
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">A method builders can install</div>
@@ -730,7 +734,7 @@ export default function ToolsLanding({ onOpenTool }) {
               <div className={`font-heading font-bold text-lg mb-2 ${step.isHinge ? "text-hinge-bright" : ""}`}>
                 {step.label}
               </div>
-              <div className={`text-sm text-foreground-muted transition-opacity duration-300 ${expandedCardo === step.id ? "opacity-100" : "opacity-60"}`}>
+              <div className={`text-sm text-foreground-muted transition-opacity duration-300 ${expandedCardo === step.id ? "opacity-100" : "opacity-80"}`}>
                 {step.detail}
               </div>
             </motion.div>
@@ -838,7 +842,7 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="flex flex-col items-center justify-center mb-6">
           <div className="w-12 h-px bg-gradient-to-r from-transparent via-hinge/40 to-transparent mb-6" />
           <div className="w-10 h-10 border border-hinge/30 rounded flex items-center justify-center shadow-[0_0_12px_rgba(226,163,61,0.15)] bg-surface">
-            <HingeMark size={20} animated={false} color="#E2A33D" />
+            <HingeMark size={26} animated={false} color="#E2A33D" />
           </div>
         </div>
         <div className="font-heading font-bold tracking-widest uppercase text-sm mb-2 text-foreground">
