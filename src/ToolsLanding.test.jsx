@@ -4,9 +4,14 @@ import claimsData from "./data/claims.json";
 
 describe("ToolsLanding", () => {
   it("renders hero with Aaron Marchant attribution and Try REI.ai button", () => {
-    render(<ToolsLanding onOpenTool={jest.fn()} />);
+    const { container } = render(<ToolsLanding onOpenTool={jest.fn()} />);
 
     expect(screen.getByText(/Aaron Marchant/i)).toBeInTheDocument();
+    expect(container.querySelector(".rei-landing-hero__art")).toHaveAttribute(
+      "src",
+      "/rei-cardo-horizon.webp"
+    );
+    expect(container.querySelector(".rei-landing-hero__art")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("heading", { name: /one place to ask.*a model matched to the job/i })).toBeInTheDocument();
     expect(screen.getByText(/looks at the job, chooses an AI model suited to it/i)).toBeInTheDocument();
     expect(screen.getByText("Use it")).toBeInTheDocument();

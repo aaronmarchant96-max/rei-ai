@@ -169,7 +169,7 @@ export default function ToolsLanding({ onOpenTool }) {
   const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
 
   return (
-    <div data-theme={themeMode} className="min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
+    <div data-theme={themeMode} className="rei-landing min-h-screen text-foreground font-sans relative overflow-x-hidden selection:bg-hinge/30">
       {/* Light theme overrides for Tailwind color tokens */}
       <style>{`
         [data-theme="light"] .bg-background { background-color: #F8F9FA !important; }
@@ -186,170 +186,153 @@ export default function ToolsLanding({ onOpenTool }) {
         [data-theme="light"] .to-hinge-bright { --tw-gradient-to: var(--amber-tint); }
       `}</style>
       
-      {/* ── 1. Premium Hero ── */}
-      <motion.header 
+      {/* ── 1. CARDO Horizon Hero ── */}
+      <motion.header
         initial="hidden" animate="visible" variants={fadeIn}
-        className="relative z-10 w-full px-4 sm:px-6 md:px-0 max-w-4xl mx-auto pt-16 md:pt-24 pb-20 md:pb-32 text-center flex flex-col items-center overflow-hidden"
+        className="rei-landing-hero"
       >
-        {/* Subtle Radial Gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(226,163,61,0.08),transparent_50%)] pointer-events-none"></div>
+        <img
+          className="rei-landing-hero__art"
+          src="/rei-cardo-horizon.webp"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="rei-landing-hero__veil" aria-hidden="true" />
+        <div className="rei-landing-hero__axis" aria-hidden="true" />
 
-        <motion.div 
-          whileHover={{ rotateY: -48 }}
-          style={{ transformPerspective: 200 }}
-          transition={{ type: "spring", stiffness: 200, damping: 10 }}
-          className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl bg-surface border border-[var(--amber)]/30 flex items-center justify-center mb-6 md:mb-8 drop-shadow-[0_0_10px_rgba(226,163,61,0.2)] cursor-crosshair z-10"
-        >
-          <HingeMark size={32} animated={false} color="#E2A33D" />
-        </motion.div>
-        
-        <div className="relative font-mono text-xs font-semibold tracking-wide text-gray-300 mb-4 z-10 bg-[#18181b]/90 border border-border/80 px-4 py-2 rounded-full inline-flex items-center gap-2 max-w-2xl text-center shadow-lg">
-          <span className="w-2 h-2 rounded-full bg-[var(--amber)] shrink-0 animate-pulse" />
-          <span>Built by <strong className="text-white font-bold">Aaron Marchant</strong> — a transparent way to use more than one AI model.</span>
+        <div className="rei-landing-hero__inner">
+          <div className="rei-landing-hero__copy">
+            <div className="rei-landing-hero__signature">
+              <span className="rei-landing-hero__pulse" aria-hidden="true" />
+              Built by <strong>Aaron Marchant</strong>
+              <span className="rei-landing-hero__signature-rule" aria-hidden="true" />
+              Evidence before authority
+            </div>
+
+            <div className="rei-landing-hero__eyebrow">
+              <span className="rei-landing-hero__mini-mark" aria-hidden="true">
+                <HingeMark size={18} animated={false} color="#F2B84B" />
+              </span>
+              REI decision intelligence
+            </div>
+
+            <h1 style={{ fontFamily: "'Fraunces', serif" }}>
+              {PRODUCT_STORY.headlineLead}{" "}
+              <span>{PRODUCT_STORY.headlineAccent}</span>
+            </h1>
+
+            <p className="rei-landing-hero__summary">{PRODUCT_STORY.summary}</p>
+
+            <div className="rei-landing-hero__actions">
+              <button
+                onClick={() => onOpenTool({ tool: "rei" })}
+                className="rei-landing-hero__primary group"
+              >
+                Try REI.ai
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+              </button>
+              <a
+                href={`${REPO_URL}/blob/main/docs/CASE_STUDY.md`}
+                target="_blank"
+                rel="noreferrer"
+                className="rei-landing-hero__secondary group"
+              >
+                View engineering case study
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+              </a>
+            </div>
+
+            <p className="rei-landing-hero__benefit">
+              {PRODUCT_STORY.benefit} REI does not replace your AI providers; it improves the choice made before each request is sent.
+            </p>
+
+            <button
+              onClick={() => onOpenTool({ tool: "analytics" })}
+              className="rei-landing-hero__analytics group"
+            >
+              View measured savings analytics
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
+            </button>
+          </div>
+
+          <div className="rei-landing-hero__hinge-note" aria-label="The REI hinge">
+            <span>The hinge</span>
+            <strong>Choose the right model before cost and risk compound.</strong>
+          </div>
+
+          <div className="rei-landing-hero__modes" aria-label="Ways to use REI">
+            {PRODUCT_STORY.modes.map((mode, index) => (
+              <div className="rei-landing-mode" key={mode.label}>
+                <span className="rei-landing-mode__index">0{index + 1}</span>
+                <div>
+                  <div className="rei-landing-mode__label">{mode.label}</div>
+                  <div className="rei-landing-mode__title">{mode.title}</div>
+                  <p>{mode.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        
-        <h1 
-          className="relative text-4xl sm:text-5xl md:text-7xl font-medium leading-[1.08] mb-5 md:mb-6 z-10"
-          style={{ fontFamily: "'Fraunces', serif" }}
-        >
-          {PRODUCT_STORY.headlineLead} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">{PRODUCT_STORY.headlineAccent}</span>
-        </h1>
-        
-        <p className="relative text-[#EDEFF5] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light z-10">
-          {PRODUCT_STORY.summary}
-        </p>
+      </motion.header>
 
-        {/* Three ways to understand and use REI */}
-        <div className="relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl mx-auto mb-8 w-full text-left">
-          <div className="bg-[#18181b]/90 border border-border/80 rounded-xl p-3.5 shadow-md">
-            <div className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider font-bold mb-1 flex items-center gap-1.5">
-              <span>💬</span> {PRODUCT_STORY.modes[0].label}
+      <section className="rei-landing-evidence" aria-labelledby="landing-evidence-heading">
+        <div className="rei-landing-evidence__inner">
+          <div className="rei-landing-evidence__heading">
+            <div>
+              <span className="rei-landing-kicker">Measured routing results</span>
+              <h2 id="landing-evidence-heading">The horizon is dramatic. The numbers stay accountable.</h2>
             </div>
-            <div className="text-sm text-white font-medium mb-1">{PRODUCT_STORY.modes[0].title}</div>
-            <div className="text-xs text-gray-300 leading-relaxed">{PRODUCT_STORY.modes[0].description}</div>
+            <span className="rei-landing-evidence__coordinate">CARDO / VERIFIED PLANE</span>
           </div>
-          <div className="bg-[#18181b]/90 border border-border/80 rounded-xl p-3.5 shadow-md">
-            <div className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider font-bold mb-1 flex items-center gap-1.5">
-              <span>🔌</span> {PRODUCT_STORY.modes[1].label}
-            </div>
-            <div className="text-sm text-white font-medium mb-1">{PRODUCT_STORY.modes[1].title}</div>
-            <div className="text-xs text-gray-300 leading-relaxed">{PRODUCT_STORY.modes[1].description}</div>
-          </div>
-          <div className="bg-[#18181b]/90 border border-border/80 rounded-xl p-3.5 shadow-md">
-            <div className="font-mono text-[10px] text-[var(--amber)] uppercase tracking-wider font-bold mb-1 flex items-center gap-1.5">
-              <span>📊</span> {PRODUCT_STORY.modes[2].label}
-            </div>
-            <div className="text-sm text-white font-medium mb-1">{PRODUCT_STORY.modes[2].title}</div>
-            <div className="text-xs text-gray-300 leading-relaxed">{PRODUCT_STORY.modes[2].description}</div>
-          </div>
-        </div>
 
-        {/* Verified Evidence & Savings Grid */}
-        <div className="relative z-10 w-full max-w-3xl mx-auto mb-7 md:mb-8">
-          <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-4">
-            Measured routing results
-          </div>
-          <div className="grid grid-cols-3 gap-2 md:grid-cols-3 md:gap-4">
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
-              <div className="text-2xl md:text-4xl font-bold text-white mb-1">94–96%</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Paid Routing Savings</div>
-              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">isolated from free tiers</div>
+          <div className="rei-landing-evidence__grid">
+            <div className="rei-landing-stat">
+              <strong>94–96%</strong>
+              <span>Paid Routing Savings</span>
+              <small>isolated from free tiers</small>
             </div>
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
-              <div className="text-2xl md:text-4xl font-bold text-white mb-1">{claimsData.testCount}+</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Passing Tests</div>
-              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">100% green CI suite</div>
+            <div className="rei-landing-stat">
+              <strong>{claimsData.testCount}+</strong>
+              <span>Passing Tests</span>
+              <small>100% green CI suite</small>
             </div>
-            <div className="bg-[#111111]/80 backdrop-blur-sm border border-gray-800 rounded-xl p-3 md:p-5 text-center flex flex-col justify-center min-h-[96px] md:min-h-[116px]">
-              <div className="text-2xl md:text-4xl font-bold text-white mb-1">&lt; 40ms</div>
-              <div className="text-[10px] md:text-xs text-gray-400 uppercase tracking-wider">Decision Latency</div>
-              <div className="text-[9px] md:text-[10px] text-[#565B72] mt-1">local pre-flight check</div>
+            <div className="rei-landing-stat">
+              <strong>&lt; 40ms</strong>
+              <span>Decision Latency</span>
+              <small>local pre-flight check</small>
             </div>
           </div>
-          <p className="text-xs text-[#565B72] text-center mt-4 max-w-xl mx-auto leading-relaxed px-1">
+          <p className="rei-landing-evidence__provenance">
             Measured across {claimsData.testCount}+ automated unit and integration tests and verified multi-turn production workloads. Free-tier capacity and paid-only scenarios isolated in CLAIM_LEDGER.md.
           </p>
-        </div>
 
-        <p className="relative text-[#7D8299] text-sm md:text-base max-w-2xl mx-auto mb-8 z-10 px-1">
-          {PRODUCT_STORY.benefit} REI does not replace your AI providers; it improves the choice made before each request is sent.
-        </p>
-
-        {/* Dual Primary Action Paths: Try REI.ai vs View Engineering Case Study */}
-        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-xl mx-auto mb-4 w-full">
-          <button
-            onClick={() => onOpenTool({ tool: "rei" })}
-            className="group flex items-center justify-center gap-2 bg-[var(--amber)] text-[#1A1300] px-6 sm:px-8 py-4 rounded-full font-heading font-bold uppercase tracking-wider hover:bg-[var(--amber-hover)] hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(226,163,61,0.35)] transition-all duration-300 text-xs sm:text-sm w-full sm:w-auto"
-          >
-            Try REI.ai <ArrowRight className="w-5 h-5 group-hover:translate-x-[5px] transition-transform duration-300" />
-          </button>
-
-          <a
-            href={`${REPO_URL}/blob/main/docs/CASE_STUDY.md`}
-            target="_blank"
-            rel="noreferrer"
-            className="group inline-flex items-center justify-center gap-2 bg-[#18181b]/90 hover:bg-[#27272a] border border-border/80 text-white px-6 sm:px-8 py-4 rounded-full font-heading font-semibold uppercase tracking-wider hover:border-gray-500 transition-all duration-300 text-xs sm:text-sm w-full sm:w-auto"
-          >
-            View engineering case study <ArrowRight className="w-4 h-4 text-gray-400 group-hover:translate-x-[3px] group-hover:text-white transition-all duration-300" />
-          </a>
-        </div>
-
-        <div className="relative z-10 flex items-center justify-center gap-3 mt-2">
-          <button
-            onClick={() => onOpenTool({ tool: "analytics" })}
-            className="group inline-flex items-center gap-1.5 text-xs text-hinge-bright hover:text-[var(--amber)] transition-colors font-mono tracking-wide"
-          >
-            View measured savings analytics
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-[2px] transition-transform duration-300" />
-          </button>
-        </div>
-
-        {/* ── Founder's Invitation: The Bootstrap Loop 🪝 ── */}
-        <motion.div 
-          initial="hidden" animate="visible" variants={fadeIn}
-          className="relative z-10 w-full max-w-3xl mx-auto mt-10 bg-gradient-to-r from-[#181510] via-[#241d12] to-[#181510] border border-[var(--amber)]/40 rounded-2xl p-5 md:p-6 text-left shadow-[0_0_25px_rgba(226,163,61,0.15)] overflow-hidden"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-xl bg-[var(--amber)]/10 border border-[var(--amber)]/30 flex items-center justify-center shrink-0 text-xl shadow-inner">
-              🪝
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--amber)]">The Bootstrap Loop</span>
-                <span className="bg-[var(--amber)]/20 text-[var(--amber)] font-mono text-[9px] px-2 py-0.5 rounded-full font-bold uppercase border border-[var(--amber)]/30">C-Activity Flywheel</span>
+          <motion.div initial="hidden" animate="visible" variants={fadeIn} className="rei-landing-loop">
+            <div className="rei-landing-loop__mark" aria-hidden="true"><HingeMark size={22} animated={false} color="#F2B84B" /></div>
+            <div className="rei-landing-loop__body">
+              <div className="rei-landing-loop__meta">
+                <span>The Bootstrap Loop</span>
+                <span>C-Activity Flywheel</span>
               </div>
-              <h3 className="text-white font-medium text-base sm:text-lg mb-2">
-                Are you going to try using it?
-              </h3>
-              <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-4 font-light">
-                Because the demo is live. And when you throw a prompt at the gateway, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. <strong className="text-white font-medium">That’s the whole point.</strong>
+              <h3>Are you going to try using it?</h3>
+              <p>
+                Because the demo is live. And when you throw a prompt at the gateway, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. <strong>That’s the whole point.</strong>
               </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={() => onOpenTool({ tool: "pilot" })}
-                  className="inline-flex items-center gap-2 bg-[var(--amber)] text-black px-4 py-2 rounded-lg font-mono text-xs font-bold uppercase hover:bg-[var(--amber-hover)] transition-all shadow-md"
-                >
-                  <span>🚀 Join the Loop (`/pilot`)</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+              <div className="rei-landing-loop__actions">
+                <button onClick={() => onOpenTool({ tool: "pilot" })}>
+                  Join the Loop (`/pilot`) <ArrowRight className="w-3.5 h-3.5" />
                 </button>
-                <a
-                  href={REPO_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-white font-mono transition-colors border border-gray-800 hover:border-gray-600 px-3.5 py-2 rounded-lg"
-                >
-                  <span>Star on GitHub</span>
-                  <ExternalLink className="w-3 h-3" />
+                <a href={REPO_URL} target="_blank" rel="noreferrer">
+                  Star on GitHub <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        <p className="relative z-10 text-[#565B72] text-xs mt-6 px-1">
-          1. Pick a domain → 2. Ask your question → 3. See the reasoning, not just the answer.
-        </p>
-      </motion.header>
+          <p className="rei-landing-evidence__flow">
+            <span>01</span> Pick a domain <i>→</i> <span>02</span> Ask your question <i>→</i> <span>03</span> See the reasoning, not just the answer.
+          </p>
+        </div>
+      </section>
 
       {/* ── 1.5. The Methodology (not a product, a methodology) ── */}
       <motion.section 
