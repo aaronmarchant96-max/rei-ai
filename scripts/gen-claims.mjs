@@ -238,6 +238,10 @@ const DOC_TARGETS = [
       {
         pattern: /Automated Tests\s+──►\s+[\d,]+ tests across \d+ suites/g,
         replacement: () => `Automated Tests  ──► ${testCount.toLocaleString("en-US")} tests across ${suiteCount} suites`
+      },
+      {
+        pattern: /Verified Test Suite\s+──►\s+[\d,]+ tests across \d+ suites/g,
+        replacement: () => `Verified Test Suite   ──► ${testCount.toLocaleString("en-US")} tests across ${suiteCount} suites`
       }
     ]
   }

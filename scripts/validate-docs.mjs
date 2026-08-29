@@ -163,6 +163,57 @@ function runValidation() {
     errors.push(`Found ${activeHandoffs} active handoff documents. Only 1 active handoff allowed.`);
   }
 
+  // ---------------------------------------------------------------------------
+  // Check 8: Live Claims Drift Invariant
+  // Reads claims.json and verifies target live-claim files do not drift.
+  // Exempts historical dated snapshots.
+  // ---------------------------------------------------------------------------
+  const claimsPath = path.join(repoRoot, "src", "data", "claims.json");
+  if (fs.existsSync(claimsPath)) {
+    try {
+      const claims = JSON.parse(fs.readFileSync(claimsPath, "utf8"));
+      const expectedTests = claims.testCount;
+      const expectedSuites = claims.suiteCount;
+
+      const liveClaimTargets = [
+        "README.md",
+        "docs/GITHUB_PROFILE_README.md",
+        "docs/CLAIM_LEDGER.md",
+        "docs/PORTFOLIO_OVERVIEW.md"
+      ];
+
+      for (const relPath of liveClaimTargets) {
+        const fullPath = path.join(repoRoot, relPath);
+        if (!fs.existsSync(fullPath)) continue;
+        const content = fs.readFileSync(fullPath, "utf8");
+        const lines = content.split("\n");
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.includes("Latest verified full-suite result") || line.includes("historical") || line.includes("Historical") || line.includes("Point-in-time") || line.includes("point-in-time")) continue;
+
+          const testMatch = line.match(/\b(\d{1,3}(?:,\d{3})+|\d{4,})\s+(?:passing\s+)?(?:automated\s+)?tests\b/i);
+          if (testMatch) {
+            const foundCount = parseInt(testMatch[1].replace(/,/g, ""), 10);
+            if (foundCount !== expectedTests) {
+              errors.push(`Claim drift in ${relPath}:${i+1}: found ${foundCount} tests, claims.json has ${expectedTests}. Run 'node scripts/gen-claims.mjs'.`);
+            }
+          }
+
+          const suiteMatch = line.match(/\b(\d{2,3})\s+(?:test\s+)?suites\b/i);
+          if (suiteMatch) {
+            const foundSuites = parseInt(suiteMatch[1], 10);
+            if (foundSuites !== expectedSuites) {
+              errors.push(`Claim drift in ${relPath}:${i+1}: found ${foundSuites} suites, claims.json has ${expectedSuites}. Run 'node scripts/gen-claims.mjs'.`);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      warnings.push(`Could not check claims drift: ${err.message}`);
+    }
+  }
+
   return { errors, warnings, scannedCount: allMdFiles.length };
 }
 
