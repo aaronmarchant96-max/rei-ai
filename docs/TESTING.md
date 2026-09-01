@@ -65,7 +65,7 @@ npx jest src/lib/nightShiftRouter.test.js   # one suite
 npx jest --verbose                          # verbose output
 ```
 
-Latest verified full-suite result (2026-08-29): **120/120 suites**, **1364/1364 tests**.
+Latest verified full-suite result (2026-09-01): **120/120 suites**, **1364/1364 tests**.
 
 ## Test Suite Milestones & Historical Progression
 
