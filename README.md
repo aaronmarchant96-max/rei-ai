@@ -12,6 +12,12 @@ archived_at: null
 
 # REI.ai — An Executable Method for Building Accountable AI
 
+[![Tests](https://img.shields.io/badge/tests-1366%2F1366%20passing-brightgreen)](docs/TESTING.md)
+[![Tokens](https://img.shields.io/badge/tokens-1.848B-blue)](docs/CLAIM_LEDGER.md)
+[![Build Spend](https://img.shields.io/badge/spend-%2423.52-orange)](docs/CLAIM_LEDGER.md)
+[![Input Cache Hit](https://img.shields.io/badge/cache%20hit-97.35%25-blueviolet)](docs/CACHING_RULES.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 > **"You're not just saving money. You're building better, faster."**
 > 
 > *Route each task to the right model, verify the result, and keep the evidence.*
@@ -24,6 +30,23 @@ archived_at: null
 > **Are you going to try using it?**
 > 
 > Because the live gateway is online. When you throw a prompt at `/api/v1/chat/completions`, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. **That's the whole point.**
+
+---
+
+## 📌 Table of Contents
+
+- [What is REI.ai?](#-what-is-reiai)
+- [The Evidence Loop](#-the-reiai-evidence-loop)
+- [What This Is (And Isn't)](#-what-this-is-and-isnt)
+- [The 6 Specialized Reasoning Domains](#-the-6-specialized-reasoning-domains)
+- [How the Smart Router Works](#-how-the-smart-router-works)
+- [Core Platform Engines](#-core-platform-engines)
+- [Red Team — Client-Side Prompt Security Guard](#-red-team--client-side-prompt-security-guard)
+- [Historical Live Endpoint Captures](#-historical-live-endpoint-captures)
+- [OpenAI-Compatible Cognitive Proxy](#-openai-compatible-cognitive-proxy-v1chatcompletions)
+- [About the Builder](#-about-the-builder)
+- [Quick Start](#-quick-start)
+- [Live Links & Documentation](#-live-links--documentation)
 
 ---
 
@@ -93,18 +116,18 @@ Instead of blindly sending every request to expensive flagship models, REI runs 
 
 ```mermaid
 flowchart TD
-    A[User Prompt] --> B[Hinge Classifier<br/>ECS / DAS / APS]
-    B --> C{Deterministic Cascade}
-    C -->|1. Empty| D[Default Route]
-    C -->|2. Greeting| E[Cheapest Path<br/>llama-3.1-8b-instant]
-    C -->|3. Meta Query| E
-    C -->|4. Self-Eval| F[The Engineer]
-    C -->|5. Adversarial| G[Red Team Validation]
-    C -->|6. Domain Match| H[Specialist Route<br/>Coding / Legal / Genealogy / Story]
-    C -->|7. High Complexity| I[Structured Reasoning<br/>CARDO REI]
-    C -->|8. Stored Context| J[Recall Last Domain]
-    C -->|9. Fallback| I
-    E --> K[Verified Output + Canonical RequestEvidence]
+    A["User Prompt"] --> B["Hinge Classifier<br>ECS / DAS / APS"]
+    B --> C{"Deterministic Cascade"}
+    C -->|"1. Empty"| D["Default Route"]
+    C -->|"2. Greeting"| E["Cheapest Path<br>llama-3.1-8b-instant"]
+    C -->|"3. Meta Query"| E
+    C -->|"4. Self-Eval"| F["The Engineer"]
+    C -->|"5. Adversarial"| G["Red Team Validation"]
+    C -->|"6. Domain Match"| H["Specialist Route<br>Coding / Legal / Genealogy / Story"]
+    C -->|"7. High Complexity"| I["Structured Reasoning<br>CARDO REI"]
+    C -->|"8. Stored Context"| J["Recall Last Domain"]
+    C -->|"9. Fallback"| I
+    E --> K["Verified Output + Canonical RequestEvidence"]
     F --> K
     G --> K
     H --> K
@@ -155,6 +178,11 @@ The Red Team tab is a zero-cost, in-browser security scanner that inspects promp
 
 ## 🌐 Historical Live Endpoint Captures
 
+<details>
+<summary><strong>🔍 Click to Expand Point-in-Time Production Endpoint Captures</strong></summary>
+
+<br>
+
 The following point-in-time captures were recorded against the production endpoint (`https://prompthound-labs.vercel.app/api/cfai`). They are retained as historical observations and are not a current uptime or model-availability claim:
 
 ### 1. Direct Low-Latency Routing (Groq `openai/gpt-oss-120b`)
@@ -173,6 +201,8 @@ The following point-in-time captures were recorded against the production endpoi
 - **Autonomous Action:** Model detected real-time sports query requirement, invoked `web_search`, called Exa Search API (`https://api.exa.ai/search`), parsed token-efficient neural highlights, and returned the verified answer:
   > *"The Kansas City Chiefs won Super Bowl LVIII, defeating the San Francisco 49ers with a final score of 25–22 in overtime on February 11, 2024."*
 - **Telemetry:** `1,456 prompt tokens`, `46 completion tokens` (`1,848 total`).
+
+</details>
 
 ---
 

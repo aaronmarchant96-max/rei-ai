@@ -1,41 +1,94 @@
 # Contributing to REI.ai
 
-## Getting started
+Thank you for your interest in contributing to **REI.ai**!
 
-1. Clone the repo: `git clone https://github.com/aaronmarchant96-max/rei-ai`
-2. Install dependencies: `npm install`
-3. Run the dev server: `npm run dev`
-4. Run tests: `npm test`
+REI is built on a foundation of **empirical rigor, verified claims, and least-authority systems design**. Every model choice, cost claim, and test assertion in this repository must be grounded in reproducible evidence.
 
-## Making changes
+---
 
-- Keep tests passing — 121 suites, 1366 tests as the safety net
-- Write tests for new behavior before or alongside the implementation
-- Follow the [Architecture Decision Record](docs/DECISIONS.md) format for significant design choices
-- Keep commit messages descriptive — what changed and why
+## 🧭 Core Principles
 
-## Pull request checklist
+1. **"Claim Before Code"**: If a contribution touches routing, economics, security, or accuracy, define the claim and the measurement test contract before writing implementation code.
+2. **Zero Fabrication**: Never submit estimated numbers into measured telemetry fields. Telemetry numbers in docs and tests must match machine stdout.
+3. **Principle of Least Authority**: Components should possess the minimum network, filesystem, and model execution permissions required to perform their task.
 
-- [ ] Tests pass (`npm test`)
-- [ ] Build succeeds (`npm run build`)
-- [ ] No hardcoded credentials or API keys
-- [ ] Landing page claims match current measured numbers
-- [ ] New domains follow the [domain registry pattern](src/domains/)
+---
 
-## Code style
+## 🛠️ Development Setup
 
-- React components use functional style with hooks
-- CSS lives in `src/styles/reiTheme.css` for REI UI, `src/style.css` for global
-- Prompt text lives in `src/systemPrompts.js`
-- Domain configs live in `src/domains/<name>/index.js`
+### Prerequisites
+- **Node.js**: `>= 20.0.0`
+- **npm**: `>= 10.0.0`
+- **Git**
 
-## Documentation
+### Installation
+```bash
+# 1. Clone the repository
+git clone https://github.com/aaronmarchant96-max/rei-ai.git
+cd rei-ai
 
-- Architecture decisions go in `docs/DECISIONS.md`
-- Methodology changes go in `docs/fortis-et-liber.md`
-- Testing philosophy is in `docs/TESTING.md`
-- Root-level docs (`README.md`, `LICENSE`, `SECURITY.md`) are for external visitors
+# 2. Install dependencies
+npm install
 
-## Questions?
+# 3. Start local development server (frontend + API)
+npm run dev
 
-Open an issue on GitHub.
+# Or run the headless cognitive proxy gateway alone on port 3000
+npm run server
+```
+
+---
+
+## 🧪 Verification & Testing Gates
+
+Before committing or opening a pull request, your branch **must pass all verification gates**:
+
+```bash
+# 1. Fast iteration test loop (~11s)
+npm run test:fast
+
+# 2. Full test suite verification (1,366+ tests across 121 suites)
+npm test
+
+# 3. Claims ledger synchronization check (MUST pass cleanly)
+node scripts/gen-claims.mjs --check
+
+# 4. Error-gap catalogue check
+node scripts/extract-error-gaps.mjs --check
+
+# 5. Production build check
+npm run build
+```
+
+> [!IMPORTANT]
+> Do not hand-edit test count badges or documentation numbers in `README.md` or `docs/CLAIM_LEDGER.md`. Always run `node scripts/gen-claims.mjs` to synchronize claims from authoritative test execution output.
+
+---
+
+## 📝 Commit Conventions & Error-Gap Tagging
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`, `perf:`).
+
+When fixing a defect or closing an error gap, tag the commit with the detection mechanism that caught it:
+
+| Tag | Caught By |
+| :--- | :--- |
+| `[caught: test]` | Automated test suite (local or CI) |
+| `[caught: ai-cross-check]` | Model family cross-check or adversarial evaluation |
+| `[caught: claim-gate]` | Feynman Gate or `scripts/gen-claims.mjs` integrity check |
+| `[caught: review]` | Code review, PR review, or human inspection |
+| `[caught: manual]` | Manual observation during runtime or dashboard inspection |
+
+**Example:**
+```bash
+git commit -m "fix(router): prevent regex backtracking on long query strings [caught: test]"
+```
+
+---
+
+## 🚀 Submitting a Pull Request
+
+1. **Create a topic branch**: `git checkout -b feature/your-feature-name`
+2. **Write tests first**: Add targeted unit/integration tests under `src/` or `tests/`.
+3. **Verify the suite**: Confirm `npm test`, `npm run build`, and `node scripts/gen-claims.mjs --check` pass 100% green.
+4. **Open a PR**: Provide a clear description of the problem solved, the architectural rationale, and the verified test results.
