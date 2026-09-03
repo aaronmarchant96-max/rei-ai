@@ -1,6 +1,15 @@
 {
-  "generatedAt": "2026-09-03T16:02:56.771Z",
+  "generatedAt": "2026-09-03T17:33:07.985Z",
   "entries": [
+    {
+      "hash": "6fd11f3",
+      "date": "2026-09-03",
+      "subject": "docs(claims): remove stale CI blocked status [caught: manual]",
+      "tags": [
+        "manual"
+      ],
+      "context": "docs(claims): remove stale CI blocked status"
+    },
     {
       "hash": "1a108d7",
       "date": "2026-09-03",
@@ -1644,16 +1653,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 182,
-    "totalTags": 185,
+    "totalEntries": 183,
+    "totalTags": 186,
     "byTag": {
+      "manual": 109,
       "claim-gate": 15,
-      "manual": 108,
       "test": 61,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-09": 2,
+      "2026-09": 3,
       "2026-08": 180
     }
   }
