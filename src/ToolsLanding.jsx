@@ -1,12 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { getDomainProfiles } from "./domains/_index.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck, Terminal } from "lucide-react";
 import claimsData from "./data/claims.json";
-import { verifyAll } from "./lib/claimGateway";
-import "./__eval__/claimRegistry";
 import ClaimsGate from "./components/ClaimsGate.jsx";
 import { PRODUCT_STORY } from "./data/productCopy.js";
 
@@ -56,8 +54,8 @@ const CASE_STUDIES = [
     category: "Core Gateway",
     label: "OpenAI Proxy Gateway",
     subtitle: "/v1/chat/completions",
-    description: "Drop-in proxy gateway for Cursor, Cline, Aider, & Agy. Routes internal agent turns to LLaMA-8B ($0.05/M) and escalates complex reasoning.",
-    hinge: "model: 'rei-auto' • 94%+ cost reduction • spec-compliant",
+    description: "OpenAI-compatible proxy gateway for agent clients. Applies deterministic routing policy and returns route, delivery, usage, and cost receipts.",
+    hinge: "model: 'rei-auto' • deterministic pre-flight • receipt-producing",
     badge: { label: "NEW", tone: "amber" },
   },
   {
@@ -77,7 +75,7 @@ const CASE_STUDIES = [
     label: "Red Team",
     subtitle: "Prompt Injection Proving Ground",
     description: "Framework-agnostic adversarial scanner — pre-flight checks, jailbreak validation, open-source detection blueprint",
-    hinge: "14 D1 categories • $0 per scan • public taxonomy",
+    hinge: "16 D1 categories • local pre-flight • public taxonomy",
     badge: { label: "NEW", tone: "amber" },
   },
   {
@@ -87,8 +85,8 @@ const CASE_STUDIES = [
     label: "CARDO Guard",
     subtitle: "Cost-Weighted Gate",
     description: "AI Risk Decision Gate",
-    hinge: "Act $42k | Miss $850k → ACT",
-    badge: { label: `✅ ${claimsData.testCount}+ Passing Tests`, tone: "verified" },
+    hinge: "Example: Act $42k | Miss $850k → ACT",
+    badge: { label: `✅ ${claimsData.testCount.toLocaleString("en-US")} Local Tests Passing`, tone: "verified" },
   },
   {
     id: "trace",
@@ -97,7 +95,7 @@ const CASE_STUDIES = [
     label: "Tracepoint",
     subtitle: "Industrial Telemetry",
     description: "Industrial Telemetry & Handover Review",
-    hinge: "P-204 Vibration +49.7% vs Baseline",
+    hinge: "Demo fixture: P-204 vibration +49.7% vs baseline",
   },
   {
     id: "furnace",
@@ -124,7 +122,7 @@ const CASE_STUDIES = [
     label: "Storm Replay",
     subtitle: "Radar Signal Review",
     description: "Historical Radar Signal Review Pipeline",
-    hinge: "Motion 0.0162 | Graves Co 22:00 CST",
+    hinge: "Demo fixture: motion 0.0162 | Graves Co 22:00 CST",
   },
 ];
 
@@ -134,15 +132,6 @@ export default function ToolsLanding({ onOpenTool }) {
   });
   const [expandedCardo, setExpandedCardo] = useState(null);
   const [demoScenario, setDemoScenario] = useState("coding");
-  const [gateSavingsPct, setGateSavingsPct] = useState(null);
-
-  useEffect(() => {
-    const reports = verifyAll();
-    const savings = reports.find((r) => r.claimId === "cost-savings-ceiling");
-    if (savings && typeof savings.computed === "number") {
-      setGateSavingsPct(savings.computed);
-    }
-  }, []);
   
   const domains = useMemo(() => getDomainProfiles(), []);
 
@@ -250,7 +239,7 @@ export default function ToolsLanding({ onOpenTool }) {
               onClick={() => onOpenTool({ tool: "analytics" })}
               className="rei-landing-hero__analytics group"
             >
-              View measured savings analytics
+              View savings evidence
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
             </button>
           </div>
@@ -279,7 +268,7 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="rei-landing-evidence__inner">
           <div className="rei-landing-evidence__heading">
             <div>
-              <span className="rei-landing-kicker">Measured routing results</span>
+              <span className="rei-landing-kicker">Measured and modeled evidence</span>
               <h2 id="landing-evidence-heading">The horizon is dramatic. The numbers stay accountable.</h2>
             </div>
             <span className="rei-landing-evidence__coordinate">CARDO / VERIFIED PLANE</span>
@@ -287,23 +276,23 @@ export default function ToolsLanding({ onOpenTool }) {
 
           <div className="rei-landing-evidence__grid">
             <div className="rei-landing-stat">
-              <strong>94–96%</strong>
-              <span>Paid Routing Savings</span>
-              <small>isolated from free tiers</small>
+              <strong>97.35%</strong>
+              <span>Input Cache Hit Rate</span>
+              <small>derived from billing export</small>
             </div>
             <div className="rei-landing-stat">
-              <strong>{claimsData.testCount}+</strong>
+              <strong>{claimsData.testCount.toLocaleString("en-US")}</strong>
               <span>Passing Tests</span>
-              <small>100% green CI suite</small>
+              <small>{claimsData.suiteCount} suites · latest local run</small>
             </div>
             <div className="rei-landing-stat">
-              <strong>&lt; 40ms</strong>
-              <span>Decision Latency</span>
-              <small>local pre-flight check</small>
+              <strong>70.6%</strong>
+              <span>Pooled Calibration Accuracy</span>
+              <small>96 / 136 fixed samples</small>
             </div>
           </div>
           <p className="rei-landing-evidence__provenance">
-            Measured across {claimsData.testCount}+ automated unit and integration tests and verified multi-turn production workloads. Free-tier capacity and paid-only scenarios isolated in CLAIM_LEDGER.md.
+            Local verification: {claimsData.testCount.toLocaleString("en-US")} tests across {claimsData.suiteCount} suites. Cache economics come from 9,157 billing-export requests; calibration is pooled across 136 fixed samples. Modes, baselines, and exclusions are recorded in CLAIM_LEDGER.md.
           </p>
 
           <motion.div initial="hidden" animate="visible" variants={fadeIn} className="rei-landing-loop">
@@ -315,7 +304,7 @@ export default function ToolsLanding({ onOpenTool }) {
               </div>
               <h3>Are you going to try using it?</h3>
               <p>
-                Because the demo is live. And when you throw a prompt at the gateway, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. <strong>That’s the whole point.</strong>
+                Because the demo is live. A completed request can produce bounded route and delivery evidence for review. That evidence can inform a later tested policy update, but it does not autonomously retrain the router or grant it authority over production traffic. <strong>Evidence first, change second.</strong>
               </p>
               <div className="rei-landing-loop__actions">
                 <button onClick={() => onOpenTool({ tool: "pilot" })}>
@@ -342,10 +331,10 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="text-center mb-12 md:mb-16">
           <div className="font-mono text-[11px] md:text-xs font-bold tracking-widest uppercase text-hinge-bright mb-3 md:mb-4 px-2">Formal Architecture & Systems Engineering</div>
           <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-2">
-            Built on a verified <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">engineering methodology</span>.
+            Built on an evidence-gated <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--amber)] to-[var(--amber-tint)]">engineering methodology</span>.
           </h2>
           <p className="text-[#EDEFF5] text-base md:text-xl max-w-2xl mx-auto leading-relaxed font-light px-3">
-            That 90%+ spend reduction isn't a marketing claim — it's the measured output of the CARDO REI cognitive architecture. CARDO finds the hinge, the single factor that changes the answer. Every decision is tested, every claim is measured, every system is traced.
+            CARDO separates observations from modeled comparisons before a number becomes a public claim. Current routing holdouts model 87–90% savings versus an always-premium baseline; the separate build-workflow billing export measured a 97.35% input-cache hit rate. Each result keeps its own corpus, baseline, and limitations.
           </p>
         </div>
 
@@ -451,8 +440,8 @@ export default function ToolsLanding({ onOpenTool }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full max-w-4xl mx-auto">
           {[
             { icon: "🎯", val: "90–100%", label: "Router Accuracy (implemented routes)" },
-            { icon: "✅", val: `${claimsData.testCount}+`, label: "Passing Tests" },
-            { icon: "⚡", val: gateSavingsPct !== null ? `~${gateSavingsPct}%` : "~92%", label: "Savings vs Premium (ceiling)" },
+            { icon: "✅", val: claimsData.testCount.toLocaleString("en-US"), label: "Passing Tests" },
+            { icon: "⚡", val: "87–90%", label: "Modeled Savings vs Premium" },
           ].map((stat, index) => (
             <div
               key={index}
@@ -470,12 +459,12 @@ export default function ToolsLanding({ onOpenTool }) {
         {/* Accuracy precision + proof philosophy */}
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <p className="text-sm text-[#94A3B8] leading-relaxed">
-            <span className="text-[#EDEFF5]">90–100% route-selection accuracy on our reproducible benchmark.</span>{" "}
-            Production traffic is evaluated separately. Where ground truth doesn't exist, REI labels the measurement as{" "}
+            <span className="text-[#EDEFF5]">90–100% route-selection accuracy across current implemented-route holdouts under their documented exclusions.</span>{" "}
+            The pooled 136-sample calibration result is 70.6%; production traffic is evaluated separately. Where ground truth doesn't exist, REI labels the measurement as{" "}
             <span className="text-[#EDEFF5]">unavailable</span> rather than converting uncertainty into a score.
           </p>
           <p className="text-sm text-[#94A3B8] leading-relaxed mt-3">
-            Savings are measured in three separate ways — never presented as one number: baseline-relative, paid-provider routing, and free-tier contribution, stress-tested across scenarios. See{" "}
+            Savings are modeled separately by baseline-relative routing, paid-provider routing, and free-tier contribution. They are synthetic, corpus-specific pre-send estimates—not realized customer savings. See{" "}
             <a
               href={`${REPO_URL}/blob/main/docs/CLAIM_LEDGER.md`}
               target="_blank" rel="noopener noreferrer"
@@ -551,7 +540,7 @@ export default function ToolsLanding({ onOpenTool }) {
             <div className="text-center mb-8">
               <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">Scenario Analysis: Provider-Price Stress Test</div>
               <h3 className="font-heading text-2xl md:text-3xl font-bold">What happens if your free provider disappears?</h3>
-              <p className="text-xs text-[#94A3B8] mt-2">Baseline comparison: 91.2% with active free-tier capacity vs 81.1% on commercial-only providers</p>
+              <p className="text-xs text-[#94A3B8] mt-2">Synthetic fixed fixture: 91.2% with active free-tier capacity vs 81.1% on commercial-only providers</p>
             </div>
 
             <div className="overflow-x-auto">
@@ -644,18 +633,18 @@ export default function ToolsLanding({ onOpenTool }) {
           How REI.ai differs from ChatGPT
         </h2>
         <p className="text-[#94A3B8] text-sm md:text-base max-w-2xl mx-auto mb-8 font-light">
-          ChatGPT gives you an answer. <strong className="text-white font-medium">REI.ai gives you the reasoning, the evidence, and what would change the conclusion.</strong>
+          A conventional single-model chat focuses on the answer. <strong className="text-white font-medium">REI.ai adds a visible routing decision, delivery checks, and a cost receipt around the answer.</strong>
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
           <div className="bg-[#18181b]/90 border border-red-500/20 rounded-xl p-5 shadow-lg">
             <div className="flex items-center gap-2 text-red-400 font-bold text-sm mb-3">
-              <span>❌</span> Standard Chatbot (e.g. ChatGPT)
+              <span>○</span> Conventional Single-Model Chat
             </div>
             <ul className="text-xs text-gray-400 space-y-3 leading-relaxed">
-              <li>• <strong>One-size-fits-all:</strong> Blindly sends simple queries to expensive flagship models at premium rates.</li>
-              <li>• <strong>Opaque answers:</strong> Produces confident outputs without separating verified facts from unproven assumptions.</li>
-              <li>• <strong>Unchecked slop:</strong> No client-side pre-flight checks against prompt injections, corporate padding, or AI hedging.</li>
+              <li>• <strong>Selected model:</strong> The user or application generally chooses the provider and model before the request.</li>
+              <li>• <strong>Answer-first interface:</strong> Route rationale and baseline-relative cost may not be shown alongside the response.</li>
+              <li>• <strong>Application-dependent controls:</strong> Pre-flight policy and evidence receipts depend on the surrounding product.</li>
             </ul>
           </div>
           <div className="bg-[#18181b]/90 border border-[var(--amber)]/30 rounded-xl p-5 shadow-lg">
@@ -663,9 +652,9 @@ export default function ToolsLanding({ onOpenTool }) {
               <span>⚡</span> REI.ai Cognitive Control System
             </div>
             <ul className="text-xs text-gray-300 space-y-3 leading-relaxed">
-              <li>• <strong>Deterministic routing:</strong> Routes to the cheapest capable model (-85.7% measured cost delta on representative workloads).</li>
-              <li>• <strong>Structured CARDO reasoning:</strong> Explicit epistemic provenance separating known facts, risks, and the decision hinge.</li>
-              <li>• <strong>Auditable receipts:</strong> Full execution trace, anti-slop gating, and reproducible verification telemetry.</li>
+              <li>• <strong>Deterministic routing:</strong> Applies a configured route before execution; a fixed synthetic fixture modeled an 85.7% cost delta versus its premium baseline.</li>
+              <li>• <strong>Structured CARDO workflow:</strong> Prompts and interfaces ask for facts, risks, and the decision hinge to remain distinguishable.</li>
+              <li>• <strong>Auditable receipts:</strong> Records route, delivery status, usage provenance, and reported cost when those fields are available.</li>
             </ul>
           </div>
         </div>
@@ -767,7 +756,7 @@ export default function ToolsLanding({ onOpenTool }) {
           <div className="font-mono text-xs font-bold tracking-widest uppercase text-hinge-bright mb-2">Laboratory & Stress Tests</div>
           <h2 className="font-heading text-3xl md:text-4xl font-bold">Experiments & Benchmarks</h2>
           <p className="text-sm text-foreground-muted max-w-2xl mx-auto mt-3 leading-relaxed">
-            <strong className="text-foreground">REI.ai</strong> is the flagship multi-model router. <strong className="text-foreground">Experiments</strong> are the domain lab stress tests, radar signal replays, and adversarial red-team proving grounds that validated the CARDO methodology.
+            <strong className="text-foreground">REI.ai</strong> is the flagship multi-model router. <strong className="text-foreground">Experiments</strong> are domain lab stress tests, radar signal replays, and adversarial red-team proving grounds used to exercise the CARDO methodology.
           </p>
         </div>
 

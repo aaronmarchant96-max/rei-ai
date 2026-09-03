@@ -21,12 +21,25 @@ describe("ToolsLanding", () => {
     expect(screen.getByRole("link", { name: /view engineering case study/i })).toBeInTheDocument();
   });
 
-  it("renders stats badges with accuracy and test count", () => {
-    render(<ToolsLanding onOpenTool={jest.fn()} />);
+  it("renders evidence-bounded stats and excludes retired landing claims", () => {
+    const { container } = render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getAllByText(new RegExp(`${claimsData.testCount}\\+`)).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(claimsData.testCount.toLocaleString("en-US")).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Passing Tests").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Router Accuracy (implemented routes)")).toBeInTheDocument();
+    expect(screen.getByText("97.35%")).toBeInTheDocument();
+    expect(screen.getByText("Input Cache Hit Rate")).toBeInTheDocument();
+    expect(screen.getByText("70.6%")).toBeInTheDocument();
+    expect(screen.getByText("Pooled Calibration Accuracy")).toBeInTheDocument();
+    expect(screen.getByText("87–90%")).toBeInTheDocument();
+    expect(screen.getByText("Modeled Savings vs Premium")).toBeInTheDocument();
+
+    expect(container).not.toHaveTextContent("94–96%");
+    expect(container).not.toHaveTextContent("100% green CI");
+    expect(container).not.toHaveTextContent("< 40ms");
+    expect(container).not.toHaveTextContent("14 D1 categories");
+    expect(container).not.toHaveTextContent("telemetry makes the router smarter");
+    expect(container).not.toHaveTextContent("Every decision is tested");
   });
 
   it("explains the REI Method, product layers, entry offer, and formal CARDO engine", () => {
@@ -51,7 +64,7 @@ describe("ToolsLanding", () => {
   it("renders the methodology flow (find the hinge → test/measure/trace → gate → iterate)", () => {
     render(<ToolsLanding onOpenTool={jest.fn()} />);
 
-    expect(screen.getByRole("heading", { name: /built on a verified.*engineering methodology/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /built on an evidence-gated.*engineering methodology/i })).toBeInTheDocument();
     expect(screen.getByText(/find the hinge/i)).toBeInTheDocument();
     expect(screen.getByText(/verified evidence/i)).toBeInTheDocument();
     expect(screen.getByText(/human \/ claims gate/i)).toBeInTheDocument();
@@ -89,7 +102,7 @@ describe("ToolsLanding", () => {
     const onOpenTool = jest.fn();
     render(<ToolsLanding onOpenTool={onOpenTool} />);
 
-    const cta = screen.getByRole("button", { name: /view measured savings analytics/i });
+    const cta = screen.getByRole("button", { name: /view savings evidence/i });
     expect(cta).toBeInTheDocument();
     fireEvent.click(cta);
     expect(onOpenTool).toHaveBeenCalledWith({ tool: "analytics" });
@@ -152,7 +165,7 @@ describe("ToolsLanding", () => {
     expect(screen.getByText("Observability")).toBeInTheDocument();
     expect(screen.getByText("Adversarial")).toBeInTheDocument();
     expect(screen.getByText("Risk Gate")).toBeInTheDocument();
-    expect(screen.getByText(`✅ ${claimsData.testCount}+ Passing Tests`)).toBeInTheDocument();
+    expect(screen.getByText(`✅ ${claimsData.testCount.toLocaleString("en-US")} Local Tests Passing`)).toBeInTheDocument();
   });
 
   it("applies featured full-width layout to the primary OpenAI Proxy Gateway card", () => {
