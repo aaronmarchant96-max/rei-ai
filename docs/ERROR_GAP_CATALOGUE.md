@@ -1,8 +1,8 @@
 # Error-Gap Catalogue
 
 > Auto-generated from git commit history.
-> Last updated: 2026-08-26T20:44:06.065Z
-> Span: 2026-08-08 → 2026-08-26 (180 tagged commits, 183 total tags)
+> Last updated: 2026-09-03T02:56:26.270Z
+> Span: 2026-08-08 → 2026-09-02 (181 tagged commits, 184 total tags)
 
 ## Tag Taxonomy
 
@@ -19,13 +19,14 @@
 |---|---|
 | `manual` | 108 |
 | `test` | 61 |
-| `claim-gate` | 13 |
+| `claim-gate` | 14 |
 | `ai-cross-check` | 1 |
 
 ## Timeline (newest first)
 
 | Commit | Date | Subject | Tags & Context |
 |---|---|---|---|
+| `8cff49e` | 2026-09-02 | fix(claims): align public metrics with evidence [caught: claim-gate] | `claim-gate` — fix(claims): align public metrics with evidence |
 | `e81c975` | 2026-08-26 | fix(systemPrompts): fix newline escapes in CODING_PROMPT concurrency rules [caug... | `test` — fix(systemPrompts): fix newline escapes in CODING_PROMPT concurrency rules |
 | `b3a306a` | 2026-08-26 | feat(landing): align REI homepage with CARDO horizon [caught: manual] | `manual` — feat(landing): align REI homepage with CARDO horizon |
 | `7c3edff` | 2026-08-26 | docs(workflow): document dual-remote deploy configuration [caught: manual] | `manual` — docs(workflow): document dual-remote deploy configuration |
@@ -209,11 +210,11 @@
 
 ## Analytics
 
-> Populated as the dataset grows. Currently 180 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
+> Populated as the dataset grows. Currently 181 entries — threshold for meaningful pattern analysis is ~30+ entries across 2+ months.
 
 ### Current observations
 
-- **180 tagged commits** across 1 month(s).
+- **181 tagged commits** across 2 month(s).
 - No pattern analysis yet — dataset is too small for statistical significance.
 - The first four tags appeared in the same commit (`02a0076`, the AGENTS.md doc that established the practice).
 

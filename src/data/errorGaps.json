@@ -1,6 +1,15 @@
 {
-  "generatedAt": "2026-08-26T20:44:06.065Z",
+  "generatedAt": "2026-09-03T02:56:26.270Z",
   "entries": [
+    {
+      "hash": "8cff49e",
+      "date": "2026-09-02",
+      "subject": "fix(claims): align public metrics with evidence [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "fix(claims): align public metrics with evidence"
+    },
     {
       "hash": "e81c975",
       "date": "2026-08-26",
@@ -1626,15 +1635,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 180,
-    "totalTags": 183,
+    "totalEntries": 181,
+    "totalTags": 184,
     "byTag": {
+      "claim-gate": 14,
       "manual": 108,
       "test": 61,
-      "claim-gate": 13,
       "ai-cross-check": 1
     },
     "byMonth": {
+      "2026-09": 1,
       "2026-08": 180
     }
   }
