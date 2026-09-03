@@ -1,5 +1,8 @@
 # REI Telemetry Proof
 
+> [!WARNING]
+> **Historical evidence snapshot.** This document contains point-in-time $9.03 and ~92% figures that have been superseded. Do not use them as current claims. On 2026-09-02, `npm run verify:cache` measured $23.5172 billed across 1,848,473,560 tokens and the routing holdouts measured 87–90% ceiling-based modeled savings. The authoritative current source is [`CLAIM_LEDGER.md`](CLAIM_LEDGER.md).
+
 **Every cost claim in this document is traceable to a specific, reproducible data source.**
 
 ---

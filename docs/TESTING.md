@@ -2,8 +2,8 @@
 status: canonical
 authority_scope: evaluation-and-test-taxonomy
 owner: Aaron Marchant
-last_verified: 2026-08-20
-verified_against_commit: 7247921
+last_verified: 2026-09-02
+verified_against_commit: 4e729c2
 claims_source: docs/CLAIM_LEDGER.md
 supersedes: []
 superseded_by: null
@@ -12,7 +12,7 @@ archived_at: null
 
 # Testing Strategy
 
-REI.ai currently has 120 test suites with 1364 tests passing. The generated count is recorded in `src/data/claims.json`. This document explains the testing philosophy, what each category covers, and how to write new tests.
+REI.ai currently has 121 test suites with 1366 tests passing in the latest local verification. The generated count is recorded in `src/data/claims.json`. Hosted GitHub CI is currently blocked before job execution by an account-level billing issue, so these results must not be represented as green hosted CI. This document explains the testing philosophy, what each category covers, and how to write new tests.
 
 ## Philosophy
 
@@ -65,7 +65,7 @@ npx jest src/lib/nightShiftRouter.test.js   # one suite
 npx jest --verbose                          # verbose output
 ```
 
-Latest verified full-suite result (2026-09-01): **120/120 suites**, **1364/1364 tests**.
+Latest verified full-suite result (2026-09-02): **121/121 suites**, **1366/1366 tests**.
 
 ## Test Suite Milestones & Historical Progression
 
@@ -96,18 +96,20 @@ npm test -- --runInBand --testPathPatterns=routingEval
 
 ## Known limitations
 
-### Adversarial routing ceiling
-The v3 keyword router has a structural ceiling for adversarial prompts. Some adversarial queries ("argue against your own position", "find the weakest assumption in this argument") use natural vocabulary that doesn't contain trigger words like "red-team", "poke holes", or "prove wrong". The keyword router cannot catch these — it's a lexical ceiling, not a bug.
+### Corpus-specific routing results
+The keyword router's measured result depends on the corpus and the exclusion policy. Publish the denominator and exclusions with every percentage; do not collapse these measurements into a universal accuracy claim.
 
-**Verified accuracy (2026-08-05, `npm test -- --runInBand --testPathPatterns=routingEval`):**
-- routingEval (57 prompts): **60%** (27/45) — 98% savings
-- routingEvalBlind (27 prompts): **67%** (18/27) — 98% savings
-- routingEvalML (27 prompts): **66.7%** (18/27) — 98% savings
-- routingEvalBlindV3 (30 prompts): **80%** (24/30)
-- routingEvalBlindSemantic (30 prompts): **73%** (22/30)
-- routingEvalBlindV2 semantic (50 prompts): **12%** — ⛔ NOT VALID in CI (ONNX unavailable, hash-noise fallback). No semantic accuracy claim can be drawn from CI runs.
+**Verified locally on 2026-09-02 (`npm test -- --runInBand --testPathPatterns=routingEval`):**
+- routingEval: **100% implemented-route accuracy** (39 correct, 0 incorrect; 6 unimplemented `factCheck` cases excluded) — **89%** ceiling-based modeled savings
+- routingEvalBlind: **96%** (22 correct, 1 incorrect; 4 `factCheck` cases excluded) — **87%** ceiling-based modeled savings
+- routingEvalML: **95.7%** (22/23; 4 `factCheck` cases excluded) — **87.4%** ceiling-based modeled savings
+- routingEvalBlindV3: **90%** (27/30)
+- routingEvalFinal: **93%** (28/30)
+- routingEvalForeign: **91.18%** (31/34) — **90%** ceiling-based modeled savings
+- pooled calibration corpus: **70.6%** (96/136 unique samples)
+- semantic routing: **unavailable in this environment** because ONNX loading fell back to synthetic hash mode; no semantic-accuracy claim can be drawn from this run
 
-**The router operates at 60–80% accuracy on measured holdouts.** Earlier "~90%" and "92%" figures were not producible by any benchmark and have been retired.
+These are deterministic or replayed laboratory measurements, not production quality or realized customer-savings claims.
 
 ### v4 semantic router (research, not production)
 A v4 semantic router exists (`src/lib/semanticHingeClassifier.js`) using 384-dim ONNX embeddings (all-MiniLM-L6-v2 via @xenova/transformers). It was evaluated at 70-73% on fresh 30-prompt holdouts with real embeddings. It is not wired to production at 70% accuracy versus the v3 keyword router's 60-80% measured range. The architecture is documented; the evaluation results are transparent. Shipping it before it beats the v3 baseline would reduce accuracy — it is correctly marked as research-only.

@@ -1,6 +1,9 @@
 # Cost Efficiency Proof
 
-**Claim:** Night Shift Router reduces inference cost ~92% below always-premium (gpt-4o) routing without quality degradation — ceiling-based lab benchmark, deterministic and reproducible.
+> [!WARNING]
+> **Historical benchmark snapshot.** The calculations below preserve an earlier pricing/corpus state and must not be cited as current. The producing command measured **87–90% ceiling-based modeled savings** across current holdouts on 2026-09-02. See [`CLAIM_LEDGER.md`](CLAIM_LEDGER.md) for current denominators, exclusions, and limitations. No production-quality or realized-customer-savings conclusion follows from this historical document.
+
+**Retired headline:** Night Shift Router was previously described as reducing inference cost ~92% below always-premium routing without quality degradation. That wording is no longer an active claim.
 
 **Method:** Deterministic benchmark harness — 57 prompts across 9 categories. Zero inference cost in the evaluation itself. Reproducible by any third party.
 

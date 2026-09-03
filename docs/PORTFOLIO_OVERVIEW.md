@@ -2,8 +2,8 @@
 status: canonical
 authority_scope: builder-story-and-case-studies
 owner: Aaron Marchant
-last_verified: 2026-08-20
-verified_against_commit: 7247921
+last_verified: 2026-09-02
+verified_against_commit: 4e729c2
 claims_source: docs/CLAIM_LEDGER.md
 supersedes: []
 superseded_by: null
@@ -20,10 +20,10 @@ archived_at: null
 
 ## 🎯 Profile & Core Competencies
 
-- **Inference Optimization & FinOps**: Deterministic `< 1ms` pre-flight model selection, OpenAI-compatible proxy gateways, and prompt-freeze caching achieving **96.0% build spend reduction** ($23.52 billed vs $590.57 no-cache counterfactual across 1.848B tokens).
+- **Inference Optimization & FinOps**: Deterministic pre-flight model selection, OpenAI-compatible proxy gateways, and prompt-freeze caching with a **96.0% modeled build-spend reduction** ($23.5172 billed vs a $590.5747 no-cache counterfactual across 1,848,473,560 tokens).
 - **Adversarial Security & Evaluation**: 14-category prompt-injection detection, ground-truth benchmarking, and formal epistemic claim ledgers.
 - **Full-Stack AI Engineering**: End-to-end React/TypeScript interfaces, serverless streaming backends, structured reasoning pipelines, and complex provenance architectures.
-- **Empirical Rigor**: **1364 automated tests across 120 suites** (100% green CI) with machine-reproducible claim verification.
+- **Empirical Rigor**: **1366/1366 automated tests across 121/121 suites** in the latest local verification. Hosted GitHub CI is currently blocked before runner execution and is not green.
 
 ---
 
@@ -33,7 +33,7 @@ archived_at: null
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                             THE 3-PILLAR TRIAD                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 1. REI.ai          ──► AI Systems & FinOps (Proxy, <1ms Routing, 1364 Tests) │
+│ 1. REI.ai          ──► AI Systems & FinOps (Proxy, Evidence, 1366 Tests)     │
 │ 2. Arena Harness   ──► AI Security & Evals (Adversarial, Red Team, D1-D3)   │
 │ 3. Family Archive  ──► Full-Stack Product (GPS Evidence Tiers, Provenance)  │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -44,17 +44,16 @@ archived_at: null
 ### 1. REI.ai — AI FinOps Proxy & Dynamic Inference Router
 **Repository:** [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai) · **Live:** [prompthound-labs.vercel.app](https://prompthound-labs.vercel.app)
 
-* **Problem**: Engineering teams waste 80%+ of their inference budgets by routing simple, routine agent queries to expensive flagship models (e.g. GPT-4o, Claude 3.5 Sonnet) when sub-cent models (e.g. LLaMA 3.1 8B, Gemini 2.5 Flash) provide identical accuracy.
+* **Problem**: Teams lack evidence about which routine requests may be candidates for less expensive models without degrading task-specific quality.
 * **Architecture**:
   - **OpenAI-Compatible Gateway (`/v1/chat/completions`)**: Drop-in proxy for Cursor, Cline, Aider, and LangChain.
-  - **Deterministic 9-Stage Decision Cascade**: Classifies prompt semantics locally in **`< 1ms`** without calling an LLM to route an LLM.
+  - **Deterministic 9-Stage Decision Cascade**: Classifies prompt semantics locally without calling an LLM to route an LLM. A fresh benchmark is required before publishing a numeric latency ceiling.
   - **Prompt-Freeze Caching**: Frozen instruction prefixes and SHA-256 cache keys yielding an **88.0% effective multi-turn cache ratio** and **97.35% input cache hit rate**.
   - **Epistemic Trace Receipts**: Every turn outputs audit headers stamped with explicit evidence tiers (`(Observed)`, `(Derived)`, `(Modeled)`). Missing telemetry explicitly renders `"Evidence unavailable"`—zero synthetic data.
 * **Measured Result**:
-  - **1364 passing automated tests** across 120 test suites.
+  - **1366 passing automated tests** across 121 test suites.
   - **1.848B development-agent tokens** processed through OpenCode/DeepSeek build workflow for **$23.52** (saving $567.06 vs $590.57 no-cache counterfactual).
-  - **81–92% modeled and replayed inference savings** across documented provider scenarios (workload-specific quality preservation requires bounded non-inferiority evaluation).
-  - **< 40ms end-to-end routing latency** (< 1ms in-memory resolution).
+  - **81.1–91.2% modeled provider-scenario savings** and **87–90% ceiling-based savings on current synthetic holdouts**; neither is realized customer savings, and quality preservation requires bounded non-inferiority evaluation.
 * **Reproduce from Clean Checkout**:
   ```bash
   git clone https://github.com/aaronmarchant96-max/rei-ai.git
@@ -74,9 +73,9 @@ archived_at: null
   - **Multi-Model Holdout Benchmark Engine**: 136 ground-truth holdout queries evaluating classification accuracy across 6 specialized reasoning domains.
   - **Feynman Gate Integrity Suite**: Automated test suite (`feynmanGate.test.js`) that refuses to pass if any claim ledger number deviates from live test stdout.
 * **Measured Result**:
-  - **100% adherence** under red-team stress testing.
+  - **12/12 correct routes** on the fixed red-team regression corpus; the separate five-entry route-adherence replay measured **75%** (3/4 escalated entries reached the adversarial route).
   - **93–96% classification accuracy** across blind and holdout evaluation suites.
-  - **Zero silent tool failures**: Strictly validates tool arguments against JSON/Zod schemas with automatic retry loops.
+  - Schema-validation and retry behavior are covered by automated tests; no universal zero-failure claim is made.
 
 ---
 
@@ -90,7 +89,7 @@ archived_at: null
   - **Negative Search Audit Receipts**: Logs exhaustively searched databases where no record was found, preventing duplicate retrieval queries.
   - **High-Density React UI**: Responsive family tree exploration, document transcription viewer, and confidence badges.
 * **Measured Result**:
-  - **100% citation provenance** on all generated genealogical assertions.
+  - Citation and provenance requirements are enforced by repository schemas and integrity tests; this is not a claim that every generated assertion has been externally audited.
   - Reusable standalone TypeScript library (`archivistEngine.ts`) with dedicated unit test suite.
 
 ---
@@ -120,13 +119,13 @@ archived_at: null
 
 | Metric | Verified Value | Verification Source / Producing Command |
 | :--- | :--- | :--- |
-| **Automated Passing Tests** | **1364 tests** (120 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
+| **Automated Passing Tests** | **1366 tests** (121 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
 | **Input Cache Hit Rate** | **97.35%** | `npm run verify:cache` · `data/cache-spend.csv` |
 | **Effective Multi-Turn Cache Ratio** | **88.0%** | Reconstructed $N=1,500$ model turns · `docs/CACHING_RULES.md` |
-| **Modeled & Replayed Savings** | **81–92%** | Provider scenario sensitivity · `docs/CLAIM_LEDGER.md` |
+| **Modeled Provider-Scenario Savings** | **81.1–91.2%** | Fixed workload and routes; provider scenario sensitivity · `docs/CLAIM_LEDGER.md` |
 | **Build Workflow API Spend** | **$23.52** | 1.848B tokens processed ($567.06 saved vs no-cache) |
-| **Router Decision Latency** | **< 1ms** | In-memory TypeScript cascade (`nightShiftRouter.ts`) |
-| **Production Decision Latency** | **< 40ms** (39.52ms avg) | Serverless proxy execution trace log |
-| **Production Deployments** | **1,000+** | Vercel production deployment log |
+| **Router Decision Latency** | **Benchmark required** | Deterministic in-memory cascade; no current retained benchmark supports a numeric ceiling |
+| **Production Decision Latency** | **Benchmark required** | Historical 39.52ms copy lacks a current retained trace artifact |
+| **GitHub Deployment Records** | **1,495** | GitHub Deployment API observed 2026-09-02; records are not equivalent to successful production releases |
 
-*All metrics current as of August 2026. Verified via automated pre-commit integrity gate `npm run claims:check`.*
+*Metrics above were re-audited on 2026-09-02. `npm run claims:check` verifies synchronized test totals; it does not independently verify every portfolio statement.*

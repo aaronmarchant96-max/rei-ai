@@ -17,6 +17,7 @@ import { execFileSync } from "node:child_process";
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderLatestVerifiedFullSuite } from "./claim-doc-transforms.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const claimsPath = join(root, "src", "data", "claims.json");
@@ -67,7 +68,12 @@ try {
 
 const testCount = summary.numTotalTests;
 const suiteCount = summary.numTotalTestSuites;
-const todayIso = new Date().toISOString().split("T")[0];
+const now = new Date();
+const todayIso = [
+  now.getFullYear(),
+  String(now.getMonth() + 1).padStart(2, "0"),
+  String(now.getDate()).padStart(2, "0"),
+].join("-");
 
 const claims = {
   testCount,
@@ -93,12 +99,12 @@ const DOC_TARGETS = [
     relPath: "README.md",
     transforms: [
       {
-        pattern: /Backed by \*\*\d+ automated tests across \d+ test suites\*\*/g,
-        replacement: () => `Backed by **${testCount} automated tests across ${suiteCount} test suites**`
+        pattern: /Backed by \*\*[\d,]+ automated tests across \d+ test suites\*\*/g,
+        replacement: () => `Backed by **${testCount.toLocaleString("en-US")} automated tests across ${suiteCount} test suites**`
       },
       {
         pattern: /- \*\*Empirical Rigor(?: & Fast Local Loop)?:\*\* Backed by [\d,]+ automated tests across \d+ test suites/g,
-        replacement: () => `- **Empirical Rigor:** Backed by ${testCount} automated tests across ${suiteCount} test suites`
+        replacement: () => `- **Empirical Rigor:** Backed by ${testCount.toLocaleString("en-US")} automated tests across ${suiteCount} test suites`
       },
       {
         pattern: /\| Automated Tests \| \*\*\d+ passing tests across \d+ suites\*\* \|/g,
@@ -136,12 +142,16 @@ const DOC_TARGETS = [
     relPath: "docs/TESTING.md",
     transforms: [
       {
-        pattern: /REI\.ai currently has \d+ test suites with \d+ tests passing\./g,
-        replacement: () => `REI.ai currently has ${suiteCount} test suites with ${testCount} tests passing.`
+        pattern: /REI\.ai currently has \d+ test suites with \d+ tests passing(?: in the latest local verification)?\./g,
+        replacement: () => `REI.ai currently has ${suiteCount} test suites with ${testCount} tests passing in the latest local verification.`
       },
       {
         pattern: /Latest verified full-suite result \([^)]+\): \*\*\d+\/\d+ suites\*\*, \*\*\d+\/\d+ tests\*\*\./g,
-        replacement: () => `Latest verified full-suite result (${todayIso}): **${suiteCount}/${suiteCount} suites**, **${testCount}/${testCount} tests**.`
+        replacement: (matchedLine) => renderLatestVerifiedFullSuite(matchedLine, {
+          testCount,
+          suiteCount,
+          verificationDate: todayIso,
+        })
       }
     ]
   },
@@ -193,8 +203,8 @@ const DOC_TARGETS = [
     relPath: "docs/SESSION_HANDOFF.md",
     transforms: [
       {
-        pattern: /- \*\*Tests:\*\* [\d,]+ unit & integration tests \/ \d+ suites passing 100% green \(`npm test`\)/g,
-        replacement: () => `- **Tests:** ${testCount.toLocaleString("en-US")} unit & integration tests / ${suiteCount} suites passing 100% green (\`npm test\`)`
+        pattern: /- \*\*Tests:\*\* [\d,]+ unit & integration tests \/ \d+ suites (?:passing 100% green|passing locally) \(`npm test`\)/g,
+        replacement: () => `- **Tests:** ${testCount.toLocaleString("en-US")} unit & integration tests / ${suiteCount} suites passing locally (\`npm test\`)`
       }
     ]
   },
@@ -204,6 +214,10 @@ const DOC_TARGETS = [
       {
         pattern: /\*\*\d+ automated tests across \d+ suites\*\*/g,
         replacement: () => `**${testCount} automated tests across ${suiteCount} suites**`
+      },
+      {
+        pattern: /\*\*[\d,]+\/[\d,]+ automated tests across \d+\/\d+ suites\*\*/g,
+        replacement: () => `**${testCount}/${testCount} automated tests across ${suiteCount}/${suiteCount} suites**`
       },
       {
         pattern: /\b\d+ Tests\b/g,
@@ -225,6 +239,10 @@ const DOC_TARGETS = [
       {
         pattern: /\*\*[\d,]+ automated tests across \d+ test (?:files|suites)\*\*/g,
         replacement: () => `**${testCount.toLocaleString("en-US")} automated tests across ${suiteCount} test suites**`
+      },
+      {
+        pattern: /\*\*[\d,]+\/[\d,]+ automated tests across \d+\/\d+ suites\*\*/g,
+        replacement: () => `**${testCount.toLocaleString("en-US")}/${testCount.toLocaleString("en-US")} automated tests across ${suiteCount}/${suiteCount} suites**`
       }
     ]
   },
@@ -236,12 +254,20 @@ const DOC_TARGETS = [
         replacement: () => `**${testCount.toLocaleString("en-US")} automated tests across ${suiteCount} test suites**`
       },
       {
+        pattern: /\*\*[\d,]+\/[\d,]+ automated tests across \d+\/\d+ suites\*\*/g,
+        replacement: () => `**${testCount.toLocaleString("en-US")}/${testCount.toLocaleString("en-US")} automated tests across ${suiteCount}/${suiteCount} suites**`
+      },
+      {
         pattern: /Automated Tests\s+──►\s+[\d,]+ tests across \d+ suites/g,
         replacement: () => `Automated Tests  ──► ${testCount.toLocaleString("en-US")} tests across ${suiteCount} suites`
       },
       {
         pattern: /Verified Test Suite\s+──►\s+[\d,]+ tests across \d+ suites/g,
         replacement: () => `Verified Test Suite   ──► ${testCount.toLocaleString("en-US")} tests across ${suiteCount} suites`
+      },
+      {
+        pattern: /Verified Test Suite\s+──►\s+[\d,]+\/[\d,]+ tests across \d+\/\d+ suites/g,
+        replacement: () => `Verified Test Suite   ──► ${testCount.toLocaleString("en-US")}/${testCount.toLocaleString("en-US")} tests across ${suiteCount}/${suiteCount} suites`
       }
     ]
   }

@@ -2,8 +2,8 @@
 status: canonical
 authority_scope: public-entrypoint-and-headlines
 owner: Aaron Marchant
-last_verified: 2026-08-20
-verified_against_commit: 7247921
+last_verified: 2026-09-02
+verified_against_commit: 4e729c2
 claims_source: docs/CLAIM_LEDGER.md
 supersedes: []
 superseded_by: null
@@ -17,7 +17,7 @@ archived_at: null
 > *Route each task to the right model, verify the result, and keep the evidence.*
 > 
 > Originally built on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now running on a Lenovo ThinkPad T14 Gen 2a (AMD Ryzen 5 PRO 5650U, 16GB RAM) with a ~$60/month operating budget:
-> **1.848B development & evaluation tokens processed through the OpenCode/DeepSeek build workflow for $23.52, with 97.35% measured input-cache hits across 1,000+ deployments.**
+> **1.848B development & evaluation tokens processed through the OpenCode/DeepSeek build workflow for $23.52, with a 97.35% measured input-cache hit rate across 9,157 billing-export requests.**
 
 > [!TIP]
 > ### 🪝 The Bootstrap Loop
@@ -40,7 +40,7 @@ The product has four parts:
 
 The OpenAI-compatible FinOps proxy and dynamic inference router (`/v1/chat/completions`) is the first production implementation of the method. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** is the formal execution cycle under the hood.
 
-Backed by **1364 automated tests across 120 test suites** (100% green CI), REI.ai enforces verifiable cost savings, prompt-cache optimization, anti-slop verification, and client-side security.
+Backed by **1,366 automated tests across 121 test suites**, all passing in the latest local verification on 2026-09-02. Hosted GitHub CI is currently unavailable because the account-level runner job is blocked before execution; local results must not be described as green hosted CI.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -56,7 +56,7 @@ Backed by **1364 automated tests across 120 test suites** (100% green CI), REI.a
 ## 📊 What This Is (And Isn't)
 
 **What this is:**
-- **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally (< 1ms resolution) and routes to the cheapest capable model. Serves standard OpenAI-compatible `/v1/chat/completions` for drop-in agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for exact benchmark numbers and producing commands.
+- **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally and recommends a lower-cost eligible model under explicit routing policy. Serves standard OpenAI-compatible `/v1/chat/completions` for agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for current benchmark numbers, denominators, exclusions, and producing commands.
 - **Evidence & Provenance Architecture:** Emits canonical `RequestEvidence` objects downstream of execution with explicit epistemic tiers (`observed`, `derived`, `modeled`, `replayed`, `unavailable`). Missing telemetry renders "Evidence unavailable" — zero substitution of `$0.00`.
 - **Prompt-Freeze & Deterministic Caching Protocol:** Sustains an **88.0% reconstructed effective prompt cache ratio** (136.2M cached / 154.7M input tokens across $N=1,500$ reconstructed model turns) by freezing prefix order and generating SHA-256 deterministic cache keys. [See caching protocol](docs/CACHING_RULES.md).
 - **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
@@ -64,8 +64,8 @@ Backed by **1364 automated tests across 120 test suites** (100% green CI), REI.a
 - **Delivery Integrity Gate (`delivery-gated-v1`):** Validates transport completion, finish reason normalization (`stop`), raw vs. display parse parity, code fence balance, and explicit artifact contracts. Incomplete or truncated responses are marked `savingsEligibility: "excluded"` and contribute `$0.00` to eligible savings.
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
-- **A Suite of 6 Specialized Tool Domains:** Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Debate & Critical Pressure-Testing, Storytelling, and General Chat.
-- **Empirical Rigor:** Backed by 1364 automated tests across 120 test suites with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
+- **Five Registered Reasoning Domains plus Debate:** General Chat, Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, and Storytelling are registered in the central domain catalog; Debate & Critical Pressure-Testing is maintained as a separate module.
+- **Empirical Rigor:** Backed by 1,366 automated tests across 121 test suites in the latest local run, with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
 
 **What this is not:**
 - Just another standard ChatGPT wrapper with a UI reskin.
@@ -148,14 +148,14 @@ Every bugfix or test failure logs a machine-parseable tag (`[caught: test]`, `[c
 The Red Team tab is a zero-cost, in-browser security scanner that inspects prompts for jailbreaks, prompt injection, or policy bypass attempts **before any API call is made**.
 
 - **100% Private & Zero Cost:** Runs in-browser pattern checks without consuming API tokens.
-- **Catches 14 Attack Vectors:** Flags prompt extraction, identity spoofing, credential leaking, base64 ciphers, and recursive jailbreaks.
+- **Defines 16 Threat Categories:** The current fixed 12-case regression corpus exercises 11 categories and routes 12/12 cases correctly; this is bounded fixture evidence, not a universal detection-rate claim.
 - **Model Agnostic:** Works as a pre-flight firewall for OpenAI, Anthropic, Gemini, Groq, or local Ollama endpoints.
 
 ---
 
-## 🌐 Verified Live Endpoints & Autonomous Tool Execution
+## 🌐 Historical Live Endpoint Captures
 
-Real-world verification runs against the production endpoint (`https://prompthound-labs.vercel.app/api/cfai`):
+The following point-in-time captures were recorded against the production endpoint (`https://prompthound-labs.vercel.app/api/cfai`). They are retained as historical observations and are not a current uptime or model-availability claim:
 
 ### 1. Direct Low-Latency Routing (Groq `openai/gpt-oss-120b`)
 - **Query:** *"What is the capital of France? Answer in 3 words."*
@@ -201,14 +201,14 @@ export OPENAI_API_KEY="local-dev-key"
 
 | Metric | Value |
 | :--- | :--- |
-| Total API Spend | **$14.66** |
+| Verified DeepSeek Build-Workflow Spend | **$23.5172** *(2026-07-20 through 2026-08-14 billing export)* |
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
-| Automated Tests | **1364 passing tests across 120 suites** |
-| Deployments | **1,000+ Vercel production deployments** |
+| Automated Tests | **1366 passing tests across 121 suites** |
+| GitHub Deployment Records | **1,495 records** *(GitHub API, observed 2026-09-02; not a claim that every record was a successful production release)* |
 | Development Hardware | Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) *(orig. Celeron J4105)* |
 | Monthly Operating Budget | ~$60/month *(expanded evaluation & tool testing volume)* |
-| In-Memory Route Resolution | < 1 millisecond |
+| In-Memory Route Resolution | Deterministic; fresh latency benchmark required before publishing a numeric ceiling |
 
 ---
 
@@ -234,7 +234,7 @@ npm run server
 # Run fast test loop (~11.4s on 12-thread machine via 50% maxWorkers)
 npm run test:fast
 
-# Run serial test suite (120 test suites, 1364 tests)
+# Run serial test suite (121 test suites, 1366 tests)
 npm test
 
 # Run offline counterfactual replay simulator (zero API spend)

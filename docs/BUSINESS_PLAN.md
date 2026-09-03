@@ -40,12 +40,12 @@ The **REI Method** supplies the five-question standard. The **REI Engine** appli
 ### 2.1 Solo Founder & Zero-Headcount Operating Model
 - **Founder**: Aaron Marchant — AI Systems Engineer & Software Architect.
 - **Headcount Strategy**: **100% Solo Founder (Zero Hiring)**. No hiring or team expansion planned. All platform engineering, routing maintenance, pilot reconciliation, and onboarding are fully automated via AI pair-engineering and serverless edge functions.
-- **Track Record**: Processed **1.848 Billion development & evaluation tokens** through the OpenCode/DeepSeek workflow for **$23.52 total API spend** (97.35% input-cache hit rate across 1,000+ deployments).
-- **Test Infrastructure**: Built and maintains a 100% green test suite comprising **1,364 automated tests across 120 test suites**.
+- **Track Record**: Processed **1.848 billion development & evaluation tokens** through the OpenCode/DeepSeek workflow for **$23.52 total API spend** (97.35% measured input-cache hit rate across 9,157 billing-export requests).
+- **Test Infrastructure**: The latest local verification passed **1,366/1,366 automated tests across 121/121 suites**. Hosted GitHub CI is currently blocked before runner execution and is not represented as green.
 
 ### 2.2 Infrastructure & Capital Efficiency
 - **Operating Overhead**: ~$60/month total infrastructure budget.
-- **Gross Margins**: **~90%+** under Bring Your Own Key (BYOK) architecture (zero inference balance-sheet liability, zero payroll overhead).
+- **Gross-Margin Model**: BYOK removes provider inference charges from REI's balance sheet, but no realized customer cohort exists yet; publish gross margin only after measured revenue and operating-cost data are available.
 
 ---
 
@@ -160,7 +160,7 @@ The **REI Method** supplies the five-question standard. The **REI Engine** appli
 ## 8. Immediate Execution Plan (Next 14 Days)
 
 1. **Deploy Pilot Onboarding Page**: Live at `/pilot` with cURL, Python, and Node SDK drop-in snippets. **`[DONE]`**
-2. **Execute First External Outreach**: Contact 5 AI developer teams using Cursor/Cline with the 14-day zero-risk pilot offer.
+2. **Execute First External Outreach**: Contact 5 AI developer teams using Cursor/Cline with a 14-day evidence-bounded replay offer; prospective shadow operation remains gated on production integration and customer approval.
 3. **Run 14-Day Audit**: Process 1,000+ real production turns through `/api/v1/chat/completions`.
 4. **Generate Reconciliation Report**: Run `node scripts/generate-pilot-report.mjs <tenant_id> 14` to present empirical savings and close Phase 2 paid conversion.
 
