@@ -1,6 +1,15 @@
 {
-  "generatedAt": "2026-09-03T02:56:26.270Z",
+  "generatedAt": "2026-09-03T16:02:56.771Z",
   "entries": [
+    {
+      "hash": "1a108d7",
+      "date": "2026-09-03",
+      "subject": "fix(landing): bind public claims to verified evidence [caught: claim-gate]",
+      "tags": [
+        "claim-gate"
+      ],
+      "context": "fix(landing): bind public claims to verified evidence"
+    },
     {
       "hash": "8cff49e",
       "date": "2026-09-02",
@@ -1635,16 +1644,16 @@
     }
   ],
   "summary": {
-    "totalEntries": 181,
-    "totalTags": 184,
+    "totalEntries": 182,
+    "totalTags": 185,
     "byTag": {
-      "claim-gate": 14,
+      "claim-gate": 15,
       "manual": 108,
       "test": 61,
       "ai-cross-check": 1
     },
     "byMonth": {
-      "2026-09": 1,
+      "2026-09": 2,
       "2026-08": 180
     }
   }
