@@ -12,11 +12,11 @@ archived_at: null
 
 # REI.ai — An Executable Method for Building Accountable AI
 
-[![Tests](https://img.shields.io/badge/tests-1366%2F1366%20passing-brightgreen)](docs/TESTING.md)
-[![Tokens](https://img.shields.io/badge/tokens-1.848B-blue)](docs/CLAIM_LEDGER.md)
-[![Build Spend](https://img.shields.io/badge/spend-%2423.52-orange)](docs/CLAIM_LEDGER.md)
-[![Input Cache Hit](https://img.shields.io/badge/cache%20hit-97.35%25-blueviolet)](docs/CACHING_RULES.md)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+![Tests](https://img.shields.io/badge/tests-1366%2F1366-brightgreen)
+![Tokens](https://img.shields.io/badge/tokens-1.84B-blue)
+![Spend](https://img.shields.io/badge/spend-$23.52-orange)
+![Cache Hit](https://img.shields.io/badge/cache_hit-97.35%25-green)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 > **"You're not just saving money. You're building better, faster."**
 > 
