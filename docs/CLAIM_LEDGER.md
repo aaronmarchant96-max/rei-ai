@@ -117,7 +117,7 @@ Direct, reproducible machine telemetry captured from live production endpoints (
 
 | Claim | Producing command | Verified |
 |-------|-------------------|----------|
-| 1366 tests / 121 suites | `npm test -- --runInBand` | ✅ 121/121 suites and 1366/1366 tests passed locally on 2026-09-02; hosted GitHub CI did not start because of an account-level billing lock. |
+| 1366 tests / 121 suites | `npm test -- --runInBand` | ✅ 121/121 suites and 1366/1366 tests passed locally on 2026-09-02. |
 | Historical fast Jest worker benchmark (2026-08-22; 11.38s warm median) | `npm run test:fast` | ✅ Point-in-time result: 11.38s warm median (range: 11.28–11.42s) via `maxWorkers=50%` across the then-current 97 suites and 1099 tests. Current suite totals are generated separately. |
 | Gateway Concurrency & Single-Flight (9 tests) | `npm test -- --runInBand src/lib/gatewayConcurrency.test.js` | ✅ Tenant-scoped single-flight coalescing, leader/follower cost accounting, Gemini & Groq pools |
 | Delivery Integrity Gate (9 tests) | `npm test -- --runInBand src/lib/deliveryIntegrityGate.test.ts` | ✅ Transport, finish_reason normalization, raw/display parse parity, delivery-gated-v1 economic policy |

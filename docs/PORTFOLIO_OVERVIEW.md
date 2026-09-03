@@ -23,7 +23,7 @@ archived_at: null
 - **Inference Optimization & FinOps**: Deterministic pre-flight model selection, OpenAI-compatible proxy gateways, and prompt-freeze caching with a **96.0% modeled build-spend reduction** ($23.5172 billed vs a $590.5747 no-cache counterfactual across 1,848,473,560 tokens).
 - **Adversarial Security & Evaluation**: 14-category prompt-injection detection, ground-truth benchmarking, and formal epistemic claim ledgers.
 - **Full-Stack AI Engineering**: End-to-end React/TypeScript interfaces, serverless streaming backends, structured reasoning pipelines, and complex provenance architectures.
-- **Empirical Rigor**: **1366/1366 automated tests across 121/121 suites** in the latest local verification. Hosted GitHub CI is currently blocked before runner execution and is not green.
+- **Empirical Rigor**: **1366/1366 automated tests across 121/121 suites** in the latest local verification.
 
 ---
 

@@ -19,7 +19,7 @@
   3. *Insufficient Evidence* (Missing or redacted prompt data excluded from savings claims)
 - 🔒 **`ingestable ≠ replay-routable`**: Missing prompt text is normalized into denominator audits but excluded from savings metrics.
 - 🔑 **Bring Your Own Key (BYOK)**: Customer-owned provider keys; zero inference balance-sheet liability.
-- 🧪 **Local Verification**: **1,366/1,366 automated tests across 121/121 suites** passed locally on 2026-09-02. Hosted GitHub CI is currently blocked before runner execution.
+- 🧪 **Local Verification**: **1,366/1,366 automated tests across 121/121 suites** passed locally on 2026-09-02.
 
 🌐 **Live Platform**: [https://rei.ai](https://rei.ai)  
 📦 **Repository**: [github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)

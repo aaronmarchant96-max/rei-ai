@@ -12,7 +12,7 @@ archived_at: null
 
 # Testing Strategy
 
-REI.ai currently has 121 test suites with 1366 tests passing in the latest local verification. The generated count is recorded in `src/data/claims.json`. Hosted GitHub CI is currently blocked before job execution by an account-level billing issue, so these results must not be represented as green hosted CI. This document explains the testing philosophy, what each category covers, and how to write new tests.
+REI.ai currently has 121 test suites with 1366 tests passing in the latest local verification. The generated count is recorded in `src/data/claims.json`. This document explains the testing philosophy, what each category covers, and how to write new tests.
 
 ## Philosophy
 

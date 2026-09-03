@@ -21,7 +21,7 @@ archived_at: null
 
 ## 🟢 Verification & Claim Baseline
 
-- **Tests:** 1,366 unit & integration tests / 121 suites passing locally (`npm test`); hosted GitHub CI is currently blocked before runner execution
+- **Tests:** 1,366 unit & integration tests / 121 suites passing locally (`npm test`)
 - **Claims Synchronization:** `node scripts/gen-claims.mjs --check` (94 markdown files 100% clean)
 - **Prebuild Integrity:** `node scripts/extract-error-gaps.mjs --check` (use current command output; do not copy a historical count here)
 - **TypeScript:** `npx tsc --noEmit` 0 errors clean

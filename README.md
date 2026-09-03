@@ -40,7 +40,7 @@ The product has four parts:
 
 The OpenAI-compatible FinOps proxy and dynamic inference router (`/v1/chat/completions`) is the first production implementation of the method. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** is the formal execution cycle under the hood.
 
-Backed by **1,366 automated tests across 121 test suites**, all passing in the latest local verification on 2026-09-02. Hosted GitHub CI is currently unavailable because the account-level runner job is blocked before execution; local results must not be described as green hosted CI.
+Backed by **1,366 automated tests across 121 test suites**, all passing in the latest local verification on 2026-09-02.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
