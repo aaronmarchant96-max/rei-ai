@@ -14,7 +14,7 @@ archived_at: null
 
 ![Tests](https://img.shields.io/badge/tests-1366%2F1366-brightgreen)
 ![Tokens](https://img.shields.io/badge/tokens-1.84B-blue)
-![Spend](https://img.shields.io/badge/spend-$23.52-orange)
+![Spend](https://img.shields.io/badge/spend-%2423.52-orange)
 ![Cache Hit](https://img.shields.io/badge/cache_hit-97.35%25-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -115,19 +115,19 @@ REI.ai automatically detects task intent and dispatches to specialized reasoning
 Instead of blindly sending every request to expensive flagship models, REI runs a **deterministic 9-stage decision cascade** locally:
 
 ```mermaid
-flowchart TD
-    A["User Prompt"] --> B["Hinge Classifier<br>ECS / DAS / APS"]
-    B --> C{"Deterministic Cascade"}
-    C -->|"1. Empty"| D["Default Route"]
-    C -->|"2. Greeting"| E["Cheapest Path<br>llama-3.1-8b-instant"]
-    C -->|"3. Meta Query"| E
-    C -->|"4. Self-Eval"| F["The Engineer"]
-    C -->|"5. Adversarial"| G["Red Team Validation"]
-    C -->|"6. Domain Match"| H["Specialist Route<br>Coding / Legal / Genealogy / Story"]
-    C -->|"7. High Complexity"| I["Structured Reasoning<br>CARDO REI"]
-    C -->|"8. Stored Context"| J["Recall Last Domain"]
-    C -->|"9. Fallback"| I
-    E --> K["Verified Output + Canonical RequestEvidence"]
+graph TD
+    A[User Prompt] --> B[Hinge Classifier: ECS / DAS / APS]
+    B --> C{Deterministic Cascade}
+    C -->|Empty| D[Default Route]
+    C -->|Greeting| E[Cheapest Path: LLaMA 3.1 8B Instant]
+    C -->|Meta Query| E
+    C -->|Self-Eval| F[The Engineer]
+    C -->|Adversarial| G[Red Team Validation]
+    C -->|Domain Match| H[Specialist Route: Coding / Legal / Genealogy / Story]
+    C -->|High Complexity| I[Structured Reasoning: CARDO REI]
+    C -->|Stored Context| J[Recall Last Domain]
+    C -->|Fallback| I
+    E --> K[Verified Output & RequestEvidence]
     F --> K
     G --> K
     H --> K
