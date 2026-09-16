@@ -13,17 +13,18 @@ archived_at: null
 # REI.ai — An Executable Method for Building Accountable AI
 
 ![Tests](https://img.shields.io/badge/tests-1366%2F1366-brightgreen)
-![Tokens](https://img.shields.io/badge/tokens-1.84B-blue)
-![Spend](https://img.shields.io/badge/spend-%2423.52-orange)
-![Cache Hit](https://img.shields.io/badge/cache_hit-97.35%25-green)
+![Build tokens](https://img.shields.io/badge/build_tokens-1.84B-blue)
+![Build spend](https://img.shields.io/badge/build_spend-%2423.52-orange)
+![Build cache hit](https://img.shields.io/badge/build_cache_hit-97.35%25-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 > **"You're not just saving money. You're building better, faster."**
 > 
 > *Route each task to the right model, verify the result, and keep the evidence.*
 > 
-> Originally built on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now running on a Lenovo ThinkPad T14 Gen 2a (AMD Ryzen 5 PRO 5650U, 16GB RAM) with a ~$60/month operating budget:
-> **1.848B development & evaluation tokens processed through the OpenCode/DeepSeek build workflow for $23.52, with a 97.35% measured input-cache hit rate across 9,157 billing-export requests.**
+> REI.ai is an OpenAI-compatible router and FinOps proxy that chooses the cheapest eligible model *before* the request is sent, then returns an auditable receipt: the route, the reason, the delivery status, and the observed cost. See the [Claim Ledger](docs/CLAIM_LEDGER.md) for what is measured vs. modeled.
+> 
+> *Build metrics — how REI was made, **not** a product claim: 1.848B development & evaluation tokens through the OpenCode/DeepSeek build workflow for $23.52, at a 97.35% measured input-cache hit rate across 9,157 billing-export requests. Originally on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now a Lenovo ThinkPad T14 Gen 2a (~$60/month). Details in [About the Builder](#-about-the-builder).*
 
 > [!TIP]
 > ### 🪝 The Bootstrap Loop
@@ -45,6 +46,7 @@ archived_at: null
 - [Historical Live Endpoint Captures](#-historical-live-endpoint-captures)
 - [OpenAI-Compatible Cognitive Proxy](#-openai-compatible-cognitive-proxy-v1chatcompletions)
 - [About the Builder](#-about-the-builder)
+- [Repository History](#-repository-history)
 - [Quick Start](#-quick-start)
 - [Live Links & Documentation](#-live-links--documentation)
 
@@ -239,6 +241,12 @@ export OPENAI_API_KEY="local-dev-key"
 | Development Hardware | Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) *(orig. Celeron J4105)* |
 | Monthly Operating Budget | ~$60/month *(expanded evaluation & tool testing volume)* |
 | In-Memory Route Resolution | Deterministic; fresh latency benchmark required before publishing a numeric ceiling |
+
+---
+
+## 📜 Repository History
+
+This repository was imported to GitHub as a **single squashed snapshot on 2026-09-03**; the initial commit is dated **2026-04-01** to mark when the project began. Commit timestamps before 2026-09-03 reflect that back-dated origin, not an incremental daily history. The code, tests, and evidence in the tree are real — the **git timeline is compressed**. Claim provenance lives in [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md).
 
 ---
 
