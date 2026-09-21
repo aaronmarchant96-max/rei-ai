@@ -19,22 +19,22 @@ archived_at: null
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 > **"You're not just saving money. You're building better, faster."**
-> 
+>
 > *Route each task to the right model, verify the result, and keep the evidence.*
-> 
+>
 > REI.ai is an OpenAI-compatible router and FinOps proxy that chooses the cheapest eligible model *before* the request is sent, then returns an auditable receipt: the route, the reason, the delivery status, and the observed cost. See the [Claim Ledger](docs/CLAIM_LEDGER.md) for what is measured vs. modeled.
-> 
+>
 > *Build metrics — how REI was made, **not** a product claim: 1.848B development & evaluation tokens through the OpenCode/DeepSeek build workflow for $23.52, at a 97.35% measured input-cache hit rate across 9,157 billing-export requests. Originally on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now a Lenovo ThinkPad T14 Gen 2a (~$60/month). Details in [About the Builder](#-about-the-builder).*
 
 > [!TIP]
-> ### 🪝 The Bootstrap Loop
+> ### The Bootstrap Loop
 > **Are you going to try using it?**
-> 
+>
 > Because the live gateway is online. When you throw a prompt at `/api/v1/chat/completions`, you’re not just a user—you’re contributing to the bootstrap loop. Your telemetry makes the router smarter. And the router getting smarter means the next person who uses it gets a better result for less money. **That's the whole point.**
 
 ---
 
-## 📌 Table of Contents
+## Table of Contents
 
 - [What is REI.ai?](#-what-is-reiai)
 - [The Evidence Loop](#-the-reiai-evidence-loop)
@@ -52,7 +52,7 @@ archived_at: null
 
 ---
 
-## 🎯 What is REI.ai?
+## What is REI.ai?
 
 **REI is a method for making AI decisions accountable.** Before an AI system sends a request, accepts an answer, or claims savings, it asks five questions: What is the job? Which model should handle it? What rules must the answer follow? Did it finish correctly? Can we prove what happened and what it cost?
 
@@ -78,7 +78,7 @@ Backed by **1,366 automated tests across 121 test suites**, all passing in the l
 
 ---
 
-## 📊 What This Is (And Isn't)
+## What This Is (And Isn't)
 
 **What this is:**
 - **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally and recommends a lower-cost eligible model under explicit routing policy. Serves standard OpenAI-compatible `/v1/chat/completions` for agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for current benchmark numbers, denominators, exclusions, and producing commands.
@@ -99,7 +99,7 @@ Backed by **1,366 automated tests across 121 test suites**, all passing in the l
 
 ---
 
-## 🧠 The 6 Specialized Reasoning Domains
+## The 6 Specialized Reasoning Domains
 
 REI.ai automatically detects task intent and dispatches to specialized reasoning contexts:
 
@@ -112,7 +112,7 @@ REI.ai automatically detects task intent and dispatches to specialized reasoning
 
 ---
 
-## 📐 How the Smart Router Works
+## How the Smart Router Works
 
 Instead of blindly sending every request to expensive flagship models, REI runs a **deterministic 9-stage decision cascade** locally:
 
@@ -142,7 +142,7 @@ Cascade priority is economically optimized: simple greetings use the low-cost pa
 
 ---
 
-## ⚡ Core Platform Engines
+## Core Platform Engines
 
 ### 1. The Evidence & Live Demonstration Layer (`src/lib/evidenceEngine.ts`)
 - **Downstream-Only Observer:** Strictly normalizes execution traces without re-running classification or routing.
@@ -168,7 +168,7 @@ Every bugfix or test failure logs a machine-parseable tag (`[caught: test]`, `[c
 
 ---
 
-## 🔴 Red Team — Client-Side Prompt Security Guard
+## Red Team — Client-Side Prompt Security Guard
 
 The Red Team tab is a zero-cost, in-browser security scanner that inspects prompts for jailbreaks, prompt injection, or policy bypass attempts **before any API call is made**.
 
@@ -178,10 +178,10 @@ The Red Team tab is a zero-cost, in-browser security scanner that inspects promp
 
 ---
 
-## 🌐 Historical Live Endpoint Captures
+## Historical Live Endpoint Captures
 
 <details>
-<summary><strong>🔍 Click to Expand Point-in-Time Production Endpoint Captures</strong></summary>
+<summary><strong>Click to Expand Point-in-Time Production Endpoint Captures</strong></summary>
 
 <br>
 
@@ -208,7 +208,7 @@ The following point-in-time captures were recorded against the production endpoi
 
 ---
 
-## 🔌 OpenAI-Compatible Cognitive Proxy (`/v1/chat/completions`)
+## OpenAI-Compatible Cognitive Proxy (`/v1/chat/completions`)
 
 REI.ai runs as a drop-in local model proxy gateway for any agent, CLI, or IDE extension (Cursor, Cline, Agy, Aider, OpenCode) supporting the OpenAI API specification:
 
@@ -229,7 +229,7 @@ export OPENAI_API_KEY="local-dev-key"
 
 ---
 
-## 👤 About the Builder
+## About the Builder
 
 | Metric | Value |
 | :--- | :--- |
@@ -244,13 +244,13 @@ export OPENAI_API_KEY="local-dev-key"
 
 ---
 
-## 📜 Repository History
+## Repository History
 
 This repository was imported to GitHub as a **single squashed snapshot on 2026-09-03**; the initial commit is dated **2026-04-01** to mark when the project began. Commit timestamps before 2026-09-03 reflect that back-dated origin, not an incremental daily history. The code, tests, and evidence in the tree are real — the **git timeline is compressed**. Claim provenance lives in [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md).
 
 ---
 
-## 🛠️ Quick Start
+## Quick Start
 
 ```bash
 # Clone the repository
@@ -281,7 +281,7 @@ npx tsx scripts/replay-cost-savings.mjs
 
 ---
 
-## 🔗 Live Links & Documentation
+## Live Links & Documentation
 
 - **Live Application:** [https://prompthound-labs.vercel.app/#rei](https://prompthound-labs.vercel.app/#rei)
 - **Source Repository:** [https://github.com/aaronmarchant96-max/rei-ai](https://github.com/aaronmarchant96-max/rei-ai)
