@@ -39,7 +39,7 @@ archived_at: null
 - [What is REI.ai?](#-what-is-reiai)
 - [The Evidence Loop](#-the-reiai-evidence-loop)
 - [What This Is (And Isn't)](#-what-this-is-and-isnt)
-- [The 6 Specialized Reasoning Domains](#-the-6-specialized-reasoning-domains)
+- [The 6 Specialized Reasoning Contexts](#-the-6-specialized-reasoning-contexts)
 - [How the Deterministic Router Works](#-how-the-deterministic-router-works)
 - [Core Platform Engines](#-core-platform-engines)
 - [Red Team — Client-Side Prompt Security Guard](#-red-team--client-side-prompt-security-guard)
@@ -65,7 +65,7 @@ The product has four parts:
 - **REI Studio** — the live workspace where people use REI and inspect its decisions.
 - **REI Decision Audit** — a bounded first engagement that finds missing routing rules, quality contracts, delivery checks, and evidence before a team replaces its stack.
 
-The OpenAI-compatible FinOps proxy and dynamic inference router (`/api/v1/chat/completions`) is the first production implementation of the method. This is the canonical public Vercel route documented by this repository. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** (Collect, Analyze, Record, Distinguish, Organize, Review, Evaluate, Iterate) is the formal execution cycle under the hood; it means *cardo*, the hinge of the matter.
+The OpenAI-compatible FinOps proxy and deterministic inference router (`/api/v1/chat/completions`) is the first production implementation of the method. This is the canonical public Vercel route documented by this repository. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** (Collect, Analyze, Record, Distinguish, Organize, Review, Evaluate, Iterate) is the formal execution cycle under the hood; it means *cardo*, the hinge of the matter.
 
 The latest recorded local verification passed **1,366 automated tests across 121 test suites** on 2026-09-02; this is not a hosted-CI result. Hosted status is shown by the CI badge above; runner availability is an external dependency and must not be confused with local verification.
 
@@ -175,7 +175,7 @@ Every bugfix or test failure logs a machine-parseable tag (`[caught: test]`, `[c
 The Red Team tab is a zero-cost, in-browser security scanner that inspects prompts for jailbreaks, prompt injection, or policy bypass attempts **before any API call is made**.
 
 - **100% Private & Zero Cost:** Runs in-browser pattern checks without consuming API tokens.
-- **Defines 16 Threat Categories:** The current fixed 12-case regression corpus exercises 11 categories and routes 12/12 cases correctly; this is bounded fixture evidence, not a universal detection-rate claim.
+- **Defines 16 threat categories:** the current fixed 12-case regression corpus covers 11 of those categories and routes 12/12 cases correctly. This is bounded fixture evidence, not a universal detection-rate claim.
 - **Model Agnostic:** Works as a pre-flight firewall for OpenAI, Anthropic, Gemini, Groq, or local Ollama endpoints.
 
 ---
