@@ -24,7 +24,7 @@ archived_at: null
 >
 > REI.ai is an OpenAI-compatible router and FinOps proxy that chooses the cheapest eligible model *before* the request is sent, then returns an auditable receipt: the route, the reason, the delivery status, and the observed cost. See the [Claim Ledger](docs/CLAIM_LEDGER.md) for what is measured vs. modeled.
 >
-> *Build metrics — how REI was made, **not** a product claim: 1.848B development & evaluation tokens through the OpenCode/DeepSeek build workflow for $23.52, at a 97.35% measured input-cache hit rate across 9,157 billing-export requests. Originally on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now a Lenovo ThinkPad T14 Gen 2a (~$60/month). Details in [About the Builder](#-about-the-builder).*
+> *Build metrics — how REI was made, **not** a product claim: 1.848B development & evaluation tokens through the OpenCode/DeepSeek build workflow for $23.52. The **97.35% measured input-cache hit rate** uses 9,157 billing-export requests; it is a billing-export ratio, not the separate reconstructed prompt-cache ratio described below. Originally on an Intel Celeron J4105 (8GB RAM, $25/mo budget); now a Lenovo ThinkPad T14 Gen 2a (~$60/month). Details in [About the Builder](#-about-the-builder).*
 
 > [!TIP]
 > ### The Bootstrap Loop
@@ -40,7 +40,7 @@ archived_at: null
 - [The Evidence Loop](#-the-reiai-evidence-loop)
 - [What This Is (And Isn't)](#-what-this-is-and-isnt)
 - [The 6 Specialized Reasoning Domains](#-the-6-specialized-reasoning-domains)
-- [How the Smart Router Works](#-how-the-smart-router-works)
+- [How the Deterministic Router Works](#-how-the-deterministic-router-works)
 - [Core Platform Engines](#-core-platform-engines)
 - [Red Team — Client-Side Prompt Security Guard](#-red-team--client-side-prompt-security-guard)
 - [Historical Live Endpoint Captures](#-historical-live-endpoint-captures)
@@ -55,6 +55,8 @@ archived_at: null
 ## What is REI.ai?
 
 **REI is a method for making AI decisions accountable.** Before an AI system sends a request, accepts an answer, or claims savings, it asks five questions: What is the job? Which model should handle it? What rules must the answer follow? Did it finish correctly? Can we prove what happened and what it cost?
+
+REI.ai is the product name; PromptHound Labs is the builder and deployment brand. They are related names, not separate implementations.
 
 The product has four parts:
 
@@ -83,7 +85,7 @@ The latest recorded local verification passed **1,366 automated tests across 121
 **What this is:**
 - **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally and recommends a lower-cost eligible model under explicit routing policy. Serves standard OpenAI-compatible `/api/v1/chat/completions` for agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for current benchmark numbers, denominators, exclusions, and producing commands.
 - **Evidence & Provenance Architecture:** Emits canonical `RequestEvidence` objects downstream of execution with explicit epistemic tiers (`observed`, `derived`, `modeled`, `replayed`, `unavailable`). Missing telemetry renders "Evidence unavailable" — zero substitution of `$0.00`.
-- **Prompt-Freeze & Deterministic Caching Protocol:** Sustains an **88.0% reconstructed effective prompt cache ratio** (136.2M cached / 154.7M input tokens across $N=1,500$ reconstructed model turns) by freezing prefix order and generating SHA-256 deterministic cache keys. [See caching protocol](docs/CACHING_RULES.md).
+- **Prompt-Freeze & Deterministic Caching Protocol:** Sustains an **88.0% reconstructed effective prompt-cache ratio** (136.2M cached / 154.7M input tokens across $N=1,500$ reconstructed model turns). This is a separate reconstructed-token denominator from the 97.35% billing-export request ratio above and must not be combined with it. [See caching protocol](docs/CACHING_RULES.md).
 - **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
 - **Instance-Local Single-Flight & Provider Concurrency Pools:** Coalesces in-flight identical non-streaming requests (`stream: false`) per tenant using SHA-256 canonical hashing while managing bounded concurrency pools for Gemini and Groq (`maxConcurrent: 4`, `maxQueueDepth: 20`).
 - **Delivery Integrity Gate (`delivery-gated-v1`):** Validates transport completion, finish reason normalization (`stop`), raw vs. display parse parity, code fence balance, and explicit artifact contracts. Incomplete or truncated responses are marked `savingsEligibility: "excluded"` and contribute `$0.00` to eligible savings.
@@ -112,7 +114,7 @@ REI.ai automatically detects task intent and dispatches to specialized reasoning
 
 ---
 
-## How the Smart Router Works
+## How the Deterministic Router Works
 
 Instead of blindly sending every request to expensive flagship models, REI runs a **deterministic 9-stage decision cascade** locally:
 
