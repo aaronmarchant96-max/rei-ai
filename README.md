@@ -12,7 +12,7 @@ archived_at: null
 
 # REI.ai — An Executable Method for Building Accountable AI
 
-![Tests](https://img.shields.io/badge/tests-1366%2F1366-brightgreen)
+[![CI](https://github.com/aaronmarchant96-max/rei-ai/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/aaronmarchant96-max/rei-ai/actions/workflows/ci.yml)
 ![Build tokens](https://img.shields.io/badge/build_tokens-1.84B-blue)
 ![Build spend](https://img.shields.io/badge/build_spend-%2423.52-orange)
 ![Build cache hit](https://img.shields.io/badge/build_cache_hit-97.35%25-green)
@@ -63,9 +63,9 @@ The product has four parts:
 - **REI Studio** — the live workspace where people use REI and inspect its decisions.
 - **REI Decision Audit** — a bounded first engagement that finds missing routing rules, quality contracts, delivery checks, and evidence before a team replaces its stack.
 
-The OpenAI-compatible FinOps proxy and dynamic inference router (`/v1/chat/completions`) is the first production implementation of the method. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** is the formal execution cycle under the hood.
+The OpenAI-compatible FinOps proxy and dynamic inference router (`/api/v1/chat/completions`) is the first production implementation of the method. This is the canonical public Vercel route documented by this repository. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** (Collect, Analyze, Record, Distinguish, Organize, Review, Evaluate, Iterate) is the formal execution cycle under the hood; it means *cardo*, the hinge of the matter.
 
-Backed by **1,366 automated tests across 121 test suites**, all passing in the latest local verification on 2026-09-02.
+The latest recorded local verification passed **1,366 automated tests across 121 test suites** on 2026-09-02; this is not a hosted-CI result.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -185,7 +185,7 @@ The Red Team tab is a zero-cost, in-browser security scanner that inspects promp
 
 <br>
 
-The following point-in-time captures were recorded against the production endpoint (`https://prompthound-labs.vercel.app/api/cfai`). They are retained as historical observations and are not a current uptime or model-availability claim:
+The following point-in-time captures were recorded against the production endpoint (`https://prompthound-labs.vercel.app/api/cfai`). They are retained as historical observations and are not a current uptime or model-availability claim. Model identifiers in this section are preserved exactly as captured; provider availability is not asserted.
 
 ### 1. Direct Low-Latency Routing (Groq `openai/gpt-oss-120b`)
 - **Query:** *"What is the capital of France? Answer in 3 words."*
