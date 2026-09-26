@@ -91,7 +91,7 @@ The latest recorded local verification passed **1,366 automated tests across 121
 - **Delivery Integrity Gate (`delivery-gated-v1`):** Validates transport completion, finish reason normalization (`stop`), raw vs. display parse parity, code fence balance, and explicit artifact contracts. Incomplete or truncated responses are marked `savingsEligibility: "excluded"` and contribute `$0.00` to eligible savings.
 - **Anti-Slop & De-Roboticize Pipeline:** Locally detects and strips buzzword padding, corporate boilerplate, and AI hedging.
 - **Night Shift Routing:** Classifies each request locally and selects a route with an explicit model, token ceiling, quality gate, and cost estimate.
-- **Five Registered Reasoning Domains plus Debate:** General Chat, Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, and Storytelling are registered in the central domain catalog; Debate & Critical Pressure-Testing is maintained as a separate module.
+- **Six reasoning contexts:** General Chat, Coding & Architecture, Historical Genealogy, Legal Precedent Analysis, Storytelling, and Debate & Critical Pressure-Testing. These are application contexts and routing policies, not claims of autonomous specialist models.
 - **Empirical Rigor:** Backed by 1,366 automated tests across 121 test suites in the latest local run, with a fast local test loop (`npm run test:fast` / `jest --maxWorkers=50%`) on ThinkPad T14 Gen 2a.
 
 **What this is not:**
@@ -101,7 +101,7 @@ The latest recorded local verification passed **1,366 automated tests across 121
 
 ---
 
-## The 6 Specialized Reasoning Domains
+## The 6 Specialized Reasoning Contexts
 
 REI.ai automatically detects task intent and dispatches to specialized reasoning contexts:
 
