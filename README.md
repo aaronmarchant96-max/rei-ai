@@ -81,7 +81,7 @@ The latest recorded local verification passed **1,366 automated tests across 121
 ## What This Is (And Isn't)
 
 **What this is:**
-- **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally and recommends a lower-cost eligible model under explicit routing policy. Serves standard OpenAI-compatible `/v1/chat/completions` for agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for current benchmark numbers, denominators, exclusions, and producing commands.
+- **A Deterministic AI Router & OpenAI Proxy:** Inspects prompt semantics locally and recommends a lower-cost eligible model under explicit routing policy. Serves standard OpenAI-compatible `/api/v1/chat/completions` for agent integration. See [docs/CLAIM_LEDGER.md](docs/CLAIM_LEDGER.md) for current benchmark numbers, denominators, exclusions, and producing commands.
 - **Evidence & Provenance Architecture:** Emits canonical `RequestEvidence` objects downstream of execution with explicit epistemic tiers (`observed`, `derived`, `modeled`, `replayed`, `unavailable`). Missing telemetry renders "Evidence unavailable" — zero substitution of `$0.00`.
 - **Prompt-Freeze & Deterministic Caching Protocol:** Sustains an **88.0% reconstructed effective prompt cache ratio** (136.2M cached / 154.7M input tokens across $N=1,500$ reconstructed model turns) by freezing prefix order and generating SHA-256 deterministic cache keys. [See caching protocol](docs/CACHING_RULES.md).
 - **CARDO REI Reasoning Framework:** Enforces structured decision-making that separates verified facts from assumptions.
@@ -208,7 +208,7 @@ The following point-in-time captures were recorded against the production endpoi
 
 ---
 
-## OpenAI-Compatible Cognitive Proxy (`/v1/chat/completions`)
+## OpenAI-Compatible Cognitive Proxy (`/api/v1/chat/completions`)
 
 REI.ai runs as a drop-in local model proxy gateway for any agent, CLI, or IDE extension (Cursor, Cline, Agy, Aider, OpenCode) supporting the OpenAI API specification:
 
@@ -237,7 +237,6 @@ export OPENAI_API_KEY="local-dev-key"
 | Tokens Processed | **1.84+ billion** |
 | Specialized Domains | **6 application reasoning modes** |
 | Automated Tests | **1366 passing tests across 121 suites** |
-| GitHub Deployment Records | **1,495 records** *(GitHub API, observed 2026-09-02; not a claim that every record was a successful production release)* |
 | Development Hardware | Lenovo ThinkPad T14 Gen 2a (Ryzen 5 PRO 5650U, 16GB RAM) *(orig. Celeron J4105)* |
 | Monthly Operating Budget | ~$60/month *(expanded evaluation & tool testing volume)* |
 | In-Memory Route Resolution | Deterministic; fresh latency benchmark required before publishing a numeric ceiling |
