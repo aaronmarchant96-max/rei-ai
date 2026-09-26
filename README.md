@@ -65,7 +65,7 @@ The product has four parts:
 
 The OpenAI-compatible FinOps proxy and dynamic inference router (`/api/v1/chat/completions`) is the first production implementation of the method. This is the canonical public Vercel route documented by this repository. It can sit in front of agents, coding assistants, and backend pipelines to choose an eligible model and return an auditable receipt. **CARDO** (Collect, Analyze, Record, Distinguish, Organize, Review, Evaluate, Iterate) is the formal execution cycle under the hood; it means *cardo*, the hinge of the matter.
 
-The latest recorded local verification passed **1,366 automated tests across 121 test suites** on 2026-09-02; this is not a hosted-CI result.
+The latest recorded local verification passed **1,366 automated tests across 121 test suites** on 2026-09-02; this is not a hosted-CI result. Hosted status is shown by the CI badge above; runner availability is an external dependency and must not be confused with local verification.
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
