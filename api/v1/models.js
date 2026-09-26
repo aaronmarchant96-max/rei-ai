@@ -1,5 +1,5 @@
 // REI.ai OpenAI-compatible Models List endpoint
-// Route: /api/v1/models & /v1/models
+// Route: /api/v1/models
 
 export default async function handler(req, res) {
   if (res.setHeader) {
@@ -55,13 +55,6 @@ export default async function handler(req, res) {
       created: 1700000000,
       owned_by: "groq",
       description: "High-complexity narrative & engineering architect (~$0.90 / 1M tokens)",
-    },
-    {
-      id: "gemini-3.6-flash",
-      object: "model",
-      created: 1700000000,
-      owned_by: "google",
-      description: "Long-context reasoning fallback engine",
     },
     {
       id: "zai/glm-5.2",
