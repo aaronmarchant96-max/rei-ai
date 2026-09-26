@@ -2,8 +2,8 @@
 status: canonical
 authority_scope: public-entrypoint-and-headlines
 owner: Aaron Marchant
-last_verified: 2026-09-02
-verified_against_commit: 4e729c2
+last_verified: 2026-09-26
+verified_against_commit: 8a89ddde0ae36fcf4b194ab89e46c9446ecdb265
 claims_source: docs/CLAIM_LEDGER.md
 supersedes: []
 superseded_by: null
