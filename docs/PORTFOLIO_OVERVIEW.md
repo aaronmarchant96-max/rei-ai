@@ -126,6 +126,5 @@ archived_at: null
 | **Build Workflow API Spend** | **$23.52** | 1.848B tokens processed ($567.06 saved vs no-cache) |
 | **Router Decision Latency** | **Benchmark required** | Deterministic in-memory cascade; no current retained benchmark supports a numeric ceiling |
 | **Production Decision Latency** | **Benchmark required** | Historical 39.52ms copy lacks a current retained trace artifact |
-| **GitHub Deployment Records** | **1,495** | GitHub Deployment API observed 2026-09-02; records are not equivalent to successful production releases |
 
 *Metrics above were re-audited on 2026-09-02. `npm run claims:check` verifies synchronized test totals; it does not independently verify every portfolio statement.*
