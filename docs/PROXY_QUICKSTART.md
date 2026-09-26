@@ -170,7 +170,7 @@ main();
 
 - **OpenAI Base URL**: `https://prompthound-labs.vercel.app/api/v1`
 - **API Key**: `$REI_API_KEY`
-- **Model Name**: `rei-auto` (or explicit models like `deepseek-chat`, `llama-3.3-70b-versatile`, `gemini-3.6-flash`)
+- **Model Name**: `rei-auto` (or explicit models like `deepseek-chat`, `llama-3.3-70b-versatile`)
 
 ---
 
