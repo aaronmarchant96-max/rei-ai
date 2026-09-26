@@ -25,7 +25,7 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Test Suite (79 suites, 967 tests)
+      - name: Test Suite
         run: npm test -- --runInBand
 
       - name: Claims & Documentation Synchronization Gate
