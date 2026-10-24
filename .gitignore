@@ -33,3 +33,9 @@ api/package-lock.json
 
 # Transient test-output artifacts (jest --json audit path)
 .artifacts/
+
+# Local IDE and scratch tooling
+.continue/
+.vibe/
+home/
+tools/

@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "framework": "Engelbart H-LAM/T Cognitive Augmentation",
+  "author": "Aaron Marchant",
+  "description": "Configurable parameters, heuristics, and weights for REI.ai Hinge Classification and Night Shift Routing",
+  "hinge": {
+    "wordInflection": 50,
+    "wordSlope": 15,
+    "tierThresholds": {
+      "ultra": 0.80,
+      "high": 0.55,
+      "medium": 0.30
+    },
+    "structureWeights": {
+      "codeFences": 0.4,
+      "markdownTables": 0.2,
+      "urls": 0.3
+    }
+  },
+  "complexity": {
+    "wordMultiplier": 2,
+    "questionMultiplier": 8,
+    "uncertaintyMultiplier": 10,
+    "thresholds": {
+      "high": 30,
+      "medium": 15
+    }
+  },
+  "terms": {
+    "conditional": [
+      "if", "unless", "assuming", "given that", "provided that", "in case", "supposing"
+    ],
+    "comparison": [
+      "compare", "versus", "vs", "weigh", "trade-off", "tradeoff", "difference", "better", "worse"
+    ],
+    "negation": [
+      "not", "never", "without", "except", "neither", "nor", "lack", "lacking"
+    ],
+    "uncertainty": [
+      "uncertain", "unclear", "missing", "unknown", "not sure", "unsure", "doubt", "uncertainty"
+    ],
+    "highStructure": [
+      "what am i missing",
+      "what would change my mind",
+      "what would make this wrong",
+      "real hinge",
+      "how do i know",
+      "how reliable",
+      "prove it wrong",
+      "why is this uncertain",
+      "what evidence",
+      "what matters most"
+    ]
+  }
+}

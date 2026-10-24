@@ -1,29 +1,29 @@
 {
   "$schema": "https://rei.ai/schemas/evidence-package-v1.json",
   "metadata": {
-    "generatedAt": "2026-08-22T08:41:56.999Z",
-    "gitCommit": "941a104bcc3855d3a6fd788e4c71d97f4feaff2a",
+    "generatedAt": "2026-10-24T22:45:58.905Z",
+    "gitCommit": "6d67866db1c07c8fc9c1b738ec0f2ece3a664688",
     "gitBranch": "main",
     "nodeVersion": "v22.23.2",
     "platform": "linux"
   },
   "freshTestRunnerExecution": {
-    "executedAt": "2026-08-22T08:41:56.999Z",
-    "durationMs": 38050,
+    "executedAt": "2026-10-24T22:45:58.906Z",
+    "durationMs": 24210,
     "exitCode": 0,
     "status": "PASS",
-    "totalSuites": 97,
-    "passedSuites": 97,
+    "totalSuites": 123,
+    "passedSuites": 123,
     "failedSuites": 0,
-    "totalTests": 1099,
-    "passedTests": 1099,
+    "totalTests": 1405,
+    "passedTests": 1405,
     "failedTests": 0
   },
   "routerBenchmark": {
     "dataset": "Pooled calibration corpus",
     "uniqueScoredSamples": 136,
-    "correctRoutes": 97,
-    "measuredAccuracyPct": 71.3,
+    "correctRoutes": 96,
+    "measuredAccuracyPct": 70.6,
     "claimedRange": "60–80%",
     "status": "PASS"
   },
@@ -94,7 +94,7 @@
       "dataset": "Pooled calibration corpus combining held-out Blind V1, Blind V2, V3, and semantic benchmark fixtures",
       "uniqueScoredSamples": 136,
       "producingCode": "src/__eval__/hingeCalibrationDebate.js (buildPool + computeRouterScores)",
-      "measured": "97/136 = 71.3%",
+      "measured": "96/136 = 70.6%",
       "reproductionCommand": "npm test -- src/__eval__/claimsSync.test.js"
     },
     {

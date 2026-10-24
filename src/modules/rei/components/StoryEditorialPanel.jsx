@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   evaluatePassageEditorial,
-  EditorialReviewResult,
-  EditorialDecisionRecord,
   getEditorialDecisionHistory,
   saveEditorialDecisionRecord,
   clearEditorialDecisionHistory,
