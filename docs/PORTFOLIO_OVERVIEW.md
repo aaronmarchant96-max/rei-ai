@@ -23,7 +23,7 @@ archived_at: null
 - **Inference Optimization & FinOps**: Deterministic pre-flight model selection, OpenAI-compatible proxy gateways, and prompt-freeze caching with a **96.0% modeled build-spend reduction** ($23.5172 billed vs a $590.5747 no-cache counterfactual across 1,848,473,560 tokens).
 - **Adversarial Security & Evaluation**: 14-category prompt-injection detection, ground-truth benchmarking, and formal epistemic claim ledgers.
 - **Full-Stack AI Engineering**: End-to-end React/TypeScript interfaces, serverless streaming backends, structured reasoning pipelines, and complex provenance architectures.
-- **Empirical Rigor**: **1366/1366 automated tests across 121/121 suites** in the latest local verification.
+- **Empirical Rigor**: **1405/1405 automated tests across 123/123 suites** in the latest local verification.
 
 ---
 
@@ -33,7 +33,7 @@ archived_at: null
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                             THE 3-PILLAR TRIAD                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ 1. REI.ai          ──► AI Systems & FinOps (Proxy, Evidence, 1366 Tests)     │
+│ 1. REI.ai          ──► AI Systems & FinOps (Proxy, Evidence, 1405 Tests)     │
 │ 2. Arena Harness   ──► AI Security & Evals (Adversarial, Red Team, D1-D3)   │
 │ 3. Family Archive  ──► Full-Stack Product (GPS Evidence Tiers, Provenance)  │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -51,7 +51,7 @@ archived_at: null
   - **Prompt-Freeze Caching**: Frozen instruction prefixes and SHA-256 cache keys yielding an **88.0% effective multi-turn cache ratio** and **97.35% input cache hit rate**.
   - **Epistemic Trace Receipts**: Every turn outputs audit headers stamped with explicit evidence tiers (`(Observed)`, `(Derived)`, `(Modeled)`). Missing telemetry explicitly renders `"Evidence unavailable"`—zero synthetic data.
 * **Measured Result**:
-  - **1366 passing automated tests** across 121 test suites.
+  - **1405 passing automated tests** across 123 test suites.
   - **1.848B development-agent tokens** processed through OpenCode/DeepSeek build workflow for **$23.52** (saving $567.06 vs $590.57 no-cache counterfactual).
   - **81.1–91.2% modeled provider-scenario savings** and **87–90% ceiling-based savings on current synthetic holdouts**; neither is realized customer savings, and quality preservation requires bounded non-inferiority evaluation.
 * **Reproduce from Clean Checkout**:
@@ -119,7 +119,7 @@ archived_at: null
 
 | Metric | Verified Value | Verification Source / Producing Command |
 | :--- | :--- | :--- |
-| **Automated Passing Tests** | **1366 tests** (121 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
+| **Automated Passing Tests** | **1405 tests** (123 suites) | `npm test -- --runInBand` · `src/data/claims.json` |
 | **Input Cache Hit Rate** | **97.35%** | `npm run verify:cache` · `data/cache-spend.csv` |
 | **Effective Multi-Turn Cache Ratio** | **88.0%** | Reconstructed $N=1,500$ model turns · `docs/CACHING_RULES.md` |
 | **Modeled Provider-Scenario Savings** | **81.1–91.2%** | Fixed workload and routes; provider scenario sensitivity · `docs/CLAIM_LEDGER.md` |
@@ -127,4 +127,4 @@ archived_at: null
 | **Router Decision Latency** | **Benchmark required** | Deterministic in-memory cascade; no current retained benchmark supports a numeric ceiling |
 | **Production Decision Latency** | **Benchmark required** | Historical 39.52ms copy lacks a current retained trace artifact |
 
-*Metrics above were re-audited on 2026-09-02. `npm run claims:check` verifies synchronized test totals; it does not independently verify every portfolio statement.*
+*Metrics above were re-audited on 2026-09-02, with test counts synchronized to the verified 2026-10-24 suite. Dual claim sources: [docs/CLAIM_LEDGER.md](CLAIM_LEDGER.md) serves as the authority for narrative, architectural, and financial claims; [src/data/claims.json](../src/data/claims.json) provides the machine-generated authority for automated test totals verified by `npm run claims:check`. The check verifies synchronized test totals; it does not independently verify every portfolio statement.*
