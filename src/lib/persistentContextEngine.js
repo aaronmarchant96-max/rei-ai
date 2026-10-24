@@ -51,6 +51,11 @@ export function scoreMessage(message) {
     return 90;
   }
 
+  // Evidentiary anchors: messages with attached records, claims, or citations
+  if (message.attachedRecord || message.archiveRecord || message.claims || message.archivalCitation) {
+    score += 80;
+  }
+
   // Active decision topics
   if (DOMAIN_KEYWORDS.architecture.test(text)) {
     score += 40;
@@ -110,6 +115,8 @@ export function createInitialHCM(domainId, welcomeText) {
       domainId,
       initializedAt: new Date().toISOString()
     },
+    archiveRecords: {},
+    recordRevisions: {},
     pinnedFacts: [],
     summarizedHistory: [],
     recentMessages: [
@@ -132,6 +139,10 @@ export function compressHCM(hcm, maxRecent = 10) {
   }
 
   const cloned = cloneHCM(hcm);
+
+  // Preserve evidentiary registers on root
+  cloned.archiveRecords = cloneHCM(hcm.archiveRecords || {});
+  cloned.recordRevisions = cloneHCM(hcm.recordRevisions || {});
 
   if (cloned.recentMessages.length <= maxRecent) {
     return cloned;
@@ -222,12 +233,15 @@ export function flattenHCM(hcm) {
 /**
  * Saves chat history using HCM policies.
  * Automatically compresses when size thresholds are exceeded.
+ * Safely handles QuotaExceededError and returns explicit persistence receipt.
  */
-export function saveChatHistoryHCM(domainId, messages, maxRecent = 10) {
-  if (typeof window === "undefined" || !domainId) return;
+export function saveChatHistoryHCM(domainId, messages, maxRecent = 10, archiveRecords, recordRevisions) {
+  if (typeof window === "undefined" || !domainId) {
+    return { success: false, bytesUsed: 0, error: "window_or_domain_missing" };
+  }
 
   if (!Array.isArray(messages) || messages.length === 0) {
-    return; // Nothing to save
+    return { success: false, bytesUsed: 0, error: "empty_messages" };
   }
 
   const storageKey = `rei_chat_history_${domainId}`;
@@ -244,7 +258,7 @@ export function saveChatHistoryHCM(domainId, messages, maxRecent = 10) {
       // Rebuild recentMessages from flattened list, filtering out system artifacts
       const systemWelcome = messages[0];
       const rest = messages.filter(
-        m => !m.isSystemAnnouncement && !m.isSummary && m !== systemWelcome
+        (m) => !m.isSystemAnnouncement && !m.isSummary && m !== systemWelcome
       );
       hcm.recentMessages = [systemWelcome, ...rest];
     } else {
@@ -262,41 +276,73 @@ export function saveChatHistoryHCM(domainId, messages, maxRecent = 10) {
     hcm.recentMessages = messages;
   }
 
-  // Adaptive compression: trigger when size or count exceeds thresholds
-  let serialized = JSON.stringify(hcm);
-  const LENGTH_THRESHOLD = STORAGE_LIMITS.SOFT_LIMIT_BYTES;
-  const COUNT_THRESHOLD = Math.ceil(maxRecent * 1.5);
-
-  if (serialized.length > LENGTH_THRESHOLD || hcm.recentMessages.length > COUNT_THRESHOLD) {
-    hcm = compressHCM(hcm, maxRecent);
-    serialized = JSON.stringify(hcm);
+  // Update evidentiary registers
+  if (archiveRecords && typeof archiveRecords === "object") {
+    hcm.archiveRecords = { ...(hcm.archiveRecords || {}), ...archiveRecords };
+  }
+  if (recordRevisions && typeof recordRevisions === "object") {
+    hcm.recordRevisions = { ...(hcm.recordRevisions || {}), ...recordRevisions };
   }
 
-  // Hard limit: if still too large, keep recent summaries and drop oldest
-  if (serialized.length > STORAGE_LIMITS.HARD_LIMIT_BYTES && hcm.summarizedHistory.length > 2) {
-    // Keep newest summaries (most relevant context)
-    const keepCount = Math.max(1, hcm.summarizedHistory.length - 1);
+  // Compression check against conversational messages (excluding evidentiary registers)
+  const proseSerialized = JSON.stringify(hcm.recentMessages);
+  const COUNT_THRESHOLD = Math.ceil(maxRecent * 1.5);
+
+  if (proseSerialized.length > STORAGE_LIMITS.SOFT_LIMIT_BYTES || hcm.recentMessages.length > COUNT_THRESHOLD) {
+    hcm = compressHCM(hcm, maxRecent);
+  }
+
+  // Hard limit pruning of summaries if chat history grows very large
+  if (hcm.summarizedHistory && hcm.summarizedHistory.length > 4) {
+    const keepCount = Math.max(2, hcm.summarizedHistory.length - 2);
     hcm.summarizedHistory = hcm.summarizedHistory.slice(-keepCount);
   }
 
+  let serialized = "";
   try {
-    window.localStorage.setItem(storageKey, JSON.stringify(hcm));
+    serialized = JSON.stringify(hcm);
+    window.localStorage.setItem(storageKey, serialized);
+    return { success: true, bytesUsed: serialized.length };
   } catch (e) {
     console.error("Failed to save HCM to localStorage:", e);
+    const isQuota =
+      e?.name === "QuotaExceededError" ||
+      e?.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+      e?.code === 22 ||
+      e?.code === 1014;
+    return {
+      success: false,
+      bytesUsed: serialized ? serialized.length : 0,
+      error: isQuota ? "storage_quota_exceeded" : (e?.message || "storage_failed")
+    };
   }
 }
 
 /**
- * Reads chat history with graceful recovery from corruption using HCM tiers.
- * Auto-migrates legacy array format to HCM structure.
+ * Reads full chat session using HCM structure, returning an explicit object
+ * containing messages, archive records, and record revisions.
  */
-export function readChatHistoryHCM(domainId, fallbackWelcomeText) {
-  if (typeof window === "undefined" || !domainId) return null;
+export function readChatSessionHCM(domainId, fallbackWelcomeText) {
+  if (typeof window === "undefined" || !domainId) {
+    return {
+      messages: null,
+      archiveRecords: {},
+      recordRevisions: {},
+      recoveredFromCorruption: false
+    };
+  }
 
   const storageKey = `rei_chat_history_${domainId}`;
   const saved = window.localStorage.getItem(storageKey);
 
-  if (!saved) return null;
+  if (!saved) {
+    return {
+      messages: null,
+      archiveRecords: {},
+      recordRevisions: {},
+      recoveredFromCorruption: false
+    };
+  }
 
   try {
     const parsed = JSON.parse(saved);
@@ -307,26 +353,53 @@ export function readChatHistoryHCM(domainId, fallbackWelcomeText) {
       if (parsed.length > 1) {
         hcm.recentMessages = parsed;
       }
-      return flattenHCM(hcm);
+      return {
+        messages: flattenHCM(hcm),
+        archiveRecords: {},
+        recordRevisions: {},
+        recoveredFromCorruption: false
+      };
     }
 
     // Load HCM v1 structure
     if (parsed && parsed.version === "hcm_v1" && parsed.domainId === domainId) {
-      return flattenHCM(parsed);
+      return {
+        messages: flattenHCM(parsed),
+        archiveRecords: parsed.archiveRecords || {},
+        recordRevisions: parsed.recordRevisions || {},
+        recoveredFromCorruption: false
+      };
     }
 
-    throw new Error("Unknown storage structure version");
+    throw new Error("Unknown storage structure version or domain mismatch");
   } catch (error) {
     console.error("Failed to parse saved chat history, attempting recovery:", error);
 
-    // Graceful recovery: reset to initialization
     try {
       const hcm = createInitialHCM(domainId, fallbackWelcomeText);
       window.localStorage.setItem(storageKey, JSON.stringify(hcm));
-      return flattenHCM(hcm);
+      return {
+        messages: flattenHCM(hcm),
+        archiveRecords: {},
+        recordRevisions: {},
+        recoveredFromCorruption: true
+      };
     } catch (cleanupError) {
       console.warn("Unable to write recovered chat history:", cleanupError);
-      return null;
+      return {
+        messages: null,
+        archiveRecords: {},
+        recordRevisions: {},
+        recoveredFromCorruption: true
+      };
     }
   }
+}
+
+/**
+ * Reads chat history returning a flat array of messages for backwards compatibility.
+ */
+export function readChatHistoryHCM(domainId, fallbackWelcomeText) {
+  const session = readChatSessionHCM(domainId, fallbackWelcomeText);
+  return session.messages;
 }

@@ -620,4 +620,42 @@ describe("REI Workspace Transition & Progressive Disclosure", () => {
     const input = screen.getByPlaceholderText(/what are you trying to think through/i);
     expect(input.value.length).toBeGreaterThan(0);
   });
+
+  test("Story domain mounts StoryEditorialPanel, evaluates exemplar, and logs decision", async () => {
+    render(<REI />);
+
+    // Switch domain to The Storyteller
+    const storyTab = screen.getByRole("button", { name: /The Storyteller/i });
+    fireEvent.click(storyTab);
+
+    // StoryEditorialPanel toggle button should be visible
+    const toggleBtn = screen.getByRole("button", { name: /Editorial Review v0\.1/i });
+    expect(toggleBtn).toBeInTheDocument();
+
+    // Expand panel
+    fireEvent.click(toggleBtn);
+
+    // Click benchmark exemplar EVAL-001
+    const eval001Btn = screen.getByRole("button", { name: /EVAL-001: Funeral Bell Rule/i });
+    expect(eval001Btn).toBeInTheDocument();
+    fireEvent.click(eval001Btn);
+
+    // Verify textarea populated
+    expect(screen.getByDisplayValue(/Keeping it after the funeral bell/i)).toBeInTheDocument();
+
+    // Run review
+    const runBtn = screen.getByRole("button", { name: /Run Forensic Editorial Review/i });
+    fireEvent.click(runBtn);
+
+    // Verify decision badge and rationale appear
+    expect(screen.getByText(/✓ RETAIN ORIGINAL/i)).toBeInTheDocument();
+    expect(screen.getByText(/Changing 'after' to 'before' inverts the legal timing condition/i)).toBeInTheDocument();
+
+    // Confirm retain original
+    const confirmBtn = screen.getByRole("button", { name: /Confirm Retain Original/i });
+    fireEvent.click(confirmBtn);
+
+    expect(screen.getByText(/✓ Kept original text/i)).toBeInTheDocument();
+    expect(screen.getByText(/Session Editorial Decisions/i)).toBeInTheDocument();
+  });
 });

@@ -2,7 +2,8 @@ import { useState, useRef, useEffect, useMemo, useLayoutEffect } from "react";
 import { useMobile, useKeyboardVisible } from "./useMobile.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter";
 import { getModelCosts, computeActualCost } from "./lib/costHelpers";
-import { readChatHistoryHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
+import { readChatSessionHCM, saveChatHistoryHCM } from "./lib/persistentContextEngine.js";
+import { parseArchivalAttachment, extractActiveArchiveRecords, buildArchivalPromptContext } from "./lib/archivistEngine";
 import { buildDecisionReport } from "./lib/buildDecisionReport.js";
 import { logDecision } from "./lib/decisionStore";
 import { logRoutingDecision, updateLatestLogEntry, getLogs } from "./lib/routingLog";
@@ -29,6 +30,7 @@ import { projectStoredSessionActivity } from "./lib/activityLedger";
 import { isSimpleGreeting } from "./lib/routingConstants.js";
 import { getDomainProfiles, getDomainPrompt, getDomain } from "./domains/_index.js";
 import IngestPanel from "./modules/rei/components/IngestPanel.jsx";
+import StoryEditorialPanel from "./modules/rei/components/StoryEditorialPanel.jsx";
 import DomainBanner from "./modules/rei/components/DomainBanner.jsx";
 import ChatHistory from "./modules/rei/components/ChatHistory.jsx";
 import ChatInput from "./modules/rei/components/ChatInput.jsx";
@@ -94,7 +96,7 @@ export function buildDomainSystemMessage(domainId, currentDomain) {
 function readStoredMessages(selectedDomain) {
   const currentDomain = DOMAIN_PROFILES.find((domain) => domain.id === selectedDomain) || DOMAIN_PROFILES[0];
   const welcomeText = buildDomainSystemMessage(selectedDomain, currentDomain);
-  return readChatHistoryHCM(selectedDomain, welcomeText);
+  return readChatSessionHCM(selectedDomain, welcomeText);
 }
 
 const API_TIMEOUT_MS = 120000;
@@ -306,10 +308,17 @@ export default function REI({ initialPrompt } = {}) {
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
 
   const [inputMessage, setInputMessage] = useState("");
+  const initialSession = useMemo(() => {
+    return readStoredMessages(selectedDomain);
+  }, [selectedDomain]);
+
+  const [archiveRecords, setArchiveRecords] = useState(() => initialSession?.archiveRecords || {});
+  const [recordRevisions, setRecordRevisions] = useState(() => initialSession?.recordRevisions || {});
+  const [persistenceStatus, setPersistenceStatus] = useState("saved");
+
   const [messages, setMessages] = useState(() => {
-    const storedMessages = readStoredMessages(selectedDomain);
-    if (storedMessages) {
-      return storedMessages;
+    if (initialSession?.messages && initialSession.messages.length > 0) {
+      return initialSession.messages;
     }
 
     return [
@@ -349,16 +358,31 @@ export default function REI({ initialPrompt } = {}) {
     }
   }, [initialPrompt]);
 
+  const isInitialMount = useRef(true);
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const session = readStoredMessages(selectedDomain);
     const domainSpecificMessage = {
       sender: "rei",
       text: buildDomainSystemMessage(selectedDomain, currentDomain),
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     };
-    
-    setMessages([domainSpecificMessage]);
-    if (typeof window !== "undefined") {
-      saveChatHistoryHCM(selectedDomain, [domainSpecificMessage]);
+
+    if (session?.messages && session.messages.length > 0) {
+      setMessages(session.messages);
+      setArchiveRecords(session.archiveRecords || {});
+      setRecordRevisions(session.recordRevisions || {});
+    } else {
+      setMessages([domainSpecificMessage]);
+      setArchiveRecords({});
+      setRecordRevisions({});
+      if (typeof window !== "undefined") {
+        saveChatHistoryHCM(selectedDomain, [domainSpecificMessage], 10, {}, {});
+      }
     }
 
     setRawRecordText("");
@@ -372,9 +396,14 @@ export default function REI({ initialPrompt } = {}) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      saveChatHistoryHCM(selectedDomain, messages);
+      const receipt = saveChatHistoryHCM(selectedDomain, messages, 10, archiveRecords, recordRevisions);
+      if (receipt && receipt.success === false) {
+        setPersistenceStatus(receipt.error || "storage_failed");
+      } else {
+        setPersistenceStatus("saved");
+      }
     }
-  }, [messages, selectedDomain]);
+  }, [messages, selectedDomain, archiveRecords, recordRevisions]);
 
   const handleClearHistory = () => {
     resetSession();
@@ -384,8 +413,27 @@ export default function REI({ initialPrompt } = {}) {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setMessages([domainSpecificMessage]);
+    setArchiveRecords({});
+    setRecordRevisions({});
     if (typeof window !== "undefined") {
-      saveChatHistoryHCM(selectedDomain, [domainSpecificMessage]);
+      saveChatHistoryHCM(selectedDomain, [domainSpecificMessage], 10, {}, {});
+    }
+  };
+
+  const handleUpdateRecord = (updatedRecord, revision) => {
+    if (!updatedRecord || !updatedRecord.id) return;
+    setArchiveRecords((prev) => ({
+      ...prev,
+      [updatedRecord.id]: updatedRecord
+    }));
+    if (revision) {
+      setRecordRevisions((prev) => {
+        const list = prev[updatedRecord.id] || [];
+        return {
+          ...prev,
+          [updatedRecord.id]: [...list, revision]
+        };
+      });
     }
   };
 
@@ -486,11 +534,25 @@ export default function REI({ initialPrompt } = {}) {
       console.warn("Failed to log evaluation:", e);
     }
 
+    const activeRecords = extractActiveArchiveRecords(messages, archiveRecords);
+    let referencedRecord = null;
+    const claims = data.claims || [];
+    if (claims.length > 0 && claims[0]?.sources?.[0]?.recordId) {
+      referencedRecord = activeRecords.find((r) => r.id === claims[0].sources[0].recordId) || archiveRecords[claims[0].sources[0].recordId] || null;
+    }
+    if (!referencedRecord && activeRecords.length > 0) {
+      referencedRecord = activeRecords[activeRecords.length - 1];
+    }
+
     const aiMsg = {
       sender: "rei",
       text: aiText,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       domainLabel: currentDomain.label,
+      claims: claims,
+      archivalCitation: data.archivalCitation || null,
+      archiveRecord: referencedRecord || undefined,
+      referencedRecord: referencedRecord || undefined,
       rawJson: {
         routerDecision: finalRouterDecision,
         usage,
@@ -503,6 +565,7 @@ export default function REI({ initialPrompt } = {}) {
         rawTrace: data.rawTrace || null,
         strategicMetadataStatus: strategicEnvelope.status,
         strategicSituation: strategicEnvelope.strategicSituation,
+        claims: claims,
       },
     };
 
@@ -530,14 +593,32 @@ export default function REI({ initialPrompt } = {}) {
       return;
     }
 
+    let newlyAttachedRecord = null;
+    if (ingestedRecord) {
+      const parsed = parseArchivalAttachment(ingestedRecord, recordSourceType);
+      newlyAttachedRecord = parsed.record;
+    }
+
     const userMsg = {
       sender: "user",
       text: promptText,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       attachedRecord: ingestedRecord
-        ? { charCount: ingestedRecord.length, sourceType: recordSourceType }
+        ? {
+            charCount: ingestedRecord.length,
+            sourceType: recordSourceType,
+            record: newlyAttachedRecord,
+          }
         : null,
+      archiveRecord: newlyAttachedRecord || undefined,
     };
+
+    if (newlyAttachedRecord) {
+      setArchiveRecords((prev) => ({
+        ...prev,
+        [newlyAttachedRecord.id]: newlyAttachedRecord,
+      }));
+    }
 
     setMessages((prev) => [...prev, userMsg]);
     setInputMessage("");
@@ -561,9 +642,18 @@ export default function REI({ initialPrompt } = {}) {
           content: msg.text
         }));
 
-      const recordBlock = ingestedRecord
-        ? `\n\nIngested Record (${recordSourceType}):\n${ingestedRecord}`
+      const currentRecordsMap = newlyAttachedRecord
+        ? { ...archiveRecords, [newlyAttachedRecord.id]: newlyAttachedRecord }
+        : archiveRecords;
+      const activeRecords = extractActiveArchiveRecords([...messages, userMsg], currentRecordsMap);
+
+      const archivalBlock = activeRecords.length > 0
+        ? buildArchivalPromptContext(activeRecords, userMsg.text)
         : "";
+
+      const recordBlock = archivalBlock || (ingestedRecord
+        ? `\n\nIngested Record (${recordSourceType}):\n${ingestedRecord}`
+        : "");
 
       const fileBlock = currentFiles.length
         ? `\n\nAttached Files:\n${currentFiles.map((f) => `--- ${f.name} ---\n${f.content}`).join("\n\n")}\n`
@@ -574,7 +664,7 @@ export default function REI({ initialPrompt } = {}) {
         input: userMsg.text,
         domain: selectedDomain,
         history: historyPayload,
-        attachedRecord: ingestedRecord,
+        attachedRecord: ingestedRecord || (activeRecords.length > 0 ? (activeRecords[activeRecords.length - 1].capture?.transcription || activeRecords[activeRecords.length - 1].title) : undefined),
       });
       const routingMs = Math.round((performance.now() - routerStart) * 100) / 100;
 
@@ -925,6 +1015,10 @@ export default function REI({ initialPrompt } = {}) {
                 />
               )}
 
+              {(!mobile || messages.length > 1 || isTyping) && (
+                <StoryEditorialPanel selectedDomain={selectedDomain} />
+              )}
+
               {messages.length <= 1 && !isTyping && (
                 <WelcomePanel
                   activeDomain={selectedDomain}
@@ -962,6 +1056,8 @@ export default function REI({ initialPrompt } = {}) {
                 onExport={handleExport}
                 onInspect={handleInspectDecision}
                 domainLabel={currentDomain?.label || "REI.ai"}
+                onUpdateRecord={handleUpdateRecord}
+                revisions={recordRevisions}
               />
 
               {backendError && (

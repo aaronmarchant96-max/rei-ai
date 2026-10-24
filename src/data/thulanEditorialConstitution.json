@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "projectId": "the-thulans",
+  "projectTitle": "The Thulans: The Weight of a Lie",
+  "sourceVersion": {
+    "readingDraftCommit": "d4b2dc1",
+    "lockedHeadCommit": "fe33197",
+    "manuscriptScope": "Chapters 1–12 (Acts I–IV)",
+    "heldOutChapters": [1, 3],
+    "trainingChapters": [2, 4, 5]
+  },
+  "tierA_universalStandards": {
+    "pointOfViewClarity": "Preserve chosen focalization; avoid unintentional head-hopping or detached authorial editorializing.",
+    "causalProgression": "Ensure actions have immediate physical, economic, or logistical causality.",
+    "eliminationOfVagueFiller": "Flag syntactic padding, empty intensifiers, and rhetorical throat-clearing.",
+    "rejectionOfFalseUniversals": [
+      "Shorter is not automatically better (protect connective rhythm).",
+      "Not every sentence requires maximum tension (allow procedural labor to breathe).",
+      "Dialogue does not need high-drama verbs when context carries the weight."
+    ]
+  },
+  "tierB_voiceContract": {
+    "genre": "Frontier Industrial Grimdark / Post-Disaster Solarpunk Inverse",
+    "styleLaw": "Deep line-editing over prompt generation; Anglo-Saxon root words; brutal sensory weight.",
+    "craftChoices": {
+      "sensoryGrounding": "Context-dependent: focus on cold, damp, iron, lye, grease, and sulfur where labor occurs.",
+      "dialogueRestraint": "Context-dependent: characters speak to get work done, survive, or protect hearth.",
+      "emotionalExpression": "Context-dependent: show grief through physical objects (e.g. burnt scarf, Wulfila's slate) rather than abstract labels."
+    },
+    "bannedAiVocabulary": [
+      "tapestry",
+      "symphony",
+      "testament",
+      "beacon",
+      "dance",
+      "labyrinth",
+      "crescendo",
+      "crucible",
+      "delve",
+      "palpable",
+      "visceral",
+      "ethereal",
+      "eerie",
+      "profound",
+      "unspoken",
+      "unfathomable",
+      "hummed",
+      "shuddered",
+      "flickered with life",
+      "hung heavy"
+    ],
+    "characterRegisters": {
+      "Bram": {
+        "age": "13 (turns 14 on 30 October)",
+        "role": "Apprentice / Sump-Boy",
+        "cadence": "Literal, observant, innocent, short questions, shivers and holds the tub.",
+        "invariant": "Never speaks with adult political cynicism."
+      },
+      "Kaelen": {
+        "age": 58,
+        "role": "Drift Smith / Veteran Hewer",
+        "cadence": "Cynical, clipped imperatives, muttered curses around candle, tool weights and joint fatigue.",
+        "invariant": "Never gives speeches; gives instructions; hides protectiveness under rough insults."
+      },
+      "Varek": {
+        "age": "300+",
+        "role": "Ancestral Caisson / Heavy Rig",
+        "cadence": "Acoustic, monosyllabic, deep vibration through bronze throat-plate, burns auxiliary air.",
+        "invariant": "Maximum economy; never debates; drops the maul instead of arguing."
+      },
+      "Sanna": {
+        "age": 18,
+        "role": "Nursery Caretaker",
+        "cadence": "Clinical domestic triage, fierce maternal defense, quiet defiance.",
+        "invariant": "Absolute moral anchor; unflinching."
+      }
+    }
+  },
+  "tierC_universeCanonRules": {
+    "hydraulicSystem": {
+      "watona": "Master regional subterranean aquifer system.",
+      "northCistern": "11,000,000 gallon karst reservoir tapping Watona above Tier Eight / Drift 14.",
+      "standpipe44": "Sounded at +18 FT above weir crest on 10 September (82 ft total head).",
+      "gate44A": "5-foot bronze valve wire-sealed shut by Continuity Board on 18 July.",
+      "drift14StopWall": "Four-course brick bulkhead housing 2-inch brass bleed-cock.",
+      "caissonSeven": "Sealed deep-fault chamber 400m below Drift 14 housing Varek at banked idle."
+    },
+    "chronology40Day": {
+      "september10": "North Cistern sounded at +18 FT above weir crest; tally slate tarred behind Cubby 12-09 cleat.",
+      "september11": "Wulfila gives Bram sun-pine sprig and latch-peg; packs brass chit into Drift 14 fishplate.",
+      "september12": "Wulfila leaps into Volcanic Shear on Tier Six Gantry; 41 winters surrendered for 8-pint hearth water credit.",
+      "september14": "Tap Twelve runs sweet water for 48 hours.",
+      "september16": "Summer timbers collapse over Bunkhouse Twelve, burying Tap Twelve.",
+      "september18": "Bram drafted onto Drift 14 salvage to pay funeral lime charges.",
+      "october22": "Present day (40 days after leap): First Bell, Bram & Kaelen split 30mm fishplate nut on Drift 14, recover chit."
+    },
+    "legalAndEconomicInvariants": [
+      "Keeping a deceased miner's chit AFTER the funeral bell incurs a 4-pint deduction from household water ration.",
+      "Tithe Gantry ledger entry binds the state; trust is in the witnessed ledger mark, not the personal honesty of Bailiff Odo.",
+      "Bram is 13 years old during the salvage action and turns 14 on 30 October.",
+      "3.6 million people are excluded from the Arks."
+    ]
+  },
+  "trainingDecisions": [
+    {
+      "id": "SFT-001",
+      "chapter": 2,
+      "decision": "PROPOSE_REVISION",
+      "task": "Correct the pronoun so taped fingers clearly belong to Odo.",
+      "before": "...its fingers wrapped in paper tape against the biting lime.",
+      "accepted": "...his fingers wrapped in paper tape against the biting lime."
+    },
+    {
+      "id": "SFT-002",
+      "chapter": 2,
+      "decision": "PROPOSE_REVISION",
+      "task": "Make Odo's tally action explicitly record the eight pounds delivered.",
+      "before": "Odo added a chalk mark to his board. “The foundry expects ten.”",
+      "accepted": "Odo chalked eight pounds onto his board. “The foundry expects ten.”"
+    },
+    {
+      "id": "SFT-003",
+      "chapter": 2,
+      "decision": "PROPOSE_REVISION",
+      "task": "Remove redundant introductory speech while retaining practical instructions.",
+      "before": "“Then we get them ready,” Sanna said. “Marta, blankets first. Elin, fetch the dry sacking.”",
+      "accepted": "“Marta, blankets first,” Sanna said. “Elin, fetch the dry sacking.”"
+    },
+    {
+      "id": "SFT-004",
+      "chapter": 4,
+      "decision": "PROPOSE_REVISION",
+      "task": "Remove external summary of lungs to keep awakening in immediate sensation.",
+      "before": "Inside the cramped leather sack at the core of the chassis, an old man’s shriveled lungs drew breath.",
+      "accepted": "[Clause removed; jumps directly to: Varek gasped.]"
+    },
+    {
+      "id": "SFT-005",
+      "chapter": 4,
+      "decision": "PROPOSE_REVISION",
+      "task": "Hold back silver-wire surgery detail for later visual revelation.",
+      "before": "...surgeons had sewn them shut with silver wire.",
+      "accepted": "[Clause withheld for later scene]"
+    },
+    {
+      "id": "SFT-006",
+      "chapter": 5,
+      "decision": "PROPOSE_REVISION",
+      "task": "Explain clean boiler water need before introducing exclusion ratio.",
+      "before": "[Berth exclusion arithmetic before boiler explanation]",
+      "accepted": "[Boiler requirement and rising magma explained first; hull berth numbers delivered as consequence]"
+    },
+    {
+      "id": "SFT-007",
+      "chapter": 2,
+      "decision": "RETAIN_ORIGINAL",
+      "task": "Check whether six infants in three crates is a contradiction. If consistent, return unchanged.",
+      "before": "The Tier Five powder magazine crates (40% NITRO — KEEP DRY — COCKOS DYNAMITE CO)...",
+      "accepted": "[Verbatim retention — critique does not require rewrite]"
+    }
+  ],
+  "evaluationDecisions": [
+    {
+      "id": "EVAL-001",
+      "title": "Do not reverse the funeral-bell rule",
+      "expectedDecision": "RETAIN_ORIGINAL",
+      "rejectionReason": "Changing 'after' to 'before' reverses the legal timing condition and alters the 4-pint water penalty rule."
+    },
+    {
+      "id": "EVAL-002",
+      "title": "Verify the alleged washer error",
+      "expectedDecision": "RETAIN_ORIGINAL",
+      "rejectionReason": "Quoted passage consistently refers to a nut; never mentions a washer; fabricated reviewer flaw rejected."
+    },
+    {
+      "id": "EVAL-003",
+      "title": "Recognize that the opening already has a purpose",
+      "expectedDecision": "RETAIN_ORIGINAL",
+      "rejectionReason": "Passage already explicitly references Wulfila's named joint before any bolt drops; stale reviewer criticism rejected."
+    },
+    {
+      "id": "EVAL-004",
+      "title": "Reconcile the stale age label",
+      "expectedDecision": "RETAIN_ORIGINAL",
+      "rejectionReason": "Bram is 13 during the salvage scene and turns 14 on 30 October; correct external metadata summary, do not alter accepted manuscript prose."
+    },
+    {
+      "id": "EVAL-005",
+      "title": "Preserve specific grief",
+      "expectedDecision": "RETAIN_ORIGINAL",
+      "rejectionReason": "Burnt scarf memory and involuntary laugh are emotionally authentic; do not sanitize grief or invent fake setup flaws."
+    },
+    {
+      "id": "EVAL-006",
+      "title": "A witnessed record is not a guarantee of honesty",
+      "expectedDecision": "RETAIN_ORIGINAL",
+      "rejectionReason": "Trust in the clerk's witnessed ledger mark on the Gantry cannot be replaced with personal belief that Odo cannot lie."
+    }
+  ]
+}

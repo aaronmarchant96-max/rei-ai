@@ -3,7 +3,7 @@ import { getDomainProfiles } from "./domains/_index.js";
 import { buildRouterDecision } from "./lib/nightShiftRouter";
 import HingeMark from "./modules/rei/components/HingeMark.jsx";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck, Terminal } from "lucide-react";
+import { ArrowRight, Activity, Crosshair, Scale, MessageSquare, ExternalLink, ShieldCheck, Terminal, Film } from "lucide-react";
 import claimsData from "./data/claims.json";
 import ClaimsGate from "./components/ClaimsGate.jsx";
 import { PRODUCT_STORY } from "./data/productCopy.js";
@@ -13,6 +13,7 @@ const REPO_URL = "https://github.com/aaronmarchant96-max/rei-ai";
 function ToolIcon({ id, size = 24, className = "" }) {
   const iconProps = { size, className: `text-hinge-bright ${className}`, strokeWidth: 1.5 };
   switch (id) {
+  case "storyboard": return <Film {...iconProps} />;
   case "openai-proxy": return <Terminal {...iconProps} />;
   case "analytics": return <Activity {...iconProps} />;
   case "red-team": return <ShieldCheck {...iconProps} />;
@@ -123,6 +124,17 @@ const CASE_STUDIES = [
     subtitle: "Radar Signal Review",
     description: "Historical Radar Signal Review Pipeline",
     hinge: "Demo fixture: motion 0.0162 | Graves Co 22:00 CST",
+  },
+  {
+    id: "storyboard",
+    toolId: "storyboard",
+    iconId: "storyboard",
+    category: "Production Studio",
+    label: "Thulan Graphic Novel Studio",
+    subtitle: "Dark Horse Storyboard & Animatic",
+    description: "Dark Horse 16:9 plates, Mignola inking, dialogue captions, and 24fps audio-synced animatic compilation.",
+    hinge: "Take 7 uncut master • Bell cue stamps • Modular prompt chips",
+    badge: { label: "NEW", tone: "amber" },
   },
 ];
 

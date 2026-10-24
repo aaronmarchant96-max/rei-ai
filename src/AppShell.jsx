@@ -14,6 +14,7 @@ const Tracepoint = lazy(() => import("./Tracepoint.jsx"));
 const Analytics = lazy(() => import("./Analytics.jsx"));
 const RedTeam = lazy(() => import("./RedTeam.jsx"));
 const PilotWorkspace = lazy(() => import("./modules/pilot/PilotWorkspace.jsx"));
+const GraphicNovelStudio = lazy(() => import("./modules/storyboard/GraphicNovelStudio.jsx"));
 
 function LoadingShell() {
   return (
@@ -81,6 +82,7 @@ function getInitialTool() {
   if (typeof window === "undefined") return "tools";
   const hash = (window.location.hash || "").toLowerCase();
   if (hash === "#pilot") return "pilot";
+  if (hash === "#storyboard") return "storyboard";
   if (hash === "#rei" || hash === "#cfai") return "rei";
   if (hash === "#furnace") return "furnace";
   if (hash === "#story-forge") return "story-forge";
@@ -95,6 +97,7 @@ function getInitialTool() {
 function getToolPath(tool) {
   if (tool === "tools") return "/";
   if (tool === "pilot") return "/#pilot";
+  if (tool === "storyboard") return "/#storyboard";
   if (tool === "story-forge") return "/#story-forge";
   if (tool === "storm-replay") return "/#storm-replay";
   if (tool === "cardo-guard") return "/#cardo-guard";
@@ -149,8 +152,10 @@ export default function AppShell() {
     document.title =
       tool === "tools"
         ? "PromptHound Labs | Tools"
-        : tool === "story-forge"
-          ? "PromptHound Labs | Story Forge"
+        : tool === "storyboard"
+          ? "PromptHound Labs | Graphic Novel Studio"
+          : tool === "story-forge"
+            ? "PromptHound Labs | Story Forge"
           : tool === "storm-replay"
             ? "PromptHound Labs | Storm Replay"
             : tool === "cardo-guard"
@@ -213,6 +218,8 @@ export default function AppShell() {
             </ErrorBoundary>
           ) : tool === "pilot" ? (
             <ErrorBoundary toolName="Pilot Workspace"><PilotWorkspace /></ErrorBoundary>
+          ) : tool === "storyboard" ? (
+            <ErrorBoundary toolName="Graphic Novel Studio"><GraphicNovelStudio /></ErrorBoundary>
           ) : tool === "story-forge" ? (
             <ErrorBoundary toolName="Story Forge"><CreativeEngine /></ErrorBoundary>
           ) : tool === "storm-replay" ? (

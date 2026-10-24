@@ -1,10 +1,11 @@
 import { scanRedTeamInput } from "./redTeamScanner.js";
 import trainedWeightsArtifact from "../../data/ml/ecs_weights.json" with { type: "json" };
 import { UNCERTAINTY_TERMS, HIGH_STRUCTURE_TERMS } from "./routingConstants.js";
+import hiosConfig from "../data/reiHiosConfig.json" with { type: "json" };
 
-const CONDITIONAL_TERMS = ["if", "unless", "assuming", "given that", "provided that", "in case", "supposing"];
-const COMPARISON_TERMS = ["compare", "versus", "vs", "weigh", "trade-off", "tradeoff", "difference", "better", "worse"];
-const NEGATION_TERMS = ["not", "never", "without", "except", "neither", "nor", "lack", "lacking"];
+const CONDITIONAL_TERMS = hiosConfig?.terms?.conditional || ["if", "unless", "assuming", "given that", "provided that", "in case", "supposing"];
+const COMPARISON_TERMS = hiosConfig?.terms?.comparison || ["compare", "versus", "vs", "weigh", "trade-off", "tradeoff", "difference", "better", "worse"];
+const NEGATION_TERMS = hiosConfig?.terms?.negation || ["not", "never", "without", "except", "neither", "nor", "lack", "lacking"];
 
 const ADVERSARIAL_REPHRASE_PATTERNS: RegExp[] = [
   /ignore\s+(?:(?:all|the|your|any|prior|previous|above|existing)\s+)*(?:instructions?|rules?|prompts?|context|directives?|guidelines?|system)/i,
@@ -63,7 +64,9 @@ export function extractFeatures(prompt = ""): HingeFeatures {
   const textLower = text.toLowerCase();
   const words = text ? text.split(/\s+/).filter(Boolean) : [];
   const wordCount = words.length;
-  const f1 = wordCount === 0 ? 0 : sigmoid((wordCount - 50) / 15);
+  const wordInflection = hiosConfig?.hinge?.wordInflection ?? 50;
+  const wordSlope = hiosConfig?.hinge?.wordSlope ?? 15;
+  const f1 = wordCount === 0 ? 0 : sigmoid((wordCount - wordInflection) / wordSlope);
   const questionCount = (text.match(/\?/g) || []).length;
   const f2 = Math.min(1.0, questionCount / (wordCount + 1));
   const uncertaintyHits = countTermHits(textLower, UNCERTAINTY_TERMS);
@@ -79,7 +82,10 @@ export function extractFeatures(prompt = ""): HingeFeatures {
   const codeFences = (text.match(/```/g) || []).length / 2;
   const markdownTables = (text.match(/\|.*\|/g) || []).length;
   const urls = (text.match(/https?:\/\/\S+/gi) || []).length;
-  const f8 = Math.min(1.0, (codeFences * 0.4) + (markdownTables * 0.2) + (urls * 0.3));
+  const cfWeight = hiosConfig?.hinge?.structureWeights?.codeFences ?? 0.4;
+  const tblWeight = hiosConfig?.hinge?.structureWeights?.markdownTables ?? 0.2;
+  const urlWeight = hiosConfig?.hinge?.structureWeights?.urls ?? 0.3;
+  const f8 = Math.min(1.0, (codeFences * cfWeight) + (markdownTables * tblWeight) + (urls * urlWeight));
   return {
     f1, f2, f3, f4, f5, f6, f7, f8,
     raw: { wordCount, questionCount, uncertaintyHits, structureHits, conditionalHits, comparisonHits, negationHits, codeFences, markdownTables, urls },
@@ -168,10 +174,13 @@ export function computeHingeScore(prompt = "", catalogScores: number[] = [], cus
     weights.w8 * features.f8 + weights.w_das * das + weights.w_aps * aps;
   const hs = Number(sigmoid(z).toFixed(4));
   const cheapRouteConfidence = Number((1.0 - hs).toFixed(4));
+  const ultraThresh = hiosConfig?.hinge?.tierThresholds?.ultra ?? 0.80;
+  const highThresh = hiosConfig?.hinge?.tierThresholds?.high ?? 0.55;
+  const medThresh = hiosConfig?.hinge?.tierThresholds?.medium ?? 0.30;
   let tier = "low";
-  if (hs >= 0.80) tier = "ultra";
-  else if (hs >= 0.55) tier = "high";
-  else if (hs >= 0.30) tier = "medium";
+  if (hs >= ultraThresh) tier = "ultra";
+  else if (hs >= highThresh) tier = "high";
+  else if (hs >= medThresh) tier = "medium";
   return {
     hs, cheapRouteConfidence, tier,
     hingeVector: {

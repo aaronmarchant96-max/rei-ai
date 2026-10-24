@@ -127,7 +127,7 @@ app.get("/api/eval/status", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n🚀 REI.ai Cognitive Proxy running on http://localhost:${PORT}`);
+  console.log(`\nREI.ai Cognitive Proxy running on http://localhost:${PORT}`);
   console.log(`   - OpenAI Base URL: http://localhost:${PORT}/v1`);
   console.log(`   - Available Models: http://localhost:${PORT}/v1/models`);
   console.log(`   - Native Endpoint: http://localhost:${PORT}/api/cfai\n`);

@@ -1,11 +1,14 @@
 import { useState, useMemo } from "react";
 import { parseAssistantStyleReply, extractDeliverableAndScaffolding } from "../../../lib/replyParser.js";
 import { buildRequestEvidence } from "../../../lib/evidenceEngine";
+import { verifyModelClaim } from "../../../lib/archivistEngine";
 import TelemetryCapsule from "./TelemetryCapsule.jsx";
 import CardoComparisonToggle from "./CardoComparisonToggle.jsx";
+import CitationInspectorModal from "./CitationInspectorModal.jsx";
 
-export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport, onInspect, domainLabel = "REI.ai" }) {
+export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExport, onInspect, domainLabel = "REI.ai", onUpdateRecord, revisions = [] }) {
   const [copied, setCopied] = useState(false);
+  const [isCitationInspectorOpen, setIsCitationInspectorOpen] = useState(false);
 
   const handleCopy = async (text) => {
     const ok = await onCopy(text);
@@ -64,11 +67,62 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
       className={`rei-chat-message ${msg.sender === "user" ? "rei-chat-message--user" : "rei-chat-message--rei"}`}
       onAnimationEnd={(e) => { e.currentTarget.style.opacity = "1"; }}
     >
-      {msg.sender === "user" && msg.attachedRecord && (
-        <div style={{ fontSize: "11px", color: "var(--amber-text)", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
-          📋 Attached Record — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount.toLocaleString()} chars)
-        </div>
-      )}
+      {msg.sender === "user" && msg.attachedRecord && (() => {
+        const rec = msg.attachedRecord?.record || msg.archiveRecord;
+        if (rec) {
+          const locStr = rec.locators?.line ? ` (line ${rec.locators.line})` : "";
+          return (
+            <div style={{ fontSize: "11px", color: "var(--amber-text)", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
+              📋 Ingested Record — {rec.title || rec.id}{locStr}
+            </div>
+          );
+        }
+        return (
+          <div style={{ fontSize: "11px", color: "var(--amber-text)", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
+            📋 Attached Record — {msg.attachedRecord.sourceType} ({msg.attachedRecord.charCount?.toLocaleString() || 0} chars)
+          </div>
+        );
+      })()}
+
+      {msg.sender === "rei" && !isSystemNotice && (() => {
+        const rec = msg.archiveRecord || msg.referencedRecord;
+        const claims = msg.claims || msg.rawJson?.claims || [];
+        if (!rec || claims.length === 0) return null;
+        const validation = verifyModelClaim(claims[0], rec);
+        return (
+          <div style={{ marginBottom: "6px", display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                fontSize: "11px",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                fontWeight: 600,
+                background: validation.passed ? "rgba(34, 197, 94, 0.12)" : "rgba(239, 68, 68, 0.12)",
+                border: validation.passed ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(239, 68, 68, 0.3)",
+                color: validation.passed ? "#4ade80" : "#f87171",
+              }}
+              title={validation.passed ? "Record ID, locators, and verbatim excerpt match the ingested record transcript." : validation.reason}
+            >
+              {validation.passed ? "✓ Reference checks passed" : "⚠️ Reference check failed"}
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsCitationInspectorOpen(true)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--amber-text, #f0c965)",
+                fontSize: "11px",
+                textDecoration: "underline",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              Inspect Citation & Evidence
+            </button>
+          </div>
+        );
+      })()}
 
       {msg.sender === "rei" && !isSystemNotice && evidence && (
         <TelemetryCapsule evidence={evidence} onInspect={onInspect} />
@@ -219,12 +273,40 @@ export default function ChatBubble({ msg, selectedDomain, mobile, onCopy, onExpo
               </>
             );
           })()}
+          {(msg.archiveRecord || msg.referencedRecord || msg.claims?.length > 0 || msg.attachedRecord?.record) && (
+            <button
+              onClick={() => setIsCitationInspectorOpen(true)}
+              className="rei-copy-btn touch-target"
+              aria-label="Inspect Citation and Evidence"
+              style={{ fontSize: "9px" }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+              onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+              title="Inspect Citation and Evidence"
+            >
+              📜 Inspect Citation
+            </button>
+          )}
         </div>
       </div>
 
       <span className="rei-chat-meta">
         {msg.sender === "user" ? "You" : domainLabel} • {msg.timestamp}
       </span>
+
+      <CitationInspectorModal
+        isOpen={isCitationInspectorOpen}
+        onClose={() => setIsCitationInspectorOpen(false)}
+        record={msg.archiveRecord || msg.referencedRecord || msg.attachedRecord?.record}
+        claims={msg.claims || msg.rawJson?.claims || []}
+        revisions={
+          Array.isArray(revisions)
+            ? revisions
+            : ((msg.archiveRecord?.id || msg.referencedRecord?.id || msg.attachedRecord?.record?.id)
+                ? revisions[msg.archiveRecord?.id || msg.referencedRecord?.id || msg.attachedRecord?.record?.id] || []
+                : [])
+        }
+        onUpdateRecord={onUpdateRecord}
+      />
     </div>
   );
 }
