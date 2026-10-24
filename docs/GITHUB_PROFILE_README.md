@@ -7,7 +7,7 @@
 
 ### Flagship Project: [REI.ai](https://github.com/aaronmarchant96-max/rei-ai)
 
-> **"Routing decisions should be audited like load-bearing connections: show the evidence before the spend."**
+> **"Audit before you route. Show the evidence before you spend."**
 
 [REI.ai](https://github.com/aaronmarchant96-max/rei-ai) is an OpenAI-compatible Decision Audit & Pre-Spend Router. Its replay workflow categorizes existing traffic into three evidence buckets and identifies candidates for a prospective shadow pilot before any live-routing change.
 
@@ -33,18 +33,18 @@
 | Total Tokens Processed | **1.848 Billion** development & evaluation tokens | `npm run verify:cache` (`data/cache-spend.csv`) |
 | Total Build Spend | **$23.52** API spend (97.3502% input cache hit rate) | Billing export reconciliation |
 | Verified Test Suite | **1,405/1,405 tests** across 123/123 suites (local & CI) | Hosted GitHub Actions + `npm test` (2026-10-24) |
-| Git History | **1,061 commits** on main (measured 2026-10-24) | `git rev-list --count main` |
+| Git History | **1,062 commits** on main (measured 2026-10-24) | `git rev-list --count main` |
 | Operating Budget | ~$60/month lean serverless infrastructure | Infrastructure receipts |
 
 ---
 
-### Behind the Machine: Tradecraft & The Human Reality
+### Why I Built This
 
-I spent over a decade working construction—mostly hanging off the side of high-rises doing commercial glazing and swing-stage rigging. When you work at height, you don't guess. You check the anchors, you test the drop lines, and you don't take someone else's word that a bolt is tight. If a rig fails, someone hits the ground.
+Before teaching myself to code, I spent a decade in construction doing commercial glazing and swing-stage rigging. When you work at height, you don't guess—you test the lines and check the connections yourself.
 
-When I started teaching myself to code, I looked at the AI space and felt like I was watching people hang drywall without framing the walls first. Models hallucinating answers, startups burning millions on cloud API calls they can't afford, and software that sounds smart until you actually inspect what it's doing.
+When I started building software, I was surprised by how much of the AI ecosystem runs on blind trust: models hallucinating facts, startups burning through cloud budgets on calls they don't need, and tools that sound smart until you look at what they're actually doing.
 
-I built REI.ai and its supporting tools because I needed software that works the way a good tradesman works: honest, verifiable, and frugal.
+I built REI.ai because I wanted tools that are honest, verifiable, and frugal:
 
 - **Family Archive**: I started this because I was digitizing old family records and got tired of AI tools confidently inventing relatives who never existed. When you're dealing with real human history, an algorithm shouldn't make things up just to sound helpful.
 - ***The Thulans***: A long-form fiction project I've been writing. Most LLMs spit out generic purple prose. I wanted an editorial tool with restraint—one that checks continuity, catches plot holes, and respects character voice without rewriting everything into corporate sludge.
