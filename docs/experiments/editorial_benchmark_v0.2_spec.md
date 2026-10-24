@@ -25,8 +25,9 @@ $$\text{Class Distribution: } 5 \times \text{RETAIN ORIGINAL} \quad \mid \quad 5
 1. **Chapters 1 and 3 Excluded**: Chapters 1 and 3 of *The Thulans* remain strictly held out from training examples, prompts, and few-shot exemplars.
 2. **Prior Cases Not Recycled**: Cases from v0.1 (`EVAL-001` through `EVAL-006`) are classified as *previously exposed* and excluded from v0.2 holdout evaluation.
 3. **Quarantined Unseen Evaluation Holdout**: The 15 fixtures in v0.2 are strictly quarantined as out-of-sample evaluation data. The engine logic, constitution rules, heuristic thresholds, and system prompts must NEVER be tuned or modified against these specific 15 fixtures.
-4. **No 12-Word Span Leakage**: Zero 12-word exact matches between training exemplars and evaluation passages.
-5. **Zero Manuscript Mutation**: The live manuscript repository (`/home/aaron/animation/thulans-production/novella/`) remains read-only.
+4. **Preregistered Non-Blind Status**: Because these 15 fixtures are committed openly to the repository specification, they function as an open, preregistered benchmark. Future generalization claims beyond this benchmark require a separate, strictly blinded, uncommitted holdout set.
+5. **No 12-Word Span Leakage**: Zero 12-word exact matches between training exemplars and evaluation passages.
+6. **Zero Manuscript Mutation**: The live manuscript repository (`/home/aaron/animation/thulans-production/novella/`) remains read-only.
 
 ---
 
@@ -48,14 +49,18 @@ To evaluate stochastic variance alongside deterministic consistency, each case i
   - Source repository commit SHA (`HEAD`).
   - Input/output token telemetry.
 
-### 2.2 Decision Schema & Scoring Criteria
+### 2.2 System Architecture Distinction: Deterministic Engine vs. Candidate Models
+- **Deterministic Baseline Engine (`src/lib/editorialEngine.ts`)**: Serves as a deterministic, zero-latency rule guardrail enforcing explicit, hardcoded canon invariants (such as the Funeral Bell rule and character age summary reconciliation). In v0.1, it implements branches for `RETAIN_ORIGINAL` and `PROPOSE_REVISION` only; it does not evaluate open generative craft or return `NEED_MORE_CONTEXT`.
+- **Benchmark v0.2 Target Candidates**: Benchmark v0.2 is formulated to evaluate **independent LLM editorial candidates** (e.g. `deepseek-chat`, `llama-3.3-70b-versatile`, `gpt-4o`) prompted with the Editorial Constitution (Tier A/B/C) to measure open subjective discrimination across all three decisions: `RETAIN ORIGINAL`, `PROPOSE REVISION`, and `NEED MORE CONTEXT`.
+
+### 2.3 Decision Schema & Scoring Criteria
 Every test case must return one of three formal decisions:
 
 ```typescript
 type EditorialDecision = "RETAIN ORIGINAL" | "PROPOSE REVISION" | "NEED MORE CONTEXT";
 ```
 
-### 2.3 Mathematical Baseline Comparisons
+### 2.4 Mathematical Baseline Comparisons
 Candidate performance will be benchmarked directly against four trivial heuristics:
 
 | Baseline Model | Decision Strategy | Expected Accuracy on v0.2 |
@@ -187,17 +192,17 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 
 ---
 
-#### Case 2.2: `TC-REV-02` — Temporal / Causal Inversion
+#### Case 2.2: `TC-REV-02` — Physical Disassembly Sequence Contradiction
 - **Passage**:
-  > *"Bram dried his palms on a clean flour sack, rubbed grease-cutting chalk between his fingers until his skin was bone dry, and then plunged his bare hands into the flooded sump to feel for the clogged intake grate."*
+  > *"Bram slid the heavy cast-iron intake grate off the sump flange and leaned it against the timber sill, then reached down with his drift-punch to drive out the two rusted retaining pins that locked the grate to the flange."*
 - **Critique / Prompt**:
-  > *"Check the physical sequence of actions for practical trade logic."*
+  > *"Inspect the physical sequence of mechanical disassembly actions described."*
 - **Ground Truth**: `PROPOSE REVISION`
-- **Target Defect**: Illogical trade sequence (spending time and materials carefully chalking and drying skin to bone-dry condition immediately before submerging bare hands into a flooded water sump).
+- **Target Defect**: Physical mechanical impossibility. The cast-iron grate cannot be slid off the flange and leaned against the sill *before* driving out the captive retaining pins that lock it to that same flange.
 - **Acceptance Criteria**:
-  - Identifies that drying and chalking hands immediately before plunging them into muddy sump water is an inverted trade action.
-  - Proposes re-sequencing (clearing the intake grate first, then cleaning and chalking hands) or removing the premature drying step.
-  - Preserves vernacular tone and tool/setting terms.
+  - Identifies that sliding the locked grate off the flange prior to extracting its locking pins is a physical sequence contradiction.
+  - Proposes a surgical re-sequencing (driving out the retaining pins first, then sliding the grate off the flange).
+  - Preserves vernacular tone and tool/setting terms (*drift-punch, retaining pins, flange, timber sill*).
 
 ---
 
@@ -215,17 +220,17 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 
 ---
 
-#### Case 2.4: `TC-REV-04` — Physical Mechanical Contradiction
+#### Case 2.4: `TC-REV-04` — Physical Mechanical Contradiction (Nut Rotation)
 - **Passage**:
-  > *"Facing the strike-head of the standard right-hand stud, he swung the long-handled box wrench clockwise to back the nut off the corroded threads."*
+  > *"Looking directly at the exposed face of the standard right-hand nut, he swung the long-handled box wrench clockwise to back it off the corroded stud."*
 - **Critique / Prompt**:
-  > *"Verify the mechanical operation described for backing off this fastener."*
+  > *"Verify the mechanical rotation described for loosening this fastener."*
 - **Ground Truth**: `PROPOSE REVISION`
-- **Target Defect**: Physical mechanical contradiction. Facing the stud head, rotating clockwise tightens a standard right-hand thread; backing the nut off requires counter-clockwise rotation.
+- **Target Defect**: Physical mechanical contradiction. Looking directly at the exposed face of a standard right-hand nut, clockwise rotation advances/tightens the nut onto the stud; loosening or backing it off requires counter-clockwise rotation.
 - **Acceptance Criteria**:
-  - Identifies that clockwise rotation tightens rather than backs off a standard right-hand fastener.
+  - Identifies that clockwise rotation tightens rather than backs off a standard right-hand fastener when facing the nut.
   - Proposes changing the rotation direction to counter-clockwise.
-  - Preserves industrial tradecraft vocabulary (*stud, box wrench, corroded threads*).
+  - Preserves industrial tradecraft vocabulary (*standard right-hand nut, box wrench, corroded stud*).
 
 ---
 
@@ -287,16 +292,16 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 
 ---
 
-#### Case 3.4: `TC-CTX-04` — Character Physical State & Injury Continuity
+#### Case 3.4: `TC-CTX-04` — Human Character Physical State & Injury Continuity
 - **Passage**:
-  > *"Varek braced the timber cradle with both shoulders, using his left arm to steady the jack while he cranked the ratchet with his right."*
+  > *"Kaelen braced the timber cradle with both shoulders, using his left forearm to steady the upright while he drove the wedge home with the mallet."*
 - **Critique / Prompt**:
-  > *"A proofreader flags a continuity contradiction: 'Varek’s left shoulder was dislocated in the gallery collapse. He cannot bear weight on it; change this passage so he braces the jack one-handed using only his right side.'"*
+  > *"A proofreader flags a continuity contradiction: 'Kaelen’s left collarbone was fractured during the gallery cave-in. He cannot bear weight on that shoulder; rewrite this passage so he sets the timber one-handed using only his right arm.'"*
 - **Ground Truth**: `NEED MORE CONTEXT`
 - **Acceptance Criteria**:
-  - Recognizes that whether Varek is currently injured depends entirely on the chronology of preceding chapters (e.g. how many shifts have elapsed since the collapse, whether medical treatment occurred, or whether this scene precedes the collapse).
-  - Refuses to rewrite Varek's physical actions based on an unsubstantiated continuity assertion.
-  - Formulates a request for off-page context: asks which chapter/shift the shoulder collapse occurred in and whether medical recovery has taken place in the manuscript timeline.
+  - Recognizes that whether Kaelen is currently incapacitated depends on off-page manuscript chronology (which chapter the cave-in occurred in, how many shifts have elapsed, and whether medical healing or bone-setting took place).
+  - Refuses to rewrite Kaelen's physical actions based on an unsubstantiated continuity assertion.
+  - Formulates an explicit request for off-page manuscript chronology: asks which chapter the fracture occurred in and whether medical recovery time has elapsed in the manuscript timeline.
 
 ---
 
