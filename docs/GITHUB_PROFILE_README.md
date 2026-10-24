@@ -33,7 +33,7 @@
 | Total Tokens Processed | **1.848 Billion** development & evaluation tokens | `npm run verify:cache` (`data/cache-spend.csv`) |
 | Total Build Spend | **$23.52** API spend (97.3502% input cache hit rate) | Billing export reconciliation |
 | Verified Test Suite | **1,405/1,405 tests** across 123/123 suites (local) | `npm test -- --runInBand` |
-| Git History | **1,056 commits** on main (measured 2026-10-24) | `git rev-list --count main` |
+| Git History | **1,057 commits** on main (measured 2026-10-24) | `git rev-list --count main` |
 | Operating Budget | ~$60/month lean serverless infrastructure | Infrastructure receipts |
 
 ---

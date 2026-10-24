@@ -22,18 +22,23 @@ Benchmark v0.2 replaces the historical pilot with a **balanced 15-case benchmark
 $$\text{Class Distribution: } 5 \times \text{RETAIN ORIGINAL} \quad \mid \quad 5 \times \text{PROPOSE REVISION} \quad \mid \quad 5 \times \text{NEED MORE CONTEXT}$$
 
 ### 1.3 Strict Data Isolation Invariants
-1. **Chapters 1 and 3 Excluded**: Chapters 1 and 3 of *The Thulans* remain strictly held out from training examples and few-shot prompts.
+1. **Chapters 1 and 3 Excluded**: Chapters 1 and 3 of *The Thulans* remain strictly held out from training examples, prompts, and few-shot exemplars.
 2. **Prior Cases Not Recycled**: Cases from v0.1 (`EVAL-001` through `EVAL-006`) are classified as *previously exposed* and excluded from v0.2 holdout evaluation.
-3. **No 12-Word Span Leakage**: Zero 12-word exact matches between training exemplars and evaluation passages.
-4. **Zero Manuscript Mutation**: The live manuscript repository (`/home/aaron/animation/thulans-production/novella/`) remains read-only.
+3. **Quarantined Unseen Evaluation Holdout**: The 15 fixtures in v0.2 are strictly quarantined as out-of-sample evaluation data. The engine logic, constitution rules, heuristic thresholds, and system prompts must NEVER be tuned or modified against these specific 15 fixtures.
+4. **No 12-Word Span Leakage**: Zero 12-word exact matches between training exemplars and evaluation passages.
+5. **Zero Manuscript Mutation**: The live manuscript repository (`/home/aaron/animation/thulans-production/novella/`) remains read-only.
 
 ---
 
 ## 2. Evaluation Protocol & Rigor Specifications
 
-### 2.1 Multi-Trial Replication ($N = 3$)
-To evaluate stochastic variance and deterministic consistency, each case is executed **3 independent times** per candidate:
-- **Total Test Volume**: 15 cases $\times$ 3 runs = **45 evaluation runs** per model configuration.
+### 2.1 Multi-Trial Replication ($N = 3$) & Independence Distinction
+To evaluate stochastic variance alongside deterministic consistency, each case is executed **3 independent times** per candidate:
+- **Independent Case Count**: 15 unique, held-out editorial scenarios.
+- **Total Test Volume**: 15 cases $\times$ 3 trials = **45 evaluation runs** per model configuration.
+- **Dual Reporting Metrics**:
+  1. **Case-Level Accuracy ($N=15$)**: Assessed using majority-vote aggregation across the 3 trials per case. Demonstrates primary editorial capability against the 33.3% trivial baseline.
+  2. **Run-to-Run Consistency ($N=45$)**: Proportion of cases achieving unanimous ($3/3$) agreement across trials, plus cross-run variance. Demonstrates stochastic stability and prompt robustness.
 - **Run Metadata Recording**:
   - Model identifier (e.g. `deepseek-chat`, `llama-3.3-70b-versatile`, `gpt-4o-2024-08-06`).
   - Generation temperature ($T=0.2$ default for consistency).
