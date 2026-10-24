@@ -57,9 +57,9 @@ export interface ExecutionContext {
 export function handleExecution(ctx: ExecutionContext): ExecutionResult {
   const { requestId, requestedModel, promptText, mode, policyVersion = "2.0.0" } = ctx;
 
-  const routerDecision: RouterDecision = buildRouterDecision(promptText);
+  const routerDecision: RouterDecision = buildRouterDecision({ input: promptText });
   const recommendedModel = routerDecision.model || requestedModel;
-  const recommendedRouteId = routerDecision.routeId || "default";
+  const recommendedRouteId = routerDecision.id || routerDecision.routeId || "default";
 
   if (mode === "shadow") {
     const shadowDecision: ShadowDecision = {

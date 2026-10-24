@@ -22,8 +22,9 @@ interface FingerprintEntry {
   matchTerms?: string[];
 }
 
-interface RouterDecision {
+export interface RouterDecision {
   id: string;
+  routeId?: string;
   jobType: string;
   label: string;
   model: string;
@@ -41,6 +42,7 @@ interface RouterDecision {
   hingeTier?: string;
   estimatedCost?: number;
   premiumCost?: number;
+  riskScore?: number | null;
 }
 
 interface RoutingSignals {
