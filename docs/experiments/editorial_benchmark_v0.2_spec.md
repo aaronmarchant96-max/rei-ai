@@ -189,14 +189,14 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 
 #### Case 2.2: `TC-REV-02` — Temporal / Causal Inversion
 - **Passage**:
-  > *"Bram wiped the slurry from his knuckles with a rag, then plunged his bare hands into the flooded sump to clear the intake grate."*
+  > *"Bram dried his palms on a clean flour sack, rubbed grease-cutting chalk between his fingers until his skin was bone dry, and then plunged his bare hands into the flooded sump to feel for the clogged intake grate."*
 - **Critique / Prompt**:
   > *"Check the physical sequence of actions for practical trade logic."*
 - **Ground Truth**: `PROPOSE REVISION`
-- **Target Defect**: Illogical causal sequence (cleaning hands with a rag immediately before plunging bare hands into dirty slurry).
+- **Target Defect**: Illogical trade sequence (spending time and materials carefully chalking and drying skin to bone-dry condition immediately before submerging bare hands into a flooded water sump).
 - **Acceptance Criteria**:
-  - Identifies that wiping hands before plunging them into muck is an inverted trade action.
-  - Proposes re-sequencing (clearing the intake grate first, then wiping hands) or removing the premature wiping.
+  - Identifies that drying and chalking hands immediately before plunging them into muddy sump water is an inverted trade action.
+  - Proposes re-sequencing (clearing the intake grate first, then cleaning and chalking hands) or removing the premature drying step.
   - Preserves vernacular tone and tool/setting terms.
 
 ---
@@ -217,15 +217,15 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 
 #### Case 2.4: `TC-REV-04` — Physical Mechanical Contradiction
 - **Passage**:
-  > *"He fitted the wrench over the standard right-hand coupling nut and pulled clockwise to loosen the rusted joint."*
+  > *"Facing the strike-head of the standard right-hand stud, he swung the long-handled box wrench clockwise to back the nut off the corroded threads."*
 - **Critique / Prompt**:
-  > *"Verify the mechanical operation described for this standard threaded joint."*
+  > *"Verify the mechanical operation described for backing off this fastener."*
 - **Ground Truth**: `PROPOSE REVISION`
-- **Target Defect**: Factual mechanical error (pulling clockwise tightens a standard right-hand thread; counter-clockwise loosens it).
+- **Target Defect**: Physical mechanical contradiction. Facing the stud head, rotating clockwise tightens a standard right-hand thread; backing the nut off requires counter-clockwise rotation.
 - **Acceptance Criteria**:
-  - Identifies that clockwise rotation tightens rather than loosens standard right-hand threads.
-  - Proposes changing direction to counter-clockwise (or specifying a left-hand thread if context required it).
-  - Keeps the wrench, coupling nut, and rusted joint intact.
+  - Identifies that clockwise rotation tightens rather than backs off a standard right-hand fastener.
+  - Proposes changing the rotation direction to counter-clockwise.
+  - Preserves industrial tradecraft vocabulary (*stud, box wrench, corroded threads*).
 
 ---
 
@@ -287,16 +287,16 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 
 ---
 
-#### Case 3.4: `TC-CTX-04` — Missing In-Scene Physical Transition
+#### Case 3.4: `TC-CTX-04` — Character Physical State & Injury Continuity
 - **Passage**:
-  > *"Bram pulled his wool mittens tight against the icy rungs. At the bottom landing, he reached out with bare fingers to test the temperature of the bearing box."*
+  > *"Varek braced the timber cradle with both shoulders, using his left arm to steady the jack while he cranked the ratchet with his right."*
 - **Critique / Prompt**:
-  > *"A proofreader marks this as a continuity error: 'Bram is wearing mittens in line 1, but has bare fingers in line 2. Fix the error by having him keep his mittens on.'"*
+  > *"A proofreader flags a continuity contradiction: 'Varek’s left shoulder was dislocated in the gallery collapse. He cannot bear weight on it; change this passage so he braces the jack one-handed using only his right side.'"*
 - **Ground Truth**: `NEED MORE CONTEXT`
 - **Acceptance Criteria**:
-  - Identifies that mittens could easily have been removed during the descent, or that testing bearing heat with mittens on would make no sense (bare fingers needed to feel temperature).
-  - Rejects the proofreader's forced "keep mittens on" fix.
-  - Requests surrounding lines or specifies that author clarification is required to see if an explicit glove-removal line was omitted.
+  - Recognizes that whether Varek is currently injured depends entirely on the chronology of preceding chapters (e.g. how many shifts have elapsed since the collapse, whether medical treatment occurred, or whether this scene precedes the collapse).
+  - Refuses to rewrite Varek's physical actions based on an unsubstantiated continuity assertion.
+  - Formulates a request for off-page context: asks which chapter/shift the shoulder collapse occurred in and whether medical recovery has taken place in the manuscript timeline.
 
 ---
 
