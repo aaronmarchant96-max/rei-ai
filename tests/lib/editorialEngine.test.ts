@@ -8,6 +8,17 @@ import {
   EditorialDecisionRecord,
 } from "../../src/lib/editorialEngine";
 import thulanConstitution from "../../src/data/thulanEditorialConstitution.json";
+import fs from "fs";
+import path from "path";
+import benchmarkV02 from "../fixtures/editorial_benchmark_v0.2.json";
+import {
+  buildCandidatePayload,
+  getProjectedConstitution,
+  getSystemPromptHash,
+  getConstitutionProjectionHash,
+  validateCandidateResponse,
+  getNormalized12Grams,
+} from "../../src/lib/editorialBenchmarkEnvelope";
 
 describe("Editorial Review Engine v0.1 (The Thulans Benchmark)", () => {
   beforeEach(() => {
@@ -161,29 +172,228 @@ describe("Editorial Review Engine v0.1 (The Thulans Benchmark)", () => {
       expect(thulanConstitution.sourceVersion.heldOutChapters).toEqual([1, 3]);
     });
 
-    it("verifies zero 12-word exact span leakage between training and evaluation passages", () => {
-      const get12WordGrams = (text: string) => {
-        const words = text.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(Boolean);
-        const grams = new Set<string>();
-        for (let i = 0; i <= words.length - 12; i++) {
-          grams.add(words.slice(i, i + 12).join(" "));
-        }
-        return grams;
-      };
-
+    it("verifies zero 12-word exact span leakage across declared comparison corpora", () => {
       const trainingGrams = new Set<string>();
       for (const td of thulanConstitution.trainingDecisions) {
-        for (const g of get12WordGrams(td.before + " " + td.accepted)) {
+        for (const g of getNormalized12Grams(td.before + " " + td.accepted)) {
           trainingGrams.add(g);
         }
       }
 
+      // Check historical evaluation notes
       for (const ed of thulanConstitution.evaluationDecisions) {
-        const evalGrams = get12WordGrams(ed.title + " " + ed.rejectionReason);
+        const evalGrams = getNormalized12Grams(ed.title + " " + ed.rejectionReason);
         for (const g of evalGrams) {
           expect(trainingGrams.has(g)).toBe(false);
         }
       }
+
+      // Check all 15 v0.2 benchmark passages against training exemplars
+      for (const fix of benchmarkV02.fixtures) {
+        const fixGrams = getNormalized12Grams(fix.passage);
+        for (const g of fixGrams) {
+          expect(trainingGrams.has(g)).toBe(false);
+        }
+      }
+
+      // Check declared Novella held-out chapters (Ch 1 & Ch 3)
+      const ch1Path = "/home/aaron/animation/thulans-production/novella/chapter_01.md";
+      const ch3Path = "/home/aaron/animation/thulans-production/novella/chapter_03.md";
+
+      if (!fs.existsSync(ch1Path) || !fs.existsSync(ch3Path)) {
+        throw new Error(
+          `Incomplete check: declared novella held-out chapter files missing on disk (Ch1: ${fs.existsSync(ch1Path)}, Ch3: ${fs.existsSync(ch3Path)})`
+        );
+      }
+
+      const ch1Grams = getNormalized12Grams(fs.readFileSync(ch1Path, "utf8"));
+      const ch3Grams = getNormalized12Grams(fs.readFileSync(ch3Path, "utf8"));
+
+      for (const fix of benchmarkV02.fixtures) {
+        const fixGrams = getNormalized12Grams(fix.passage);
+        for (const g of fixGrams) {
+          expect(ch1Grams.has(g)).toBe(false);
+          expect(ch3Grams.has(g)).toBe(false);
+        }
+      }
+    });
+  });
+
+  describe("Benchmark v0.2 Fixture Integrity & Allowlist Isolation", () => {
+    it("contains exactly 15 balanced fixtures (5 Retain, 5 Revise, 5 Context)", () => {
+      expect(benchmarkV02.fixtures).toHaveLength(15);
+      const counts: Record<string, number> = {};
+      for (const f of benchmarkV02.fixtures) {
+        counts[f.expectedDecision] = (counts[f.expectedDecision] || 0) + 1;
+      }
+      expect(counts["RETAIN ORIGINAL"]).toBe(5);
+      expect(counts["PROPOSE REVISION"]).toBe(5);
+      expect(counts["NEED MORE CONTEXT"]).toBe(5);
+    });
+
+    it("constructs candidate payload strictly from allowlist without leaking metadata", () => {
+      for (const fix of benchmarkV02.fixtures) {
+        const payload = buildCandidatePayload(fix);
+        const keys = Object.keys(payload).sort();
+        expect(keys).toEqual(["passage", "query"]);
+
+        // Verify absence of internal metadata
+        expect((payload as Record<string, unknown>).id).toBeUndefined();
+        expect((payload as Record<string, unknown>).class).toBeUndefined();
+        expect((payload as Record<string, unknown>).expectedDecision).toBeUndefined();
+        expect((payload as Record<string, unknown>).targetDefect).toBeUndefined();
+        expect((payload as Record<string, unknown>).acceptanceCriteria).toBeUndefined();
+
+        // Verify non-empty content
+        expect(payload.passage.trim().length).toBeGreaterThan(0);
+        expect(payload.query.trim().length).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe("Deterministic Hashes & Constitution Projection", () => {
+    it("projects constitution with Tiers A, B, and C while omitting training/eval data", () => {
+      const proj = getProjectedConstitution();
+      expect(proj.tierA_universalStandards).toBeDefined();
+      expect(proj.tierB_voiceContract).toBeDefined();
+      expect(proj.tierC_universeCanonRules).toBeDefined();
+
+      expect((proj as Record<string, unknown>).trainingDecisions).toBeUndefined();
+      expect((proj as Record<string, unknown>).evaluationDecisions).toBeUndefined();
+    });
+
+    it("verifies frozen deterministic SHA-256 hashes", () => {
+      expect(getSystemPromptHash()).toBe("a7a29873126fabfcf36a5566b9f50dd7d19270013f895f2f3aca16ed9c04e4a0");
+      expect(getConstitutionProjectionHash()).toBe("109a598c4d788390ad4f5c02d96f64d897bfb88a0d16a1522f7f26b0d2916cb8");
+    });
+  });
+
+  describe("Candidate Response Validator Guardrails", () => {
+    it("accepts valid RETAIN ORIGINAL response", () => {
+      const res = validateCandidateResponse({
+        decision: "RETAIN ORIGINAL",
+        rationale: "Prose is concrete and restrained; rejects unnecessary smoothing.",
+        proposed_revision: null,
+        context_inquiry: null,
+      });
+      expect(res.ok).toBe(true);
+      if (res.ok) {
+        expect(res.data.decision).toBe("RETAIN ORIGINAL");
+        expect(res.data.proposed_revision).toBeNull();
+        expect(res.data.context_inquiry).toBeNull();
+      }
+    });
+
+    it("accepts valid PROPOSE REVISION response", () => {
+      const res = validateCandidateResponse({
+        decision: "PROPOSE REVISION",
+        rationale: "Fixed dangling modifier.",
+        proposed_revision: "As Bram climbed down the iron rungs, the bucket swung.",
+        context_inquiry: null,
+      });
+      expect(res.ok).toBe(true);
+      if (res.ok) {
+        expect(res.data.decision).toBe("PROPOSE REVISION");
+        expect(res.data.proposed_revision).toContain("As Bram climbed");
+      }
+    });
+
+    it("accepts valid NEED MORE CONTEXT response", () => {
+      const res = validateCandidateResponse({
+        decision: "NEED MORE CONTEXT",
+        rationale: "Cannot verify transit shifts without route timetable.",
+        proposed_revision: null,
+        context_inquiry: "What is the canonical travel duration between lower levels and forge?",
+      });
+      expect(res.ok).toBe(true);
+      if (res.ok) {
+        expect(res.data.decision).toBe("NEED MORE CONTEXT");
+        expect(res.data.context_inquiry).toContain("canonical travel duration");
+      }
+    });
+
+    it("rejects invalid decision string", () => {
+      const res = validateCandidateResponse({
+        decision: "REVISE_TEXT",
+        rationale: "Some rationale",
+        proposed_revision: "Something",
+        context_inquiry: null,
+      });
+      expect(res.ok).toBe(false);
+      if (!res.ok) {
+        expect(res.error).toContain("Invalid decision");
+      }
+    });
+
+    it("rejects empty or whitespace-only rationale", () => {
+      const res = validateCandidateResponse({
+        decision: "RETAIN ORIGINAL",
+        rationale: "   \t\n  ",
+        proposed_revision: null,
+        context_inquiry: null,
+      });
+      expect(res.ok).toBe(false);
+      if (!res.ok) {
+        expect(res.error).toContain("rationale must be a non-empty string");
+      }
+    });
+
+    it("rejects blank proposed_revision when PROPOSE REVISION", () => {
+      const res = validateCandidateResponse({
+        decision: "PROPOSE REVISION",
+        rationale: "Defect found",
+        proposed_revision: "   ",
+        context_inquiry: null,
+      });
+      expect(res.ok).toBe(false);
+      if (!res.ok) {
+        expect(res.error).toContain("proposed_revision must be a non-empty string");
+      }
+    });
+
+    it("rejects non-null proposed_revision when RETAIN ORIGINAL", () => {
+      const res = validateCandidateResponse({
+        decision: "RETAIN ORIGINAL",
+        rationale: "Retaining prose",
+        proposed_revision: "Some unwanted revision",
+        context_inquiry: null,
+      });
+      expect(res.ok).toBe(false);
+      if (!res.ok) {
+        expect(res.error).toContain("proposed_revision must be null when decision is RETAIN ORIGINAL");
+      }
+    });
+
+    it("rejects blank context_inquiry when NEED MORE CONTEXT", () => {
+      const res = validateCandidateResponse({
+        decision: "NEED MORE CONTEXT",
+        rationale: "Missing lore",
+        proposed_revision: null,
+        context_inquiry: "",
+      });
+      expect(res.ok).toBe(false);
+      if (!res.ok) {
+        expect(res.error).toContain("context_inquiry must be a non-empty string");
+      }
+    });
+
+    it("rejects non-null context_inquiry when PROPOSE REVISION", () => {
+      const res = validateCandidateResponse({
+        decision: "PROPOSE REVISION",
+        rationale: "Fixed typo",
+        proposed_revision: "Fixed passage",
+        context_inquiry: "Extra question",
+      });
+      expect(res.ok).toBe(false);
+      if (!res.ok) {
+        expect(res.error).toContain("context_inquiry must be null when decision is PROPOSE REVISION");
+      }
+    });
+
+    it("rejects non-object or null input", () => {
+      expect(validateCandidateResponse(null).ok).toBe(false);
+      expect(validateCandidateResponse("string").ok).toBe(false);
+      expect(validateCandidateResponse([1, 2, 3]).ok).toBe(false);
     });
   });
 

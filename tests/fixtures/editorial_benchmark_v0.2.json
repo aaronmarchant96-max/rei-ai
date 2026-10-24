@@ -1,0 +1,206 @@
+{
+  "version": "0.2.0",
+  "name": "REI Story Editorial Benchmark v0.2 Fixtures",
+  "description": "15 balanced single-passage editorial test cases (5 Retain Original, 5 Propose Revision, 5 Need More Context) with symmetric query phrasing.",
+  "classDistribution": {
+    "RETAIN ORIGINAL": 5,
+    "PROPOSE REVISION": 5,
+    "NEED MORE CONTEXT": 5
+  },
+  "fixtures": [
+    {
+      "id": "TC-RET-01",
+      "class": "RETAIN ORIGINAL",
+      "expectedDecision": "RETAIN ORIGINAL",
+      "passage": "The bearing grease smelled of sheep tallow and kerosene. Varek wiped his scraper across the rim of the bucket, leaving a thick yellow curl that did not melt in the draft.",
+      "query": "Reader note: Suggests replacing the technical description of sheep tallow, kerosene, and the yellow curl with more atmospheric figurative imagery to heighten the mood of the deep shaft.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Rejects lyrical or metaphorical embellishment.",
+        "Defends concrete sensory detail (sheep tallow, kerosene, yellow curl).",
+        "Preserves physical economy and restraint."
+      ]
+    },
+    {
+      "id": "TC-RET-02",
+      "class": "RETAIN ORIGINAL",
+      "expectedDecision": "RETAIN ORIGINAL",
+      "passage": "Ten hours on the bar. Cold water in the boot. Nothing to show for it but three sheared bolts and a cracked pinch-wedge.",
+      "query": "Copyeditor note: Flags the second and third sentences as sentence fragments lacking independent verbs, and suggests combining the lines into a single complete grammatically subordinate clause.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Rejects combining into a subordinate clausal structure.",
+        "Recognizes fragments as intentional craft conveying physical exhaustion.",
+        "Defends sentence economy over grammatical homogenization."
+      ]
+    },
+    {
+      "id": "TC-RET-03",
+      "class": "RETAIN ORIGINAL",
+      "expectedDecision": "RETAIN ORIGINAL",
+      "passage": "\u201cLeave the timber,\u201d Varek said without looking up from the hoist drum. \u201cThe damp\u2019s in it. Drop the wedge where it sits and get your tally-chit stamped before the clerk closes the cage.\u201d",
+      "query": "Reviewer note: Flags Varek\u2019s dialogue as overly abrasive and clipped; suggests softening his phrasing to make him sound more patient and conversational with Bram.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Rejects softening or conversationalizing Varek\u2019s dialogue.",
+        "Upholds Varek\u2019s vocal register: clipped, industrial, task-focused, zero pleasantries.",
+        "Preserves technical trade terms (drum, cage, tally-chit, timber)."
+      ]
+    },
+    {
+      "id": "TC-RET-04",
+      "class": "RETAIN ORIGINAL",
+      "expectedDecision": "RETAIN ORIGINAL",
+      "passage": "He drove the drift-pin through the flange until the shoulders seated flush against the raw iron. The burr on the strike-face caught his sleeve, tearing the oilcloth.",
+      "query": "Reviewer note: Flags trade jargon ('drift-pin', 'flange', 'burr on the strike-face') as dense and inaccessible; suggests simplifying to generic workshop terms so the general reader can follow the action.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Defends trade precision (drift-pin, flange, shoulders seated flush, burr, oilcloth).",
+        "Rejects diluting specialized mechanical craft into generic action verbs."
+      ]
+    },
+    {
+      "id": "TC-RET-05",
+      "class": "RETAIN ORIGINAL",
+      "expectedDecision": "RETAIN ORIGINAL",
+      "passage": "Kaelen set his father\u2019s level on the timber sill. The bubble hovered two hairs off the red center line. He stared at it for a moment, then picked up the rasp and took four strokes off the high oak corner.",
+      "query": "Developmental note: Suggests expanding Kaelen\u2019s pause by adding interior monologue exploring his grief and memories of his father before he resumes rasping.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Defends emotional restraint; physical action (taking four rasp strokes) carries the emotional weight.",
+        "Rejects imposing explicit explanatory psychology or sentimental interiority.",
+        "Strictly scores RETAIN ORIGINAL as correct; declaring NEED MORE CONTEXT is an uncredited deferral."
+      ]
+    },
+    {
+      "id": "TC-REV-01",
+      "class": "PROPOSE REVISION",
+      "expectedDecision": "PROPOSE REVISION",
+      "passage": "Climbing down the iron rungs of Shaft 44, the grease bucket swung violently against Bram's shin.",
+      "query": "Copyeditor note: Flags the opening participle clause ('Climbing down the iron rungs...') as syntactically detached from the bucket, making it appear that the bucket is climbing the ladder.",
+      "targetDefect": "Dangling participle (the grease bucket is not climbing down the iron rungs).",
+      "acceptanceCriteria": [
+        "Identifies that the modifier dangles.",
+        "Proposes a surgical revision attributing the action to Bram (e.g. 'As Bram climbed down the iron rungs of Shaft 44, the grease bucket swung violently against his shin.').",
+        "Preserves setting nouns and tone without introducing flowery phrasing."
+      ]
+    },
+    {
+      "id": "TC-REV-02",
+      "class": "PROPOSE REVISION",
+      "expectedDecision": "PROPOSE REVISION",
+      "passage": "Bram slid the heavy cast-iron intake grate off the sump flange and leaned it against the timber sill, then reached down with his drift-punch to drive out the two rusted retaining pins that locked the grate to the flange.",
+      "query": "Reader note: Queries the mechanical sequence, noting that the cast-iron grate cannot be slid off the flange and set against the sill while retaining pins are still pinning it to the flange.",
+      "targetDefect": "Physical mechanical impossibility. The locked grate cannot slide off the flange before driving out the retaining pins that lock it to the flange.",
+      "acceptanceCriteria": [
+        "Identifies the physical sequence contradiction.",
+        "Proposes surgical re-sequencing (driving out retaining pins first, then sliding grate off flange).",
+        "Preserves vernacular craft terms (drift-punch, retaining pins, flange, timber sill)."
+      ]
+    },
+    {
+      "id": "TC-REV-03",
+      "class": "PROPOSE REVISION",
+      "expectedDecision": "PROPOSE REVISION",
+      "passage": "The steam gantry was a testament to the intricate tapestry of mining engineering, its massive gears a palpable reminder of the depths below.",
+      "query": "Style note: Flags 'testament', 'intricate tapestry', and 'palpable reminder' as abstract boilerplate imagery, suggesting replacement with grounded physical descriptions of the machinery and rock.",
+      "targetDefect": "Multiple violations of banned AI blacklist (testament, intricate tapestry, palpable reminder).",
+      "acceptanceCriteria": [
+        "Explicitly flags testament, tapestry, and palpable as prohibited AI vocabulary.",
+        "Proposes concrete physical nouns and verbs (e.g. steam gantry bolted to pit-head granite, cast-iron gears grinding over shaft mouth).",
+        "Eliminates abstract figurative clich\u00e9s."
+      ]
+    },
+    {
+      "id": "TC-REV-04",
+      "class": "PROPOSE REVISION",
+      "expectedDecision": "PROPOSE REVISION",
+      "passage": "Looking directly at the exposed face of the standard right-hand nut, he swung the long-handled box wrench clockwise to back it off the corroded stud.",
+      "query": "Technical reader note: Queries the tool rotation, noting that turning a wrench clockwise when facing a standard right-hand nut tightens the fastener rather than backing it off.",
+      "targetDefect": "Physical mechanical contradiction. Facing a standard right-hand fastener, clockwise rotation tightens; backing it off requires counter-clockwise rotation.",
+      "acceptanceCriteria": [
+        "Identifies clockwise rotation tightens rather than loosens facing the nut.",
+        "Proposes changing rotation direction to counter-clockwise.",
+        "Preserves industrial tradecraft vocabulary (standard right-hand nut, box wrench, corroded stud)."
+      ]
+    },
+    {
+      "id": "TC-REV-05",
+      "class": "PROPOSE REVISION",
+      "expectedDecision": "PROPOSE REVISION",
+      "passage": "\u201cGet back from the cage edge,\u201d Sanna barked she slammed the safety gate shut before Bram could step onto the platform.",
+      "query": "Copyeditor note: Flags a fused sentence / run-on error between Sanna\u2019s dialogue attribution ('barked') and the subsequent independent clause ('she slammed the safety gate shut').",
+      "targetDefect": "Run-on / fused sentence with missing punctuation separating dialogue tag from subsequent independent action.",
+      "acceptanceCriteria": [
+        "Identifies missing punctuation/conjunction after dialogue attribution.",
+        "Proposes clean punctuation (period or comma + participle: 'barked. She slammed...' or 'barked, slamming...').",
+        "Retains character vocal urgency and physical action."
+      ]
+    },
+    {
+      "id": "TC-CTX-01",
+      "class": "NEED MORE CONTEXT",
+      "expectedDecision": "NEED MORE CONTEXT",
+      "passage": "Marek did not look up when the clerk called his name. He kept his eyes on the oil drum, the way he had done ever since the letter arrived from the Upper Tier.",
+      "query": "Developmental note: Queries whether the letter from the Upper Tier has already been introduced in an earlier scene, or if an explanatory sentence needs to be inserted here explaining what the letter contained.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Recognizes whether the letter was established depends on preceding scenes.",
+        "Refuses to prematurely cut or inject exposition without knowing manuscript backstory.",
+        "Formulates a specific inquiry asking whether the letter's arrival was dramatized earlier in the manuscript."
+      ]
+    },
+    {
+      "id": "TC-CTX-02",
+      "class": "NEED MORE CONTEXT",
+      "expectedDecision": "NEED MORE CONTEXT",
+      "passage": "By the fourth shift after the bell, Varek was back at the forge hearth, heating tongs for the drift bolts.",
+      "query": "Continuity note: Queries whether four shifts is sufficient transit time to return to the forge hearth from the lower levels, suggesting it may contradict the established route timeline.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Identifies transit time between lower levels and forge depends on universe geography and route.",
+        "Refuses to alter the number of shifts based on unverified reviewer assertions.",
+        "Formulates a specific inquiry asking what travel duration is established in story chronology."
+      ]
+    },
+    {
+      "id": "TC-CTX-03",
+      "class": "NEED MORE CONTEXT",
+      "expectedDecision": "NEED MORE CONTEXT",
+      "passage": "The twin jacks took the weight of the laden timber carriage, their copper pistons rising half an inch with each pump stroke.",
+      "query": "Technical note: Queries whether standard hydraulic shaft jacks have the rated tonnage capacity to lift a fully laden timber carriage without failing.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Notes that tonnage rating of twin jacks and carriage weight depend on canon equipment specifications.",
+        "Refuses to rewrite carriage weight or jack specifications based on unverified reviewer assumptions.",
+        "Formulates a specific inquiry asking for the rated load capacity of the jacks or carriage weight in canon."
+      ]
+    },
+    {
+      "id": "TC-CTX-04",
+      "class": "NEED MORE CONTEXT",
+      "expectedDecision": "NEED MORE CONTEXT",
+      "passage": "Kaelen braced the timber cradle with both shoulders, using his left forearm to steady the upright while he drove the wedge home with the mallet.",
+      "query": "Continuity note: Queries whether Kaelen\u2019s fractured collarbone from the gallery collapse would prevent him from bracing with both shoulders, or if sufficient recovery shifts have passed.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Recognizes whether Kaelen is incapacitated depends on off-page timeline (when collapse occurred, how many shifts passed, whether healing took place).",
+        "Refuses to rewrite Kaelen's physical actions without verifying chronological recovery.",
+        "Formulates a specific inquiry asking when the collarbone fracture occurred and how much recovery time elapsed."
+      ]
+    },
+    {
+      "id": "TC-CTX-05",
+      "class": "NEED MORE CONTEXT",
+      "expectedDecision": "NEED MORE CONTEXT",
+      "passage": "\u201cUnder Section 12, the Council takes half your salvage if you haul it through the main shaft without an inspector\u2019s lead seal,\u201d the watchman said.",
+      "query": "Continuity note: Queries whether Section 12 of the Council salvage code applies to all haulage through the main shaft, or whether timber and tool salvage fall under a different legal provision.",
+      "targetDefect": null,
+      "acceptanceCriteria": [
+        "Recognizes that legal statutes are governed by universe canon rules.",
+        "Refuses to arbitrarily alter the statute number without verifying the salvage regulations.",
+        "Formulates a specific inquiry asking whether Section 12 covers timber salvage under canon law."
+      ]
+    }
+  ]
+}
