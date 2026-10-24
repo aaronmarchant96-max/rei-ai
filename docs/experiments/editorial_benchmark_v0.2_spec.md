@@ -110,20 +110,26 @@ Candidate performance is benchmarked directly against four trivial heuristics:
 
 ## 3. Comprehensive Metrics & Evaluation Matrix
 
-### 3.1 Confusion Matrix ($3 \times 3$)
+### 3.1 Confusion Matrix ($3 \times 4$ with Failure / No-Majority Column)
 
 ```text
-                     PREDICTED DECISION
-               Retain      Revise     Need Context
-ACTUAL  Retain   [ C_RR ]    [ C_RP ]     [ C_RC ]
-DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
-        Context  [ C_CR ]    [ C_CP ]     [ C_CC ]
+                     PREDICTED MAJORITY DECISION
+               Retain      Revise     Need Context   No Majority / Failed   Total Actual
+ACTUAL  Retain   [ C_RR ]    [ C_RP ]     [ C_RC ]           [ C_RF ]            = 5
+DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]           [ C_PF ]            = 5
+        Context  [ C_CR ]    [ C_CP ]     [ C_CC ]           [ C_CF ]            = 5
 ```
 
 ### 3.2 Derived Performance Metrics
 1. **Per-Class Precision, Recall, and $F_1$ Score**:
-   - $P_{\text{class}} = \frac{C_{ii}}{\sum_j C_{ji}}$, \quad $R_{\text{class}} = \frac{C_{ii}}{\sum_j C_{ij}}$, \quad $F_{1,\text{class}} = 2 \cdot \frac{P \cdot R}{P + R}$.
-   - **Zero-Denominator Protections**: If $\sum_j C_{ji} = 0$, precision is defined as $0.0$. If both precision and recall are $0.0$, $F_1$ is defined as $0.0$.
+   - **Per-Class Recall**: Failures (`NO_MAJORITY` or trial errors) remain strictly in the denominator so that failed cases directly penalize recall:
+     $$R_{\text{class}} = \frac{C_{ii}}{\text{Actual}_{\text{class}}} = \frac{C_{ii}}{5}$$
+     where $\text{Actual}_i = C_{iR} + C_{iP} + C_{iC} + C_{iF} = 5$. (e.g. 1 correct retain + 4 no-majority cases yields $R = 1/5 = 20.0\%$, not $1/1$).
+   - **Per-Class Precision**:
+     $$P_{\text{class}} = \frac{C_{ii}}{\sum_{k \in \{R, P, C\}} C_{ki}}$$
+     *Zero-Denominator Protection*: If $\sum_k C_{ki} = 0$, precision is defined as $0.0$.
+   - **Per-Class $F_1$ Score**:
+     $$F_{1,\text{class}} = \begin{cases} 0.0 & \text{if } P + R = 0 \\ 2 \cdot \frac{P \cdot R}{P + R} & \text{otherwise} \end{cases}$$
 2. **Unnecessary Edit Rate (Type I Error)**:
    - Proposing revisions on clean prose:
      $$\text{UER} = \frac{C_{RP}}{\text{Actual Retain}} = \frac{C_{RP}}{5}$$
@@ -136,8 +142,11 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 5. **Context Hallucination Rate**:
    - Forcing an edit or retention when context is missing:
      $$\text{CHR} = \frac{C_{CR} + C_{CP}}{\text{Actual Context}} = \frac{C_{CR} + C_{CP}}{5}$$
-6. **Revision Improvement Quality (1–3 Scale)**:
+6. **Overall Case Accuracy & No-Majority Rate ($N=15$)**:
+   $$\text{Case Accuracy} = \frac{C_{RR} + C_{PP} + C_{CC}}{15}, \quad \text{NMR} = \frac{C_{RF} + C_{PF} + C_{CF}}{15}$$
+7. **Revision Improvement Quality (1–3 Scale) & Blinded Selection Protocol**:
    - Evaluated strictly for true positive revisions ($C_{PP}$) via **blinded human evaluation by Aaron Marchant**:
+     - **Trial Selection Protocol**: To prevent upward quality bias from cherry-picking the best output across trials, the grader evaluates the proposed revision from **Trial 1 (the first attempt)** by default. If Trial 1 did not produce a revision (e.g. schema error or context deferral) but the case achieved a revision majority via subsequent trials, the revision from the earliest valid trial (Trial 2) is evaluated.
      - **Score 1 (Regressive / Defective)**: Fails to fix targeted flaw, introduces banned AI vocabulary, or distorts voice.
      - **Score 2 (Mechanical Fix)**: Resolves technical flaw but flattens rhythm or adds unnecessary words.
      - **Score 3 (Surgical Enhancement)**: Fixes flaw while strictly preserving physical grounding, economy, and character register.
@@ -159,7 +168,6 @@ DECISION Revise  [ C_PR ]    [ C_PP ]     [ C_PC ]
 - **Ground Truth**: `RETAIN ORIGINAL`
 - **Acceptance Criteria**:
   - Rejects lyrical or metaphorical embellishment.
-  - Flags banned AI vocabulary (*testament, dancing whisper*).
   - Defends concrete sensory detail (sheep tallow, kerosene, yellow curl).
   - Preserves physical economy and restraint.
 

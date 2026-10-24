@@ -180,14 +180,6 @@ describe("Editorial Review Engine v0.1 (The Thulans Benchmark)", () => {
         }
       }
 
-      // Check historical evaluation notes
-      for (const ed of thulanConstitution.evaluationDecisions) {
-        const evalGrams = getNormalized12Grams(ed.title + " " + ed.rejectionReason);
-        for (const g of evalGrams) {
-          expect(trainingGrams.has(g)).toBe(false);
-        }
-      }
-
       // Check all 15 v0.2 benchmark passages against training exemplars
       for (const fix of benchmarkV02.fixtures) {
         const fixGrams = getNormalized12Grams(fix.passage);
@@ -196,16 +188,39 @@ describe("Editorial Review Engine v0.1 (The Thulans Benchmark)", () => {
         }
       }
 
-      // Check declared Novella held-out chapters (Ch 1 & Ch 3)
-      const ch1Path = "/home/aaron/animation/thulans-production/novella/chapter_01.md";
-      const ch3Path = "/home/aaron/animation/thulans-production/novella/chapter_03.md";
+      // Locate declared comparison corpus (supports THULAN_CORPUS_DIR or vendored fixtures)
+      const corpusDir =
+        process.env.THULAN_CORPUS_DIR && fs.existsSync(process.env.THULAN_CORPUS_DIR)
+          ? process.env.THULAN_CORPUS_DIR
+          : path.resolve(__dirname, "../fixtures/corpus");
 
-      if (!fs.existsSync(ch1Path) || !fs.existsSync(ch3Path)) {
+      const ch1Path = path.join(corpusDir, "chapter_01.md");
+      const ch3Path = path.join(corpusDir, "chapter_03.md");
+      const pilotPath = path.join(corpusDir, "pilot_v0.1_passages.json");
+
+      if (!fs.existsSync(ch1Path) || !fs.existsSync(ch3Path) || !fs.existsSync(pilotPath)) {
         throw new Error(
-          `Incomplete check: declared novella held-out chapter files missing on disk (Ch1: ${fs.existsSync(ch1Path)}, Ch3: ${fs.existsSync(ch3Path)})`
+          `Incomplete check: declared corpus files missing in ${corpusDir} (ch1: ${fs.existsSync(ch1Path)}, ch3: ${fs.existsSync(ch3Path)}, pilot: ${fs.existsSync(pilotPath)})`
         );
       }
 
+      // Check actual historical pilot passages from pilot_v0.1_passages.json
+      const pilotCorpus = JSON.parse(fs.readFileSync(pilotPath, "utf8"));
+      const pilotGrams = new Set<string>();
+      for (const p of pilotCorpus.pilotCases) {
+        for (const g of getNormalized12Grams(p.passage + " " + p.task)) {
+          pilotGrams.add(g);
+        }
+      }
+
+      for (const fix of benchmarkV02.fixtures) {
+        const fixGrams = getNormalized12Grams(fix.passage);
+        for (const g of fixGrams) {
+          expect(pilotGrams.has(g)).toBe(false);
+        }
+      }
+
+      // Check declared Novella held-out chapters (Ch 1 & Ch 3)
       const ch1Grams = getNormalized12Grams(fs.readFileSync(ch1Path, "utf8"));
       const ch3Grams = getNormalized12Grams(fs.readFileSync(ch3Path, "utf8"));
 
@@ -216,6 +231,24 @@ describe("Editorial Review Engine v0.1 (The Thulans Benchmark)", () => {
           expect(ch3Grams.has(g)).toBe(false);
         }
       }
+    });
+
+    it("verifies pinned cryptographic SHA-256 hashes of declared corpus files", () => {
+      const corpusDir = path.resolve(__dirname, "../fixtures/corpus");
+      const computeFileHash = (p: string) => {
+        const buf = fs.readFileSync(p);
+        return require("crypto").createHash("sha256").update(buf).digest("hex");
+      };
+
+      expect(computeFileHash(path.join(corpusDir, "chapter_01.md"))).toBe(
+        "202b9b6ca01512c342325902d8b6ae488ede2a6116bf285b4ed48b3876c5432f"
+      );
+      expect(computeFileHash(path.join(corpusDir, "chapter_03.md"))).toBe(
+        "6f44a4252fb505eaead265d6e649710c8ba2706f02c50a141b7276c8043e697b"
+      );
+      expect(computeFileHash(path.join(corpusDir, "pilot_v0.1_passages.json"))).toBe(
+        "07f148ae912f78dc3018f075189be7faf58249f1dea66a04e7267c649b9fde41"
+      );
     });
   });
 
@@ -387,6 +420,38 @@ describe("Editorial Review Engine v0.1 (The Thulans Benchmark)", () => {
       expect(res.ok).toBe(false);
       if (!res.ok) {
         expect(res.error).toContain("context_inquiry must be null when decision is PROPOSE REVISION");
+      }
+    });
+
+    it("rejects responses missing required fields without silently repairing them", () => {
+      // Codex audit reproduction: omission of proposed_revision and context_inquiry must fail
+      const missingNulls = validateCandidateResponse({
+        decision: "RETAIN ORIGINAL",
+        rationale: "Keep it.",
+      });
+      expect(missingNulls.ok).toBe(false);
+      if (!missingNulls.ok) {
+        expect(missingNulls.error).toContain("Missing required schema field: 'proposed_revision'");
+      }
+
+      const missingContextInquiry = validateCandidateResponse({
+        decision: "RETAIN ORIGINAL",
+        rationale: "Keep it.",
+        proposed_revision: null,
+      });
+      expect(missingContextInquiry.ok).toBe(false);
+      if (!missingContextInquiry.ok) {
+        expect(missingContextInquiry.error).toContain("Missing required schema field: 'context_inquiry'");
+      }
+
+      const missingRationale = validateCandidateResponse({
+        decision: "RETAIN ORIGINAL",
+        proposed_revision: null,
+        context_inquiry: null,
+      });
+      expect(missingRationale.ok).toBe(false);
+      if (!missingRationale.ok) {
+        expect(missingRationale.error).toContain("Missing required schema field: 'rationale'");
       }
     });
 

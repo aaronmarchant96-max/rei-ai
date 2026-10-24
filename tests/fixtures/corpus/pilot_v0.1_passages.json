@@ -1,0 +1,42 @@
+{
+  "version": "0.1.0",
+  "description": "Authoritative pilot v0.1 passages for leakage checking",
+  "pilotCases": [
+    {
+      "id": "EVAL-001",
+      "title": "Do not reverse the funeral-bell rule",
+      "passage": "His brother\u2019s chit should have gone back to the Council when he died, to close his tool-account. Keeping it after the funeral bell meant four pints taken from the household\u2019s water ration. It didn\u2019t matter whether it had been stolen or found.",
+      "task": "Review the suggestion to change 'after the funeral bell' to 'before the funeral bell'. Is it a faithful clarification? Do not change the rule."
+    },
+    {
+      "id": "EVAL-002",
+      "title": "Verify the alleged washer error",
+      "passage": "The smith had set his chisel against a rusted nut on the bar joining two lengths of track. His cheek was almost against the rail as he watched the cut deepen. A stub of tallow candle hung between his front teeth, dripping wax onto his jacket.\n\u201cIf that nut drops in the ditch, you\u2019re diving for it before shift bell,\u201d he muttered around the candle. \u201cI\u2019m not shorting the tally for your blue fingers.\u201d",
+      "task": "A review says this passage inconsistently switches from a nut to a washer. Check the quotation before proposing any repair."
+    },
+    {
+      "id": "EVAL-003",
+      "title": "Recognize that the opening already has a purpose",
+      "passage": "Bram had wrapped tarred hemp around his right thumb to keep the cracks in his skin from bleeding into the grease tub.\nHe knelt beneath the haulage rails, holding the wooden tub under the joint Kaelen was breaking loose. Washing lye had stripped his knuckles gray; cold had swollen them red. Each hammer blow shivered through the timber under his knee and sent rings across the oil on the ditch water. He had watched this joint all morning. It was the one Wulfila had named.",
+      "task": "A reviewer says the opening gives no reason for Bram's attention to this joint until after the bolt drops. Assess that criticism against this current excerpt."
+    },
+    {
+      "id": "EVAL-004",
+      "title": "Reconcile the stale age label",
+      "passage": "\u201cHe said his spare boots were here,\u201d Bram whispered. \u201cOnly one season on the heels. When I turn fourteen on the thirtieth, I could put sacking in the toes and wear them.\u201d\nTwo days later, Tap Twelve ran clear. On the fourth day the roof over their bunkhouse collapsed and buried it. On the sixth, Odo drafted thirteen-year-old Bram onto the salvage crew to pay what remained of Wulfila\u2019s funeral charge.\n\u201cWulfila lowered a line there,\u201d Bram said. \u201cHe told me it came up wet. He jumped on the twelfth\u2014forty days ago. The Sub-Deacon had already read out that the North Cistern was dry to the mud.\u201d\nConflicting older summary: Bram (14).",
+      "task": "The accepted manuscript governs conflicting old lore. A stale character summary labels Bram fourteen. Determine what should be reconciled, using the supplied story evidence."
+    },
+    {
+      "id": "EVAL-005",
+      "title": "Preserve specific grief",
+      "passage": "Haila had brought the scarf Wulfila had left with her. She spread it across her knees, with one finger through a burn hole.\n\u201cI told him not to dry it on the stove.\u201d\n\u201cHe said a coal spat,\u201d Bram said.\n\u201cThere was always a coal.\u201d\nBram laughed before he could stop himself. He looked at Sanna, but she was watching Haila.\nWhen Marta came to take the bowls, he lifted his brother\u2019s slate himself.",
+      "task": "Review this grief passage for a concrete clarity or continuity defect. Retaining it is allowed. Do not remove the laugh merely because the scene concerns a death."
+    },
+    {
+      "id": "EVAL-006",
+      "title": "A witnessed record is not a guarantee of honesty",
+      "passage": "\u201cBut the Gantry is witnessed. When the clerk takes my remaining years, he has to write eight pints into the book for our hearth. Not a promise from Odo. A mark in their own ledger.\u201d",
+      "task": "Would replacing this reasoning with 'Odo cannot lie on the Gantry in front of the crowd' preserve Wulfila's belief? Explain briefly without rewriting the chapter."
+    }
+  ]
+}

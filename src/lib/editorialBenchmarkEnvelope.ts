@@ -93,13 +93,24 @@ export function validateCandidateResponse(raw: unknown): ValidationResult {
 
   const obj = raw as Record<string, unknown>;
 
+  // Require all four canonical fields to be explicitly present in the object
+  const requiredFields = ["decision", "rationale", "proposed_revision", "context_inquiry"];
+  for (const field of requiredFields) {
+    if (!(field in obj)) {
+      return {
+        ok: false,
+        error: `Missing required schema field: '${field}'. All four fields (decision, rationale, proposed_revision, context_inquiry) must be explicitly provided.`,
+      };
+    }
+  }
+
   const validDecisions: BenchmarkDecision[] = [
     "RETAIN ORIGINAL",
     "PROPOSE REVISION",
     "NEED MORE CONTEXT",
   ];
 
-  if (!obj.decision || typeof obj.decision !== "string" || !validDecisions.includes(obj.decision as BenchmarkDecision)) {
+  if (typeof obj.decision !== "string" || !validDecisions.includes(obj.decision as BenchmarkDecision)) {
     return {
       ok: false,
       error: `Invalid decision: expected one of ${validDecisions.join(", ")}, got ${String(obj.decision)}`,
@@ -117,17 +128,17 @@ export function validateCandidateResponse(raw: unknown): ValidationResult {
   let context_inquiry: string | null = null;
 
   if (decision === "RETAIN ORIGINAL") {
-    if (obj.proposed_revision !== null && obj.proposed_revision !== undefined) {
+    if (obj.proposed_revision !== null) {
       return { ok: false, error: "proposed_revision must be null when decision is RETAIN ORIGINAL." };
     }
-    if (obj.context_inquiry !== null && obj.context_inquiry !== undefined) {
+    if (obj.context_inquiry !== null) {
       return { ok: false, error: "context_inquiry must be null when decision is RETAIN ORIGINAL." };
     }
   } else if (decision === "PROPOSE REVISION") {
     if (typeof obj.proposed_revision !== "string" || obj.proposed_revision.trim().length === 0) {
       return { ok: false, error: "proposed_revision must be a non-empty string when decision is PROPOSE REVISION." };
     }
-    if (obj.context_inquiry !== null && obj.context_inquiry !== undefined) {
+    if (obj.context_inquiry !== null) {
       return { ok: false, error: "context_inquiry must be null when decision is PROPOSE REVISION." };
     }
     proposed_revision = obj.proposed_revision.trim();
@@ -135,7 +146,7 @@ export function validateCandidateResponse(raw: unknown): ValidationResult {
     if (typeof obj.context_inquiry !== "string" || obj.context_inquiry.trim().length === 0) {
       return { ok: false, error: "context_inquiry must be a non-empty string when decision is NEED MORE CONTEXT." };
     }
-    if (obj.proposed_revision !== null && obj.proposed_revision !== undefined) {
+    if (obj.proposed_revision !== null) {
       return { ok: false, error: "proposed_revision must be null when decision is NEED MORE CONTEXT." };
     }
     context_inquiry = obj.context_inquiry.trim();
